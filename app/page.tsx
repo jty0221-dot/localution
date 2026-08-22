@@ -6,6 +6,7 @@ import Link from 'next/link'
 import Footer from './components/Footer'
 import TopNav from './components/TopNav'
 import HarangMarketingPopup from './components/HarangMarketingPopup'
+import ProductPreview from './components/landing/ProductPreview'
 import {
  MessageCircle, QrCode, Users, FileText, Sparkles,
  Coffee, UtensilsCrossed, Dumbbell,
@@ -149,29 +150,37 @@ const FEATURES = [
 ]
 
 // ─────────────────────────────────────────────────────────────
-// 메인 랜딩 STATS — 베이스라인 + 날짜 기반 자동 증가
-// 매일 deterministic하게 1~3씩 증가 (요일별 변동 포함, 서버/클라 일관)
-// 추후 /api/landing-stats 연동 시 실 가입자 수가 베이스라인에 더해짐
+// 메인 랜딩 STATS
+//
+// 2026-08-19 정정:
+//   이전 구현은 출시일 기준 경과일에 비례해 "누적 사장님" 수를
+//   매일 1~3명씩 자동으로 늘렸다 (days * 1.4 + days % 7).
+//   '예시' 배지를 달아두긴 했지만, 방문할 때마다 숫자가 커지는 것은
+//   실제 성장을 흉내 내는 연출이라 배지가 있어도 오해를 만든다.
+//   또한 표시광고법상 거짓·과장 표시 소지가 있다.
+//
+//   → 자동 증가를 제거하고, 실제 데이터가 붙기 전까지는
+//     '수치' 대신 '제품이 무엇을 해주는지'를 보여주는 값으로 대체한다.
+//     /api/landing-stats 가 실제 값을 반환하면 그것으로 교체된다.
 // ─────────────────────────────────────────────────────────────
-const LAUNCH_DATE = new Date('2026-01-01').getTime()
-const BASE_OWNERS = 412 // 베이스라인 사장님 수 (출시 시점 시드)
-const BASE_REPLIES = 52340 // 베이스라인 AI 답글 누적
 
-// 출시 후 경과일 기준 deterministic 누적 계산
-// (클라/SSR 동일 결과 — 같은 날짜면 같은 값, 자정 지나면 +1~3 증가)
+/**
+ * 실데이터 연동 전 표시할 값.
+ * 시간이 지나도 변하지 않는다 — 성장 연출을 하지 않기 위함.
+ * 전부 "제품 사양"이라 사실이고, 사용자 수를 지어내지 않는다.
+ */
 function computeStats(extraOwners = 0, extraReplies = 0) {
- const days = Math.max(0, Math.floor((Date.now() - LAUNCH_DATE) / 86400000))
- const owners = BASE_OWNERS + Math.floor(days * 1.4) + (days % 7) + extraOwners
- const replies = BASE_REPLIES + (days * 180) + (owners - BASE_OWNERS) * 130 + extraReplies
+ void extraOwners
+ void extraReplies
  return [
- { num: owners.toLocaleString() + '+', label: '누적 사장님' },
- { num: Math.floor(replies / 10000) + '만+', label: 'AI 답글 누적' },
- { num: '+0.6점', label: '평균 별점 상승' },
- { num: '3배', label: '리뷰 수집 속도' },
+ { num: '6곳', label: '연결 가능 플랫폼' },
+ { num: '4종', label: 'AI 답글 말투' },
+ { num: '24시간', label: '자동 수집 주기' },
+ { num: '3분', label: '매장 연결 소요' },
  ]
 }
 
-// SSR 초기 값 (베이스라인) — 클라에서 useEffect로 실제 날짜 반영
+// SSR 초기 값 — 클라에서 /api/landing-stats 응답이 오면 교체
 const STATS_DEMO = computeStats(0, 0)
 
 const HERO_DEMO = {
@@ -348,11 +357,8 @@ export default function LandingPage() {
  setIsLoggedIn(hasCookie)
  }, [])
 
- // 마운트 직후: 현재 날짜 기준 deterministic stats 즉시 갱신 (매일 자동 증가)
- // 이후 /api/landing-stats 응답이 오면 실 가입자 수 반영하여 다시 갱신됨
- useEffect(() => {
- setStats(computeStats(0, 0))
- }, [])
+ // 2026-08-19: 날짜 기반 자동 증가를 제거했으므로 마운트 시 재계산할 이유가 없다.
+ // (STATS_DEMO 가 이미 같은 값이고, 실데이터는 아래 /api/landing-stats 가 채운다)
 
  useEffect(() => {
  let cancelled = false
@@ -596,6 +602,13 @@ export default function LandingPage() {
  </Link>
  </div>
  <p className="text-xs text-[#8B95A1] mt-4">회원가입 없이 진단 가능 · 신용카드 불필요 · 월 단위 결제</p>
+
+ {/* ── 제품 미리보기 ──
+      랜딩에 제품 화면이 하나도 없어 "무엇을 사는지" 보이지 않던 문제 해결.
+      가짜 스크린샷 대신 실제 UI 를 HTML 로 재현 — 항상 정확하고 선명하다. */}
+ <div className="mt-14 md:mt-16">
+ <ProductPreview />
+ </div>
  </div>
  </section>
 
