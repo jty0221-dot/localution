@@ -7,6 +7,7 @@ import Footer from './components/Footer'
 import TopNav from './components/TopNav'
 import HarangMarketingPopup from './components/HarangMarketingPopup'
 import ProductPreview from './components/landing/ProductPreview'
+import HeroVideo from './components/landing/HeroVideo'
 import {
  MessageCircle, QrCode, Users, FileText, Sparkles,
  Coffee, UtensilsCrossed, Dumbbell,
@@ -503,20 +504,18 @@ export default function LandingPage() {
  <TopNav />
 
  {/* ── 히어로 ── */}
- <section className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 bg-gradient-to-b from-[#EFF6FF] to-white relative overflow-hidden">
- {/* SVG 배경 dot grid */}
- <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.35]" aria-hidden="true">
- <defs>
- <pattern id="dot-grid" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
- <circle cx="1.5" cy="1.5" r="1.5" fill="#3182F6" />
- </pattern>
- </defs>
- <rect width="100%" height="100%" fill="url(#dot-grid)" />
- </svg>
- {/* SVG 오른쪽 상단 블러 원 */}
- <svg className="absolute -top-32 -right-32 opacity-20 pointer-events-none" width="420" height="420" aria-hidden="true">
- <circle cx="210" cy="210" r="210" fill="#3182F6" />
- </svg>
+ <section className="pt-28 md:pt-36 pb-20 md:pb-24 px-4 bg-gradient-to-b from-[#F5F8FF] to-white relative overflow-hidden">
+ {/* 배경 영상 — 데스크톱 · 동작 줄이기 해제 · 데이터 절약 꺼짐일 때만 재생.
+      영상이 없거나 실패하면 조용히 사라지고 아래 그라데이션만 남는다. */}
+ <HeroVideo />
+
+ {/* 은은한 광원 — 영상이 없을 때도 히어로가 밋밋하지 않도록 */}
+ <div
+ className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[720px] rounded-full pointer-events-none opacity-[0.07] blur-3xl"
+ style={{ background: '#3182F6' }}
+ aria-hidden="true"
+ />
+
  <div className="max-w-4xl mx-auto text-center relative z-10">
  <div className="flex flex-wrap justify-center gap-2 mb-6">
  <Link href="/updates" className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-blue-200 transition-colors">
@@ -527,11 +526,12 @@ export default function LandingPage() {
  <Sparkles size={12} strokeWidth={2.5} /> 5월 신기능 6개 보기
  </Link>
  </div>
- <h1 className="text-4xl md:text-6xl font-black text-[#191F28] leading-tight mb-6">
+ {/* 원티드식 타이포 — 더 크게, 자간·행간은 더 좁게, 장식 없이 */}
+ <h1 className="text-[38px] leading-[1.15] md:text-[64px] md:leading-[1.1] font-black text-[#191F28] tracking-[-0.02em] mb-6">
  필요한 것만 골라쓰는<br />
  <span className="text-[#3182F6]">사장님 마케팅 플랫폼</span>
  </h1>
- <p className="text-base md:text-xl text-[#4E5968] mb-8 max-w-2xl mx-auto leading-relaxed text-left sm:text-center">
+ <p className="text-[15px] md:text-xl text-[#4E5968] mb-10 max-w-2xl mx-auto leading-relaxed text-left sm:text-center">
  리뷰·QR·블로그·플레이스·CRM — 12개 모듈 중<br className="hidden md:block" />
  내 매장에 필요한 것만 선택. 3개 묶으면 10% 할인.
  </p>
