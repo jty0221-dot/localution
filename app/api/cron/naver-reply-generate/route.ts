@@ -16,7 +16,8 @@ export const maxDuration = 300
 
 function isCronAuthorized(req: Request): boolean {
  const secret = process.env.CRON_SECRET
- if (!secret) return true
+ // 시크릿 미설정은 '인증 통과'가 아니라 '설정 오류'다 · fail-closed (SEC-002)
+ if (!secret) return false
  const auth = req.headers.get('authorization') || ''
  return auth === `Bearer ${secret}`
 }

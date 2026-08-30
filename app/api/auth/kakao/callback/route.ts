@@ -7,7 +7,9 @@
 // · 실패: returnTo?connected=error&reason=... 로 302
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
+import { cookies } from 'next/headers'
 import { createServiceClient } from '@/app/lib/adminAuth'
+import { requireUser } from '@/app/lib/userAuth'
 import {
  exchangeCodeForToken,
  fetchKakaoMe,
@@ -16,13 +18,27 @@ import {
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-function decodeState(state: string): { uid?: string; returnTo?: string } {
+const DEFAULT_RETURN_TO = '/marketing/blog-tracking'
+// route.ts 는 정해진 것만 export 할 수 있어 상수는 start 와 각각 선언한다 (값이 같아야 한다)
+const STATE_COOKIE = 'kakao_connect_state'
+
+function decodeState(state: string): { uid?: string; returnTo?: string; nonce?: string } {
  try {
  const json = Buffer.from(state, 'base64url').toString('utf-8')
  return JSON.parse(json)
  } catch {
  return {}
  }
+}
+
+// SEC-001 · returnTo 는 같은 출처 상대경로만 허용한다.
+// state 가 위조 가능하므로 여기서 거르지 않으면 new URL(returnTo, origin) 이 외부로 나간다.
+function safeReturnTo(raw: string | null | undefined): string {
+ const v = (raw || '').trim()
+ if (!v.startsWith('/')) return DEFAULT_RETURN_TO
+ if (v.startsWith('//')) return DEFAULT_RETURN_TO
+ if (v.includes('\\')) return DEFAULT_RETURN_TO
+ return v
 }
 
 function errRedirect(req: NextRequest, returnTo: string, reason: string) {
@@ -37,8 +53,8 @@ export async function GET(req: NextRequest) {
  const error = req.nextUrl.searchParams.get('error')
  const state = req.nextUrl.searchParams.get('state') || ''
 
- const { uid, returnTo: rt } = decodeState(state)
- const returnTo = rt || '/marketing/blog-tracking'
+ const { uid, returnTo: rt, nonce } = decodeState(state)
+ const returnTo = safeReturnTo(rt)
 
  if (error) {
  return errRedirect(req, returnTo, `kakao_${error}`)
@@ -48,6 +64,22 @@ export async function GET(req: NextRequest) {
  }
  if (!uid) {
  return errRedirect(req, returnTo, 'missing_state')
+ }
+
+ // SEC-001 (1) nonce 대조 — start 가 심은 HttpOnly 쿠키와 같아야 한다.
+ // 이게 없으면 공격자가 state 를 통째로 만들어 보낼 수 있다 (로그인 CSRF).
+ const cookieStore = await cookies()
+ const storedNonce = cookieStore.get(STATE_COOKIE)?.value
+ if (!nonce || !storedNonce || storedNonce !== nonce) {
+ return errRedirect(req, returnTo, 'state_mismatch')
+ }
+ cookieStore.delete(STATE_COOKIE)
+
+ // SEC-001 (2) uid 는 state 를 믿지 않고 현재 로그인 세션에서 확인한다.
+ // state 의 uid 를 그대로 쓰면 남의 계정에 공격자 카카오 토큰이 붙는다 (계정 연결 탈취).
+ const auth = await requireUser()
+ if (!auth.ok || auth.userId !== uid) {
+ return errRedirect(req, returnTo, 'session_mismatch')
  }
 
  try {
