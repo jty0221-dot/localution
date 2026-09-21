@@ -36,7 +36,7 @@ export default function KeywordsPage() {
         <PageHeader
           icon={<TrendingUp size={24} className="text-white" strokeWidth={2.5} />}
           title="리뷰 키워드 트렌드"
-          subtitle="자주 등장하는 단어 — 강점과 개선점 한눈에"
+          subtitle="자주 등장하는 단어 · 강점과 개선점 한눈에"
           variant="emerald"
         />
 

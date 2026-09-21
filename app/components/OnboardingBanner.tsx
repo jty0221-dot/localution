@@ -59,7 +59,7 @@ export default function OnboardingBanner() {
  <Rocket size={18} className="text-white" strokeWidth={2.5} />
  </div>
  <div className="min-w-0">
- <p className="text-sm font-bold truncate">시작 전 매장 정보 등록 — 1번이면 모든 기능 이용 가능</p>
+ <p className="text-sm font-bold truncate">시작 전 매장 정보 등록 · 1번이면 모든 기능 이용 가능</p>
  <p className="text-[11px] opacity-90 truncate hidden sm:block">
  네이버 플레이스 연결하면 매장 정보 자동 채움 + 답글 자동등록 + QR 리뷰 + 알림 모두 작동
  </p>

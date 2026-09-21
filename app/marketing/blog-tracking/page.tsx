@@ -105,8 +105,8 @@ function rankBadgeStyle(rank: number | null): { label: string; cls: string; desc
  cls: 'bg-[#F2F4F6] text-[#8B95A1] border-[#E5E8EB]',
  desc: '아직 인기글에 잡히지 않음',
  }
- if (rank <= 3) return { label: `${rank}위`, cls: 'bg-[#03C75A] text-white border-[#03C75A]', desc: 'TOP3 — 최상위' }
- if (rank <= 10) return { label: `${rank}위`, cls: 'bg-[#E8F6EA] text-[#03C75A] border-[#C7E9CE]', desc: 'TOP10 — 상위권' }
+ if (rank <= 3) return { label: `${rank}위`, cls: 'bg-[#03C75A] text-white border-[#03C75A]', desc: 'TOP3 · 최상위' }
+ if (rank <= 10) return { label: `${rank}위`, cls: 'bg-[#E8F6EA] text-[#03C75A] border-[#C7E9CE]', desc: 'TOP10 · 상위권' }
  if (rank <= 30) return { label: `${rank}위`, cls: 'bg-[#E8F1FE] text-[#3182F6] border-[#CFDFFC]', desc: '중상위' }
  return { label: `${rank}위`, cls: 'bg-[#FEF9E8] text-[#F5A623] border-[#FCEBC0]', desc: '중하위' }
 }
@@ -221,7 +221,7 @@ export default function BlogTrackingPage() {
  return
  }
  if (!/blog\.naver\.com\/[^/]+\/\d+/.test(fUrl)) {
- setError('URL 형식 오류 — blog.naver.com/{blogId}/{postId} 형태여야 합니다.')
+ setError('URL 형식 오류 · blog.naver.com/{blogId}/{postId} 형태여야 합니다.')
  return
  }
  setSubmitting(true)
@@ -598,7 +598,7 @@ export default function BlogTrackingPage() {
  required
  />
  <p className="text-[11px] text-[#8B95A1] mt-1">
- 네이버 블로그 글 주소 — blog.naver.com/아이디/글번호 형태
+ 네이버 블로그 글 주소 · blog.naver.com/아이디/글번호 형태
  </p>
  </div>
  <div className="mb-4">
@@ -943,7 +943,7 @@ function BlockHitsSummary({
  >
  <span className="truncate max-w-[140px]">{b.block_title}</span>
  <span className={hit ? 'font-black' : ''}>
- {hit ? `${b.my_rank}위` : '—'}
+ {hit ? `${b.my_rank}위` : '-'}
  </span>
  </span>
  )
@@ -959,7 +959,7 @@ function BlockHitsSummary({
  >
  블로그탭
  <span className={blogTab.my_rank !== null ? 'font-black' : ''}>
- {blogTab.my_rank !== null ? `${blogTab.my_rank}위` : '—'}
+ {blogTab.my_rank !== null ? `${blogTab.my_rank}위` : '-'}
  </span>
  </span>
  )}

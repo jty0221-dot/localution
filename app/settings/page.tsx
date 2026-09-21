@@ -10,7 +10,7 @@ import CreatorChannelsSection from '../components/CreatorChannelsSection'
 import AutoReplySettings from '../components/AutoReplySettings'
 import { useConnections, PlatformId } from '../lib/connections'
 import { TABS, TAB_HERO, resolveTab, type Tab } from '../lib/settings-tabs'
-import { Store, Bell, Bot, Link2, CreditCard } from 'lucide-react'
+import { Store, Bell, Bot, Link2, CreditCard, Check, X } from 'lucide-react'
 
 // settings-tabs.ts 의 icon 키 → lucide 컴포넌트 매핑 (이모지 제거 후 통일)
 const TAB_HERO_ICONS = { Store, Bell, Bot, Link2, CreditCard } as const
@@ -34,13 +34,13 @@ const FEATURES: Array<{
 }> = [
  // ── 사장님: 운영 자동화 ──
  { id: 'ai-review', name: 'AI 리뷰 자동 답글', price: 0, short: 'AI', bg: '#EFF6FF', color: '#3182F6',
- desc: '네이버·배민·쿠팡이츠·요기요·카카오 통합 — AI 분석·자동 답글 (말투 4종)', category: '사장님', popular: true },
+ desc: '네이버·배민·쿠팡이츠·요기요·카카오 통합 · AI 분석·자동 답글 (말투 4종)', category: '사장님', popular: true },
  { id: 'review-alert', name: '부정 리뷰 알림', price: 0, short: '알림', bg: '#FFFBEB', color: '#F59E0B',
  desc: '15분 자동 수집 · 별점 1~2점 우선 알림 (웹푸시 + 카카오톡)', category: '사장님', popular: true },
  { id: 'multi-store', name: '다중 매장 관리', price: 0, short: '매장', bg: '#FFF7ED', color: '#F97316',
  desc: '한 사장님이 여러 매장 운영 시 매장별 리뷰·답글 자동 분리', category: '사장님' },
  { id: 'qr-stamp', name: 'QR 리뷰·스탬프', price: 0, short: 'QR', bg: '#ECFDF5', color: '#00C471',
- desc: '디지털 스탬프 + 메뉴 QR + 리뷰 QR — 재방문율 향상', category: '사장님' },
+ desc: '디지털 스탬프 + 메뉴 QR + 리뷰 QR · 재방문율 향상', category: '사장님' },
  { id: 'crm', name: 'CRM 고객관리', price: 0, short: 'CRM', bg: '#EEF2FF', color: '#6366F1',
  desc: 'VIP·단골·블랙리스트 자동 분류 + 단체 메시지·예약 발송', category: '사장님', popular: true },
  { id: 'accounting', name: '정산·매출 캘린더', price: 0, short: '정산', bg: '#FFF7ED', color: '#FF8C00',
@@ -52,7 +52,7 @@ const FEATURES: Array<{
  { id: 'blog-ai', name: 'AI 블로그 글 작성', price: 0, short: '블로그', bg: '#FDF2F8', color: '#EC4899',
  desc: 'SEO 최적화 블로그 초안 + 블로그 지수 조회·분석', category: '마케터' },
  { id: 'shortform', name: '숏폼 퍼블리셔', price: 0, short: '숏폼', bg: '#FEF2F2', color: '#EF4444',
- desc: '틱톡·쇼츠·릴스·클립 — 1개 영상 4개 플랫폼 자동 발행', category: '마케터' },
+ desc: '틱톡·쇼츠·릴스·클립 · 1개 영상 4개 플랫폼 자동 발행', category: '마케터' },
  { id: 'threads', name: 'Threads · 유튜브 발행', price: 0, short: 'Threads', bg: '#F0F9FF', color: '#0EA5E9',
  desc: 'Threads + 유튜브 커뮤니티 동시 발행 + 예약 스케줄', category: '마케터' },
 
@@ -335,7 +335,7 @@ function StoreTab() {
  }
  if (data._mock) {
  setIsMock(true)
- setSyncError('검색 API 키 미설정 — 네이버 플레이스 URL 로 입력하시면 바로 연동됩니다')
+ setSyncError('검색 API 키 미설정 · 네이버 플레이스 URL 로 입력하시면 바로 연동됩니다')
  }
  if (data.items.length === 1) {
  applyPlace(data.items[0])
@@ -475,7 +475,7 @@ function StoreTab() {
  {showResults && searchResults.length > 0 && (
  <div className="mt-3 bg-white rounded-xl border border-[#BFDBFE] overflow-hidden shadow-md">
  <p className="text-xs font-bold text-[#8B95A1] px-4 py-2 border-b border-[#F2F4F6]">
- 검색 결과 {searchResults.length}개 — 해당하는 매장을 선택해주세요
+ 검색 결과 {searchResults.length}개 · 해당하는 매장을 선택해주세요
  </p>
  {searchResults.map((place, i) => (
  <button key={i} onClick={() => applyPlace(place)} className="w-full text-left px-4 py-3 hover:bg-[#EFF6FF] transition-colors border-b border-[#F2F4F6] last:border-0">
@@ -773,9 +773,9 @@ function NotifyTab() {
  body: JSON.stringify(partial),
  })
  const j = await res.json()
- if (!j?.ok) toast(j?.error || '저장 실패')
+ if (!j?.ok) toast.error(j?.error || '저장 실패')
  } catch (e: any) {
- toast(e?.message || '저장 실패')
+ toast.error(e?.message || '저장 실패')
  } finally {
  setSaving(false)
  }
@@ -812,13 +812,13 @@ function NotifyTab() {
  setPushPermission(perm as any)
  if (perm !== 'granted') {
  setPushResult(perm === 'denied'
- ? '알림 권한이 거부됨 — 브라우저 주소창 옆 자물쇠 → 알림 → 허용으로 변경'
+ ? '알림 권한이 거부됨 · 브라우저 주소창 옆 자물쇠 → 알림 → 허용으로 변경'
  : '알림 권한이 default 상태 (허용 안 누름)')
  return
  }
 
  // 3) Service Worker 등록
- const reg = await navigator.serviceWorker.register('/sw-push.js')
+ const reg = await navigator.serviceWorker.register('/sw.js')
  await navigator.serviceWorker.ready
  console.log('[push-enable] sw registered')
 
@@ -826,7 +826,7 @@ function NotifyTab() {
  const vRes = await fetch('/api/notify/vapid-public').then(r => r.json())
  console.log('[push-enable] vapid response', vRes)
  if (!vRes?.ok || !vRes.publicKey) {
- setPushResult(`VAPID 키 미설정 — Vercel 환경변수 (VAPID_PUBLIC_KEY, NEXT_PUBLIC_VAPID_PUBLIC_KEY 등 4개) 추가 후 Redeploy 필요. (서버 응답: ${JSON.stringify(vRes).slice(0,100)})`)
+ setPushResult(`VAPID 키 미설정 · Vercel 환경변수 (VAPID_PUBLIC_KEY, NEXT_PUBLIC_VAPID_PUBLIC_KEY 등 4개) 추가 후 Redeploy 필요. (서버 응답: ${JSON.stringify(vRes).slice(0,100)})`)
  return
  }
 
@@ -848,7 +848,7 @@ function NotifyTab() {
  console.log('[push-enable] save response', saveJ)
  if (saveJ?.ok) {
  setPrefs(p => ({ ...p, channel_web_push: true, has_web_push_sub: true }))
- setPushResult('브라우저 알림 켜짐 — 테스트 발송 버튼으로 확인해보세요')
+ setPushResult('브라우저 알림 켜짐 · 테스트 발송 버튼으로 확인해보세요')
  } else {
  setPushResult(`저장 실패: ${saveJ?.error || 'unknown'}`)
  }
@@ -863,15 +863,15 @@ function NotifyTab() {
  async function disableWebPush() {
  try {
  if ('serviceWorker' in navigator) {
- const reg = await navigator.serviceWorker.getRegistration('/sw-push.js')
+ const reg = await navigator.serviceWorker.getRegistration('/sw.js')
  const sub = await reg?.pushManager.getSubscription()
  if (sub) await sub.unsubscribe()
  }
  await fetch('/api/notify/web-push-subscribe', { method: 'DELETE' })
  setPrefs(p => ({ ...p, channel_web_push: false, has_web_push_sub: false }))
- toast('알림이 꺼졌어요')
+ toast.success('알림이 꺼졌어요')
  } catch (e: any) {
- toast(e?.message || '알림 해제 실패')
+ toast.error(e?.message || '알림 해제 실패')
  }
  }
 
@@ -948,8 +948,8 @@ function NotifyTab() {
  {prefs.low_rating_threshold === 0 && '강제 알림 거의 받지 않음 (별점 0점 이하 리뷰는 사실상 없음)'}
  {prefs.low_rating_threshold === 1 && '1점 짜리 리뷰만 강제 알림'}
  {prefs.low_rating_threshold === 2 && '2점 이하 리뷰 강제 알림'}
- {prefs.low_rating_threshold === 3 && '3점 이하 — 사장님 신경써야 할 리뷰'}
- {prefs.low_rating_threshold === 4 && '4점 이하 — 거의 모든 리뷰 알림'}
+ {prefs.low_rating_threshold === 3 && '3점 이하 · 사장님 신경써야 할 리뷰'}
+ {prefs.low_rating_threshold === 4 && '4점 이하 · 거의 모든 리뷰 알림'}
  {prefs.low_rating_threshold === 5 && '모든 리뷰가 강제 알림 (위 토글과 동일 효과)'}
  </p>
  </div>
@@ -1028,7 +1028,7 @@ function NotifyTab() {
  <p className="text-[11px] text-[#8B95A1] mt-1">카카오 로그인 + 알림 동의 1회만 하면 됩니다 (무료)</p>
  )}
  {kakaoConnected && (
- <p className="text-[11px] text-[#059669] mt-1">✓ 카카오 연결됨 — 알림 받을 준비 완료</p>
+ <p className="text-[11px] text-[#059669] mt-1 inline-flex items-center gap-1"><Check size={12} strokeWidth={3} />카카오 연결됨 · 알림 받을 준비 완료</p>
  )}
  </div>
 
@@ -1126,7 +1126,7 @@ function AITab() {
  const data = await res.json()
  setTestResult(data.reply || '답변 생성 실패')
  } catch {
- setTestResult('API 연결 오류 — 연동 관리에서 설정을 확인하세요.')
+ setTestResult('API 연결 오류 · 연동 관리에서 설정을 확인하세요.')
  } finally {
  setTesting(false)
  }
@@ -1229,7 +1229,7 @@ function AITab() {
  )
  })}
  {INDUSTRY_LABELS.filter(l => l.toLowerCase().includes(industrySearch.toLowerCase())).length === 0 && (
- <span className="text-[11px] text-[#8B95A1] py-1">검색 결과 없음 — 아래 매장 소개에 자유롭게 입력하세요</span>
+ <span className="text-[11px] text-[#8B95A1] py-1">검색 결과 없음 · 아래 매장 소개에 자유롭게 입력하세요</span>
  )}
  </div>
  )}
@@ -1360,7 +1360,7 @@ function AITab() {
  <input id="excludes" value={excludes} onChange={e => setExcludes(e.target.value)}
  placeholder="예: 죄송, 유감, 어떠셨나요"
  className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
- <p className="text-[10px] text-[#8B95A1] mt-1">쉼표로 구분 — AI가 절대 사용하지 않을 표현</p>
+ <p className="text-[10px] text-[#8B95A1] mt-1">쉼표로 구분 · AI가 절대 사용하지 않을 표현</p>
  </div>
  </div>
 
@@ -1375,7 +1375,7 @@ function AITab() {
  </div>
  {autoReply && (
  <div className="mt-4 p-3 bg-blue-50 rounded-xl text-xs text-[#3182F6] font-medium">
- 자동 답변 ON — 연동된 플랫폼에 리뷰가 등록되면 즉시 답변이 달립니다
+ 자동 답변 ON · 연동된 플랫폼에 리뷰가 등록되면 즉시 답변이 달립니다
  </div>
  )}
  </div>
@@ -1640,7 +1640,7 @@ function ConnectTab() {
  <>
  <div className="bg-[#F9FAFB] rounded-lg px-2.5 py-2 mb-2.5 min-h-[44px]">
  <p className="text-[11px] text-[#8B95A1] mb-0.5">{sv?.connected ? '서버 저장' : '연결된 계정'}</p>
- <p className="text-xs font-semibold text-[#191F28] truncate">{sv?.storeName || c?.externalName || '—'}</p>
+ <p className="text-xs font-semibold text-[#191F28] truncate">{sv?.storeName || c?.externalName || '-'}</p>
  {sv?.accountMasked && (
  <p className="text-[10px] text-[#8B95A1] truncate mt-0.5">ID: {sv.accountMasked}</p>
  )}
@@ -1850,7 +1850,7 @@ function PlanTab() {
  </div>
  <div className="text-right">
  <p className="text-xs text-[#8B95A1]">다음 결제일</p>
- <p className="text-sm font-semibold text-[#191F28] mt-0.5">—</p>
+ <p className="text-sm font-semibold text-[#191F28] mt-0.5">-</p>
  <p className="text-[10px] text-[#B0B8C1] mt-0.5">베타 기간 무료</p>
  </div>
  </div>
@@ -1861,7 +1861,7 @@ function PlanTab() {
  </div>
  )}
  <div className="bg-blue-50 rounded-xl p-3 mb-4 text-xs text-[#3182F6] leading-relaxed">
- <p className="font-semibold mb-0.5">베타 오픈 기념 — 전 기능 무료 이용 중</p>
+ <p className="font-semibold mb-0.5">베타 오픈 기념 · 전 기능 무료 이용 중</p>
  <p className="text-[#4E5968]">정식 요금제 안내는 <Link href="/pricing" className="underline font-semibold text-[#3182F6]">요금제 페이지</Link>에서 미리 확인하실 수 있어요. 금액은 임시이며, 베타 종료 전 사전 공지드립니다.</p>
  </div>
  <div className="flex items-center justify-between border-t border-[#F2F4F6] pt-4">
@@ -1968,15 +1968,15 @@ function PlanTab() {
  </div>
  <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-xs text-green-800 space-y-1">
  <p className="font-semibold flex items-center gap-1">결제 키 보안 토큰화 적용됨</p>
- <p>· 시크릿 키 (TOSS_SECRET_KEY) — Vercel 환경변수에서만 사용</p>
- <p>· 빌링 키 (billing_key) — DB(billing_methods) 서버 측 보관, 클라이언트 미노출</p>
- <p>· 카드 정보 — 마스킹 표시(****) 만 클라이언트 노출</p>
- <p>· customer_key — 사용자 ID 기반 deterministic 자동 생성</p>
+ <p>· 시크릿 키 (TOSS_SECRET_KEY) · Vercel 환경변수에서만 사용</p>
+ <p>· 빌링 키 (billing_key) · DB(billing_methods) 서버 측 보관, 클라이언트 미노출</p>
+ <p>· 카드 정보 · 마스킹 표시(****) 만 클라이언트 노출</p>
+ <p>· customer_key · 사용자 ID 기반 deterministic 자동 생성</p>
  </div>
  <div className="p-3 bg-blue-50 rounded-xl text-xs text-[#3182F6] space-y-1">
  <p className="font-semibold">Vercel 환경변수 체크리스트</p>
- <p>1. <span className="font-mono">NEXT_PUBLIC_TOSS_CLIENT_KEY</span> (클라이언트 키 — 공개 가능)</p>
- <p>2. <span className="font-mono">TOSS_SECRET_KEY</span> (시크릿 키 — 서버 전용)</p>
+ <p>1. <span className="font-mono">NEXT_PUBLIC_TOSS_CLIENT_KEY</span> (클라이언트 키 · 공개 가능)</p>
+ <p>2. <span className="font-mono">TOSS_SECRET_KEY</span> (시크릿 키 · 서버 전용)</p>
  <p>3. 콜백: <span className="font-mono">/api/payments/billing/success</span> · <span className="font-mono">/fail</span></p>
  <p>4. 웹훅: <span className="font-mono">/api/payments/webhook</span></p>
  </div>
@@ -2003,7 +2003,7 @@ function PlanTab() {
  </div>
  <div className="flex items-center gap-1.5 flex-shrink-0">
  <span className="text-xs text-[#00C471] font-semibold">무료</span>
- <button onClick={() => removeFromCart(f.id)} className="text-[#B0B8C1] hover:text-red-400 text-xs">✕</button>
+ <button onClick={() => removeFromCart(f.id)} className="text-[#B0B8C1] hover:text-red-400"><X size={14} strokeWidth={2.5} /></button>
  </div>
  </div>
  ))}
@@ -2011,7 +2011,7 @@ function PlanTab() {
  <div className="border-t border-[#F2F4F6] pt-3 mb-3 space-y-1.5">
  <div className="flex justify-between text-xs text-[#8B95A1]">
  <span>정식 요금 예상(임시)</span>
- <span className="line-through">—</span>
+ <span className="line-through">-</span>
  </div>
  <div className="flex justify-between font-bold text-[#191F28] pt-1 border-t border-[#F2F4F6]">
  <span>월 합계</span>

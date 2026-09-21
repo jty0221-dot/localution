@@ -80,7 +80,7 @@ export async function GET(req: NextRequest) {
  try {
  const { data: all } = await svc
  .from('platform_reviews')
- .select('rating, has_reply')
+ .select('rating, has_reply, reply_status')
  .eq('user_id', userId)
  .eq('platform', platform)
  if (Array.isArray(all) && all.length > 0) {

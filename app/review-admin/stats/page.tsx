@@ -232,7 +232,7 @@ ${Object.entries(data.byPlatform)
  {s.successRate}%
  </td>
  <td className="px-3 py-2.5 text-right text-xs text-[#8B95A1]">
- {s.avgDaysToReply != null ? s.avgDaysToReply + '일' : '—'}
+ {s.avgDaysToReply != null ? s.avgDaysToReply + '일' : '-'}
  </td>
  </tr>
  )

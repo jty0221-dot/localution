@@ -449,7 +449,7 @@ function ReviewDraftPanel({
  >
  <div className="flex items-center gap-2 mb-1">
  <span className="text-xs font-semibold text-[#059669]">
- {'★'.repeat(r.rating ?? 5)}
+ {Array.from({ length: r.rating ?? 5 }).map((_, i) => <Star key={i} size={11} className="inline fill-current" />)}
  </span>
  <span className="text-xs text-[#9CA3AF]">
  {PLATFORM_LABEL[r.platform] ?? r.platform}
@@ -1375,7 +1375,7 @@ function ThreadsPageContent() {
  </div>
  <div className="flex-1 min-w-0">
  <h1 className="text-[22px] md:text-[28px] font-black tracking-tight text-white leading-tight">스레드 자동 발행</h1>
- <p className="text-white/75 text-[12px] md:text-sm mt-1.5 leading-relaxed">즉시 발행 또는 예약 발행 — 카드뉴스 해시태그 자동 연동</p>
+ <p className="text-white/75 text-[12px] md:text-sm mt-1.5 leading-relaxed">즉시 발행 또는 예약 발행 · 카드뉴스 해시태그 자동 연동</p>
  </div>
  <div className="hidden md:flex items-center gap-1.5 text-[11px] font-bold text-white/90 bg-white/10 border border-white/20 px-3 py-1.5 rounded-full flex-shrink-0">
  로컬루션

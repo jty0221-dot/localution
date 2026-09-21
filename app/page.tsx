@@ -6,6 +6,10 @@ import Link from 'next/link'
 import Footer from './components/Footer'
 import TopNav from './components/TopNav'
 import HarangMarketingPopup from './components/HarangMarketingPopup'
+import ProductPreview from './components/landing/ProductPreview'
+import HeroVideo from './components/landing/HeroVideo'
+import JsonLd from './components/seo/JsonLd'
+import { SITE, graphLd, softwareApplicationLd, organizationLd, webSiteLd, faqPageLd, type FaqItem } from './lib/seo'
 import {
  MessageCircle, QrCode, Users, FileText, Sparkles,
  Coffee, UtensilsCrossed, Dumbbell,
@@ -51,7 +55,7 @@ const FEATURES = [
  {
  Icon: MessageCircle,
  title: '멀티플랫폼 리뷰 관리',
- desc: '네이버 · 구글 · 카카오맵 · 배민 · 요기요 · 쿠팡이츠 — 6개 플랫폼 리뷰를 한 화면에서 AI 답글 11종 톤(친근·전문·감사·사과·미식·맞춤 등)으로 자동 처리해요.',
+ desc: '네이버 · 구글 · 카카오맵 · 배민 · 요기요 · 쿠팡이츠 · 6개 플랫폼 리뷰를 한 화면에서 AI 답글 11종 톤(친근·전문·감사·사과·미식·맞춤 등)으로 자동 처리해요.',
  color: 'from-blue-500 to-blue-600',
  bg: 'bg-blue-50',
  tags: ['AI 답글 11종', '네이버 자동발행', '배민 30일', '쿠팡이츠 자동화'],
@@ -149,29 +153,37 @@ const FEATURES = [
 ]
 
 // ─────────────────────────────────────────────────────────────
-// 메인 랜딩 STATS — 베이스라인 + 날짜 기반 자동 증가
-// 매일 deterministic하게 1~3씩 증가 (요일별 변동 포함, 서버/클라 일관)
-// 추후 /api/landing-stats 연동 시 실 가입자 수가 베이스라인에 더해짐
+// 메인 랜딩 STATS
+//
+// 2026-08-19 정정:
+//   이전 구현은 출시일 기준 경과일에 비례해 "누적 사장님" 수를
+//   매일 1~3명씩 자동으로 늘렸다 (days * 1.4 + days % 7).
+//   '예시' 배지를 달아두긴 했지만, 방문할 때마다 숫자가 커지는 것은
+//   실제 성장을 흉내 내는 연출이라 배지가 있어도 오해를 만든다.
+//   또한 표시광고법상 거짓·과장 표시 소지가 있다.
+//
+//   → 자동 증가를 제거하고, 실제 데이터가 붙기 전까지는
+//     '수치' 대신 '제품이 무엇을 해주는지'를 보여주는 값으로 대체한다.
+//     /api/landing-stats 가 실제 값을 반환하면 그것으로 교체된다.
 // ─────────────────────────────────────────────────────────────
-const LAUNCH_DATE = new Date('2026-01-01').getTime()
-const BASE_OWNERS = 412 // 베이스라인 사장님 수 (출시 시점 시드)
-const BASE_REPLIES = 52340 // 베이스라인 AI 답글 누적
 
-// 출시 후 경과일 기준 deterministic 누적 계산
-// (클라/SSR 동일 결과 — 같은 날짜면 같은 값, 자정 지나면 +1~3 증가)
+/**
+ * 실데이터 연동 전 표시할 값.
+ * 시간이 지나도 변하지 않는다 — 성장 연출을 하지 않기 위함.
+ * 전부 "제품 사양"이라 사실이고, 사용자 수를 지어내지 않는다.
+ */
 function computeStats(extraOwners = 0, extraReplies = 0) {
- const days = Math.max(0, Math.floor((Date.now() - LAUNCH_DATE) / 86400000))
- const owners = BASE_OWNERS + Math.floor(days * 1.4) + (days % 7) + extraOwners
- const replies = BASE_REPLIES + (days * 180) + (owners - BASE_OWNERS) * 130 + extraReplies
+ void extraOwners
+ void extraReplies
  return [
- { num: owners.toLocaleString() + '+', label: '누적 사장님' },
- { num: Math.floor(replies / 10000) + '만+', label: 'AI 답글 누적' },
- { num: '+0.6점', label: '평균 별점 상승' },
- { num: '3배', label: '리뷰 수집 속도' },
+ { num: '6곳', label: '연결 가능 플랫폼' },
+ { num: '4종', label: 'AI 답글 말투' },
+ { num: '24시간', label: '자동 수집 주기' },
+ { num: '3분', label: '매장 연결 소요' },
  ]
 }
 
-// SSR 초기 값 (베이스라인) — 클라에서 useEffect로 실제 날짜 반영
+// SSR 초기 값 — 클라에서 /api/landing-stats 응답이 오면 교체
 const STATS_DEMO = computeStats(0, 0)
 
 const HERO_DEMO = {
@@ -231,6 +243,42 @@ const QR_TONES = [
  { Icon: Wine, label: '미식가' },
  { Icon: UserPlus, label: '친구추천' },
  { Icon: Camera, label: '인스타감성' },
+]
+
+// 홈 FAQ · 화면에 보이는 8개와 FAQPage 스키마가 같은 배열을 쓴다 (AEO · 개수 불일치 금지)
+const HOME_FAQS: FaqItem[] = [
+ {
+ q: 'AI 답글 톤이 정말 다양한가요?',
+ a: '친근·전문·유머·심플·감성·MZ·공식·감사·사과·미식까지 10종 기본 + 사장님이 직접 정의하는 맞춤 톤까지 총 11종을 지원해요. 부정 리뷰엔 사과 톤, 음식점은 미식 톤처럼 상황에 맞게 골라쓸 수 있고, 우리 매장만의 말투도 직접 입력해서 저장할 수 있어요.',
+ },
+ {
+ q: '리뷰가 새로 달리면 바로 알 수 있나요?',
+ a: '15분마다 자동 수집해서 별점 1-2점 부정 리뷰가 오면 우선순위로 알려드려요. 웹푸시 + 카카오톡 두 채널로 받아 빠르게 대응 가능해요. 답글 발행 통계 페이지에서 플랫폼별 답변률·자동 발행 성공률도 한눈에 확인하세요.',
+ },
+ {
+ q: '진짜 무료로 쓸 수 있나요?',
+ a: '플레이스 진단·키워드 순위 확인 등 기본 기능은 전부 무료예요. 블로그 초안·릴스 대본 같은 AI 생성 기능은 월 무료 횟수가 있고, 그 이상 쓸 때만 요금이 붙어요. 신용카드 없이 가입 가능해요.',
+ },
+ {
+ q: '네이버 계정 연동이 걱정돼요. 비밀번호가 저장되나요?',
+ a: '저장되더라도 AES-256-GCM 암호화 + 서버 KEK 분리 보관으로 안전하게 관리되고, 답글 발행 외 다른 용도로는 절대 사용되지 않아요. 언제든 네이버 설정에서 연동 해제 가능해요.',
+ },
+ {
+ q: '6개 플랫폼 답글이 진짜 자동으로 등록되나요?',
+ a: '네이버는 14단계 자동화 (v37) 로 답글이 직접 등록되고, 배민·요기요·쿠팡이츠는 한국 IP 거주형 프록시 + 쿠키 자동 갱신으로 등록돼요. 카카오맵은 카카오 비즈니스 권한이 연결된 매장에 한해 자동 등록 가능해요. 통계 페이지에서 등록 결과까지 확인 가능합니다.',
+ },
+ {
+ q: '매장이 여러 개인데 한 계정에서 관리되나요?',
+ a: '여러 매장을 하나의 로컬루션 계정에서 관리할 수 있어요. 요기요 같은 다중 매장은 자동 감지되고, 1인 마케팅 대행사나 프랜차이즈 본부 사장님들이 특히 많이 쓰시고, Pro 플랜에서는 매장별 권한 분리도 됩니다.',
+ },
+ {
+ q: '해지가 어렵거나 자동결제가 무서워요',
+ a: '언제든 설정에서 원클릭으로 해지 가능하고, 당월 남은 일수만큼 일할 계산 후 환불해드려요. 결제 키도 서버에서 토큰화해 보관하고 (billing_methods + 토스 시크릿 키), 카드 정보는 로컬에 절대 저장되지 않아요.',
+ },
+ {
+ q: '리뷰 답글을 AI가 달면 고객이 티 나게 느끼지 않을까요?',
+ a: '로컬루션 AI는 매장 말투·시그니처 메뉴·사장님 이름까지 학습하고, 사장님이 직접 정의한 맞춤 톤까지 적용해 답글을 생성해요. 최종 발행 전에 사장님이 검토·수정할 수 있어서 기계 답글처럼 느껴지지 않아요.',
+ },
 ]
 
 function FaqSlider({ faqs }: { faqs: { q: string; a: string }[] }) {
@@ -331,7 +379,7 @@ export default function LandingPage() {
  { time: '09:20', badge: '알림', Icon: Inbox, platform: '네이버', msg: '리뷰 3개가 새로 달렸어요', stress: true },
  { time: '11:50', badge: '피크', Icon: UtensilsCrossed, platform: '', msg: '점심 피크, 주방 정신없음', stress: false },
  { time: '13:10', badge: '알림', Icon: Bell, platform: '배민', msg: '리뷰 2개 · 구글 1개 추가 도착', stress: true },
- { time: '15:30', badge: '알림', Icon: Star, platform: '요기요', msg: '별점 2점 리뷰 — 어떻게 답글?', stress: true },
+ { time: '15:30', badge: '알림', Icon: Star, platform: '요기요', msg: '별점 2점 리뷰 · 어떻게 답글?', stress: true },
  { time: '18:00', badge: '마감', Icon: CreditCard, platform: '', msg: '카드·현금 매출 정산 시작…', stress: false },
  { time: '22:40', badge: '야근', Icon: Frown, platform: '', msg: '답글 아직 8개 남음. 내일 또 반복', stress: true },
  ]
@@ -348,11 +396,8 @@ export default function LandingPage() {
  setIsLoggedIn(hasCookie)
  }, [])
 
- // 마운트 직후: 현재 날짜 기준 deterministic stats 즉시 갱신 (매일 자동 증가)
- // 이후 /api/landing-stats 응답이 오면 실 가입자 수 반영하여 다시 갱신됨
- useEffect(() => {
- setStats(computeStats(0, 0))
- }, [])
+ // 2026-08-19: 날짜 기반 자동 증가를 제거했으므로 마운트 시 재계산할 이유가 없다.
+ // (STATS_DEMO 가 이미 같은 값이고, 실데이터는 아래 /api/landing-stats 가 채운다)
 
  useEffect(() => {
  let cancelled = false
@@ -384,133 +429,24 @@ export default function LandingPage() {
  return (
  <div className="min-h-screen bg-white">
 
- {/* 23차-SEO: JSON-LD 구조화 데이터 – SoftwareApplication + Organization */}
- <script
- type="application/ld+json"
- dangerouslySetInnerHTML={{
- __html: JSON.stringify({
- "@context": "https://schema.org",
- "@graph": [
- {
- "@type": "SoftwareApplication",
- "@id": "https://www.localution.co.kr/#app",
- "name": "로컬루션",
- "url": "https://www.localution.co.kr",
- "applicationCategory": "BusinessApplication",
- "operatingSystem": "Web",
- "description": "네이버·구글·카카오맵·배민·요기요·쿠팡이츠 6개 플랫폼 리뷰 자동 답글 (AI 톤 11종), 블로그·릴스·카드뉴스·스레드·유튜브 커뮤니티 자동 발행, QR 리뷰, 플레이스 SEO 진단, 답글 발행 통계, 실시간 알림까지. 소상공인·자영업자를 위한 AI 올인원 마케팅 플랫폼.",
- "offers": {
- "@type": "Offer",
- "price": "6900",
- "priceCurrency": "KRW",
- "description": "커피 한 잔 값 월 6,900원으로 모든 플랫폼 리뷰답글 자동화"
- },
- "publisher": {
- "@type": "Organization",
- "@id": "https://www.localution.co.kr/#org",
- "name": "로컬루션",
- "url": "https://www.localution.co.kr",
- "logo": {
- "@type": "ImageObject",
- "url": "https://www.localution.co.kr/logo.png",
- "width": 512,
- "height": 512
- }
- }
- },
- {
- "@type": "Organization",
- "@id": "https://www.localution.co.kr/#org",
- "name": "로컬루션",
- "url": "https://www.localution.co.kr",
- "description": "소상공인·자영업자 전용 AI 올인원 마케팅 플랫폼. 6개 플랫폼 리뷰 통합 관리 (AI 답글 11종), 블로그·릴스·스레드·유튜브 자동 발행, QR 리뷰, 플레이스 SEO, 답글 발행 통계, 실시간 알림.",
- "logo": {
- "@type": "ImageObject",
- "url": "https://www.localution.co.kr/logo.png"
- },
- "sameAs": [
- "https://www.localution.co.kr"
- ]
- },
- {
- "@type": "WebSite",
- "@id": "https://www.localution.co.kr/#website",
- "url": "https://www.localution.co.kr",
- "name": "로컬루션",
- "description": "사장님 마케팅 플랫폼",
- "potentialAction": {
- "@type": "SearchAction",
- "target": "https://www.localution.co.kr/community?q={search_term_string}",
- "query-input": "required name=search_term_string"
- }
- },
- {
- "@type": "FAQPage",
- "mainEntity": [
- {
- "@type": "Question",
- "name": "로컬루션은 무엇인가요?",
- "acceptedAnswer": {
- "@type": "Answer",
- "text": "로컬루션은 소상공인·자영업자를 위한 AI 올인원 마케팅 플랫폼입니다. 네이버·구글·카카오맵·배민·요기요·쿠팡이츠 6개 플랫폼 리뷰 자동 답글 (AI 톤 11종), 블로그·릴스·카드뉴스·스레드·유튜브 커뮤니티 자동 발행, QR 리뷰 수집, 플레이스 SEO 진단, 답글 발행 통계, 15분마다 실시간 리뷰 알림까지 제공합니다. 커피 한 잔 값 월 6,900원으로 모든 플랫폼 리뷰답글을 자동으로 등록할 수 있습니다."
- }
- },
- {
- "@type": "Question",
- "name": "AI 답글 톤이 정말 다양한가요?",
- "acceptedAnswer": {
- "@type": "Answer",
- "text": "친근·전문·유머·심플·감성·MZ·공식·감사·사과·미식까지 10종 기본 톤과 사장님이 직접 정의하는 맞춤 톤까지 총 11종을 지원합니다. 부정 리뷰엔 사과 톤, 음식점은 미식 톤처럼 상황별로 골라쓸 수 있습니다."
- }
- },
- {
- "@type": "Question",
- "name": "바로 시작할 수 있나요?",
- "acceptedAnswer": {
- "@type": "Answer",
- "text": "네, 구글 소셜 로그인 하나로 즉시 시작 가능합니다. 별도 설치 없이 웹 브라우저에서 모든 기능을 이용할 수 있습니다."
- }
- },
- {
- "@type": "Question",
- "name": "리뷰가 새로 달리면 바로 알 수 있나요?",
- "acceptedAnswer": {
- "@type": "Answer",
- "text": "15분마다 자동 수집해서 별점 1-2점 부정 리뷰가 오면 우선순위로 알려드립니다. 웹푸시와 카카오톡 두 채널로 받아 빠르게 대응할 수 있고, 답글 발행 통계 페이지에서 플랫폼별 답변률·자동 발행 성공률·실패 원인까지 한눈에 확인 가능합니다."
- }
- },
- {
- "@type": "Question",
- "name": "네이버 플레이스 순위를 올릴 수 있나요?",
- "acceptedAnswer": {
- "@type": "Answer",
- "text": "네이버 플레이스 SEO 진단 도구로 34항목 체크리스트를 점검하고, 블로그 포스팅 키워드 순위 추적, 스마트블록·블로그탭·인기글 노출 위치 자동 모니터링까지 지원합니다."
- }
- }
- ]
- }
- ]
- })
- }}
- />
+ {/* SEO · GEO : 사실은 app/lib/seo.ts 한 곳에서 온다 · FAQ 는 화면과 같은 HOME_FAQS */}
+ <JsonLd data={graphLd([softwareApplicationLd(), organizationLd(), webSiteLd(), faqPageLd(HOME_FAQS, SITE.url + '/#faq')])} />
 
  <TopNav />
 
  {/* ── 히어로 ── */}
- <section className="pt-24 md:pt-32 pb-16 md:pb-20 px-4 bg-gradient-to-b from-[#EFF6FF] to-white relative overflow-hidden">
- {/* SVG 배경 dot grid */}
- <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-[0.35]" aria-hidden="true">
- <defs>
- <pattern id="dot-grid" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
- <circle cx="1.5" cy="1.5" r="1.5" fill="#3182F6" />
- </pattern>
- </defs>
- <rect width="100%" height="100%" fill="url(#dot-grid)" />
- </svg>
- {/* SVG 오른쪽 상단 블러 원 */}
- <svg className="absolute -top-32 -right-32 opacity-20 pointer-events-none" width="420" height="420" aria-hidden="true">
- <circle cx="210" cy="210" r="210" fill="#3182F6" />
- </svg>
+ <section className="pt-28 md:pt-36 pb-20 md:pb-24 px-4 bg-gradient-to-b from-[#F5F8FF] to-white relative overflow-hidden">
+ {/* 배경 영상 — 데스크톱 · 동작 줄이기 해제 · 데이터 절약 꺼짐일 때만 재생.
+      영상이 없거나 실패하면 조용히 사라지고 아래 그라데이션만 남는다. */}
+ <HeroVideo />
+
+ {/* 은은한 광원 — 영상이 없을 때도 히어로가 밋밋하지 않도록 */}
+ <div
+ className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[720px] rounded-full pointer-events-none opacity-[0.07] blur-3xl"
+ style={{ background: '#3182F6' }}
+ aria-hidden="true"
+ />
+
  <div className="max-w-4xl mx-auto text-center relative z-10">
  <div className="flex flex-wrap justify-center gap-2 mb-6">
  <Link href="/updates" className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-blue-200 transition-colors">
@@ -521,12 +457,13 @@ export default function LandingPage() {
  <Sparkles size={12} strokeWidth={2.5} /> 5월 신기능 6개 보기
  </Link>
  </div>
- <h1 className="text-4xl md:text-6xl font-black text-[#191F28] leading-tight mb-6">
+ {/* 원티드식 타이포 — 더 크게, 자간·행간은 더 좁게, 장식 없이 */}
+ <h1 className="text-display2 md:text-display1 font-black text-[#191F28] mb-6">
  필요한 것만 골라쓰는<br />
  <span className="text-[#3182F6]">사장님 마케팅 플랫폼</span>
  </h1>
- <p className="text-base md:text-xl text-[#4E5968] mb-8 max-w-2xl mx-auto leading-relaxed text-left sm:text-center">
- 리뷰·QR·블로그·플레이스·CRM — 12개 모듈 중<br className="hidden md:block" />
+ <p className="text-[15px] md:text-xl text-[#4E5968] mb-10 max-w-2xl mx-auto leading-relaxed text-left sm:text-center">
+ 리뷰·QR·블로그·플레이스·CRM · 12개 모듈 중<br className="hidden md:block" />
  내 매장에 필요한 것만 선택. 3개 묶으면 10% 할인.
  </p>
 
@@ -596,6 +533,13 @@ export default function LandingPage() {
  </Link>
  </div>
  <p className="text-xs text-[#8B95A1] mt-4">회원가입 없이 진단 가능 · 신용카드 불필요 · 월 단위 결제</p>
+
+ {/* ── 제품 미리보기 ──
+      랜딩에 제품 화면이 하나도 없어 "무엇을 사는지" 보이지 않던 문제 해결.
+      가짜 스크린샷 대신 실제 UI 를 HTML 로 재현 · 항상 정확하고 선명하다. */}
+ <div className="mt-14 md:mt-16">
+ <ProductPreview />
+ </div>
  </div>
  </section>
 
@@ -1031,42 +975,8 @@ export default function LandingPage() {
 
  {/* ── 자주 묻는 질문 — 좌우 슬라이드 카드 ── */}
  {(() => {
- const FAQS = [
- {
- q: 'AI 답글 톤이 정말 다양한가요?',
- a: '친근·전문·유머·심플·감성·MZ·공식·감사·사과·미식까지 10종 기본 + 사장님이 직접 정의하는 맞춤 톤까지 총 11종을 지원해요. 부정 리뷰엔 사과 톤, 음식점은 미식 톤처럼 상황에 맞게 골라쓸 수 있고, 우리 매장만의 말투도 직접 입력해서 저장할 수 있어요.',
- },
- {
- q: '리뷰가 새로 달리면 바로 알 수 있나요?',
- a: '15분마다 자동 수집해서 별점 1-2점 부정 리뷰가 오면 우선순위로 알려드려요. 웹푸시 + 카카오톡 두 채널로 받아 빠르게 대응 가능해요. 답글 발행 통계 페이지에서 플랫폼별 답변률·자동 발행 성공률도 한눈에 확인하세요.',
- },
- {
- q: '진짜 무료로 쓸 수 있나요?',
- a: '플레이스 진단·키워드 순위 확인 등 기본 기능은 전부 무료예요. 블로그 초안·릴스 대본 같은 AI 생성 기능은 월 무료 횟수가 있고, 그 이상 쓸 때만 요금이 붙어요. 신용카드 없이 가입 가능해요.',
- },
- {
- q: '네이버 계정 연동이 걱정돼요. 비밀번호가 저장되나요?',
- a: '저장되더라도 AES-256-GCM 암호화 + 서버 KEK 분리 보관으로 안전하게 관리되고, 답글 발행 외 다른 용도로는 절대 사용되지 않아요. 언제든 네이버 설정에서 연동 해제 가능해요.',
- },
- {
- q: '6개 플랫폼 답글이 진짜 자동으로 등록되나요?',
- a: '네이버는 14단계 자동화 (v37) 로 답글이 직접 등록되고, 배민·요기요·쿠팡이츠는 한국 IP 거주형 프록시 + 쿠키 자동 갱신으로 등록돼요. 카카오맵은 카카오 비즈니스 권한이 연결된 매장에 한해 자동 등록 가능해요. 통계 페이지에서 등록 결과까지 확인 가능합니다.',
- },
- {
- q: '매장이 여러 개인데 한 계정에서 관리되나요?',
- a: '여러 매장을 하나의 로컬루션 계정에서 관리할 수 있어요. 요기요 같은 다중 매장은 자동 감지되고, 1인 마케팅 대행사나 프랜차이즈 본부 사장님들이 특히 많이 쓰시고, Pro 플랜에서는 매장별 권한 분리도 됩니다.',
- },
- {
- q: '해지가 어렵거나 자동결제가 무서워요',
- a: '언제든 설정에서 원클릭으로 해지 가능하고, 당월 남은 일수만큼 일할 계산 후 환불해드려요. 결제 키도 서버에서 토큰화해 보관하고 (billing_methods + 토스 시크릿 키), 카드 정보는 로컬에 절대 저장되지 않아요.',
- },
- {
- q: '리뷰 답글을 AI가 달면 고객이 티 나게 느끼지 않을까요?',
- a: '로컬루션 AI는 매장 말투·시그니처 메뉴·사장님 이름까지 학습하고, 사장님이 직접 정의한 맞춤 톤까지 적용해 답글을 생성해요. 최종 발행 전에 사장님이 검토·수정할 수 있어서 기계 답글처럼 느껴지지 않아요.',
- },
- ]
  return (
- <FaqSlider faqs={FAQS} />
+ <FaqSlider faqs={HOME_FAQS} />
  )
  })()}
 

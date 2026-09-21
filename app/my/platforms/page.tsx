@@ -194,7 +194,7 @@ export default function MyPlatformsPage() {
  <PageHeader
  icon={<Link2 size={28} className="text-white" strokeWidth={2.5} />}
  title="플랫폼 연결 관리"
- subtitle="네이버·배민·요기요·쿠팡이츠·카카오 — 본인 계정 연결로 리뷰·순위 자동화"
+ subtitle="네이버·배민·요기요·쿠팡이츠·카카오 · 본인 계정 연결로 리뷰·순위 자동화"
  variant="primary"
  />
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full">
@@ -227,11 +227,11 @@ export default function MyPlatformsPage() {
  {/* 안내 헤더 — 두 계정 구분 명시 */}
  <header className="mb-5 rounded-2xl bg-[#FFFBEB] border border-[#FDE68A] p-3 md:p-4">
  <p className="text-xs md:text-sm font-bold text-[#92400E] mb-1">
- 알아두세요 — 로그인 계정과 플랫폼 계정은 다릅니다
+ 알아두세요 · 로그인 계정과 플랫폼 계정은 다릅니다
  </p>
  <ul className="text-[11px] md:text-xs text-[#92400E] leading-relaxed space-y-0.5 ml-3 list-disc">
- <li><strong>로컬루션 로그인 계정</strong> (위) — 사장님이 가입할 때 쓴 카카오 / 네이버 / 구글 계정.</li>
- <li><strong>플랫폼 계정</strong> (아래) — 네이버 스마트플레이스 · 배민사장님 · 요기요사장님 등 각 플랫폼에서 가입한 별도 ID/PW. 자동 답글 / 리뷰 수집에 사용.</li>
+ <li><strong>로컬루션 로그인 계정</strong> (위) · 사장님이 가입할 때 쓴 카카오 / 네이버 / 구글 계정.</li>
+ <li><strong>플랫폼 계정</strong> (아래) · 네이버 스마트플레이스 · 배민사장님 · 요기요사장님 등 각 플랫폼에서 가입한 별도 ID/PW. 자동 답글 / 리뷰 수집에 사용.</li>
  </ul>
  <p className="text-[11px] md:text-xs text-[#92400E] leading-relaxed mt-2">
  비밀번호는 AES-256 으로 암호화 보관 · 연결 해제 시 즉시 파기됩니다.
@@ -257,7 +257,7 @@ export default function MyPlatformsPage() {
  <div className="flex items-center justify-between flex-wrap gap-3">
  <div className="flex items-center gap-2 text-sm text-[#1E40AF]">
  <span className="font-semibold">인증 완료 후 이동</span>
- <span className="text-[#3182F6]">— 자주 쓰는 페이지로 바로 가세요</span>
+ <span className="text-[#3182F6]">· 자주 쓰는 페이지로 바로 가세요</span>
  </div>
  <div className="flex gap-2 flex-wrap">
  <Link href="/dashboard" className="px-3 py-1.5 rounded-lg bg-white border border-[#BFDBFE] text-xs font-medium text-[#1E40AF] hover:bg-[#DBEAFE]">

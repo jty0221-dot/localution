@@ -8,9 +8,17 @@
 // · 제9조 신규: 자동 접속 및 로그 보관
 // · 시행일: 2026-05-01
 // ============================================================
+import type { Metadata } from 'next'
+import { pageMetadata } from '../lib/seo'
 import Link from 'next/link'
 import Footer from '../components/Footer'
 import { COMPANY } from '../lib/company'
+
+export const metadata: Metadata = pageMetadata({
+  title: '개인정보처리방침',
+  description: '로컬루션이 수집하는 개인정보 항목 · 이용 목적 · 보관 기간 · 제3자 제공과 이용자 권리를 안내합니다.',
+  path: 'privacy',
+})
 
 export default function Privacy() {
  return (

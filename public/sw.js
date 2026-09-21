@@ -1,6 +1,6 @@
-const CACHE_VERSION = 'v1.1.0';
+const CACHE_VERSION = 'v1.3.0';
 
-// v38: 푸시 알림 핸들러 — sound + badge + click action
+// v38: 푸시 알림 핸들러 - sound + badge + click action
 self.addEventListener('push', (event) => {
   let data = {}
   try {
@@ -38,37 +38,71 @@ self.addEventListener('notificationclick', (event) => {
   const url = (event.notification.data && event.notification.data.url) || '/dashboard'
   event.waitUntil(
     self.clients.matchAll({ type: 'window', includeUncontrolled: true }).then((clients) => {
-      // 이미 열린 탭 있으면 focus
-      for (const c of clients) {
-        if (c.url.includes(new URL(url, self.location.origin).pathname) && 'focus' in c) {
-          return c.focus()
+      for (const client of clients) {
+        if (client.url.includes(self.location.origin) && 'focus' in client) {
+          client.navigate(url)
+          return client.focus()
         }
       }
-      // 없으면 새 탭
-      if (self.clients.openWindow) return self.clients.openWindow(url)
+      return self.clients.openWindow(url)
     })
   )
+})
+
+// ServiceWorkerRegistrar 가 새 버전을 발견하면 SKIP_WAITING 을 보낸다 → 바로 교체
+self.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'SKIP_WAITING') self.skipWaiting()
 })
 
 const CACHE_NAME = `localution-${CACHE_VERSION}`;
 const OFFLINE_PAGE = '/offline.html';
 
-// Files to cache (app shell)
+// 앱 셸 (설치 시 미리 캐시)
 const PRECACHE_URLS = [
   '/',
   '/offline.html',
-  '/manifest.json',
+  '/manifest.webmanifest',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
 ];
 
-// Install event - cache app shell
+// 로그인해야 보이는 화면 · 로그인 흐름. 캐시에 남기지 않는다 (공용 기기에서 남의 화면이 남는다)
+// middleware.ts 의 보호 경로와 같은 목록 + /qr (개인 QR 화면) + /auth · /login
+const PRIVATE_PREFIXES = [
+  '/dashboard', '/admin', '/admin-biz', '/customers', '/crm', '/review-admin', '/reviews',
+  '/qr-admin', '/settings', '/settlement', '/my', '/reservations', '/partner-points',
+  '/qr', '/auth', '/login', '/logout',
+];
+
+const ASSET_EXT = ['.js', '.css', '.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp', '.ico',
+  '.woff', '.woff2', '.ttf', '.eot', '.mp4', '.webm'];
+
+function isPrivatePath(pathname) {
+  return PRIVATE_PREFIXES.some((p) => pathname === p || pathname.startsWith(p + '/'));
+}
+
+function isAsset(pathname) {
+  if (pathname.startsWith('/_next/static/')) return true;
+  return ASSET_EXT.some((ext) => pathname.endsWith(ext));
+}
+
+function offlineJson() {
+  return new Response(JSON.stringify({ ok: false, error: 'offline', message: '인터넷 연결이 없어요' }), {
+    status: 503,
+    headers: { 'Content-Type': 'application/json; charset=utf-8' },
+  });
+}
+
+function offlinePage() {
+  return caches.match(OFFLINE_PAGE).then((r) => r || new Response('Offline', { status: 503 }));
+}
+
+// Install - 앱 셸 캐시
 self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.addAll(PRECACHE_URLS).catch((error) => {
         console.warn('PRECACHE_URLS failed, some files may not be available offline:', error);
-        // Continue even if some files fail to cache
         return Promise.resolve();
       });
     })
@@ -76,7 +110,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting();
 });
 
-// Activate event - clean up old caches
+// Activate - 이전 버전 캐시 정리
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -92,102 +126,60 @@ self.addEventListener('activate', (event) => {
   self.clients.claim();
 });
 
-// Fetch event - routing strategy
+// Fetch - 경로별 전략
+//   1) 같은 출처 GET 만 다룬다. Supabase · CDN 등 다른 출처는 브라우저에 맡긴다 (인증 응답을 캐시에 남기지 않는다)
+//   2) /api · /auth · Next 데이터 요청 : 네트워크만. 오프라인이면 503 JSON
+//   3) 정적 자산 (_next/static · 이미지 · 폰트) : 캐시 우선
+//   4) 로그인 화면 (PRIVATE_PREFIXES) : 네트워크만 · 캐시 저장 없음 · 오프라인이면 offline.html
+//   5) 공개 화면 : 네트워크 우선 · 성공하면 캐시 · 오프라인이면 캐시 → offline.html
 self.addEventListener('fetch', (event) => {
   const { request } = event;
-  const url = new URL(request.url);
+  if (request.method !== 'GET') return;
 
-  // Skip non-GET requests
-  if (request.method !== 'GET') {
+  const url = new URL(request.url);
+  if (url.origin !== self.location.origin) return;
+
+  const pathname = url.pathname;
+
+  if (pathname.startsWith('/api/') || pathname.startsWith('/auth/') || pathname.startsWith('/_next/data/')) {
+    event.respondWith(fetch(request).catch(offlineJson));
     return;
   }
 
-  // Network-first strategy for API calls
-  if (url.pathname.startsWith('/api/')) {
+  if (isAsset(pathname)) {
     event.respondWith(
-      fetch(request)
-        .then((response) => {
-          // Cache successful API responses
+      caches.match(request).then((cached) => {
+        if (cached) return cached;
+        return fetch(request).then((response) => {
           if (response.ok) {
-            const cache = caches.open(CACHE_NAME);
-            cache.then((c) => c.put(request, response.clone()));
+            const copy = response.clone();
+            caches.open(CACHE_NAME).then((c) => c.put(request, copy));
           }
           return response;
-        })
-        .catch(() => {
-          // Return cached response if network fails
-          return caches.match(request).then((cachedResponse) => {
-            return (
-              cachedResponse ||
-              caches.match(OFFLINE_PAGE).then((offlineResponse) => {
-                return offlineResponse || new Response('Offline', { status: 503 });
-              })
-            );
-          });
-        })
-    );
-    return;
-  }
-
-  // Cache-first strategy for assets (JS, CSS, images)
-  if (
-    url.pathname.endsWith('.js') ||
-    url.pathname.endsWith('.css') ||
-    url.pathname.endsWith('.png') ||
-    url.pathname.endsWith('.jpg') ||
-    url.pathname.endsWith('.jpeg') ||
-    url.pathname.endsWith('.gif') ||
-    url.pathname.endsWith('.svg') ||
-    url.pathname.endsWith('.webp') ||
-    url.pathname.endsWith('.woff') ||
-    url.pathname.endsWith('.woff2') ||
-    url.pathname.endsWith('.ttf') ||
-    url.pathname.endsWith('.eot')
-  ) {
-    event.respondWith(
-      caches.match(request).then((cachedResponse) => {
-        return (
-          cachedResponse ||
-          fetch(request)
-            .then((response) => {
-              // Cache the fetched response
-              if (response.ok) {
-                const cache = caches.open(CACHE_NAME);
-                cache.then((c) => c.put(request, response.clone()));
-              }
-              return response;
-            })
-            .catch(() => {
-              // Return offline page for asset failures
-              return caches.match(OFFLINE_PAGE);
-            })
-        );
+        });
       })
     );
     return;
   }
 
-  // Network-first strategy for HTML pages (default)
+  const isNavigation = request.mode === 'navigate' || (request.headers.get('accept') || '').includes('text/html');
+
+  if (isPrivatePath(pathname)) {
+    if (isNavigation) event.respondWith(fetch(request).catch(offlinePage));
+    return;
+  }
+
   event.respondWith(
     fetch(request)
       .then((response) => {
-        // Cache successful responses
-        if (response.ok && response.status === 200) {
-          const cache = caches.open(CACHE_NAME);
-          cache.then((c) => c.put(request, response.clone()));
+        if (response.ok && response.status === 200 && response.type === 'basic') {
+          const copy = response.clone();
+          caches.open(CACHE_NAME).then((c) => c.put(request, copy));
         }
         return response;
       })
       .catch(() => {
-        // Return cached response or offline page
-        return caches.match(request).then((cachedResponse) => {
-          return (
-            cachedResponse ||
-            caches.match(OFFLINE_PAGE).then((offlineResponse) => {
-              return offlineResponse || new Response('Offline', { status: 503 });
-            })
-          );
-        });
+        return caches.match(request).then((cached) => cached || (isNavigation ? offlinePage() : offlineJson()));
       })
   );
 });

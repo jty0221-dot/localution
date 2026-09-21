@@ -21,7 +21,7 @@ import Footer from '../components/Footer'
 import {
  ArrowRight, Gift, Copy, Check, Users, Calendar, Link as LinkIcon,
  Sparkles, Search, Clock, Trophy, Info, ExternalLink, Flame, Crown,
- Medal, Star, Zap, TrendingUp,
+ Medal, Star, Zap, TrendingUp, Circle,
 } from 'lucide-react'
 
 type Profile = { id?: string; email?: string; name?: string }
@@ -174,7 +174,7 @@ function CopyButton({ text, label = '복사' }: { text: string; label?: string }
  setCopied(true)
  setTimeout(() => setCopied(false), 1400)
  } catch {
- alert('복사 실패 — 직접 선택해서 복사해주세요.')
+ alert('복사 실패 · 직접 선택해서 복사해주세요.')
  }
  }, [text])
  return (
@@ -511,14 +511,14 @@ export default function PartnerPointsPage() {
  <div className="text-[11px] text-[#4E5968] space-y-0.5 mb-3 pb-3 border-b border-[#E5E8EB]/70">
  <div className="flex items-center gap-1">
  <span className={invitesOk ? 'text-[#059669]' : 'text-[#C9CDD2]'}>
- {invitesOk ? '✓' : '○'}
+ {invitesOk ? <Check size={14} strokeWidth={3} /> : <Circle size={12} />}
  </span>
  <span>초대 <b>{t.requireInvites}명</b></span>
  </div>
  {t.requirePaid && (
  <div className="flex items-center gap-1">
  <span className={paidOk ? 'text-[#059669]' : 'text-[#C9CDD2]'}>
- {paidOk ? '✓' : '○'}
+ {paidOk ? <Check size={14} strokeWidth={3} /> : <Circle size={12} />}
  </span>
  <span>유료 전환 <b>{t.requirePaid}명</b></span>
  </div>
@@ -526,7 +526,7 @@ export default function PartnerPointsPage() {
  {t.requireRevenue && (
  <div className="flex items-center gap-1">
  <span className={revenueOk ? 'text-[#059669]' : 'text-[#C9CDD2]'}>
- {revenueOk ? '✓' : '○'}
+ {revenueOk ? <Check size={14} strokeWidth={3} /> : <Circle size={12} />}
  </span>
  <span>누적 매출 <b>{(t.requireRevenue / 10000).toFixed(0)}만원</b></span>
  </div>
@@ -566,7 +566,7 @@ export default function PartnerPointsPage() {
  <label className="block text-[12px] font-bold text-[#191F28] mb-1.5">내 파트너 코드</label>
  <div className="flex items-stretch gap-2">
  <div className="flex-1 min-w-0 flex items-center px-3.5 py-2.5 rounded-lg bg-[#F8F9FB] border border-[#E5E8EB] text-[13px] text-[#4E5968] font-mono select-all">
- {loading ? <span className="text-[#8B95A1]">불러오는 중…</span> : code || '—'}
+ {loading ? <span className="text-[#8B95A1]">불러오는 중…</span> : code || '-'}
  </div>
  {code && <CopyButton text={code} />}
  </div>
@@ -576,7 +576,7 @@ export default function PartnerPointsPage() {
  <label className="block text-[12px] font-bold text-[#191F28] mb-1.5">내 초대 링크</label>
  <div className="flex items-stretch gap-2">
  <div className="flex-1 min-w-0 flex items-center px-3.5 py-2.5 rounded-lg bg-[#F8F9FB] border border-[#E5E8EB] text-[13px] text-[#4E5968] truncate select-all">
- {loading ? <span className="text-[#8B95A1]">불러오는 중…</span> : link || '—'}
+ {loading ? <span className="text-[#8B95A1]">불러오는 중…</span> : link || '-'}
  </div>
  {link && <CopyButton text={link} label="링크 복사" />}
  </div>
@@ -594,7 +594,7 @@ export default function PartnerPointsPage() {
  카카오 공유
  </a>
  <a
- href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('로컬루션 — 소상공인 마케팅 도우미')}&url=${encodeURIComponent(link)}`}
+ href={`https://twitter.com/intent/tweet?text=${encodeURIComponent('로컬루션 · 소상공인 마케팅 도우미')}&url=${encodeURIComponent(link)}`}
  target="_blank"
  rel="noopener noreferrer"
  className="inline-flex items-center gap-1 text-[11px] font-bold px-2.5 py-1.5 rounded-lg bg-[#191F28] text-white hover:opacity-90"
@@ -682,7 +682,7 @@ export default function PartnerPointsPage() {
  <li>블로그·인스타·유튜브 설명란에 <b>내 초대 링크</b>를 상시 걸어두기</li>
  <li>카카오톡 채널·1:1 문의 답변에 <b>파트너 코드</b>를 안내하기</li>
  <li>지인 사장님 온보딩 시 직접 링크 전달 → 가입하면 <b>내 구독 +3일</b> 자동 적립</li>
- <li>월 3명 채우면 <b>다음 달 요금 0원</b> — 카톡방·커뮤니티에 공유</li>
+ <li>월 3명 채우면 <b>다음 달 요금 0원</b> · 카톡방·커뮤니티에 공유</li>
  </ul>
  <div className="mt-3 flex items-center gap-2 text-[12px] text-[#4E5968]">
  <Clock size={12} />

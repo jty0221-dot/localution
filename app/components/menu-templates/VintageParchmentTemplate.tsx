@@ -90,7 +90,7 @@ export default function VintageParchmentTemplate({
  </div>
  {getDesc(it) && (
  <p className="text-[11px] mt-0.5 italic" style={{ color: theme.text_muted }}>
- — {getDesc(it).slice(0, 50)}
+ · {getDesc(it).slice(0, 50)}
  </p>
  )}
  </li>

@@ -27,7 +27,7 @@ import ReplyFeedbackButtons from '../../components/ReplyFeedbackButtons'
 import ReplyTemplatePicker from '../../components/ReplyTemplatePicker'
 import PageHeader from '../../components/PageHeader'
 import { toast } from '../../lib/toast'
-import { Heart, Briefcase, Smile, Edit3, Mail, Flame, FileText, AlertTriangle, Sparkles, Star, type LucideIcon } from 'lucide-react'
+import { Heart, Briefcase, Smile, Edit3, Mail, Flame, FileText, AlertTriangle, Sparkles, Star, Shuffle, X, type LucideIcon } from 'lucide-react'
 // 76차: CoupangReviewBookmarkletDialog import 제거 (자동 연결로 대체됨)
 
 type PlatformSlug = 'naver_place' | 'baemin' | 'yogiyo' | 'coupangeats' | 'kakao_map'
@@ -35,7 +35,7 @@ type ReplyStatus = 'none' | 'draft' | 'queued' | 'submitting' | 'submitted' | 'f
 
 // ── 페르소나 타입 ──────────────────────────────────────────
 // v1.6y: 톤 4종 추가 — apologetic (사과), grateful (감사), gourmand (미식), custom (맞춤)
-type PersonaTone = 'friendly' | 'expert' | 'witty' | 'simple' | 'emo' | 'mz' | 'formal' | 'apologetic' | 'grateful' | 'gourmand' | 'custom'
+type PersonaTone = 'auto' | 'friendly' | 'expert' | 'witty' | 'simple' | 'emo' | 'mz' | 'formal' | 'apologetic' | 'grateful' | 'gourmand' | 'custom'
 type PersonaGender = 'none' | 'male' | 'female'
 type PersonaAge = '' | 'teen' | '20s' | '30s' | '40s' | '50s' | '60s'
 interface Persona {
@@ -46,6 +46,7 @@ interface Persona {
 const DEFAULT_PERSONA: Persona = { tone: 'friendly', gender: 'none', age: '' }
 
 const TONE_OPTIONS: { value: PersonaTone; label: string; Icon: LucideIcon }[] = [
+ { value: 'auto', label: '자동', Icon: Shuffle },
  { value: 'friendly', label: '친근', Icon: Heart },
  { value: 'expert', label: '전문가', Icon: Briefcase },
  { value: 'witty', label: '유머', Icon: Smile },
@@ -136,7 +137,7 @@ export interface PlatformConfig {
  textColor: string // 글자 컬러 hex
  icon: string // "" 헤더 이모지 (logoNode 없을 때 폴백)
  iconLetter: string // "N" 원형 아이콘 글자
- logoNode?: ReactNode // SVG 로고 — 있으면 PageHeader icon 대신 사용
+ logoNode?: ReactNode // SVG 로고 · 있으면 PageHeader icon 대신 사용
  supportsFetch: boolean // "지금 수집" 버튼 노출 여부
  connectHref: string // 미연결 시 이동 경로
  collectEndpoint?: string // "지금 수집" 커스텀 엔드포인트
@@ -148,8 +149,8 @@ function Stars({ n, color }: { n: number; color: string }) {
  const v = Math.max(0, Math.min(5, Math.round(n)))
  return (
  <span className="text-sm tracking-tight" style={{ color }}>
- {'★'.repeat(v)}
- <span className="text-[#E5E8EB]">{'★'.repeat(5 - v)}</span>
+ {Array.from({ length: v }).map((_, i) => <Star key={'f' + i} size={12} className="inline fill-current" />)}
+ {Array.from({ length: 5 - v }).map((_, i) => <Star key={'e' + i} size={12} className="inline text-[#E5E8EB]" />)}
  </span>
  )
 }
@@ -527,18 +528,8 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  const aiData = await aiRes.json()
  const generated = String(aiData?.reply || '').trim()
  if (!generated) {
- // 2026-07-30 hotfix: 결제/한도/인증 관련 에러는 원인·조치 안내를 명확하게
- const code = String(aiData?.code || '')
  const errMsg = String(aiData?.error || aiData?.message || 'AI 서버 응답 없음')
- if (code === 'ai_credit_exhausted') {
- toast.error('AI 답글 서비스가 일시 중단됐어요 (결제 확인 필요). 잠시 후 다시 시도해주세요.', { autoClose: 8000 })
- } else if (code === 'ai_rate_limited') {
- toast.error('AI 답글 요청이 몰려있어요. 30초 후 다시 시도해주세요.')
- } else if (code === 'ai_auth_failed') {
- toast.error('AI 서비스 인증 오류. 담당자에게 문의해주세요.')
- } else {
- toast.error(`답글 생성 실패: ${errMsg.slice(0, 100)}`)
- }
+ toast.error(`답글 생성 실패: ${errMsg.slice(0, 80)}`)
  setGenerating(false)
  return
  }
@@ -787,18 +778,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  })
  const aiData = await aiRes.json()
  const generated = String(aiData?.reply || aiData?.message || '').trim()
- // 2026-07-30 hotfix: 결제/인증 에러는 나머지 시도해도 다 실패하니 즉시 중단
- if (!generated) {
- const code = String(aiData?.code || '')
- if (code === 'ai_credit_exhausted' || code === 'ai_auth_failed') {
- const msg = code === 'ai_credit_exhausted'
- ? 'AI 답글 서비스가 일시 중단됐어요 (결제 확인 필요). 나머지 일괄 생성을 중단합니다.'
- : 'AI 서비스 인증 오류로 일괄 생성을 중단합니다. 담당자에게 문의해주세요.'
- toast.error(msg, { autoClose: 8000 })
- break
- }
- continue
- }
+ if (!generated) continue
 
  await fetch('/api/review-reply/draft', {
  method: 'POST',
@@ -1044,7 +1024,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <div className="flex items-start gap-3 flex-wrap">
  <span className="text-xl leading-none mt-0.5"></span>
  <div className="flex-1 min-w-[200px]">
- <p className="text-sm font-bold text-[#191F28] mb-1">네이버 플레이스 리뷰 — 자동 수집 + 사장님 답글 작성</p>
+ <p className="text-sm font-bold text-[#191F28] mb-1">네이버 플레이스 리뷰 · 자동 수집 + 사장님 답글 작성</p>
  </div>
  {placeId && (
  <a
@@ -1144,7 +1124,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${filterRating === n ? 'text-white' : 'bg-[#F2F4F6] text-[#4E5968]'}`}
  style={filterRating === n ? { background: config.color } : {}}
  >
- {n}★
+ {n}<Star size={10} className="inline ml-0.5 fill-current" />
  </button>
  ))}
  </div>
@@ -1155,7 +1135,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  ['all', '전체'],
  ['unreplied', '미답변'],
  ['replied', '답변완료'],
- ['negative', '부정 ★≤3'],
+ ['negative', '부정 3점 이하'],
  ] as const
  ).map(([v, l]) => (
  <button
@@ -1708,7 +1688,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 text-[#191F28] font-bold text-lg flex items-center justify-center hover:bg-white"
  aria-label="닫기"
  >
- ✕
+ <X size={18} strokeWidth={2.5} />
  </button>
  </div>
  )}
@@ -1737,7 +1717,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  className="text-[#8B95A1] hover:text-[#191F28] text-lg font-bold"
  aria-label="닫기"
  >
- ✕
+ <X size={18} strokeWidth={2.5} />
  </button>
  </div>
 
@@ -1904,7 +1884,7 @@ function KeywordAnalysis({ platform, platformLabel, platformColor }: { platform:
                   {data.by_category.signature.length > 0 && (
                     <CategoryBlock
                       title="매장 시그니처"
-                      desc="가장 자주, 가장 긍정적으로 언급된 키워드 — 모든 마케팅의 핵심"
+                      desc="가장 자주, 가장 긍정적으로 언급된 키워드 · 모든 마케팅의 핵심"
                       color="#059669"
                       bg="#ECFDF5"
                       keywords={data.by_category.signature}
@@ -1914,7 +1894,7 @@ function KeywordAnalysis({ platform, platformLabel, platformColor }: { platform:
                   {data.by_category.marketing_pick.length > 0 && (
                     <CategoryBlock
                       title="마케팅 활용 강점"
-                      desc="긍정 비율 75%+ — SNS 캡션·광고 카피·해시태그에 사용"
+                      desc="긍정 비율 75%+ · SNS 캡션·광고 카피·해시태그에 사용"
                       color="#3182F6"
                       bg="#EFF6FF"
                       keywords={data.by_category.marketing_pick}
@@ -1924,7 +1904,7 @@ function KeywordAnalysis({ platform, platformLabel, platformColor }: { platform:
                   {data.by_category.blog_topic.length > 0 && (
                     <CategoryBlock
                       title="블로그 글·롱테일 SEO 후보"
-                      desc="긍정 응답 있고 빈도 낮음 — 더 부각하면 차별화 가능"
+                      desc="긍정 응답 있고 빈도 낮음 · 더 부각하면 차별화 가능"
                       color="#7C3AED"
                       bg="#F5F3FF"
                       keywords={data.by_category.blog_topic}
@@ -1933,8 +1913,8 @@ function KeywordAnalysis({ platform, platformLabel, platformColor }: { platform:
                   {/* 4. 개선 필요 */}
                   {data.by_category.improvement.length > 0 && (
                     <CategoryBlock
-                      title="개선 필요 — 즉시 점검"
-                      desc="부정 비율 60%+ 또는 평균 별점 2.8 이하 — 사장님 직접 점검 권장"
+                      title="개선 필요 · 즉시 점검"
+                      desc="부정 비율 60%+ 또는 평균 별점 2.8 이하 · 사장님 직접 점검 권장"
                       color="#DC2626"
                       bg="#FEF2F2"
                       keywords={data.by_category.improvement}
@@ -2020,7 +2000,7 @@ function FeaturesTab({ byFeature, order, platformColor }: {
   return (
     <div className="space-y-3">
       <p className="text-[11px] text-[#8B95A1] leading-relaxed">
-        네이버 플레이스 스타일 분류 — 메뉴 + 10개 특징으로 키워드를 자동 분류했어요. 카테고리별로 어떤 점이 많이 언급되는지 한눈에 보세요.
+        네이버 플레이스 스타일 분류 · 메뉴 + 10개 특징으로 키워드를 자동 분류했어요. 카테고리별로 어떤 점이 많이 언급되는지 한눈에 보세요.
       </p>
       {nonEmpty.map(cat => {
         const meta = FEATURE_LABELS[cat] || FEATURE_LABELS['기타']
@@ -2046,7 +2026,7 @@ function FeaturesTab({ byFeature, order, platformColor }: {
                     <span className="tabular-nums" style={{
                       color: k.avg_rating >= 4 ? '#059669' : k.avg_rating >= 3 ? '#F59E0B' : '#DC2626'
                     }}>
-                      ★{k.avg_rating}
+                      <Star size={11} className="inline mr-0.5 fill-current" />{k.avg_rating}
                     </span>
                   )}
                 </span>
@@ -2241,7 +2221,7 @@ function CoupangStorePicker({ onPicked }: { onPicked: () => void | Promise<void>
  const j = await r.json()
  if (!j.ok) { setErrorMsg(j.error || '저장 실패'); return }
  setOpen(false)
- toast.success(`매장 ${ids.length}개 등록 완료 — 6개월치 수집 1~3분`)
+ toast.success(`매장 ${ids.length}개 등록 완료 · 6개월치 수집 1~3분`)
  await onPicked()
  } catch (e: any) { setErrorMsg(e?.message || '오류') }
  finally { setPicking(null) }

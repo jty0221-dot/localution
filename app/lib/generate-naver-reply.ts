@@ -5,6 +5,10 @@
 //   · loadStoreInfo(userId) → StoreInfo from DB
 // ============================================================
 import { createServiceClient } from '@/app/lib/adminAuth'
+import {
+  hashSeed, extractReviewSignals, buildKeywordPool, pickVariation, buildVarietyLines,
+  loadStoreMenus, loadRecentOpeners, type ReviewKind,
+} from '@/app/lib/reply-variety'
 
 // ── 타입 ────────────────────────────────────────────────────
 
@@ -15,6 +19,8 @@ export interface StoreInfo {
   mainKeyword: string
   subKeywords: string
   storeDesc: string
+  menus?: string[]          // 매장 메뉴 (menu_items.name_ko · 시그니처 먼저) · 사진 매핑 · 메뉴 언급에 쓴다
+  recentOpeners?: string[]  // 최근 답글 첫 문장 · 같은 문장으로 다시 시작하지 않게
 }
 
 export interface ReviewInfo {
@@ -24,7 +30,7 @@ export interface ReviewInfo {
 }
 
 export type GenerateResult =
-  | { ok: true; reply: string; mode: 'vision' | 'text' | 'mock' }
+  | { ok: true; reply: string; mode: 'vision' | 'text' | 'mock'; tone?: string }
   | { ok: false; error: string }
 
 // ── 내부 유틸 ────────────────────────────────────────────────
@@ -65,6 +71,9 @@ function toneDescription(tone: string): string {
     emo:      '잔잔하고 진심 담긴 편지 같은 감성 톤. 과장 없이 차분하고 따뜻하게.',
     mz:       '요즘 20대가 쓰는 자연스러운 톤. "~같아요", "~네요" 같은 부드러운 어미로.',
     formal:   '정중하고 담백한 공식적 서면 톤. 이모티콘 금지. 예의 바르게.',
+    grateful: '고마움이 앞서는 톤. 손님이 시간을 내 준 것에 먼저 감사하고, 무엇이 고마운지 구체적으로.',
+    apologetic: '사과가 먼저인 톤. 변명 없이 인정하고, 무엇을 어떻게 고칠지 한 줄로.',
+    gourmand: '음식 이야기를 좋아하는 사장님 톤. 재료 · 조리 · 먹는 법을 한 줄씩 곁들여 맛을 그려 준다.',
   }
   return map[tone] || map.friendly
 }
@@ -107,18 +116,30 @@ function buildSeoKeywords(opts: {
 function buildPrompt(
   store: StoreInfo,
   review: ReviewInfo,
-  tone: string,
-): { system: string; userText: string; reviewType: string } {
+  toneInput: string,
+): { system: string; userText: string; reviewType: string; tone: string } {
   const reviewType = classifyReview(review.content, review.rating)
   const lang = detectLang(review.content)
   const hasPhotos = review.photos.length > 0
-  const kwList = buildSeoKeywords({
+  const menus = store.menus || []
+  const recentOpeners = store.recentOpeners || []
+
+  // 리뷰마다 다른 구성 · 같은 리뷰는 같은 구성 (본문 + 사진 해시)
+  const seed = hashSeed((review.content || '') + '|' + review.photos.join(',') + '|' + String(review.rating ?? ''))
+  const signals = extractReviewSignals(review.content, menus)
+  const kwList = buildKeywordPool({
     region: store.region,
     bizType: store.bizType,
     storeName: store.storeName,
     mainKeyword: store.mainKeyword,
     subKeywords: store.subKeywords,
+    menus,
   })
+  const variation = pickVariation({
+    seed, tone: toneInput, kind: reviewType as ReviewKind, hasPhotos,
+    keywordPool: kwList, reviewMenus: signals.menus, region: store.region,
+  })
+  const tone = variation.tone
   const toneText = toneDescription(tone)
   const isExpert = tone === 'expert' || tone === 'formal' || tone === 'simple'
   const langRule = lang === 'ko'
@@ -138,8 +159,10 @@ function buildPrompt(
   if (store.region)    lines.push('- 지역: ' + store.region)
   if (store.bizType)   lines.push('- 업종: ' + store.bizType)
   if (store.storeDesc) lines.push('- 매장 소개: ' + store.storeDesc.slice(0, 200))
-  if (kwList.length)   lines.push('- SEO 키워드: ' + kwList.slice(0, 4).join(' / '))
+  if (menus.length)    lines.push('- 대표 메뉴: ' + menus.slice(0, 12).join(', '))
+  if (kwList.length)   lines.push('- 키워드 풀 (지역 · 대표 · 메뉴 · 매장명): ' + kwList.slice(0, 8).join(' / '))
   lines.push('')
+  lines.push(...buildVarietyLines({ variation, signals, kind: reviewType as ReviewKind, hasPhotos, storeMenus: menus, recentOpeners }))
   lines.push('[답변 기준]')
   lines.push('- 톤: ' + toneText)
   lines.push('- 길이: 5~8문장 (180~300자)')
@@ -147,9 +170,9 @@ function buildPrompt(
 
   if (kwList.length && reviewType !== 'negative') {
     lines.push('[SEO 전략]')
-    lines.push('- 키워드 풀에서 1~2개만 골라 자연스럽게 녹이세요: ' + kwList.slice(0, 3).join(', '))
-    lines.push('- 같은 키워드 반복 금지. 4~6문장 이내로 간결하게.')
-    lines.push('- 마지막 한 문장에 재방문 유도 자연스럽게. (예: "또 뵐게요", "다음에도 편하게 들러주세요")')
+    lines.push('- 위 [이번 답글의 구성] 에 적힌 키워드만 각 1회 녹입니다. 풀 전체를 쓰지 않습니다.')
+    lines.push('- 지역 키워드는 문장 안에서 장소를 말하는 자리에만 (예: "OO에서 OO 찾으실 때"). 문장 끝에 붙이는 식으로 쓰지 않습니다.')
+    lines.push('- 메뉴 이름은 손님이 부른 그대로, 또는 대표 메뉴 목록의 표기 그대로 씁니다.')
     lines.push('')
   }
 
@@ -184,7 +207,7 @@ function buildPrompt(
     if (hasPhotos) userText += '\n\n[고객이 첨부한 사진이 있습니다. 사진 속 요소를 자연스럽게 언급하세요.]'
   }
 
-  return { system, userText, reviewType }
+  return { system, userText, reviewType, tone }
 }
 
 function stripMarkdown(text: string): string {
@@ -216,6 +239,11 @@ export async function loadStoreInfo(userId: string): Promise<StoreInfo> {
       ? (data.sub_keywords as string[]).join(',')
       : String(data.sub_keywords || '')
 
+    const [menus, recentOpeners] = await Promise.all([
+      loadStoreMenus(svc, userId),
+      loadRecentOpeners(svc, userId),
+    ])
+
     return {
       storeName:   String(data.name           || ''),
       bizType:     String(data.category       || ''),
@@ -223,6 +251,8 @@ export async function loadStoreInfo(userId: string): Promise<StoreInfo> {
       mainKeyword: String(data.main_keyword   || ''),
       subKeywords: subKws,
       storeDesc:   String(data.description    || ''),
+      menus,
+      recentOpeners,
     }
   } catch {
     return { storeName: '', bizType: '', region: '', mainKeyword: '', subKeywords: '', storeDesc: '' }
@@ -234,6 +264,7 @@ export async function generateNaverReply(
   review: ReviewInfo,
   tone: string = 'friendly',
 ): Promise<GenerateResult> {
+  // tone 'auto' 는 리뷰 성격(긍정 · 중립 · 부정)에 맞는 풀에서 리뷰마다 돌려 가며 고른다
   const apiKey = process.env.ANTHROPIC_API_KEY
   if (!apiKey) {
     const name = store.storeName || '저희 매장'
@@ -245,9 +276,9 @@ export async function generateNaverReply(
     }
   }
 
-  const { system, userText, reviewType } = buildPrompt(store, review, tone)
+  const { system, userText, reviewType, tone: toneUsed } = buildPrompt(store, review, tone)
   const hasPhotos = review.photos.length > 0
-  const isExpert = tone === 'expert' || tone === 'formal' || tone === 'simple'
+  const isExpert = toneUsed === 'expert' || toneUsed === 'formal' || toneUsed === 'simple'
 
   // /v1/models API로 계정에서 실제 사용 가능한 모델 동적 조회
   const pickModels = async (): Promise<string[]> => {
@@ -320,7 +351,7 @@ export async function generateNaverReply(
   }
 
   // 모델 순차 시도 (404 = 해당 모델 미지원 → 다음 모델로)
-  let result = { ok: false, status: 0, reply: '', error: 'No available model' }
+  let result: { ok: boolean; status: number; reply: string; error?: string } = { ok: false, status: 0, reply: '', error: 'No available model' }
   for (const candidate of MODEL_CANDIDATES) {
     result = await callClaude(candidate, userContent)
     if (result.status !== 404) break
@@ -334,7 +365,7 @@ export async function generateNaverReply(
       if (retry.ok) {
         let reply = retry.reply
         if (isExpert) reply = stripMarkdown(reply)
-        return { ok: true, reply, mode: 'text' }
+        return { ok: true, reply, mode: 'text', tone: toneUsed }
       }
       break
     }
@@ -345,5 +376,5 @@ export async function generateNaverReply(
   let reply = result.reply
   if (isExpert) reply = stripMarkdown(reply)
 
-  return { ok: true, reply, mode: hasPhotos ? 'vision' : 'text' }
+  return { ok: true, reply, mode: hasPhotos ? 'vision' : 'text', tone: toneUsed }
 }

@@ -75,7 +75,7 @@ export default function MenuThemeEditor({ storeSlug }: { storeSlug?: string | nu
  <div className="flex-1">
  <h3 className="font-black text-[#1F1612] mb-1">메뉴판은 이미 프리미엄으로 디자인됐어요</h3>
  <p className="text-[11px] leading-relaxed text-[#78716C]">
- 진짜 인쇄 메뉴판처럼 — 큰 매장 헤더, 장식 라인, 시그니처 사진 카드, 점선 가격 leader, 한식 정갈한 레이아웃까지.
+ 진짜 인쇄 메뉴판처럼 · 큰 매장 헤더, 장식 라인, 시그니처 사진 카드, 점선 가격 leader, 한식 정갈한 레이아웃까지.
  사장님은 매장 분위기에 맞춰 <strong className="text-[#92400E]">색상만 살짝</strong> 골라주시면 돼요.
  </p>
  {previewUrl && (

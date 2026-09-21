@@ -173,7 +173,7 @@ export async function POST(req: NextRequest) {
  ...payload,
  }
  const tryInsert = async (withDesc: boolean) => {
- const p = { ...insertPayload }
+ const p: Record<string, any> = { ...insertPayload }
  if (!withDesc) delete p.description
  return svc
  .from('stores')

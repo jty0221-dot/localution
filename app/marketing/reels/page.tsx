@@ -173,7 +173,7 @@ export default function ReelsGeneratorPage() {
  <PageHeader
  icon={<Video size={28} className="text-white" strokeWidth={2.5} />}
  title="숏폼 / 릴스"
- subtitle="한 편의 롱폼에서 3개의 숏폼을 — 후킹·자막·썸네일까지 한 번에"
+ subtitle="한 편의 롱폼에서 3개의 숏폼을 · 후킹·자막·썸네일까지 한 번에"
  variant="pink"
  />
  <div className="max-w-6xl mx-auto p-4 md:p-8">

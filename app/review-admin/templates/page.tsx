@@ -69,7 +69,7 @@ export default function TemplatesPage() {
         <PageHeader
           icon={<ClipboardList size={24} className="text-white" strokeWidth={2.5} />}
           title="답글 템플릿"
-          subtitle="자주 쓰는 답글 저장 — 1클릭으로 사용"
+          subtitle="자주 쓰는 답글 저장 · 1클릭으로 사용"
           variant="emerald"
         />
 
@@ -209,7 +209,7 @@ function TemplateForm({ initial, onCancel, onSave }: {
         type="text"
         value={keywords}
         onChange={e => setKeywords(e.target.value)}
-        placeholder="추천 키워드 (예: 감사, 맛있, 친절) — 쉼표 구분"
+        placeholder="추천 키워드 (예: 감사, 맛있, 친절) · 쉼표 구분"
         className="w-full px-3 py-2 text-xs rounded-lg border border-emerald-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
       />
       <div className="flex items-center gap-2 flex-wrap">

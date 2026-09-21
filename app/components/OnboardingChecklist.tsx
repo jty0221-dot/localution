@@ -106,7 +106,7 @@ export default function OnboardingChecklist() {
  Icon: Store,
  iconBg: 'from-[#3182F6] to-[#1B64DA]',
  title: '매장 정보 등록',
- desc: '매장명, 주소, 카테고리 — 모든 페이지에 자동 반영',
+ desc: '매장명, 주소, 카테고리 · 모든 페이지에 자동 반영',
  cta: '매장 등록하기',
  href: '/my/platforms/naver_place/connect',
  },
@@ -146,7 +146,7 @@ export default function OnboardingChecklist() {
  Icon: Sparkles,
  iconBg: 'from-[#EC4899] to-[#8B5CF6]',
  title: 'AI 자동답글 켜기',
- desc: '4시간마다 미답변 리뷰에 AI 초안 자동 작성 — 답글 직접 안 달아도 됨',
+ desc: '4시간마다 미답변 리뷰에 AI 초안 자동 작성 · 답글 직접 안 달아도 됨',
  cta: '자동답글 켜기',
  href: '/settings?tab=ai',
  },
@@ -162,7 +162,7 @@ export default function OnboardingChecklist() {
  <div>
  <h3 className="font-black text-[#191F28] text-base">시작하기</h3>
  <p className="text-xs text-[#4E5968] mt-0.5">
- {doneCount}개 완료 · {5 - doneCount}개 남음 — 모두 끝나면 모든 기능 자동 작동
+ {doneCount}개 완료 · {5 - doneCount}개 남음 · 모두 끝나면 모든 기능 자동 작동
  </p>
  </div>
  </div>

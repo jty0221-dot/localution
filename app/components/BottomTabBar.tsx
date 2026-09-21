@@ -92,8 +92,7 @@ export default function BottomTabBar() {
  if (hide || !loggedIn) return null
 
  return (
- <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-[#E5E8EB]"
- style={{ paddingBottom: 'env(safe-area-inset-bottom)' }}>
+ <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 pb-safe bg-white border-t border-[#E5E8EB]">
  <div className="grid grid-cols-5 max-w-screen-sm mx-auto">
  {TABS.map(tab => {
  const active = tab.prefix.some(p => pathname === p || pathname.startsWith(p + '/'))

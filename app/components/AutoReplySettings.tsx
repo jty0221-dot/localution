@@ -9,7 +9,7 @@
 import { useEffect, useState } from 'react'
 import {
   Sparkles, ToggleLeft, ToggleRight, Loader2, CheckCircle2, AlertTriangle,
-  Smile, Briefcase, Laugh, Minus, Heart, Hash,
+  Smile, Briefcase, Laugh, Minus, Heart, Hash, Shuffle,
 } from 'lucide-react'
 
 type Settings = {
@@ -28,6 +28,7 @@ type Props = {
 }
 
 const TONES = [
+  { value: 'auto', label: '자동', desc: '리뷰마다 말투를 바꿔 씁니다', Icon: Shuffle, color: 'from-[#3182F6] to-[#7C3AED]' },
   { value: 'friendly', label: '친근한', desc: '사장님처럼 따뜻하게', Icon: Smile, color: 'from-amber-500 to-orange-600' },
   { value: 'expert', label: '전문적', desc: '정중하고 단정하게', Icon: Briefcase, color: 'from-slate-500 to-gray-700' },
   { value: 'witty', label: '유쾌한', desc: '위트 있게 밝게', Icon: Laugh, color: 'from-pink-500 to-rose-600' },
@@ -237,7 +238,7 @@ export default function AutoReplySettings({ platform, platformLabel }: Props) {
             <div className="space-y-2">
               <ScheduleToggle
                 label="주말 (토/일) 자동답글 안 함"
-                desc="평일에만 AI 자동답글 동작 — 주말 답변은 사장님이 직접"
+                desc="평일에만 AI 자동답글 동작 · 주말 답변은 사장님이 직접"
                 checked={!!settings.skip_weekends}
                 onChange={(v) => update({ skip_weekends: v } as any)}
                 disabled={saving}

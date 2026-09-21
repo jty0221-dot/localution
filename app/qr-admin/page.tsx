@@ -20,7 +20,7 @@ import {
  Smartphone, Tablet, Monitor,
  BarChart3, TrendingUp, Clock,
  Store, Printer, Link2, Gift, Wifi,
- ClipboardList, Star, MapPin, AlertTriangle,
+ ClipboardList, Star, MapPin, AlertTriangle, Check,
  type LucideIcon,
 } from 'lucide-react'
 
@@ -48,7 +48,7 @@ interface StoreInfo {
  // ⭐ 2-A: stores 테이블의 unique slug — QR URL 식별자
  // 사장님이 정보 변경해도 slug 는 유지 → QR 인쇄물 그대로 사용 가능
  slug?: string
- storeId?: string // stores.id (uuid) — 백엔드 조회용
+ storeId?: string // stores.id (uuid) · 백엔드 조회용
 }
 
 interface QRCode {
@@ -213,7 +213,7 @@ function QRStatsPanel() {
  <div className="flex items-center justify-between">
  <div>
  <h2 className="font-black text-[#191F28]">실시간 QR 활동 통계</h2>
- <p className="text-xs text-[#8B95A1]">최근 {days}일 — 손님이 QR 스캔 ~ 리뷰 등록까지의 활동</p>
+ <p className="text-xs text-[#8B95A1]">최근 {days}일 · 손님이 QR 스캔 ~ 리뷰 등록까지의 활동</p>
  </div>
  <div className="flex gap-1 bg-[#F2F4F6] rounded-xl p-1">
  {[7, 30].map(d => (
@@ -379,8 +379,8 @@ function QRStatsPanel() {
  {r.meta.items_count !== undefined && `메뉴 ${r.meta.items_count}개 · `}
  {r.meta.tone && `${r.meta.tone} 말투 · `}
  {r.meta.char_count && `${r.meta.char_count}자 · `}
- {r.meta.has_receipt && '영수증 ✓ '}
- {r.meta.has_photo && '사진 ✓'}
+ {r.meta.has_receipt && '영수증 확인 · '}
+ {r.meta.has_photo && '사진 첨부'}
  </p>
  )}
  </div>
@@ -495,7 +495,7 @@ export default function QRAdmin() {
  .then(j => {
  if (cancelled) return
  const store = j?.store
- if (!store?.name) return // 네이버 연동 안 된 사용자 — localStorage 그대로 유지
+ if (!store?.name) return // 네이버 연동 안 된 사용자 · localStorage 그대로 유지
 
  // m.place.naver.com URL 에서 외부 placeId 추출 (1137287126 같은)
  const naverUrl = store.naver_url || store.naver_place_url || ''
@@ -900,7 +900,7 @@ export default function QRAdmin() {
  )}
  {storeInfo.source === 'naver_synced' && (
  <p className="text-[10px] text-[#059669] pl-4 mt-1.5 leading-relaxed">
- ✓ 매장 정보는 <a href="/my/platforms/naver_place/connect" className="underline font-bold">매장 연결 페이지</a>에서 관리돼요
+ <Check size={11} strokeWidth={3} className="inline -mt-0.5 mr-0.5" />매장 정보는 <a href="/my/platforms/naver_place/connect" className="underline font-bold">매장 연결 페이지</a>에서 관리돼요
  </p>
  )}
  </div>
@@ -1079,7 +1079,7 @@ export default function QRAdmin() {
  <p className="text-[11px] text-[#92400E] font-bold mb-1.5">카메라 인식 잘 안 될 때</p>
  <ul className="text-[10px] text-[#9A3412] space-y-0.5 leading-relaxed pl-3 list-disc">
  <li>밝은 조명 + 손떨림 없이 (10~30cm 거리)</li>
- <li>이 QR 은 <strong>ECC-H 30% 복원</strong> — 일부 가려져도 인식됩니다</li>
+ <li>이 QR 은 <strong>ECC-H 30% 복원</strong> · 일부 가려져도 인식됩니다</li>
  <li>인쇄 시 최소 <strong>2cm × 2cm</strong> 권장</li>
  </ul>
  </div>
@@ -1115,7 +1115,7 @@ export default function QRAdmin() {
  {activeTab === 'stats' && (
  <div className="space-y-6 max-w-5xl mx-auto w-full">
  <QRStatsPanel />
- <div className="hidden">{/* placeholder — 이전 안내 카드 자리 */}</div>
+ <div className="hidden">{/* placeholder · 이전 안내 카드 자리 */}</div>
 
  <div className="bg-white rounded-2xl p-6 shadow-sm">
  <div className="flex items-center gap-2 mb-5">
@@ -1138,7 +1138,7 @@ export default function QRAdmin() {
  </div>
  <div className="flex items-center gap-2">
  {qr.reviewUrl && (
- <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#3182F6] font-semibold">링크 ✓</span>
+ <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#3182F6] font-semibold inline-flex items-center gap-0.5">링크<Check size={10} strokeWidth={3} /></span>
  )}
  <span className={`text-xs px-2.5 py-1 rounded-full font-semibold ${
  qr.active ? 'bg-green-100 text-green-700' : 'bg-[#F2F4F6] text-[#8B95A1]'

@@ -55,7 +55,7 @@ function SystemHealthFloating() {
  try {
  const res = await fetch('/api/baemin/auto-login', { method: 'POST', credentials: 'include' })
  const data = await res.json()
- if (data.ok) { setMsg('로그인 성공 — 쿠키 갱신됨'); check() }
+ if (data.ok) { setMsg('로그인 성공 · 쿠키 갱신됨'); check() }
  else setMsg(data.error || '로그인 실패')
  } catch (e: any) { setMsg(e.message) }
  setLoginLoading(false)
@@ -141,7 +141,7 @@ function SystemHealthFloating() {
  }
  const delta = data?.summary?.reviewCountDelta ?? 0
  const pollState = data?.poll?.state
- setMsg('Worker 진단 완료 — ' + (delta > 0 ? delta + '건 새로 추가됨' : pollState ? 'state=' + pollState : '결과는 새 탭 확인'))
+ setMsg('Worker 진단 완료 · ' + (delta > 0 ? delta + '건 새로 추가됨' : pollState ? 'state=' + pollState : '결과는 새 탭 확인'))
  } catch (e: any) { setMsg(e.message) }
  setWorkerDiagLoading(false)
  }

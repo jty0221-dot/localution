@@ -33,7 +33,7 @@ const MARKETING_GROUPS = [
  color: '#03C75A',
  items: [
  { href: '/marketing/place', label: '플레이스 진단' },
- { href: '/marketing/keyword-rank', label: '플레이스 모니터링' },
+ { href: '/marketing/keyword-rank', label: '플레이스(실시간)' },
  { href: '/marketing/keyword-score', label: '플레이스 분석' },
  { href: '/marketing/blog-post', label: '블로그 글 작성' },
  { href: '/marketing/blog-tracking', label: '블로그 순위 추적' },
@@ -537,7 +537,7 @@ export default function Sidebar() {
  return (
  <>
  {/* 모바일 상단 바 */}
- <div className="md:hidden fixed top-0 left-0 right-0 h-14 bg-white border-b border-[#E5E8EB] z-30 flex items-center justify-between px-4">
+ <div className="md:hidden fixed top-0 left-0 right-0 pt-safe bg-white border-b border-[#E5E8EB] z-30 flex items-center justify-between px-4 [&>*]:h-14">
  <button
  onClick={() => {
  setMobileOpen(false)
@@ -562,7 +562,7 @@ export default function Sidebar() {
 
  {mobileOpen && <div className="md:hidden fixed inset-0 bg-black/30 z-30" onClick={() => setMobileOpen(false)} />}
 
- <aside className={"fixed top-0 left-0 h-screen w-[220px] bg-white border-r border-[#E5E8EB] z-40 flex flex-col transition-transform duration-300 " + (mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0')}>
+ <aside className={"fixed top-0 left-0 h-screen pt-safe w-[220px] bg-white border-r border-[#E5E8EB] z-40 flex flex-col transition-transform duration-300 " + (mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0')}>
  {/* 로고 */}
  <div className="px-5 py-5 border-b border-[#F2F4F6]">
  <Link href="/" className="block">

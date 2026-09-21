@@ -89,7 +89,7 @@ export default function MenuQRCard({ storeSlug: propSlug, storeName: propName }:
  ctx.fillStyle = '#92400E'
  ctx.font = 'bold 28px serif'
  ctx.textAlign = 'center'
- ctx.fillText('— M E N U —', W / 2, 160)
+ ctx.fillText('· M E N U ·', W / 2, 160)
 
  ctx.fillStyle = '#1F1612'
  ctx.font = 'bold 72px serif'
@@ -191,7 +191,7 @@ export default function MenuQRCard({ storeSlug: propSlug, storeName: propName }:
  className="rounded-2xl p-4 shadow-sm"
  style={{ background: 'linear-gradient(135deg, #FAF6F0 0%, #FDF4E7 100%)', border: '1px solid #E7DCC9' }}>
  <div className="text-center mb-2.5">
- <p className="text-[9px] tracking-[0.4em] font-bold text-[#92400E] mb-0.5">— MENU —</p>
+ <p className="text-[9px] tracking-[0.4em] font-bold text-[#92400E] mb-0.5">· MENU ·</p>
  <p className="text-sm font-black text-[#1F1612] truncate" style={{ fontFamily: 'serif' }} title={storeName || '우리 매장'}>
  {storeName || '우리 매장'}
  </p>

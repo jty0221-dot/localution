@@ -688,11 +688,17 @@ type GraphQLReviewItem = {
   reply: { body: string | null } | null  // 사장님 답글 (있으면 body, 없으면 null/body=null)
 }
 
+// 실측 (2026-09-21 · placeId 1462464789 · total 71):
+//   · page 는 int 로 받지만 무시된다 · page 1~10 이 전부 같은 50건을 돌려준다
+//   · size 는 50 이 상한 · 51 이상이면 items 가 비어서 온다
+//   · isPhotoUsed:true 는 다른 50건 창을 돌려준다 → 두 창을 합치면 50건을 넘긴다
+//   · sort 는 효과 없음 · offset / page 문자열 은 BAD_USER_INPUT
 async function fetchVisitorReviewsGraphQL(
   placeId: string,
   businessType: string,
   size: number = 50,
   page: number = 1,
+  isPhotoUsed: boolean = false,
 ): Promise<VisitorReview[] | null> {
   const body = [
     {
@@ -703,8 +709,8 @@ async function fetchVisitorReviewsGraphQL(
           businessType,
           item: '0',
           page,
-          size,
-          isPhotoUsed: false,
+          size: Math.min(size, 50),
+          isPhotoUsed,
           includeContent: true,
           getReactions: true,
         },
@@ -797,12 +803,12 @@ export async function fetchVisitorReviews(
   for (const c of PLACE_CATEGORIES) if (!tryOrder.includes(c)) tryOrder.push(c)
 
   // 1) GraphQL 우선 시도
-  //   · quickMode: 첫 페이지 (50건) 만 — 신규 리뷰 감지용 (cron 일반 동작)
+  //   · quickMode: 첫 페이지 (50건) 만 · 신규 리뷰 감지용 (cron 일반 동작)
   //   · 첫 페이지에 신규 (knownReviewIds 에 없는) 리뷰가 있으면 다음 페이지도 fetch
   //   · 모두 기존 ID 면 stop (대부분의 cron 호출 → 1 페이지로 종료)
   const PAGE_SIZE = 50
   const MAX_PAGES_FULL = 10  // 첫 수집 / 신규 리뷰 많을 때
-  const MAX_PAGES_QUICK = 1   // 일반 cron — 신규 없으면 1페이지만
+  const MAX_PAGES_QUICK = 1   // 일반 cron · 신규 없으면 1페이지만
   const quickMode = options.quickMode === true
   const knownIds = options.knownReviewIds || new Set<string>()
 
@@ -810,21 +816,46 @@ export async function fetchVisitorReviews(
     const firstPage = await fetchVisitorReviewsGraphQL(placeId, cat, PAGE_SIZE, 1)
     if (!firstPage) continue
     if (firstPage.length === 0) continue
-    const all: VisitorReview[] = [...firstPage]
+
+    // reviewId 기준 중복 제거 · page 가 무시되면 같은 50건이 다시 오므로 (2026-09-21 실측)
+    // 그대로 push 하면 같은 리뷰가 페이지 수만큼 쌓인다
+    const seen = new Set<string>()
+    const all: VisitorReview[] = []
+    const addNew = (rows: VisitorReview[]): number => {
+      let added = 0
+      for (const r of rows) {
+        if (seen.has(r.reviewId)) continue
+        seen.add(r.reviewId)
+        all.push(r)
+        added += 1
+      }
+      return added
+    }
+    addNew(firstPage)
 
     // 첫 페이지의 모든 리뷰가 이미 DB 에 있으면 → 더 fetch 안 함 (트래픽 절감)
     const allKnownInFirstPage = quickMode && firstPage.every(r => knownIds.has(r.reviewId))
     if (allKnownInFirstPage) return all
 
     // 신규 발견 또는 quickMode 아님 → 추가 페이지 fetch
+    //   새 ID 가 하나도 안 늘면 page 가 무시되는 상태이므로 바로 멈춘다
+    //   (네이버가 페이지네이션을 되살리면 이 루프가 그대로 다시 일한다)
     const maxPages = quickMode ? MAX_PAGES_QUICK + 2 : MAX_PAGES_FULL
     for (let p = 2; p <= maxPages && all.length >= (p - 1) * PAGE_SIZE; p++) {
       const more = await fetchVisitorReviewsGraphQL(placeId, cat, PAGE_SIZE, p)
       if (!more || more.length === 0) break
-      all.push(...more)
+      const added = addNew(more)
+      if (added === 0) break
       if (more.length < PAGE_SIZE) break
       // quickMode: 신규 리뷰 없는 페이지 도달 시 stop
       if (quickMode && more.every(r => knownIds.has(r.reviewId))) break
+    }
+
+    // 사진 리뷰 창(isPhotoUsed:true) 은 다른 50건을 돌려준다 → 전체 수집 때 한 번 더 합친다
+    //   quickMode(15분 크론) 는 첫 창만으로 신규 감지가 되므로 호출 수를 늘리지 않는다
+    if (!quickMode) {
+      const photoWindow = await fetchVisitorReviewsGraphQL(placeId, cat, PAGE_SIZE, 1, true)
+      if (photoWindow && photoWindow.length > 0) addNew(photoWindow)
     }
     return all
   }

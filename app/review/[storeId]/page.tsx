@@ -445,7 +445,7 @@ export default function ReviewPage() {
  const receiptUrl = photos.find(p => p.cat === 'receipt')?.url
 
  const apiTone = TONE_MAP[tone] || 'mom'
- const rating = 5 // 손님이 QR 통해 자발적 리뷰 — 일반적으로 긍정
+ const rating = 5 // 손님이 QR 통해 자발적 리뷰 · 일반적으로 긍정
 
  // 클라이언트 타임아웃 45초 — 서버 maxDuration(50s) 직전 fallback
  const controller = new AbortController()

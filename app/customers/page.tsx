@@ -67,7 +67,7 @@ export default function CustomersPage() {
  return pick.map(c => {
  const body = msgText.replace(/\{고객명\}/g, c.name || '고객')
  return `[${c.name} · ${c.phone}]\n${body}`
- }).join('\n\n————————\n\n')
+ }).join('\n\n--------\n\n')
  }
 
  const sendKakao = async () => {
@@ -166,7 +166,7 @@ export default function CustomersPage() {
  <PageHeader
  icon={<Heart size={28} className="text-white" strokeWidth={2.5} />}
  title="고객 관리"
- subtitle="단골을 데이터로 키운다 — 재방문·리뷰·쿠폰이 연결되는 CRM"
+ subtitle="단골을 데이터로 키운다 · 재방문·리뷰·쿠폰이 연결되는 CRM"
  variant="warn"
  />
 
@@ -455,7 +455,7 @@ export default function CustomersPage() {
  <div className="mb-4 text-[11px] leading-relaxed bg-[#F8F9FB] border border-[#E5E8EB] rounded-lg px-3 py-2.5">
  {sendMode === 'kakao' && (
  <p className="text-[#4E5968]">
- <strong className="text-[#191F28]">Windows/Mac 호환</strong> — 고객별로 이름이 치환된 메시지가 <strong>클립보드에 복사</strong>되고
+ <strong className="text-[#191F28]">Windows/Mac 호환</strong> · 고객별로 이름이 치환된 메시지가 <strong>클립보드에 복사</strong>되고
  카카오톡 PC가 자동 실행됩니다. 상대방 대화창에 <kbd className="px-1 bg-white border border-[#E5E8EB] rounded">Ctrl+V</kbd> 로 붙여넣으세요.
  <br />
  <span className="text-[#8B95A1]">※ 카카오톡 PC가 설치되어 있어야 자동 실행됩니다</span>

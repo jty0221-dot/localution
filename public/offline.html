@@ -109,7 +109,7 @@
   <script>
     // Check for connection status
     function checkConnection() {
-      fetch('/manifest.json', { method: 'HEAD', cache: 'no-store' })
+      fetch('/manifest.webmanifest', { method: 'HEAD', cache: 'no-store' })
         .then(() => {
           // Connection restored
           window.location.href = '/';

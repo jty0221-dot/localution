@@ -225,7 +225,7 @@ export default function MySubscriptionPage() {
  textAlign: 'center',
  }}
  >
- <div style={{ fontSize: 40, marginBottom: 8, color: '#9ca3af' }}>—</div>
+ <div style={{ fontSize: 40, marginBottom: 8, color: '#9ca3af' }}>-</div>
  <div style={{ fontWeight: 700, color: '#111827', marginBottom: 4 }}>
  아직 구독 중인 모듈이 없어요
  </div>

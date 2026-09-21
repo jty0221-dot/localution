@@ -151,7 +151,7 @@ export default function SlideAdBanner({
  style={{ background: s.bg, minHeight }}
  role="link"
  tabIndex={0}
- aria-label={`${s.title} 배너 — 클릭 시 ${isExternal ? '새 창' : '이동'}`}
+ aria-label={`${s.title} 배너 · 클릭 시 ${isExternal ? '새 창' : '이동'}`}
  onClick={() => (isExternal ? window.open(s.link, '_blank') : (window.location.href = s.link))}
  onKeyDown={(e) => {
  if (e.key === 'Enter' || e.key === ' ') {

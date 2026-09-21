@@ -1,3 +1,9 @@
+/* 원티드 본문 서체 Pretendard JP — 한글·영문·일문이 한 얼굴에 다 들어 있다.
+   dynamic subset 이라 실제로 화면에 뜬 글자만 내려받는다.
+   출처: Claude 디자인 시스템 · Wanted Design Library · tokens/fonts.css
+   CSS @import 는 반드시 다른 모든 규칙보다 앞에 있어야 한다 — 순서를 바꾸면 통째로 무시된다. */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-jp-dynamic-subset.min.css");
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -6,7 +12,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 
-/* 🔧 모바일 터치 응답성 (2026-04-19)
+/* 모바일 터치 응답성 (2026-04-19)
    • touch-action: manipulation — 더블탭 확대 300ms 딜레이 제거
    • 링크·버튼 터치 시 iOS 기본 반짝 효과 제거 (아래 * tap-highlight 로도 처리됨)
 */
@@ -17,8 +23,38 @@ a, button, [role="button"], input[type="button"], input[type="submit"] {
 body {
   background-color: #F2F4F6;
   color: #191F28;
-  font-family: -apple-system, 'Pretendard Variable', Pretendard, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-family: 'Pretendard JP', Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
+}
+
+/* 앱 포장 대비 · safe-area (2026-09-21)
+   viewport-fit=cover 라 노치 · 홈 인디케이터 뒤까지 배경이 깔린다.
+   그 위에 얹히는 고정 바(상단 nav · 하단 탭 · 토스트)는 아래 클래스로 여백을 받는다.
+   PWA 홈 화면 · TWA · Capacitor 웹뷰 전부 같은 env() 값을 준다 (브라우저 탭에서는 0). */
+:root {
+  --safe-top: env(safe-area-inset-top, 0px);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-left: env(safe-area-inset-left, 0px);
+  --safe-right: env(safe-area-inset-right, 0px);
+}
+.pt-safe { padding-top: var(--safe-top); }
+.pb-safe { padding-bottom: var(--safe-bottom); }
+.px-safe { padding-left: var(--safe-left); padding-right: var(--safe-right); }
+.top-safe { top: var(--safe-top); }
+.bottom-safe { bottom: var(--safe-bottom); }
+.h-screen-safe { height: calc(100vh - var(--safe-top) - var(--safe-bottom)); }
+/* 고정 상단 바(TopNav · Sidebar 모바일 바)가 pt-safe 로 커지는 만큼 본문을 내린다.
+   페이지의 pt-16 · pt-14 오프셋은 그대로 두면 된다. 브라우저 탭에서는 0 이라 아무 변화가 없다. */
+body { padding-top: var(--safe-top); }
+@supports (height: 100dvh) {
+  .h-screen-safe { height: calc(100dvh - var(--safe-top) - var(--safe-bottom)); }
+}
+
+/* 홈 화면에서 열린 앱 (standalone) 은 브라우저 크롬이 없다.
+   당겨서 새로고침 · 가로 바운스가 앱처럼 느껴지지 않아서 끈다. 텍스트 선택은 그대로 둔다. */
+@media (display-mode: standalone) {
+  html { overscroll-behavior-y: none; }
+  body { -webkit-touch-callout: none; }
 }
 
 ::-webkit-scrollbar {
@@ -49,3 +85,60 @@ html, body {
 /* 탭바 등 가로 스크롤 컨테이너에서 스크롤바 숨김 */
 .scrollbar-hide::-webkit-scrollbar { display: none; }
 .scrollbar-hide { -ms-overflow-style: none; scrollbar-width: none; }
+
+/* ── 원티드 토큰 (Claude 디자인 시스템 · Wanted Design Library) ──────────────
+   Tailwind 로 쓸 때는 유틸을 쓴다 — text-display1 · rounded-wd-2xl · shadow-wd-light.
+   여기 변수는 Tailwind 가 닿지 않는 자리(인라인 style · 서드파티 위젯)용 사본이다.
+   색은 가져오지 않았다 — 원티드는 #0066FF 지만 로컬루션은 #3182F6 이다. */
+:root {
+  --wd-font-core: 'Pretendard JP', Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --wd-font-mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* 본문 굵기는 Regular 가 아니라 Medium 이다. Regular 는 입력 필드 값에서만 쓴다 */
+  --wd-weight-regular: 400;
+  --wd-weight-medium: 500;
+  --wd-weight-semibold: 600;
+  --wd-weight-bold: 700;
+
+  /* 라운드는 하나로 고정하지 않고 크기를 따라 올라간다 — 체크박스 3px, 알약 1000px */
+  --wd-radius-xs: 3px;
+  --wd-radius-sm: 4px;
+  --wd-radius-md: 6px;
+  --wd-radius-lg: 8px;
+  --wd-radius-xl: 10px;
+  --wd-radius-2xl: 12px;
+  --wd-radius-3xl: 16px;
+  --wd-radius-4xl: 20px;
+  --wd-radius-5xl: 24px;
+  --wd-radius-6xl: 32px;
+  --wd-radius-full: 1000px;
+
+  /* 그림자에는 색이 없다 — 순수 검정을 낮은 알파로 세 겹 겹친다 */
+  --wd-shadow-normal: 0 1px 2px 0 rgba(0,0,0,0.12), 0 0 1px 0 rgba(0,0,0,0.08), 0 0 1px 0 rgba(0,0,0,0.08);
+  --wd-shadow-light: 0 2px 8px 0 rgba(0,0,0,0.12), 0 1px 4px 0 rgba(0,0,0,0.08), 0 0 1px 0 rgba(0,0,0,0.08);
+  --wd-shadow-strong: 0 6px 12px 0 rgba(0,0,0,0.12), 0 4px 8px 0 rgba(0,0,0,0.08), 0 0 4px 0 rgba(0,0,0,0.08);
+  --wd-shadow-heavy: 0 16px 20px 0 rgba(0,0,0,0.12), 0 8px 16px 0 rgba(0,0,0,0.08), 0 0 8px 0 rgba(0,0,0,0.08);
+  --wd-shadow-knob: 0 3px 8px 0 rgba(0,0,0,0.15), 0 3px 1px 0 rgba(0,0,0,0.06);
+
+  /* 경계선은 border 가 아니라 inset ring 이다 — 포커스가 와도 레이아웃이 밀리지 않는다 */
+  --wd-ring: inset 0 0 0 1px rgba(112,115,124,0.16);
+  --wd-ring-soft: inset 0 0 0 1px rgba(112,115,124,0.08);
+  --wd-ring-brand: inset 0 0 0 1px #3182F6;
+
+  /* 회색은 거의 언제나 불투명이 아니다 — Cool Neutral 50 을 5·8·16% 로 깐다 */
+  --wd-fill: rgba(112,115,124,0.05);
+  --wd-fill-strong: rgba(112,115,124,0.08);
+  --wd-fill-heavy: rgba(112,115,124,0.16);
+
+  --wd-content-max: 1100px;
+  --wd-gap: 16px;
+  --wd-card-padding: 12px;
+}
+
+/* 데스크톱은 카드 안팎을 조금 더 벌린다 */
+@media (min-width: 768px) {
+  :root {
+    --wd-gap: 20px;
+    --wd-card-padding: 16px;
+  }
+}

@@ -35,7 +35,7 @@ function saveHistory(blogId: string, entry: HistoryEntry) {
 }
 
 function fmtNum(n: number) {
- if (!n) return '—'
+ if (!n) return '-'
  if (n >= 10000) return (n / 10000).toFixed(1) + '만'
  return n.toLocaleString()
 }
@@ -92,7 +92,7 @@ function VisitorGraph({ daily, today }: { daily: DailyVisit[]; today: number }) 
  </div>
  <div className="flex justify-between text-[9px] text-[#C9D0D8]">
  <span>{data[0]?.date?.slice(5) || ''}</span>
- <span className="text-[#F04452] font-semibold">오늘 {today > 0 ? today.toLocaleString() : '—'}</span>
+ <span className="text-[#F04452] font-semibold">오늘 {today > 0 ? today.toLocaleString() : '-'}</span>
  </div>
  </div>
  )
@@ -148,7 +148,7 @@ export default function BlogIndexPage() {
  <Sidebar />
  <main className="flex-1 ml-0 md:ml-[220px] flex flex-col min-h-screen pt-4 md:pt-0">
  <PageHeader icon={<BarChart3 size={28} className="text-white" strokeWidth={2.5} />} title="블로그 지수조회"
- subtitle="방문자 · 이웃 · 최신화 · 지수를 한눈에 — 조회 반복 시 방문자 그래프 자동 축적"
+ subtitle="방문자 · 이웃 · 최신화 · 지수를 한눈에 · 조회 반복 시 방문자 그래프 자동 축적"
  variant="sky" />
 
  <div className="flex-1 p-4 md:p-6 max-w-2xl mx-auto w-full space-y-4">
@@ -255,10 +255,10 @@ export default function BlogIndexPage() {
  {/* 통계 카드 4개 */}
  <div className="grid grid-cols-2 gap-3">
  {([
- { label:'일일 방문자', value: data.visitorToday ? fmtNum(data.visitorToday)+'명' : '—', Icon: Eye, color:'#F04452', bg:'#FFF1F2', sub:'오늘 기준' },
+ { label:'일일 방문자', value: data.visitorToday ? fmtNum(data.visitorToday)+'명' : '-', Icon: Eye, color:'#F04452', bg:'#FFF1F2', sub:'오늘 기준' },
  { label:'누적 방문자', value: fmtNum(data.visitorTotal)+(data.visitorTotal?'명':''), Icon: TrendingUp, color:'#3182F6', bg:'#EFF6FF', sub:'전체 누적' },
  { label:'이웃 수', value: fmtNum(data.neighborCount)+(data.neighborCount?'명':''), Icon: Users, color:'#12B76A', bg:'#ECFDF5', sub:'서로이웃 포함' },
- { label:'전체 글 수', value: data.postCount ? data.postCount+'개+' : '—', Icon: FileText, color:'#7C3AED', bg:'#F5F3FF', sub:'RSS 기준' },
+ { label:'전체 글 수', value: data.postCount ? data.postCount+'개+' : '-', Icon: FileText, color:'#7C3AED', bg:'#F5F3FF', sub:'RSS 기준' },
  ] as { label: string; value: string; Icon: LucideIcon; color: string; bg: string; sub: string }[]).map(item => (
  <div key={item.label} className="bg-white rounded-2xl border border-[#E5E8EB] p-4 flex items-center gap-3">
  <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ background:item.bg, color:item.color }}>

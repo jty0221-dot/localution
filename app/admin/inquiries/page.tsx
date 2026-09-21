@@ -79,7 +79,7 @@ export default function AdminInquiriesPage() {
  try {
  const res = await adminFetch('/api/inquiry')
  if (!res.ok) {
- setErr(`목록 로드 실패 (${res.status}) — ADMIN_SECRET 설정을 확인해주세요.`)
+ setErr(`목록 로드 실패 (${res.status}) · ADMIN_SECRET 설정을 확인해주세요.`)
  setLoading(false)
  return
  }
@@ -236,7 +236,7 @@ export default function AdminInquiriesPage() {
  <Icon size={18} strokeWidth={2.25} />
  </div>
  <div className="text-2xl font-black" style={{ color: k.color }}>
- {loading ? '—' : k.value.toLocaleString()}
+ {loading ? '-' : k.value.toLocaleString()}
  </div>
  <div className="text-xs text-[#8B95A1] font-medium mt-0.5">{k.label}</div>
  </div>

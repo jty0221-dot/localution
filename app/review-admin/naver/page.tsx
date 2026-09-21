@@ -41,7 +41,7 @@ function CredentialsAlert() {
  <Lock size={16} className="text-[#DC2626]" strokeWidth={2.5} />
  </div>
  <div className="flex-1">
- <div className="font-bold text-[#991B1B] text-[14px] mb-1">비밀번호 변경 감지 — 재등록 필요</div>
+ <div className="font-bold text-[#991B1B] text-[14px] mb-1">비밀번호 변경 감지 · 재등록 필요</div>
  <div className="text-[12px] text-[#7F1D1D] leading-relaxed mb-3">
  네이버 비밀번호가 변경되었거나 잘못된 정보입니다. 새 비밀번호로 다시 등록해야 답글 자동 발행이 정상 작동해요.
  </div>

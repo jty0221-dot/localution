@@ -1,8 +1,12 @@
 'use client'
 
 import { useState, useEffect, useCallback } from 'react'
-import { Link2, AlertTriangle, CheckCircle2 } from 'lucide-react'
+import {
+ Link2, AlertTriangle, CheckCircle2, Sparkles, Star, Check, Clock,
+ MessageSquareReply, Bot, Palette, ShieldCheck, Gauge,
+} from 'lucide-react'
 import Sidebar from '@/app/components/Sidebar'
+import PageHeader from '@/app/components/PageHeader'
 
 // ── 타입 ─────────────────────────────────────────────────────
 interface Review {
@@ -25,6 +29,7 @@ interface Settings {
 
 // ── 상수 ─────────────────────────────────────────────────────
 const TONES = [
+ { value: 'auto', label: '자동', desc: '리뷰마다 말투를 바꿔 씁니다' },
  { value: 'friendly', label: '친근한', desc: '사장님처럼 따뜻하게' },
  { value: 'expert', label: '전문적', desc: '정중하고 단정하게' },
  { value: 'witty', label: '유쾌한', desc: '위트 있게 밝게' },
@@ -44,14 +49,16 @@ const STATUS_LABEL: Record<string, { text: string; color: string }> = {
 function StarRow({ rating }: { rating: number | null }) {
  const r = Math.round(Math.min(5, Math.max(0, rating ?? 0)))
  return (
- <span className="text-amber-400 text-sm">
- {'★'.repeat(r)}{'☆'.repeat(5 - r)}
+ <span className="inline-flex items-center gap-0.5 text-amber-400">
+ {Array.from({ length: 5 }).map((_, i) => (
+ <Star key={i} size={12} strokeWidth={2} className={i < r ? 'fill-amber-400' : 'text-gray-300'} />
+ ))}
  </span>
  )
 }
 
 function fmtDate(iso: string | null): string {
- if (!iso) return '—'
+ if (!iso) return '-'
  return new Date(iso).toLocaleDateString('ko-KR', { month: 'short', day: 'numeric' })
 }
 
@@ -244,7 +251,10 @@ export default function NaverAutoReplyPage() {
  {rev.draft_reply ? (
  <div className="mb-3">
  <div className="flex items-center gap-1.5 mb-1.5">
- <span className="text-[11px] font-bold text-[#1A67F5]">✦ AI 초안</span>
+ <span className="inline-flex items-center gap-1 text-[11px] font-bold text-[#3182F6]">
+ <Sparkles size={12} strokeWidth={2.5} />
+ AI 초안
+ </span>
  {rev.reply_tone && (
  <span className="text-[10px] text-[#8B95A1]">
  · {TONES.find(t => t.value === rev.reply_tone)?.label || rev.reply_tone}
@@ -255,7 +265,7 @@ export default function NaverAutoReplyPage() {
  <textarea
  value={editText}
  onChange={e => setEditText(e.target.value)}
- className="w-full text-sm text-[#1A1A2E] bg-[#EEF4FF] border border-[#1A67F5]/30 rounded-xl px-3 py-2.5 resize-none leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#1A67F5]/30"
+ className="w-full text-sm text-[#1A1A2E] bg-[#EEF4FF] border border-[#3182F6]/30 rounded-xl px-3 py-2.5 resize-none leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#3182F6]/30"
  rows={5}
  />
  ) : (
@@ -278,7 +288,7 @@ export default function NaverAutoReplyPage() {
  <button
  onClick={() => handleApprove(rev, editText)}
  disabled={busy || !editText.trim()}
- className="flex-1 min-w-[100px] py-2 rounded-xl text-sm font-bold bg-[#1A67F5] text-white hover:bg-[#1552CC] disabled:opacity-50 transition-colors"
+ className="flex-1 min-w-[100px] py-2 rounded-xl text-sm font-bold bg-[#3182F6] text-white hover:bg-[#1B64DA] disabled:opacity-50 transition-colors"
  >
  {busy ? '처리 중…' : '수정 후 승인'}
  </button>
@@ -294,14 +304,14 @@ export default function NaverAutoReplyPage() {
  <button
  onClick={() => handleApprove(rev)}
  disabled={busy}
- className="flex-1 min-w-[80px] py-2 rounded-xl text-sm font-bold bg-[#1A67F5] text-white hover:bg-[#1552CC] disabled:opacity-50 transition-colors"
+ className="flex-1 min-w-[80px] inline-flex items-center justify-center gap-1.5 py-2.5 rounded-xl text-sm font-bold bg-[#3182F6] text-white hover:bg-[#1B64DA] disabled:opacity-50 transition-colors"
  >
- {busy ? '처리 중…' : '✓ 승인·게시'}
+ {busy ? '처리 중…' : (<><Check size={14} strokeWidth={2.5} />승인·게시</>)}
  </button>
  <button
  onClick={() => { setEditingId(rev.id); setEditText(rev.draft_reply || '') }}
  disabled={busy}
- className="px-3 py-2 rounded-xl text-sm font-semibold text-[#1A67F5] bg-[#EEF4FF] hover:bg-[#DCE8FF] disabled:opacity-50 transition-colors"
+ className="px-3 py-2 rounded-xl text-sm font-semibold text-[#3182F6] bg-[#EEF4FF] hover:bg-[#DCE8FF] disabled:opacity-50 transition-colors"
  >
  수정
  </button>
@@ -318,10 +328,16 @@ export default function NaverAutoReplyPage() {
  )}
 
  {rev.reply_status === 'queued' && (
- <p className="text-xs text-[#1A67F5] font-semibold mt-1">⏳ Railway Worker가 SmartPlace에 게시 중이에요</p>
+ <p className="inline-flex items-center gap-1 text-xs text-[#3182F6] font-semibold mt-1">
+ <Clock size={12} strokeWidth={2.5} />
+ 스마트플레이스에 게시하는 중이에요
+ </p>
  )}
  {rev.reply_status === 'submitted' && (
- <p className="text-xs text-green-600 font-semibold mt-1">✓ 답글이 성공적으로 게시됐어요</p>
+ <p className="inline-flex items-center gap-1 text-xs text-[#059669] font-semibold mt-1">
+ <CheckCircle2 size={12} strokeWidth={2.5} />
+ 답글이 게시됐어요
+ </p>
  )}
  </div>
  )
@@ -348,16 +364,21 @@ export default function NaverAutoReplyPage() {
  return (
  <div className="space-y-4">
  {/* 자동답글 ON/OFF */}
- <div className="bg-white rounded-2xl border border-[#E8ECF0] p-5">
- <div className="flex items-center justify-between">
- <div>
+ <div className="bg-white rounded-2xl border border-[#E8ECF0] shadow-sm p-4 md:p-5">
+ <div className="flex items-center justify-between gap-4">
+ <div className="flex items-start gap-3 min-w-0">
+ <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-[#3182F6] to-[#1B64DA] shadow-sm flex items-center justify-center">
+ <Bot size={16} className="text-white" strokeWidth={2.5} />
+ </div>
+ <div className="min-w-0">
  <div className="text-sm font-bold text-[#1A1A2E] mb-0.5">자동 AI 답글 생성</div>
- <div className="text-xs text-[#8B95A1]">크론이 실행될 때 미답변 리뷰에 AI 초안을 자동으로 만들어요</div>
+ <div className="text-xs text-[#8B95A1]">수집기가 돌 때 미답변 리뷰에 AI 초안을 자동으로 만들어요</div>
+ </div>
  </div>
  <button
  onClick={() => setSettingsDraft(prev => prev ? { ...prev, enabled: !prev.enabled } : prev)}
  className={`relative w-12 h-6 rounded-full transition-colors ${
- settingsDraft.enabled ? 'bg-[#1A67F5]' : 'bg-[#D1D5DB]'
+ settingsDraft.enabled ? 'bg-[#3182F6]' : 'bg-[#D1D5DB]'
  }`}
  >
  <span className={`absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full shadow transition-transform ${
@@ -368,8 +389,16 @@ export default function NaverAutoReplyPage() {
  </div>
 
  {/* 답글 톤 */}
- <div className="bg-white rounded-2xl border border-[#E8ECF0] p-5">
- <div className="text-sm font-bold text-[#1A1A2E] mb-3">기본 답글 톤</div>
+ <div className="bg-white rounded-2xl border border-[#E8ECF0] shadow-sm p-4 md:p-5">
+ <div className="flex items-center gap-3 mb-3">
+ <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] shadow-sm flex items-center justify-center">
+ <Palette size={16} className="text-white" strokeWidth={2.5} />
+ </div>
+ <div>
+ <div className="text-sm font-bold text-[#1A1A2E]">기본 답글 톤</div>
+ <div className="text-xs text-[#8B95A1]">리뷰가 말한 메뉴에 먼저 반응하고 지역 키워드는 한두 개만 자연스럽게 넣어요</div>
+ </div>
+ </div>
  <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
  {TONES.map(t => (
  <button
@@ -377,11 +406,11 @@ export default function NaverAutoReplyPage() {
  onClick={() => setSettingsDraft(prev => prev ? { ...prev, tone: t.value } : prev)}
  className={`p-3 rounded-xl border text-left transition-all ${
  settingsDraft.tone === t.value
- ? 'border-[#1A67F5] bg-[#EEF4FF]'
+ ? 'border-[#3182F6] bg-[#EEF4FF]'
  : 'border-[#E8ECF0] hover:border-[#B0BEC5]'
  }`}
  >
- <div className={`text-sm font-bold mb-0.5 ${settingsDraft.tone === t.value ? 'text-[#1A67F5]' : 'text-[#1A1A2E]'}`}>
+ <div className={`text-sm font-bold mb-0.5 ${settingsDraft.tone === t.value ? 'text-[#3182F6]' : 'text-[#1A1A2E]'}`}>
  {t.label}
  </div>
  <div className="text-[11px] text-[#8B95A1]">{t.desc}</div>
@@ -391,10 +420,14 @@ export default function NaverAutoReplyPage() {
  </div>
 
  {/* 자동 승인 */}
- <div className="bg-white rounded-2xl border border-[#E8ECF0] p-5">
+ <div className="bg-white rounded-2xl border border-[#E8ECF0] shadow-sm p-4 md:p-5">
  <div className="flex items-start justify-between gap-4">
- <div>
- <div className="text-sm font-bold text-[#1A1A2E] mb-0.5">자동 승인 (Auto-Approve)</div>
+ <div className="flex items-start gap-3 min-w-0">
+ <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] shadow-sm flex items-center justify-center">
+ <ShieldCheck size={16} className="text-white" strokeWidth={2.5} />
+ </div>
+ <div className="min-w-0">
+ <div className="text-sm font-bold text-[#1A1A2E] mb-0.5">자동 승인</div>
  <div className="text-xs text-[#8B95A1]">
  ON이면 AI가 초안을 만들자마자 바로 게시 대기열에 넣어요.<br />
  OFF이면 이 페이지에서 직접 검토 후 승인해야 해요.
@@ -405,6 +438,7 @@ export default function NaverAutoReplyPage() {
  AI 답글이 검토 없이 자동 게시됩니다
  </div>
  )}
+ </div>
  </div>
  <button
  onClick={() => setSettingsDraft(prev => prev ? { ...prev, auto_approve: !prev.auto_approve } : prev)}
@@ -420,9 +454,16 @@ export default function NaverAutoReplyPage() {
  </div>
 
  {/* 회당 최대 건수 */}
- <div className="bg-white rounded-2xl border border-[#E8ECF0] p-5">
- <div className="text-sm font-bold text-[#1A1A2E] mb-1">크론 1회당 최대 답글 생성 수</div>
- <div className="text-xs text-[#8B95A1] mb-3">너무 많으면 AI API 비용이 많이 나올 수 있어요 (권장: 5~10건)</div>
+ <div className="bg-white rounded-2xl border border-[#E8ECF0] shadow-sm p-4 md:p-5">
+ <div className="flex items-center gap-3 mb-3">
+ <div className="w-9 h-9 shrink-0 rounded-xl bg-gradient-to-br from-[#059669] to-[#047857] shadow-sm flex items-center justify-center">
+ <Gauge size={16} className="text-white" strokeWidth={2.5} />
+ </div>
+ <div>
+ <div className="text-sm font-bold text-[#1A1A2E]">1회 실행당 최대 답글 생성 수</div>
+ <div className="text-xs text-[#8B95A1]">너무 많으면 AI 비용이 커질 수 있어요 (권장 5~10건)</div>
+ </div>
+ </div>
  <div className="flex items-center gap-3">
  <input
  type="range"
@@ -430,9 +471,9 @@ export default function NaverAutoReplyPage() {
  max={20}
  value={settingsDraft.max_per_run}
  onChange={e => setSettingsDraft(prev => prev ? { ...prev, max_per_run: Number(e.target.value) } : prev)}
- className="flex-1 accent-[#1A67F5]"
+ className="flex-1 accent-[#3182F6]"
  />
- <span className="w-10 text-center text-sm font-bold text-[#1A67F5]">{settingsDraft.max_per_run}건</span>
+ <span className="w-10 text-center text-sm font-bold text-[#3182F6]">{settingsDraft.max_per_run}건</span>
  </div>
  </div>
 
@@ -442,7 +483,7 @@ export default function NaverAutoReplyPage() {
  disabled={settingsSaving || !changed}
  className={`w-full py-3 rounded-2xl text-sm font-bold transition-all ${
  changed
- ? 'bg-[#1A67F5] text-white hover:bg-[#1552CC]'
+ ? 'bg-[#3182F6] text-white hover:bg-[#1B64DA]'
  : 'bg-[#F2F4F6] text-[#8B95A1] cursor-not-allowed'
  } disabled:opacity-60`}
  >
@@ -456,18 +497,14 @@ export default function NaverAutoReplyPage() {
  return (
  <div className="min-h-screen bg-[#F8F9FA]">
  <Sidebar />
- <div className="md:ml-[240px] pt-4 md:pt-0 min-h-screen">
- <div className="max-w-3xl mx-auto px-4 py-6 md:py-8">
+ <div className="md:ml-[220px] flex flex-col min-h-screen">
+ <PageHeader
+ icon={<MessageSquareReply size={24} className="text-white" strokeWidth={2.5} />}
+ title="네이버 AI 자동답글"
+ subtitle="AI 답글 초안을 검토하고 승인하면 스마트플레이스에 자동 게시돼요"
+ />
 
- {/* 헤더 */}
- <div className="mb-6">
- <h1 className="text-xl md:text-2xl font-black text-[#1A1A2E] mb-1">
- 네이버 AI 자동답글
- </h1>
- <p className="text-sm text-[#8B95A1]">
- AI가 만든 답글 초안을 검토·승인하면 SmartPlace에 자동 게시돼요
- </p>
- </div>
+ <main className="flex-1 max-w-4xl w-full mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6">
 
  {/* 탭 */}
  <div className="flex gap-1 mb-5 bg-white rounded-2xl border border-[#E8ECF0] p-1">
@@ -481,7 +518,7 @@ export default function NaverAutoReplyPage() {
  onClick={() => setTab(key as typeof tab)}
  className={`flex-1 flex items-center justify-center gap-1.5 py-2 rounded-xl text-sm font-semibold transition-all ${
  tab === key
- ? 'bg-[#1A67F5] text-white shadow-sm'
+ ? 'bg-[#3182F6] text-white shadow-sm'
  : 'text-[#8B95A1] hover:text-[#1A1A2E]'
  }`}
  >
@@ -503,9 +540,9 @@ export default function NaverAutoReplyPage() {
  <button
  onClick={handleManualRun}
  disabled={loading}
- className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-[#1A67F5] bg-[#EEF4FF] hover:bg-[#DCE8FF] disabled:opacity-50 transition-colors"
+ className="flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold text-[#3182F6] bg-[#EEF4FF] hover:bg-[#DCE8FF] disabled:opacity-50 transition-colors"
  >
- <span className={loading ? 'animate-spin' : ''}>✦</span>
+ <Sparkles size={14} strokeWidth={2.5} className={loading ? 'animate-spin' : ''} />
  AI 초안 지금 생성
  </button>
  </div>
@@ -541,13 +578,13 @@ export default function NaverAutoReplyPage() {
  )}
  </>
  )}
- </div>
+ </main>
  </div>
 
  {/* 토스트 */}
  {toast && (
  <div className={`fixed bottom-6 left-1/2 -translate-x-1/2 px-5 py-3 rounded-2xl text-sm font-semibold shadow-xl z-50 transition-all ${
- toast.type === 'ok' ? 'bg-[#1A67F5] text-white' : 'bg-red-500 text-white'
+ toast.type === 'ok' ? 'bg-[#3182F6] text-white' : 'bg-red-500 text-white'
  }`}>
  {toast.msg}
  </div>

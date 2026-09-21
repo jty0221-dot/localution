@@ -30,7 +30,7 @@ export default function ReviewPollingToast({ platform }: Props) {
  const id = String(latest.platform_review_id || latest.id || '')
  if (!lastSeenRef.current) {
  lastSeenRef.current = id
- return // 첫 polling — baseline 만 설정
+ return // 첫 polling · baseline 만 설정
  }
  if (id !== lastSeenRef.current) {
  // 새 리뷰 도착

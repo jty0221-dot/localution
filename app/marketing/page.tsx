@@ -44,13 +44,13 @@ const diagData = [
  { category: '사진/영상', items: [
  { label: '대표 사진', status: 'ok' as const, desc: '고화질 1장 등록됨', score: 10 },
  { label: '내부 사진', status: 'warn' as const, desc: '권장 10장 중 4장', score: 4 },
- { label: '음식 사진', status: 'bad' as const, desc: '미등록 — 방문자 전환에 영향', score: 0 },
+ { label: '음식 사진', status: 'bad' as const, desc: '미등록 · 방문자 전환에 영향', score: 0 },
  { label: '외부/간판 사진', status: 'ok' as const, desc: '등록됨', score: 10 },
  ]},
  { category: '리뷰 관리', items: [
  { label: '리뷰 수', status: 'ok' as const, desc: '127개 (업종 평균 이상)', score: 10 },
  { label: '평균 평점', status: 'ok' as const, desc: '4.6점', score: 10 },
- { label: '사장님 답글률', status: 'warn' as const, desc: '62% — 80% 이상 권장', score: 6 },
+ { label: '사장님 답글률', status: 'warn' as const, desc: '62% · 80% 이상 권장', score: 6 },
  { label: '최근 리뷰 답변', status: 'bad' as const, desc: '14일 이상 미답변', score: 2 },
  ]},
  { category: 'SNS 연동', items: [
@@ -107,7 +107,7 @@ function RankTab() {
  return (
  <div>
  <div className="flex items-center gap-2 mb-3">
- <span className="inline-block text-[10px] font-semibold bg-[#FEF9E8] text-[#CA8A04] border border-[#FCD34D] px-2 py-0.5 rounded-full">예시 데이터 — 실제 연동 시 내 매장 순위가 표시됩니다</span>
+ <span className="inline-block text-[10px] font-semibold bg-[#FEF9E8] text-[#CA8A04] border border-[#FCD34D] px-2 py-0.5 rounded-full">예시 데이터 · 실제 연동 시 내 매장 순위가 표시됩니다</span>
  </div>
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center gap-2">
@@ -502,7 +502,7 @@ export default function MarketingPage() {
  <PageHeader
  icon={<Rocket size={28} className="text-white" strokeWidth={2.5} />}
  title="마케팅"
- subtitle="네이버 플레이스·블로그·인스타를 한 곳에서 — 자영업자 올인원"
+ subtitle="네이버 플레이스·블로그·인스타를 한 곳에서 · 자영업자 올인원"
  variant="accent"
  />
  <div className="max-w-5xl mx-auto p-4 md:p-8">

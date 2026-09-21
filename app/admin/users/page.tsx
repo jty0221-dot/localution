@@ -120,7 +120,7 @@ export default function AdminUsersPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* 헤더 */}
         <div className="flex items-start justify-between gap-3 mb-4 md:mb-6 flex-wrap">
           <div className="min-w-0 flex-1">

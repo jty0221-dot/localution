@@ -6,9 +6,17 @@
 // · 제10조 강화: 면책조항에 플랫폼 정책 변경 대응 조문 추가
 // · 시행일: 2026-05-01 (14일 공지 기간 확보)
 // ============================================================
+import type { Metadata } from 'next'
+import { pageMetadata } from '../lib/seo'
 import Link from 'next/link'
 import Footer from '../components/Footer'
 import { COMPANY } from '../lib/company'
+
+export const metadata: Metadata = pageMetadata({
+  title: '이용약관',
+  description: '로컬루션 서비스 이용약관. 계정 · 결제 · 환불 · 서비스 변경과 책임 범위를 정합니다.',
+  path: 'terms',
+})
 
 export default function Terms() {
  const sections = [

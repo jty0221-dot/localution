@@ -102,9 +102,9 @@ export default function QRReportPanel({ storeName }: { storeName?: string }) {
  list.push({ Icon: Sparkles, text: '아직 스캔 활동이 없어요. QR을 매장에 비치하고 손님께 안내해보세요', tone: 'info' })
  return list
  }
- if (m.overall_rate >= 30) list.push({ Icon: Flame, text: `전체 전환율 ${m.overall_rate}% — 우수해요 (업계 평균 15-20%)`, tone: 'good' })
- else if (m.overall_rate >= 15) list.push({ Icon: ThumbsUp, text: `전체 전환율 ${m.overall_rate}% — 양호한 수준입니다`, tone: 'good' })
- else list.push({ Icon: Lightbulb, text: `전체 전환율 ${m.overall_rate}% — 리워드 강화 또는 QR 위치 개선을 고려해보세요`, tone: 'warn' })
+ if (m.overall_rate >= 30) list.push({ Icon: Flame, text: `전체 전환율 ${m.overall_rate}% · 우수해요 (업계 평균 15-20%)`, tone: 'good' })
+ else if (m.overall_rate >= 15) list.push({ Icon: ThumbsUp, text: `전체 전환율 ${m.overall_rate}% · 양호한 수준입니다`, tone: 'good' })
+ else list.push({ Icon: Lightbulb, text: `전체 전환율 ${m.overall_rate}% · 리워드 강화 또는 QR 위치 개선을 고려해보세요`, tone: 'warn' })
 
  if (m.trend > 10) list.push({ Icon: TrendingUp, text: `최근 활동이 ${m.trend}% 증가하고 있어요`, tone: 'good' })
  else if (m.trend < -10) list.push({ Icon: TrendingDown, text: `최근 활동이 ${Math.abs(m.trend)}% 감소했어요. 재방문 이벤트를 진행해보세요`, tone: 'warn' })
@@ -114,7 +114,7 @@ export default function QRReportPanel({ storeName }: { storeName?: string }) {
  const mobilePct = stats.devices.mobile && metrics.totalEvents
  ? Math.round((stats.devices.mobile / Object.values(stats.devices).reduce((a, b) => a + b, 0)) * 100)
  : 0
- if (mobilePct >= 80) list.push({ Icon: Smartphone, text: `모바일 사용자가 ${mobilePct}% — QR 위주 마케팅이 효과적이에요`, tone: 'info' })
+ if (mobilePct >= 80) list.push({ Icon: Smartphone, text: `모바일 사용자가 ${mobilePct}% · QR 위주 마케팅이 효과적이에요`, tone: 'info' })
 
  return list
  }, [stats, metrics])

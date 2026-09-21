@@ -8,11 +8,11 @@ export default function LoginPage() {
  const [counters, setCounters] = useState({ visitors: 0, reviews: 0, rank: 0 })
  // 회원가입 모드 여부 (/signup → /login?mode=signup 로 rewrite 되거나, 직접 쿼리로 접근)
  const [isSignup, setIsSignup] = useState(false)
- // 다른 계정으로 로그인 (네이버/카카오/구글에 reset 쿼리 전달 — 계정 선택/재로그인 강제)
+ // 다른 계정으로 로그인 (네이버/카카오/구글에 reset 쿼리 전달 · 계정 선택/재로그인 강제)
  const [useDifferentAccount, setUseDifferentAccount] = useState(false)
  const oauthQuery = useDifferentAccount ? '?reset=1' : ''
 
- // 모바일 상단 — 실시간 데이터 (단조 증가, 영속, 절대 내려가지 않음)
+ // 모바일 상단 · 실시간 데이터 (단조 증가, 영속, 절대 내려가지 않음)
  //   · 사장님 수: 142명에서 시작 (출시 시점), 매우 느린 자연 증가
  //   · 새로고침해도 localStorage 에 저장된 마지막 값 + 시간 경과분 합산 → 내려가지 않음
  //   · 다른 기기에서도 동일하게 보이도록 base 는 출시일 기준 deterministic 계산
@@ -29,7 +29,7 @@ export default function LoginPage() {
  }
  function computeBaseReviews(now: number) {
  const minutesSinceLaunch = Math.max(0, (now - LAUNCH_TS) / 60000)
- // 하루 ~12건씩 — 분당 0.0083
+ // 하루 ~12건씩 · 분당 0.0083
  return 12 + Math.floor(minutesSinceLaunch * 0.0083)
  }
  function computeBaseTotalReplies(now: number) {
@@ -68,19 +68,19 @@ export default function LoginPage() {
  try { localStorage.setItem(STATS_KEY, JSON.stringify(next)) } catch {}
  }
  pullStats()
- // 매 30초마다 자연 증가분만 반영 (단조 증가만 — 절대 감소 X)
+ // 매 30초마다 자연 증가분만 반영 (단조 증가만 · 절대 감소 X)
  //   사장님: ~28시간마다 +1, 답글: 30초마다 ~0.25 → 가끔 +1
  //   페이지를 오래 열어둬도 너무 자주 안 변하도록
  const t = setInterval(() => {
  setLiveStats(prev => {
  const now = Date.now()
- // 누적 답글은 약 2분에 +1 페이스 — 살아있는 느낌
+ // 누적 답글은 약 2분에 +1 페이스 · 살아있는 느낌
  const nudgeReplies = Math.random() < 0.25 ? 1 : 0
  // 오늘 답글은 약 5분에 +1 페이스
  const nudgeToday = Math.random() < 0.1 ? 1 : 0
  const next = {
  ...prev,
- // 사장님은 base 가 시간으로 자연 증가하므로 별도 nudge 안 함 — 새로고침으로 갱신
+ // 사장님은 base 가 시간으로 자연 증가하므로 별도 nudge 안 함 · 새로고침으로 갱신
  owners: Math.max(prev.owners, computeBaseOwners(now)),
  reviewsToday: Math.max(prev.reviewsToday + nudgeToday, computeBaseReviews(now)),
  monthlyReplies: Math.max(prev.monthlyReplies + nudgeReplies, computeBaseTotalReplies(now)),
@@ -111,7 +111,7 @@ export default function LoginPage() {
  // · 수정: ?redirect=<path> 가 있으면 거기로, 없으면 /dashboard
  const params = new URLSearchParams(window.location.search)
  const redirect = params.get('redirect')
- // 보안: open redirect 방지 — 같은 출처 path 만 허용
+ // 보안: open redirect 방지 · 같은 출처 path 만 허용
  const safe = redirect && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard'
  window.location.href = safe
  }
@@ -261,7 +261,7 @@ export default function LoginPage() {
  .accountSwitch input { width:14px; height:14px; accent-color:#3b82f6; cursor:pointer; flex-shrink:0; }
  .accountSwitch span { font-size:12px; color:#94a3b8; font-weight:500; line-height:1.4; }
 
- /* 모바일 상단 브랜드 바 — 1100px 이하에서 노출, 데스크톱은 숨김 */
+ /* 모바일 상단 브랜드 바 · 1100px 이하에서 노출, 데스크톱은 숨김 */
  .mobileTopBar { display:none; position:sticky; top:0; left:0; right:0; z-index:20; padding: calc(env(safe-area-inset-top, 0px) + 12px) 16px 12px; background: linear-gradient(180deg, rgba(6,13,26,0.96) 0%, rgba(6,13,26,0.88) 100%); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(59,130,246,0.18); }
  .mobileTopBar .row { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:10px; }
  .mobileTopBar .brand { display:flex; align-items:center; gap:10px; }
@@ -283,7 +283,7 @@ export default function LoginPage() {
  50% { transform: scale(1.04); }
  }
 
- /* 실시간 통계 트랙 — 가로 stat 카드 3개 + 회전 데이터 */
+ /* 실시간 통계 트랙 · 가로 stat 카드 3개 + 회전 데이터 */
  .liveStats { display:grid; grid-template-columns: repeat(3, 1fr); gap:6px; }
  .liveStatCard { background: rgba(59,130,246,0.08); border:1px solid rgba(59,130,246,0.16); border-radius:10px; padding:7px 8px; min-height:46px; position:relative; overflow:hidden; }
  .liveStatCard .liveStatIcon { position:absolute; top:6px; right:6px; opacity:0.45; }
@@ -294,7 +294,7 @@ export default function LoginPage() {
  .liveStatCard.featured .liveStatValue { color:#60a5fa; }
 
  @media (max-width: 1100px) {
- /* mobileTopBar 와 mainWrap 이 column 으로 stacking — mobileTopBar 위, mainWrap 아래 */
+ /* mobileTopBar 와 mainWrap 이 column 으로 stacking · mobileTopBar 위, mainWrap 아래 */
  .mobileTopBar { display:block; width:100%; flex-shrink:0; }
  .mainWrap { display:block; flex-direction:column; height:auto; width:100%; max-width:none; padding:0; }
  .leftArea { display:none; }
@@ -325,7 +325,7 @@ export default function LoginPage() {
  }
  `}</style>
 
- {/* 모바일 상단 브랜드 바 (1100px 이하 노출) — 실제 로고 + 실시간 통계 카드 3종 */}
+ {/* 모바일 상단 브랜드 바 (1100px 이하 노출) · 실제 로고 + 실시간 통계 카드 3종 */}
  <div className='mobileTopBar'>
  <div className='row'>
  <div className='brand'>
@@ -343,7 +343,7 @@ export default function LoginPage() {
  </div>
  </div>
 
- {/* 실시간 통계 3 카드 — 매 3초마다 자연스럽게 갱신 */}
+ {/* 실시간 통계 3 카드 · 매 3초마다 자연스럽게 갱신 */}
  <div className='liveStats'>
  <div className='liveStatCard featured'>
  <svg className='liveStatIcon' width="11" height="11" viewBox="0 0 12 12" fill="none">
@@ -531,7 +531,7 @@ export default function LoginPage() {
  </a>
  </div>
 
- {/* 다른 계정으로 로그인 토글 — 같은 OAuth 계정이 자동 재사용되는 문제 해결 */}
+ {/* 다른 계정으로 로그인 토글 · 같은 OAuth 계정이 자동 재사용되는 문제 해결 */}
  <label className='accountSwitch'>
  <input
  type='checkbox'

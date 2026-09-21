@@ -54,7 +54,7 @@ export default function ImpersonationBanner() {
 
   return (
     <div className="sticky top-0 z-50 bg-gradient-to-r from-[#F04452] to-[#DC2626] text-white shadow-lg">
-      <div className="max-w-7xl mx-auto px-3 md:px-6 py-2 flex items-center justify-between gap-2 flex-wrap">
+      <div className="max-w-6xl mx-auto px-3 md:px-6 py-2 flex items-center justify-between gap-2 flex-wrap">
         <div className="flex items-center gap-2 min-w-0 flex-1">
           <Shield size={16} className="flex-shrink-0" strokeWidth={2.5} />
           <div className="min-w-0">

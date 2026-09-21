@@ -34,6 +34,10 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/app/lib/userAuth'
 import { createServiceClient } from '@/app/lib/adminAuth'
 import { rateLimit, getClientIp } from '@/app/lib/rate-limit'
+import {
+  hashSeed, extractReviewSignals, buildKeywordPool, pickVariation, buildVarietyLines,
+  loadStoreMenus, loadRecentOpeners, type ReviewKind,
+} from '@/app/lib/reply-variety'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -230,11 +234,26 @@ function buildSystemPrompt(ctx: {
  }
  customerProfile: { gender: string; age: string }
  customPrompt?: string // v1.6y: custom 톤 사장님 맞춤 프롬프트
-}): string {
+ reviewText?: string       // 리뷰 본문 · 메뉴 · 포인트 추출용
+ menus?: string[]          // 매장 메뉴 (menu_items) · 사진 매핑 · 메뉴 언급
+ recentOpeners?: string[]  // 최근 답글 첫 문장 · 같은 시작 반복 방지
+ seed?: number             // 리뷰별 구성 seed (본문 + 사진 해시)
+}): { system: string; tone: string } {
  const { lang, platform, bizType, storeName, region, mainKeyword, subKeywords,
  storeDesc, storeStrengths, ownerMindset, reviewType, rating, hasPhotos, aiSettings, customerProfile, customPrompt } = ctx
  const lc = LANG_CONFIG[lang] || LANG_CONFIG['ko']
- const isExpert = aiSettings.tone === 'expert' || aiSettings.tone === 'formal' || aiSettings.tone === 'simple'
+ const menus = ctx.menus || []
+ const recentOpeners = ctx.recentOpeners || []
+ const seed = ctx.seed ?? 0
+ // 리뷰 파악 · 키워드 회전 · 톤 결정 ('auto' 면 리뷰 성격에 맞는 풀에서 순환)
+ const signals = extractReviewSignals(ctx.reviewText || '', menus)
+ const kwPool = buildKeywordPool({ region, bizType, storeName, mainKeyword, subKeywords, menus })
+ const variation = pickVariation({
+   seed, tone: aiSettings.tone, kind: reviewType as ReviewKind, hasPhotos,
+   keywordPool: kwPool, reviewMenus: signals.menus, region,
+ })
+ const toneResolved = variation.tone
+ const isExpert = toneResolved === 'expert' || toneResolved === 'formal' || toneResolved === 'simple'
 
  const lengthMap: Record<string, string> = {
  short: '4~5문장 (120~180자)',
@@ -242,8 +261,8 @@ function buildSystemPrompt(ctx: {
  long: '10~13문장 (360~520자)',
  }
  const length = lengthMap[aiSettings.length] || lengthMap['medium']
- const toneText = toneDescription(aiSettings.tone, customPrompt)
- const kwList = buildSeoKeywords({ region, bizType, storeName, mainKeyword, subKeywords })
+ const toneText = toneDescription(toneResolved, customPrompt)
+ const kwList = kwPool
 
  const lines: string[] = []
 
@@ -268,8 +287,11 @@ function buildSystemPrompt(ctx: {
  if (storeDesc) lines.push('- 매장 소개: ' + storeDesc.slice(0, 400))
  if (storeStrengths) lines.push('- 매장 강점: ' + storeStrengths)
  if (ownerMindset) lines.push('- 사장 마인드/철학: ' + ownerMindset)
- if (kwList.length) lines.push('- SEO 핵심 키워드 풀: ' + kwList.slice(0, 6).join(' / '))
+ if (menus.length) lines.push('- 대표 메뉴: ' + menus.slice(0, 12).join(', '))
+ if (kwList.length) lines.push('- 키워드 풀 (지역 · 대표 · 메뉴 · 매장명): ' + kwList.slice(0, 8).join(' / '))
  lines.push('- 플랫폼: ' + platform)
+ lines.push('')
+ lines.push(...buildVarietyLines({ variation, signals, kind: reviewType as ReviewKind, hasPhotos, storeMenus: menus, recentOpeners }))
  lines.push('')
 
  // ── 3) 고객 프로필 ──
@@ -322,8 +344,10 @@ function buildSystemPrompt(ctx: {
 
  // ── 6) SEO 상위노출 전략 (30차-21: 키워드 과다·미사여구 방지) ──
  if (kwList.length && reviewType !== 'negative') {
- lines.push('[네이버 플레이스 SEO 상위노출 전략 — 절제가 핵심]')
- lines.push('- 아래 키워드 풀에서 딱 1~2개만 골라서 답글 전체에 자연스럽게 녹이세요: ' + kwList.slice(0, 4).join(', '))
+ lines.push('[네이버 플레이스 SEO 상위노출 전략 · 절제가 핵심]')
+ lines.push('- 이번 답글에 녹일 키워드는 위 [이번 답글의 구성] 에 적힌 것만, 각 1회: ' + (variation.keywords.join(', ') || kwList.slice(0, 2).join(', ')))
+ lines.push('- 지역 키워드는 장소를 말하는 자리에만 (예: "OO에서 OO 찾으실 때"). 문장 끝에 덧붙이지 않습니다.')
+ lines.push('- 메뉴 이름은 손님이 부른 그대로, 또는 대표 메뉴 목록의 표기 그대로 씁니다.')
  lines.push('- "매장명" 또는 "지역+업종" 조합은 답글 전체에서 1회만 언급. 절대 반복하지 마세요.')
  lines.push('- 같은 키워드가 2번 이상 등장하면 안 됩니다. 검색 스팸처럼 보여 역효과.')
  lines.push('- 답글 길이는 실제 사장님이 쓰는 수준으로 짧고 간결하게. 4~6문장 이내 권장.')
@@ -367,7 +391,7 @@ function buildSystemPrompt(ctx: {
  }
 
  lines.push('마크다운 없이 평문으로만 출력하세요. 답글 본문만 출력하고, 서문·해설·제목은 쓰지 마세요.')
- return lines.join('\n')
+ return { system: lines.join('\n'), tone: toneResolved }
 }
 
 // ── 사진 URL 필터 (https 만, 최대 N 개) ──
@@ -429,6 +453,8 @@ export async function POST(req: NextRequest) {
  let storeStrengths: string = String(body?.storeStrengths ?? body?.store_strengths ?? '')
  let ownerMindset: string = String(body?.ownerMindset ?? body?.owner_mindset ?? '')
  let addressForRegion = ''
+ let storeMenus: string[] = []
+ let recentOpeners: string[] = []
 
  if (auth.ok) {
  const svc = createServiceClient()
@@ -464,6 +490,13 @@ export async function POST(req: NextRequest) {
  }
  } catch (_) { /* graceful degrade */ }
 
+ // 2-a2) 메뉴 · 최근 답글 첫 문장 (사진 매핑 · 말투 다양성)
+ try {
+   const [m, ro] = await Promise.all([loadStoreMenus(svc, auth.userId), loadRecentOpeners(svc, auth.userId)])
+   storeMenus = m
+   recentOpeners = ro
+ } catch (_) { /* graceful degrade */ }
+
  // 2-b) review_id 자동 로드
  if (reviewId) {
  try {
@@ -492,10 +525,9 @@ export async function POST(req: NextRequest) {
  const reviewType = classifyReview(reviewText, rating || null)
  const lang = detectLang(reviewText)
  const lc = LANG_CONFIG[lang] || LANG_CONFIG['ko']
- const isExpert = tone === 'expert' || tone === 'formal' || tone === 'simple'
  const hasPhotos = photos.length > 0
 
- const systemPrompt = buildSystemPrompt({
+ const built = buildSystemPrompt({
  lang, platform, bizType, storeName, region, mainKeyword, subKeywords,
  storeDesc, storeStrengths, ownerMindset, reviewType,
  rating: typeof rating === 'number' ? rating : 0,
@@ -503,7 +535,14 @@ export async function POST(req: NextRequest) {
  aiSettings,
  customerProfile,
  customPrompt,
+ reviewText,
+ menus: storeMenus,
+ recentOpeners,
+ seed: hashSeed(reviewText + '|' + photos.join(',') + '|' + String(rating ?? '')),
  })
+ const systemPrompt = built.system
+ const toneUsed = built.tone
+ const isExpert = toneUsed === 'expert' || toneUsed === 'formal' || toneUsed === 'simple'
 
  // 4) 사용자 메시지 (텍스트 + 사진)
  let textPart: string
@@ -539,7 +578,7 @@ export async function POST(req: NextRequest) {
  photo_only: `${prefix} 사진까지 남겨 주셔서 감사해요. 다음 방문 때도 같은 느낌 드리려고 준비해 둘게요.`,
  }
  const reply = mocks[reviewType] || mocks.positive
- return NextResponse.json({ ok: true, reply, lang, reviewType, mode: 'mock' })
+ return NextResponse.json({ ok: true, reply, lang, reviewType, mode: 'mock', meta: { tone: toneUsed } })
  }
 
  // 6) 모델 후보 — 최신 우선 (동적 조회 제거: /v1/models 6초 + 모델 404 fallback 누적으로 timeout 발생)
@@ -591,11 +630,10 @@ export async function POST(req: NextRequest) {
  if (!respOk) {
  console.error('[ai-review-reply] Claude error:', respStatus, respText.slice(0, 400))
  let claudeErrMsg = `HTTP ${respStatus}`
- let rawMsg = ''
  try {
  const errJson = JSON.parse(respText)
- rawMsg = errJson?.error?.message || errJson?.message || ''
- if (rawMsg) claudeErrMsg = `HTTP ${respStatus}: ${String(rawMsg).slice(0, 100)}`
+ const msg = errJson?.error?.message || errJson?.message || ''
+ if (msg) claudeErrMsg = `HTTP ${respStatus}: ${String(msg).slice(0, 100)}`
  } catch { /* ignore */ }
  // 사진 있을 때 → 텍스트만으로 재시도
  if (hasPhotos) {
@@ -606,33 +644,12 @@ export async function POST(req: NextRequest) {
  const d2 = JSON.parse(retry.text)
  let reply2 = d2.content?.[0]?.text?.trim() || '답변 생성 실패'
  if (isExpert) reply2 = stripArtifacts(reply2, true)
- return NextResponse.json({ ok: true, reply: reply2, lang, reviewType, mode: 'text-fallback', meta: { model: candidate } })
+ return NextResponse.json({ ok: true, reply: reply2, lang, reviewType, mode: 'text-fallback', meta: { model: candidate, tone: toneUsed } })
  }
  break
  }
  }
- // 2026-07-30 hotfix: Anthropic 결제/한도 에러는 사장님이 원인·조치를 바로 알 수 있게 분류
- const lower = (rawMsg + ' ' + respText).toLowerCase()
- const isCreditIssue = lower.includes('credit balance is too low')
- || lower.includes('billing') || lower.includes('quota')
- || lower.includes('exceeded your') || respStatus === 402
- const isRateLimit = respStatus === 429
- const isAuthIssue = respStatus === 401 || respStatus === 403
- let claudeErrCode: string | undefined
- if (isCreditIssue) claudeErrCode = 'ai_credit_exhausted'
- else if (isRateLimit) claudeErrCode = 'ai_rate_limited'
- else if (isAuthIssue) claudeErrCode = 'ai_auth_failed'
- const friendlyMsg = isCreditIssue
- ? 'AI 서비스 결제 잔액이 소진되었어요. 사장님 담당자에게 문의해주세요. (원인: Anthropic API credit)'
- : isRateLimit
- ? 'AI 요청이 몰려서 잠시 지연이에요. 30초 후 다시 시도해주세요.'
- : isAuthIssue
- ? 'AI 서비스 인증에 문제가 있어요. 관리자에게 문의해주세요.'
- : claudeErrMsg
- return NextResponse.json(
- { ok: false, error: friendlyMsg, code: claudeErrCode, raw: claudeErrMsg },
- { status: isCreditIssue ? 402 : (respStatus === 429 ? 429 : 500) },
- )
+ return NextResponse.json({ ok: false, error: claudeErrMsg }, { status: 500 })
  }
 
  const data = JSON.parse(respText)
@@ -645,7 +662,7 @@ export async function POST(req: NextRequest) {
  lang,
  reviewType,
  mode: hasPhotos ? 'vision' : 'text',
- meta: { model: usedModel, photos: photos.length, region, storeName, mainKeyword },
+ meta: { model: usedModel, photos: photos.length, region, storeName, mainKeyword, tone: toneUsed },
  })
  } catch (err: any) {
  console.error('[ai-review-reply] exception:', err?.message || err)

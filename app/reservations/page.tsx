@@ -106,7 +106,7 @@ export default function ReservationsPage() {
  <PageHeader
  icon={<CalendarIcon size={28} className="text-white" strokeWidth={2.5} />}
  title="예약·일정 관리"
- subtitle="단체 예약 · 행사 · 휴무일을 한 캘린더에서 — 노쇼 방지 알림 (준비 중)"
+ subtitle="단체 예약 · 행사 · 휴무일을 한 캘린더에서 · 노쇼 방지 알림 (준비 중)"
  variant="primary"
  />
 

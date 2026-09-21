@@ -21,7 +21,7 @@ const RAW_JS_TEMPLATE = [
  ' alert("store.coupangeats.com 페이지에서 실행해주세요.\\n\\n현재 페이지: " + location.hostname);',
  ' return;',
  ' }',
- ' // 1. storeId 확보 — 다단계 fallback',
+ ' // 1. storeId 확보 · 다단계 fallback',
  ' var storeId = null;',
  ' var storeName = "";',
  ' // 1-A) whoami 호출',
@@ -68,7 +68,7 @@ const RAW_JS_TEMPLATE = [
  ' if (s && s.data) storeName = s.data.name || s.data.storeName || "";',
  ' } catch(_) {}',
  ' }',
- ' // 3. 리뷰 페이지네이션 — 다중 endpoint + 헤더 강화 (Akamai 세션 검증 통과)',
+ ' // 3. 리뷰 페이지네이션 · 다중 endpoint + 헤더 강화 (Akamai 세션 검증 통과)',
  ' // 53차 검증된 헤더 패턴 적용: x-request-meta + x-requested-with',
  ' function makeMeta(){',
  ' var meta = {',
@@ -187,10 +187,10 @@ const RAW_JS_TEMPLATE = [
  ' reply: (dr.replyContent || (dr.reply && (dr.reply.content || dr.reply.text))) ? { content: dr.replyContent || dr.reply.content || dr.reply.text } : null',
  ' });',
  ' }',
- ' console.log("로컬루션: DOM에서 " + allReviews.length + "개 추출 성공 — 페이지 스크롤로 더 많이 로드 가능");',
+ ' console.log("로컬루션: DOM에서 " + allReviews.length + "개 추출 성공 · 페이지 스크롤로 더 많이 로드 가능");',
  ' break; // DOM 추출은 페이지네이션 X',
  ' }',
- ' firstError = "HTTP " + lastStatus + " — " + lastBody;',
+ ' firstError = "HTTP " + lastStatus + " · " + lastBody;',
  ' alert("리뷰를 가져올 수 없어요.\\n\\n해결 방법:\\n1) F12 → Network 탭\\n2) 검색창에 \\"reviews\\" 입력\\n3) 페이지 새로고침\\n4) 첫번째 reviews 행 우클릭 → Copy as cURL\\n5) 사장님께 그 결과 전달\\n\\n또는: 페이지를 끝까지 스크롤한 후 다시 실행하면 DOM에서 추출 시도합니다.\\n\\n에러: " + firstError);',
  ' return;',
  ' }',
@@ -226,7 +226,7 @@ const RAW_JS_TEMPLATE = [
  ' reply: (r.replyContent || (r.reply && (r.reply.content || r.reply.text))) ? { content: r.replyContent || r.reply.content || r.reply.text } : null',
  ' });',
  ' }',
- ' console.log("로컬루션: page " + page + " — " + list.length + "개 / 누적 " + allReviews.length + "개");',
+ ' console.log("로컬루션: page " + page + " · " + list.length + "개 / 누적 " + allReviews.length + "개");',
  ' if (list.length < 30) break; // 마지막 페이지',
  ' page++;',
  ' }',
@@ -322,7 +322,7 @@ export default function CoupangReviewBookmarkletDialog({
  onSuccess?.()
  } else {
  const hint = j?.hint
- ? ` (찾은 키: ${[...(hint.topKeys || []), ...(hint.dataKeys || [])].slice(0, 8).join(', ') || '없음'})`
+ ? ` (찾은 키: ${[...(j.hint.topKeys || []), ...(j.hint.dataKeys || [])].slice(0, 8).join(', ') || '없음'})`
  : ''
  setPasteResult({
  ok: false,
@@ -421,7 +421,7 @@ export default function CoupangReviewBookmarkletDialog({
  <div className={`mt-3 p-3 rounded-xl text-xs font-bold ${
  pasteResult.ok ? 'bg-green-50 text-green-700 border border-green-200' : 'bg-red-50 text-red-700 border border-red-200'
  }`}>
- {pasteResult.ok ? '저장 완료 — ' : '실패 — '}
+ {pasteResult.ok ? '저장 완료 · ' : '실패 · '}
  {pasteResult.message}
  </div>
  )}

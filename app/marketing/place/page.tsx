@@ -5,7 +5,8 @@ import { useState, useMemo, useEffect, useCallback } from 'react'
 import Sidebar from '../../components/Sidebar'
 import PageHeader from '../../components/PageHeader'
 import Footer from '../../components/Footer'
-import { MapPin } from 'lucide-react'
+import AnswerBlock from '../../components/seo/AnswerBlock'
+import { MapPin, Check, X, Star } from 'lucide-react'
 
 // ── 34항목 체크리스트 (하랑마케팅 PDF 기반) ─────────────
 type ChecklistItem = { id: string; title: string; detail: string; youtube?: string; weight?: number }
@@ -244,7 +245,7 @@ function ChecklistRow({ item, checked, hasVideo, onToggle, onOpen }: {
  return (
  <div className="flex items-center gap-3 py-2.5 px-3 rounded-xl hover:bg-[#F8F9FA] transition-colors">
  <button onClick={onToggle} className={`flex-shrink-0 w-6 h-6 rounded-md border-2 flex items-center justify-center transition-all ${checked ? 'bg-[#12B76A] border-[#12B76A]' : 'bg-white border-[#D1D5DB] hover:border-[#3182F6]'}`}>
- {checked && <span className="text-white text-xs font-black">✓</span>}
+ {checked && <Check size={14} strokeWidth={3} className="text-white" />}
  </button>
  <button onClick={onToggle} className="flex-1 text-left min-w-0">
  <p className={`text-sm font-semibold ${checked ? 'text-[#12B76A] line-through' : 'text-[#191F28]'}`}>{item.title}</p>
@@ -395,7 +396,7 @@ export default function PlaceDiagnosisPage() {
  else setRegisterMsg(data.error || '등록 실패')
  return
  }
- setRegisterMsg(`✓ "${data.target?.name || placeId}" 추적 등록 완료`)
+ setRegisterMsg(`${data.target?.name || placeId} 추적 등록 완료`)
  await reloadTargets()
  } catch (e: any) {
  setRegisterMsg('네트워크 오류로 등록 실패')
@@ -589,6 +590,18 @@ export default function PlaceDiagnosisPage() {
  </p>
  </div>
 
+ {/* AEO · GEO 답변 블록 : 진단 도구가 무엇을 보는지 두 문장으로 */}
+ <AnswerBlock
+  className="mb-5"
+  question="네이버 플레이스 진단은 무엇을 확인하나요?"
+  answer="매장 플레이스 주소만 넣으면 키워드 · 리뷰수 · 답글률을 읽어 34항목 체크리스트로 상위노출 상태를 점검합니다. 결과는 항목별 점수와 바로 고칠 수 있는 순서로 정리됩니다."
+  facts={[
+   '34항목 체크리스트 · 항목마다 가중치와 해설',
+   '방문자 리뷰 · 블로그 리뷰 수를 추적해 추이로 확인',
+   '로그인 없이 무료로 진단',
+  ]}
+ />
+
  {/* 22차-2 + 22차-3b: 내가 추적 중인 지점 + 추이 차트 */}
  {trackedTargets.length > 0 && (
  <div className="bg-white rounded-2xl shadow-sm p-5 mb-5">
@@ -636,7 +649,7 @@ export default function PlaceDiagnosisPage() {
  </span>
  )}
  {t.last_rating != null && (
- <span>★ <span className="text-[#F59E0B] font-bold">{t.last_rating}</span></span>
+ <span className="inline-flex items-center gap-0.5"><Star size={11} className="text-[#F59E0B] fill-[#F59E0B]" /><span className="text-[#F59E0B] font-bold">{t.last_rating}</span></span>
  )}
  {t.last_ts && <span className="text-[#B0B8C1]">· {new Date(t.last_ts).toLocaleDateString('ko-KR', { month: 'numeric', day: 'numeric' })}</span>}
  </div>
@@ -661,7 +674,7 @@ export default function PlaceDiagnosisPage() {
  <button
  onClick={() => removeTarget(t.id, t.name)}
  className="px-2 py-1.5 text-[10px] font-bold rounded-lg bg-white text-[#8B95A1] hover:bg-[#FFF1F2] hover:text-[#F04452] border border-[#E5E8EB] transition-colors">
- ✕
+ <X size={16} strokeWidth={2.5} />
  </button>
  </div>
  </div>
@@ -735,7 +748,7 @@ export default function PlaceDiagnosisPage() {
  <div className="flex items-center justify-between mb-3">
  <p className="text-sm font-bold text-[#191F28]">매장 정보</p>
  {loadingInfo && <span className="text-[10px] text-[#3182F6] font-semibold flex items-center gap-1"><span className="w-2 h-2 border-2 border-[#3182F6] border-t-transparent rounded-full animate-spin"/>불러오는 중</span>}
- {fetchedInfo && !loadingInfo && <span className="text-[10px] text-[#12B76A] font-bold">✓ 네이버 연동</span>}
+ {fetchedInfo && !loadingInfo && <span className="text-[10px] text-[#12B76A] font-bold inline-flex items-center gap-0.5"><Check size={11} strokeWidth={3} />네이버 연동</span>}
  </div>
 
  {fetchedInfo?.thumbnail && (
@@ -787,7 +800,7 @@ export default function PlaceDiagnosisPage() {
  {fetchedInfo?.rating !== null && fetchedInfo?.rating !== undefined && (
  <div className="flex justify-between gap-2">
  <span className="text-[#8B95A1]">평점</span>
- <span className="font-bold text-[#F59E0B]">★ {fetchedInfo.rating}</span>
+ <span className="font-bold text-[#F59E0B] inline-flex items-center gap-0.5"><Star size={12} className="fill-[#F59E0B]" />{fetchedInfo.rating}</span>
  </div>
  )}
  </div>
@@ -801,7 +814,7 @@ export default function PlaceDiagnosisPage() {
  {fetchedInfo && (
  isCurrentTracked ? (
  <div className="w-full text-center text-xs font-bold py-2.5 rounded-xl bg-[#E8F5E9] text-[#12B76A] border border-[#12B76A]/30">
- ✓ 추적 중 (매일 자동 갱신)
+ <Check size={13} strokeWidth={3} className="inline -mt-0.5 mr-1" />추적 중 (매일 자동 갱신)
  </div>
  ) : (
  <button

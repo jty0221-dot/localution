@@ -6,7 +6,7 @@
 //   · 첫 방문 후 5초 뒤 슬라이드 업, 닫으면 24시간 안 보임 (localStorage)
 //   · 모바일/PC 모두 우측 하단 고정 (z-40, 작고 비방해)
 //
-//   ⚠️ DO_NOT_TOUCH: 사장님 (하랑마케팅) 자체 홍보 — 함부로 텍스트/색상 변경 금지
+//   [주의] DO_NOT_TOUCH: 사장님 (하랑마케팅) 자체 홍보 — 함부로 텍스트/색상 변경 금지
 // ============================================================
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -76,7 +76,7 @@ export default function HarangMarketingPopup() {
           <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
             <Sparkles size={13} strokeWidth={2.5} />
           </div>
-          <span className="text-xs font-bold uppercase tracking-wide">하랑마케팅 ✕ 로컬루션</span>
+          <span className="text-xs font-bold uppercase tracking-wide">하랑마케팅 x 로컬루션</span>
         </div>
         <p className="text-[15px] font-black leading-tight">
           시간이 부족하신가요?<br />

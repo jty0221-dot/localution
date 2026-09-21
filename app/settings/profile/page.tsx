@@ -164,7 +164,7 @@ export default function ProfileSettingsPage() {
  })
  const data = await res.json().catch(() => ({}))
  if (!res.ok || !data?.ok) toast.error(data?.error || '서버 저장 실패 (로컬은 저장됨)')
- else toast.success('저장 완료 — 사이드바에 즉시 반영됩니다')
+ else toast.success('저장 완료 · 사이드바에 즉시 반영됩니다')
  } else {
  toast.info('로컬 저장됨 (로그인하면 서버에도 자동 동기화돼요)')
  }
@@ -189,7 +189,7 @@ export default function ProfileSettingsPage() {
  </div>
  <div className="flex-1 min-w-0">
  <h1 className="text-xl sm:text-2xl font-black tracking-tight">프로필 설정</h1>
- <p className="text-white/85 text-xs sm:text-sm mt-1 leading-relaxed">계정 정보와 알림을 내 업체에 맞게 — 설정은 한 번, 결과는 오래</p>
+ <p className="text-white/85 text-xs sm:text-sm mt-1 leading-relaxed">계정 정보와 알림을 내 업체에 맞게 · 설정은 한 번, 결과는 오래</p>
  </div>
  <div className="hidden sm:flex items-center gap-2 text-[11px] font-bold text-white/90 bg-white/15 backdrop-blur px-3 py-1.5 rounded-full border border-white/20">
  로컬루션
@@ -289,7 +289,7 @@ export default function ProfileSettingsPage() {
  <span>{p.label}</span>
  {p.review_count > 0 && (
  <span className="text-[10px] opacity-80">
- 리뷰 {p.review_count}{p.rating_avg != null ? ' · ' + p.rating_avg.toFixed(1) + '★' : ''}
+ 리뷰 {p.review_count}{p.rating_avg != null ? ' · 평점 ' + p.rating_avg.toFixed(1) : ''}
  </span>
  )}
  {p.platform_store_id && (

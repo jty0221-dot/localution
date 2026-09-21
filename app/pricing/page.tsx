@@ -3,6 +3,8 @@
 import { useState } from 'react'
 // Sidebar 제거 — pricing 은 공개 랜딩성 페이지로 표시
 import Footer from '../components/Footer'
+import AnswerBlock from '../components/seo/AnswerBlock'
+import { SITE } from '../lib/seo'
 import Link from 'next/link'
 import {
  MessageCircle, Search, PenLine, BarChart3, Users, Smartphone,
@@ -272,6 +274,18 @@ export default function PricingPage() {
  </p>
  </div>
 
+ {/* AEO · GEO 답변 블록 : 요금 질문에 두 문장으로 답한다 (숫자는 SITE 정본) */}
+ <AnswerBlock
+  className="mb-8 sm:mb-10 max-w-4xl mx-auto"
+  question="로컬루션 요금은 얼마인가요?"
+  answer={`${SITE.priceText}부터 필요한 기능만 골라 쓰는 선택형 요금제입니다. 신용카드 등록 없이 시작하고 언제든 원클릭으로 해지할 수 있습니다.`}
+  facts={[
+   '기능 단위로 담는 선택형 요금제 · 여러 개를 담으면 번들 할인',
+   '베타 테스트 기간에는 전 기능 무료',
+   '자동결제 없음 · 언제든 해지',
+  ]}
+ />
+
  {/* ── 역할별 추천 번들 ──────────────────────── */}
  <div className="mb-8 sm:mb-10">
  <div className="text-center mb-4">
@@ -315,7 +329,7 @@ export default function PricingPage() {
  <Gift size={20} strokeWidth={2.25} className="text-white" />
  </div>
  <div className="flex-1">
- <p className="text-sm font-black text-[#065F46] mb-1">베타 테스트 기간 — 모든 기능 무료로 써보세요</p>
+ <p className="text-sm font-black text-[#065F46] mb-1">베타 테스트 기간 · 모든 기능 무료로 써보세요</p>
  <p className="text-xs text-[#065F46]/80 leading-relaxed break-keep">
  신용카드 등록 안 받습니다. 자동결제 불가능합니다. 정식 출시는 <b>최소 30일 전</b> 카카오톡·이메일로 미리 안내드리고, 원치 않으면 해지만 하면 끝입니다.
  </p>

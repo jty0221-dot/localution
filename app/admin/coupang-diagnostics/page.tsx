@@ -4,7 +4,7 @@
 // /admin/coupang-diagnostics
 //   · PC: 표 레이아웃 + 우측 액션 버튼
 //   · 모바일: 카드 레이아웃 (한 사용자 = 한 카드, 가로 스크롤 X)
-//   · CLAUDE.md 규칙: max-w-7xl / 반응형 padding / 폰트 단계별
+//   · CLAUDE.md 규칙: max-w-6xl / 반응형 padding / 폰트 단계별
 // ============================================================
 
 export const dynamic = 'force-dynamic'
@@ -159,14 +159,14 @@ export default function CoupangDiagnosticsPage() {
     try {
       const r = await fetch('/api/admin/trigger-fetch?platform=coupangeats&user_id=' + userId + '&days=' + days, { cache: 'no-store' })
       const j = await r.json()
-      setFetchResult(j.ok ? '큐 등록 완료 — ' + (j.jobId || '') : '실패: ' + (j.error || ''))
+      setFetchResult(j.ok ? '큐 등록 완료 · ' + (j.jobId || '') : '실패: ' + (j.error || ''))
       setTimeout(() => load(), 3000)
     } catch (e: any) { setFetchResult('오류: ' + (e?.message || 'unknown')) }
     finally { setFetchingUser(null) }
   }, [load])
 
   const testFetch = useCallback(async (userId: string) => {
-    const sid = prompt('테스트할 storeId 입력 (예: 779523)\n\n저장된 쿠키로 즉시 fetch — interpretation 결과로 storeId 유효성 확인')
+    const sid = prompt('테스트할 storeId 입력 (예: 779523)\n\n저장된 쿠키로 즉시 fetch · interpretation 결과로 storeId 유효성 확인')
     if (!sid || !/^\d+$/.test(sid.trim())) return
     setFetchingUser(userId); setFetchResult(null)
     try {
@@ -214,7 +214,7 @@ export default function CoupangDiagnosticsPage() {
       }
       const stores = j.discovered_stores || []
       if (stores.length === 0) {
-        setFetchResult('매장 0개 — 권한 없는 계정일 가능성. 사장님 직접 확인 필요')
+        setFetchResult('매장 0개 · 권한 없는 계정일 가능성. 사장님 직접 확인 필요')
         return
       }
       // 매장 목록 alert + 자동 등록 제안
@@ -300,7 +300,7 @@ export default function CoupangDiagnosticsPage() {
       const r = await fetch('/api/admin/retry-coupang-login?user_id=' + userId, { cache: 'no-store' })
       const j = await r.json()
       if (j.ok) {
-        setFetchResult(`재로그인 성공 (${j.elapsed_ms}ms · ${j.method} · 쿠키 ${j.cookie_count}개) — 자동 fetch 트리거 중`)
+        setFetchResult(`재로그인 성공 (${j.elapsed_ms}ms · ${j.method} · 쿠키 ${j.cookie_count}개) · 자동 fetch 트리거 중`)
         // 즉시 14일 fetch 트리거
         await fetch('/api/admin/trigger-fetch?platform=coupangeats&user_id=' + userId + '&days=14', { cache: 'no-store' })
       } else {
@@ -315,7 +315,7 @@ export default function CoupangDiagnosticsPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* 헤더 */}
         <div className="flex items-start justify-between gap-3 mb-4 md:mb-6 flex-wrap">
           <div className="min-w-0 flex-1">
@@ -358,12 +358,12 @@ export default function CoupangDiagnosticsPage() {
               </div>
               {!data.env.PROXY_HOST && (
                 <div className="mt-3 p-2.5 md:p-3 rounded-lg bg-amber-50 border border-amber-200 text-[11px] md:text-xs text-amber-900 leading-relaxed">
-                  <strong>PROXY_HOST 없음</strong> — Akamai 통과 불가. iproyal residential proxy 환경변수 설정 필수.
+                  <strong>PROXY_HOST 없음</strong> · Akamai 통과 불가. iproyal residential proxy 환경변수 설정 필수.
                 </div>
               )}
               {!data.env.ENCRYPTION_KEK_HEX && (
                 <div className="mt-3 p-2.5 md:p-3 rounded-lg bg-red-50 border border-red-200 text-[11px] md:text-xs text-red-900 leading-relaxed">
-                  <strong>ENCRYPTION_KEK_HEX 잘못됨</strong> — 64 hex 필요. 비밀번호/쿠키 저장 불가.
+                  <strong>ENCRYPTION_KEK_HEX 잘못됨</strong> · 64 hex 필요. 비밀번호/쿠키 저장 불가.
                 </div>
               )}
             </section>
@@ -438,7 +438,7 @@ export default function CoupangDiagnosticsPage() {
                   </button>
                   <button onClick={() => clearFailed(true)} disabled={probing}
                     className="text-[11px] md:text-xs font-bold px-2.5 py-1.5 rounded-lg bg-[#DC2626] text-white hover:bg-[#B91C1C] disabled:opacity-50"
-                    title="active stalled 까지 강제 제거 — 워커 처리 중 job 도 끊어짐">
+                    title="active stalled 까지 강제 제거 · 워커 처리 중 job 도 끊어짐">
                     강제 정리
                   </button>
                 </div>
@@ -637,7 +637,7 @@ export default function CoupangDiagnosticsPage() {
                         <td className="px-3 py-2.5 text-center whitespace-nowrap">
                           <Link href={'/admin/coupang/' + u.user_id}
                             className="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-1.5 rounded bg-[#191F28] text-white hover:bg-[#0F172A] mr-1"
-                            title="사용자 상세 페이지 — 매장별 리뷰·미답변·관리 액션">
+                            title="사용자 상세 페이지 · 매장별 리뷰·미답변·관리 액션">
                             상세 <ExternalLink size={10} strokeWidth={2.5} />
                           </Link>
                           <button onClick={() => discoverStores(u.user_id)}

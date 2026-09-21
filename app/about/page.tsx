@@ -19,6 +19,8 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
+import AnswerBlock from '../components/seo/AnswerBlock'
+import { SITE } from '../lib/seo'
 import { MapPin, PenLine, Smartphone, MessageSquare, Map as MapIcon, BarChart3, Coffee, type LucideIcon } from 'lucide-react'
 
 /* ─────────── 5가지 제품 원칙 ─────────── */
@@ -102,7 +104,7 @@ export default function AboutPage() {
  {' '}AI가 대신합니다.
  </h1>
  <p className="text-sm md:text-lg text-[#4E5968] leading-relaxed text-left sm:text-center">
- 리뷰 답글, SNS 운영, 광고 집행 — <strong className="text-[#191F28]">하루 10분</strong>이면 충분합니다.
+ 리뷰 답글, SNS 운영, 광고 집행 · <strong className="text-[#191F28]">하루 10분</strong>이면 충분합니다.
  <br className="hidden md:block" />
  {' '}500곳 매장 데이터를 학습한 로컬루션이, <strong className="text-[#191F28]">24시간 자동</strong>으로 돌립니다.
  </p>
@@ -118,6 +120,21 @@ export default function AboutPage() {
  <p className="mt-5 text-xs text-[#8B95A1]">
  월 6,900원 · 신용카드 등록 없이 시작 · 언제든 해지
  </p>
+ </div>
+ </section>
+
+ {/* AEO · GEO 답변 블록 : 회사 소개 질문에 두 문장으로 (사실은 SITE 정본) */}
+ <section className="px-5 -mt-6 md:-mt-10 relative z-10">
+ <div className="max-w-4xl mx-auto">
+ <AnswerBlock
+  question="로컬루션은 누가 왜 만들었나요?"
+  answer={`${SITE.launchYear}년 시작한 로컬루션은 소상공인 마케팅 현장에서 반복되던 리뷰 답글 · SNS 발행 · 플레이스 점검을 한 화면으로 모은 서비스입니다. 사장님이 매일 하던 일을 AI 가 대신하고, 사람은 확인만 하도록 만들었습니다.`}
+  facts={[
+   `대상 : ${SITE.audience.join(' · ')}`,
+   `리뷰 플랫폼 ${SITE.platformCount}곳을 한 화면에서`,
+   `${SITE.priceText}부터 · 신용카드 등록 없이 시작`,
+  ]}
+ />
  </div>
  </section>
 
@@ -404,7 +421,7 @@ export default function AboutPage() {
  </div>
  </section>
 
- {/* 소형 브랜드 푸터 영역 (중복 회피 — 전역 Footer가 법적 정보 담당) */}
+ {/* 소형 브랜드 푸터 영역 (중복 회피 · 전역 Footer가 법적 정보 담당) */}
  <section className="px-5 py-10 md:py-12 border-t border-gray-100">
  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-[#8B95A1]">
  <div className="flex items-center gap-3">

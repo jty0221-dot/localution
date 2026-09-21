@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from 'next'
-import { Inter } from 'next/font/google'
 import './globals.css'
 import QuickSlot from './components/QuickSlot'
 import BottomTabBar from './components/BottomTabBar'
@@ -8,11 +7,11 @@ import ScrollToTop from './components/ScrollToTop'
 import OnboardingBanner from './components/OnboardingBanner'
 import ImpersonationBanner from './components/ImpersonationBanner'
 import AdminFloatingButton from './components/AdminFloatingButton'
+import ServiceWorkerRegistrar from './components/ServiceWorkerRegistrar'
+import { SITE, SITE_URL } from './lib/seo'
 
-const inter = Inter({ subsets: ['latin'] })
-
-const SITE_URL = 'https://www.localution.co.kr'
-const SITE_NAME = '로컬루션'
+// 사이트 사실(URL · 이름 · 색)은 app/lib/seo.ts 한 곳에서 온다 (robots · sitemap · manifest · llms.txt 와 공유)
+const SITE_NAME = SITE.name
 const SITE_TITLE = '로컬루션 | 사장님의 네이버·구글·배민 마케팅, AI가 대신합니다'
 // 네이버 서치어드바이저 80자 제한 대응 (2026-04-19)
 // 23차-SEO: og:image 추가 (opengraph-image.tsx 자동 생성) (2026-04-21)
@@ -38,6 +37,14 @@ export const metadata: Metadata = {
  creator: '로컬루션',
  publisher: '로컬루션',
  alternates: { canonical: SITE_URL },
+ manifest: '/manifest.webmanifest',
+ appleWebApp: {
+ capable: true,
+ statusBarStyle: 'default',
+ title: SITE_NAME,
+ },
+ formatDetection: { telephone: false },
+ applicationName: SITE_NAME,
  openGraph: {
  type: 'website',
  url: SITE_URL,
@@ -50,7 +57,7 @@ export const metadata: Metadata = {
  url: `${SITE_URL}/opengraph-image`,
  width: 1200,
  height: 630,
- alt: '로컬루션 – 사장님 마케팅 플랫폼',
+ alt: SITE.ogAlt,
  },
  ],
  },
@@ -84,9 +91,11 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
- themeColor: '#3182F6',
+ themeColor: SITE.themeColor,
  width: 'device-width',
  initialScale: 1,
+ // 노치 · 홈 인디케이터 영역까지 배경을 채운다 (앱 포장 대비 · safe-area CSS 와 짝)
+ viewportFit: 'cover',
 }
 
 export default function RootLayout({
@@ -96,7 +105,7 @@ export default function RootLayout({
 }) {
  return (
  <html lang="ko">
- <body className={inter.className}>
+ <body className="font-sans">
  {/* 관리자 임시 로그인 배너 (impersonation 활성 시만 표시) */}
  <ImpersonationBanner />
  {/* 2-D · 매장 미등록 사용자 글로벌 onboarding 배너 (워크스페이스 한정) */}
@@ -110,6 +119,8 @@ export default function RootLayout({
  <ScrollToTop />
  {/* 관리자 전용 floating 버튼 (admin 화이트리스트만 노출) */}
  <AdminFloatingButton />
+ {/* PWA · 서비스워커 등록 (프로덕션에서만) */}
+ <ServiceWorkerRegistrar />
  </body>
  </html>
  )

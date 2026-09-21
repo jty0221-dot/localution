@@ -81,7 +81,7 @@ const ST: Record<PipelineStatus, { bg: string; border: string; text: string; bad
 const OVERALL_TITLE: Record<PipelineStatus, string> = {
  ok: '리뷰 수집 파이프라인 전체 정상',
  warn: '일부 항목 주의 필요',
- error: '수집 오류 발견 — 즉시 확인 필요',
+ error: '수집 오류 발견 · 즉시 확인 필요',
 }
 
 function StatCard({ icon, label, value, sub, status }: {
@@ -323,8 +323,8 @@ export default function AdminReviewHealthPage() {
  desc={r.cron.ok_6h
  ? `최근 6시간 내 ${r.cron.count_6h}건 수집 확인`
  : r.cron.ok_24h
- ? `6시간 내 수집 없음 (24시간 내 ${r.cron.count_24h}건 — 지연 가능성)`
- : '24시간 내 수집 기록 없음 — 크론 중단 의심'}
+ ? `6시간 내 수집 없음 (24시간 내 ${r.cron.count_24h}건 · 지연 가능성)`
+ : '24시간 내 수집 기록 없음 · 크론 중단 의심'}
  detail={r.cron.schedule_kst}
  status={r.cron.ok_6h ? 'ok' : r.cron.ok_24h ? 'warn' : 'error'} />
 
@@ -489,7 +489,7 @@ export default function AdminReviewHealthPage() {
  {[
  { label: '엔드포인트', value: r.graphql_test.ok ? '정상' : '오류', sub: 'pcmap-api.place.naver.com' },
  { label: '응답 시간', value: `${r.graphql_test.latency_ms}ms`, sub: r.graphql_test.latency_ms < 1000 ? '빠름' : r.graphql_test.latency_ms < 3000 ? '보통' : '느림' },
- { label: '리뷰 수 확인', value: r.graphql_test.review_count !== null ? `${r.graphql_test.review_count}건` : '—', sub: `Place ID: ${r.graphql_test.place_id.slice(0, 8)}…` },
+ { label: '리뷰 수 확인', value: r.graphql_test.review_count !== null ? `${r.graphql_test.review_count}건` : '-', sub: `Place ID: ${r.graphql_test.place_id.slice(0, 8)}…` },
  { label: '오류', value: r.graphql_test.error ?? '없음', sub: r.graphql_test.ok ? '정상 응답' : '수집 불가' },
  ].map(it => (
  <div key={it.label} className="bg-[#F8FAFC] rounded-xl px-3 py-3">

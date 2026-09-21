@@ -78,7 +78,7 @@ export default function ResellerPage() {
     <div className="min-h-screen bg-[#F8F9FA]">
       <PageHeader
         title="Reseller 대시보드"
-        subtitle="모든 사장님 한 화면에서 관리 — impersonate 1클릭"
+        subtitle="모든 사장님 한 화면에서 관리 · impersonate 1클릭"
         icon={<Briefcase size={24} className="text-white" strokeWidth={2.5} />}
         variant="accent"
         badge="ADMIN"
@@ -178,7 +178,7 @@ export default function ResellerPage() {
                 <Mini label="30일 리뷰" value={u.reviews} />
                 <Mini label="미답변" value={u.unreplied} highlight={u.unreplied > 5 ? 'warn' : null} />
                 <Mini label="부정 미답변" value={u.negative_unreplied} highlight={u.negative_unreplied > 0 ? 'bad' : null} />
-                <Mini label="평균 별점" value={u.avg_rating != null ? u.avg_rating.toFixed(1) : '—'} />
+                <Mini label="평균 별점" value={u.avg_rating != null ? u.avg_rating.toFixed(1) : '-'} />
               </div>
             </div>
           ))}

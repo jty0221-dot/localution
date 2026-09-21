@@ -377,7 +377,7 @@ export default function BlogPostGeneratorPage() {
  <User size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-black text-[#191F28]">3. 페르소나 — 글 발행 주체</p>
+ <p className="text-sm font-black text-[#191F28]">3. 페르소나 · 글 발행 주체</p>
  <p className="text-[11px] text-[#8B95A1]">담당자 정보로 글의 톤·관점 결정</p>
  </div>
  </div>
@@ -414,7 +414,7 @@ export default function BlogPostGeneratorPage() {
  </div>
 
  <div>
- <label className="text-[11px] font-bold text-[#4E5968] mb-1.5 block">말투 타입 — 글 전체 톤이 완전히 달라집니다</label>
+ <label className="text-[11px] font-bold text-[#4E5968] mb-1.5 block">말투 타입 · 글 전체 톤이 완전히 달라집니다</label>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
  {TONES.map(t => {
  const active = personaTone === t.id

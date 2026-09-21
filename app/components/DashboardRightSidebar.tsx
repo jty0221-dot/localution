@@ -5,7 +5,7 @@
 //   · xl 이상 (1280px+): 우측 컬럼에 sticky 로 표시
 //   · xl 미만: 메인 콘텐츠 하단에 일반 흐름으로 표시 (스크롤 시 나타남)
 //
-//   ⚠️ DO_NOT_TOUCH:
+//   [주의] DO_NOT_TOUCH:
 //     - QuickActions 추가 금지 (/DO_NOT_TOUCH.md)
 //     - 부모는 xl:grid xl:grid-cols-[1fr_280px] 로 공간 분배 (콘텐츠 침범 방지)
 // ============================================================
@@ -177,7 +177,7 @@ function SidebarCards() {
 //   · main 에 xl:pr-[336px] 로 콘텐츠 침범 방지 (sidebar 320 + 16 margin)
 //   · 하랑마케팅 팝업 (z-40) 이 우측 하단을 덮을 수 있어 사이드바 bottom 24rem 확보
 //
-// ⚠️ DO_NOT_TOUCH:
+// [주의] DO_NOT_TOUCH:
 //   · sticky 로 변경 X (위 이슈 재현됨)
 //   · 카드 3개 순서 그대로 (TOP10 → 알림 → 도움말)
 export default function DashboardRightSidebar() {

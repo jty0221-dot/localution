@@ -40,7 +40,7 @@ export default function AffiliateAdSlots() {
  </div>
  <div>
  <h3 className="text-base font-black text-[#191F28] leading-tight">매장에 비치할 QR 인쇄물 추천</h3>
- <p className="text-[11px] text-[#8B95A1] mt-0.5">테이블 텐트 · 스티커 · 아크릴 스탠드 — 네이버 쇼핑에서 바로 주문</p>
+ <p className="text-[11px] text-[#8B95A1] mt-0.5">테이블 텐트 · 스티커 · 아크릴 스탠드 · 네이버 쇼핑에서 바로 주문</p>
  </div>
  </div>
  <span className="text-[10px] text-[#C9CDD2] flex items-center gap-1">

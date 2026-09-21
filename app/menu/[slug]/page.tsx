@@ -247,7 +247,7 @@ export default function MenuPage() {
  </div>
  {getDesc(it) && (
  <p className="text-[11px] mt-0.5 italic line-clamp-1" style={{ color: TH.muted }}>
- — {getDesc(it)}
+ · {getDesc(it)}
  </p>
  )}
  </div>

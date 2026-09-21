@@ -7,9 +7,17 @@
 // · 본 페이지는 동의서 원문 열람용
 // · 시행일: 2026-05-01
 // ============================================================
+import type { Metadata } from 'next'
+import { pageMetadata } from '../../lib/seo'
 import Link from 'next/link'
 import Footer from '../../components/Footer'
 import { COMPANY } from '../../lib/company'
+
+export const metadata: Metadata = pageMetadata({
+  title: '플랫폼 연동 동의 안내',
+  description: '네이버 · 배민 · 요기요 · 쿠팡이츠 · 구글 · 카카오 계정을 로컬루션에 연동할 때 무엇을 읽고 무엇을 쓰는지, 언제 해제되는지 안내합니다.',
+  path: 'legal/platform-consent',
+})
 
 export default function PlatformConsent() {
  return (

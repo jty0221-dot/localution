@@ -70,7 +70,7 @@ export default function NegativeReviewsWidget() {
               </span>
             </div>
             <div className="text-[11px] md:text-xs text-red-700 mt-0.5">
-              1~2점 미답변 — 24시간 안에 답글 권장
+              1~2점 미답변 · 24시간 안에 답글 권장
               {data.warning_count > 0 && ` · 3점 ${data.warning_count}건 추가`}
             </div>
           </div>

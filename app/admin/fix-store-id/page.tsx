@@ -218,7 +218,7 @@ export default function FixStoreIdPage() {
                 )}
                 {pipeline.stuck_queued_count > 0 && (
                   <div className="pt-2 border-t border-purple-200 text-[11px] text-purple-700">
-                    Stuck queued {pipeline.stuck_queued_count}건 — queue-maintenance 자동 처리 대기
+                    Stuck queued {pipeline.stuck_queued_count}건 · queue-maintenance 자동 처리 대기
                   </div>
                 )}
               </div>

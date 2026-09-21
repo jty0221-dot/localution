@@ -6,7 +6,7 @@ import Link from 'next/link'
 import Sidebar from '../../components/Sidebar'
 import PageHeader from '../../components/PageHeader'
 import Footer from '../../components/Footer'
-import { ArrowRight, Camera, Send } from 'lucide-react'
+import { ArrowRight, Camera, Send, Check } from 'lucide-react'
 
 type Tone = 'info' | 'empathy' | 'warning' | 'action'
 type Ratio = '1:1' | '4:5'
@@ -46,8 +46,8 @@ const TONE_LABEL: Record<Tone, string> = {
 }
 
 const RATIO_LABEL: Record<Ratio, string> = {
- '1:1': '1:1 정사각 (1080×1080) — 피드 기본',
- '4:5': '4:5 세로 (1080×1350) — 피드 점유율↑',
+ '1:1': '1:1 정사각 (1080×1080) · 피드 기본',
+ '4:5': '4:5 세로 (1080×1350) · 피드 점유율↑',
 }
 
 const BRAND_NAVY = '#1F2937'
@@ -243,7 +243,7 @@ export default function CardNewsPage() {
  </div>
  </Field>
 
- <Field label="(선택) 유튜브 제목 연동 — 주제 일치화" hint="youtube-production-team 스킬로 만든 영상 제목 입력 시 CTA에 '영상으로 보기' 자동 삽입.">
+ <Field label="(선택) 유튜브 제목 연동 · 주제 일치화" hint="youtube-production-team 스킬로 만든 영상 제목 입력 시 CTA에 '영상으로 보기' 자동 삽입.">
  <input
  className="form-input"
  placeholder="예) 플레이스 예약 전환율 3배 올린 실전 3가지"
@@ -293,10 +293,10 @@ export default function CardNewsPage() {
  </div>
 
  <div className="mt-3 text-xs text-[#6B7280] flex flex-wrap gap-x-4 gap-y-1">
- <span>✓ 업로드 채널 고정: <b>인스타그램 캐러셀</b></span>
- <span>✓ 최대 10장 (인스타 정책 준수)</span>
- <span>✓ 슬라이드 하단 진행도 도트 자동</span>
- <span>✓ 첫 장 스와이프 힌트 내장</span>
+ <span><Check size={12} strokeWidth={3} className="inline -mt-0.5 mr-0.5" />업로드 채널 고정: <b>인스타그램 캐러셀</b></span>
+ <span><Check size={12} strokeWidth={3} className="inline -mt-0.5 mr-0.5" />최대 10장 (인스타 정책 준수)</span>
+ <span><Check size={12} strokeWidth={3} className="inline -mt-0.5 mr-0.5" />슬라이드 하단 진행도 도트 자동</span>
+ <span><Check size={12} strokeWidth={3} className="inline -mt-0.5 mr-0.5" />첫 장 스와이프 힌트 내장</span>
  </div>
  </div>
 
@@ -552,7 +552,7 @@ function SlideCard({
  <ul style={{ marginTop: 16, listStyle: 'none', padding: 0 }}>
  {slide.bullets.map((b, i) => (
  <li key={i} style={{ display: 'flex', gap: 10, fontSize: 16, color: fg, marginBottom: 8, lineHeight: 1.5 }}>
- <span style={{ color: '#EC4899', fontWeight: 900 }}>✓</span>
+ <Check size={18} strokeWidth={3} color="#EC4899" style={{ flexShrink: 0, marginTop: 3 }} />
  <span>{b}</span>
  </li>
  ))}

@@ -207,11 +207,11 @@ function ScoreCard({ data }: { data: KeywordScore }) {
  <CompBadge level={data.competition} />
  {data.trend === 'up' && <span className="text-[10px] text-[#12B76A] font-bold">▲ 상승세</span>}
  {data.trend === 'down' && <span className="text-[10px] text-[#F04452] font-bold">▼ 하락세</span>}
- {data.trend === 'stable' && <span className="text-[10px] text-[#8B95A1] font-bold">— 유지</span>}
+ {data.trend === 'stable' && <span className="text-[10px] text-[#8B95A1] font-bold">· 유지</span>}
  </div>
  <div className="flex items-center gap-4 text-[11px] text-[#8B95A1]">
  <span>월간 검색량 <strong className="text-[#191F28]">{data.searchVol.toLocaleString()}</strong></span>
- <span>현재 순위 <strong className={data.currentRank && data.currentRank <= 5 ? 'text-[#3182F6]' : data.currentRank && data.currentRank <= 10 ? 'text-[#F59E0B]' : 'text-[#F04452]'}>{data.currentRank ?? '—'}위</strong></span>
+ <span>현재 순위 <strong className={data.currentRank && data.currentRank <= 5 ? 'text-[#3182F6]' : data.currentRank && data.currentRank <= 10 ? 'text-[#F59E0B]' : 'text-[#F04452]'}>{data.currentRank ?? '-'}위</strong></span>
  </div>
  {/* 미니 요소별 바 */}
  <div className="flex gap-1 mt-2">
@@ -285,7 +285,7 @@ export default function KeywordScorePage() {
  <PageHeader
  icon={<Target size={28} className="text-white" strokeWidth={2.5} />}
  title="키워드 스코어"
- subtitle="조회수·경쟁도·전환가치를 한 번에 — 진짜 돈 되는 키워드만"
+ subtitle="조회수·경쟁도·전환가치를 한 번에 · 진짜 돈 되는 키워드만"
  variant="orange"
  />
  <div className="p-4 md:p-6">

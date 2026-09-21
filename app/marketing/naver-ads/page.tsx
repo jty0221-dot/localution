@@ -103,7 +103,7 @@ function HashtagModal({ keywords, onClose }: { keywords: string[]; onClose: () =
  <div className="px-4 pb-4">
  <button onClick={() => copy(formats[2].value, 99)}
  className="w-full py-2.5 rounded-xl bg-[#3182F6] text-white text-sm font-semibold hover:bg-[#1B64DA]">
- {copied === 99 ? '✓ 복사됨' : '#해시태그 전체 복사'}
+ {copied === 99 ? '복사됨' : '#해시태그 전체 복사'}
  </button>
  </div>
  </div>
@@ -305,7 +305,7 @@ export default function NaverAdsPage() {
  <PageHeader
  icon={<BarChart3 size={28} className="text-white" strokeWidth={2.5} />}
  title="키워드 조회/분석"
- subtitle="키워드별 검색량·트렌드·콘텐츠 포화도를 한눈에 — 소상공인 마케팅 인사이트 플랫폼"
+ subtitle="키워드별 검색량·트렌드·콘텐츠 포화도를 한눈에 · 소상공인 마케팅 인사이트 플랫폼"
  />
 
  <main className="flex-1 px-4 md:px-6 py-6 max-w-5xl mx-auto w-full space-y-6">

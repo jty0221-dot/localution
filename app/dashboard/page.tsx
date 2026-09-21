@@ -2,7 +2,7 @@
 // ============================================================
 // /dashboard — 사장님 메인 대시보드
 //
-// ⚠️ DO NOT RE-ADD (사장님 명시 제거) — /DO_NOT_TOUCH.md 참조
+// [주의] DO NOT RE-ADD (사장님 명시 제거) — /DO_NOT_TOUCH.md 참조
 //   · <QuickNav /> 호출 X (우측 사이드바로 대체)
 //   · <QuickActions /> 호출 X (우측 사이드바로 이전)
 //   · "신규 모듈 promo strip 3종" (인스타 카드뉴스 / 플랫폼 통합 / 블로그 순위) 비표시
@@ -447,7 +447,7 @@ function ConnectModal({ platform, initialUrl, isConnected, savedStoreName, onClo
  <div className="flex-1">
  <h3 className="text-lg font-black text-[#191F28]">{platform.name} 연동</h3>
  <p className="text-xs text-[#8B95A1]">
- {isConnected ? '이미 연결됨 — URL 변경 또는 해제 가능' : '매장 URL 또는 ID를 입력하세요'}
+ {isConnected ? '이미 연결됨 · URL 변경 또는 해제 가능' : '매장 URL 또는 ID를 입력하세요'}
  </p>
  </div>
  {isConnected && (
@@ -689,7 +689,7 @@ const SERVICE_RANKING_INIT = [
  { id: 10, name: '세금계산서 자동 발행', category: '행정', badge: '', color: '#6B7280' },
 ]
 
-// ⚠️ DO NOT RE-ADD <QuickNav /> 호출 — 사장님 요청으로 우측 사이드바(DashboardRightSidebar)로 대체됨 (2026-04-28, 2026-05-06 재확인)
+// [주의] DO NOT RE-ADD <QuickNav /> 호출 — 사장님 요청으로 우측 사이드바(DashboardRightSidebar)로 대체됨 (2026-04-28, 2026-05-06 재확인)
 // 함수 정의는 남아있지만 JSX 에서 호출하지 마세요. 자세한 내용은 /DO_NOT_TOUCH.md 참조.
 function QuickNav() {
  const links = [
@@ -802,7 +802,7 @@ function ServiceRanking() {
  <ArrowDown size={10} strokeWidth={3} />{Math.abs(diff)}
  </span>
  )}
- {diff === 0 && <span className="text-[11px] text-[#8B95A1]">—</span>}
+ {diff === 0 && <span className="text-[11px] text-[#8B95A1]">-</span>}
  </div>
  </div>
  )
@@ -1203,7 +1203,7 @@ export default function Dashboard() {
  setWorkerCollecting(prev => ({ ...prev, [platformId]: false }))
  return
  }
- toast.info(endpointMap[platformId] ? '리뷰 수집 완료!' : '워커에 수집 요청 완료 — 리뷰가 들어오면 자동 업데이트')
+ toast.info(endpointMap[platformId] ? '리뷰 수집 완료!' : '워커에 수집 요청 완료 · 리뷰가 들어오면 자동 업데이트')
 
  // 20초 간격으로 최대 9회(3분) 폴링 — 리뷰 생기면 즉시 반영
  let tries = 0
@@ -1220,7 +1220,7 @@ export default function Dashboard() {
  if (newCount > prevCount) {
  toast.success(`${platformId} 리뷰 ${newCount}건 수집 완료!`)
  } else {
- toast.info('수집 완료 — 리뷰 관리 페이지에서 확인하세요')
+ toast.info('수집 완료 · 리뷰 관리 페이지에서 확인하세요')
  }
  }
  } catch {
@@ -1460,12 +1460,12 @@ export default function Dashboard() {
 
  // 실 데이터 연결 전 가짜 숫자 노출 금지 — 데이터 없으면 '—'로 표시
  const stats = [
- { label: '이번 달 방문자', value: '—', sub: '데이터 수집 중', up: false, color: '#3182F6', ring: '#E8F4FD' },
- { label: '총 리뷰 수', value: totalReviews ? totalReviews + '건' : '—', sub: hasRealReviews ? '실시간 동기화됨' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#03C75A', ring: '#E8FFF0' },
- { label: '평균 별점', value: avgRating ? avgRating + '점' : '—', sub: hasRealReviews ? '리뷰 기반 자동 계산' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#F5A623', ring: '#FFF7E8' },
- { label: '키워드 상위', value: '—', sub: '키워드 추적 시작 시 표시', up: false, color: '#9B5CFB', ring: '#F3ECFF' },
- { label: '이번 주 매출', value: totalWeekSale > 0 ? totalWeekSale + '만원' : '—', sub: '매출 연동 시 표시', up: totalWeekSale > 0, color: '#F04452', ring: '#FFF0F0' },
- { label: '단골 고객', value: '—', sub: '고객 등록 시 자동 집계', up: false, color: '#12B76A', ring: '#E8FFF0' },
+ { label: '이번 달 방문자', value: '-', sub: '데이터 수집 중', up: false, color: '#3182F6', ring: '#E8F4FD' },
+ { label: '총 리뷰 수', value: totalReviews ? totalReviews + '건' : '-', sub: hasRealReviews ? '실시간 동기화됨' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#03C75A', ring: '#E8FFF0' },
+ { label: '평균 별점', value: avgRating ? avgRating + '점' : '-', sub: hasRealReviews ? '리뷰 기반 자동 계산' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#F5A623', ring: '#FFF7E8' },
+ { label: '키워드 상위', value: '-', sub: '키워드 추적 시작 시 표시', up: false, color: '#9B5CFB', ring: '#F3ECFF' },
+ { label: '이번 주 매출', value: totalWeekSale > 0 ? totalWeekSale + '만원' : '-', sub: '매출 연동 시 표시', up: totalWeekSale > 0, color: '#F04452', ring: '#FFF0F0' },
+ { label: '단골 고객', value: '-', sub: '고객 등록 시 자동 집계', up: false, color: '#12B76A', ring: '#E8FFF0' },
  ]
 
  // ─────────────────────────────────────────────────────────
@@ -1535,7 +1535,7 @@ export default function Dashboard() {
  <div className="min-h-screen bg-[#F8F9FA]">
  <Sidebar />
  {/* DashboardRightSidebar:
-   · xl+ (1280px+): position:fixed 로 viewport 우측 고정 — 스크롤 무관 항상 보임
+   · xl+ (1280px+): position:fixed 로 viewport 우측 고정 · 스크롤 무관 항상 보임
    · main 에 xl:pr-[336px] 로 콘텐츠 우측 여백 확보 (sidebar 320 + 16 margin)
    · xl 미만: 메인 콘텐츠 하단에 인라인 grid (lg+ 3열, mobile 1열) */}
  <div className="md:ml-[220px] flex flex-col min-h-screen">
@@ -1730,7 +1730,7 @@ export default function Dashboard() {
  ? 'bg-white border-2 border-[#E5E8EB] hover:border-[#3182F6] hover:shadow-lg hover:-translate-y-0.5'
  : 'bg-[#FAFBFC] border-2 border-dashed border-[#E5E8EB] hover:border-[#3182F6] hover:bg-white hover:shadow-md',
  ].join(' ')}
- title={p.connected ? p.name + ' 연동됨 — 클릭하여 정보 수정' : p.name + ' 연동하기'}
+ title={p.connected ? p.name + ' 연동됨 · 클릭하여 정보 수정' : p.name + ' 연동하기'}
  >
  {/* 연동됨 시 좌상단 초록 dot */}
  {p.connected && (
@@ -1857,7 +1857,7 @@ export default function Dashboard() {
  ) : p.id === 'naver_place' ? (
  <span className="inline-flex items-center gap-1.5 text-xs text-[#8B95A1]">
  <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
- 아직 수집 전 — 상단 "지금 수집" 클릭
+ 아직 수집 전 · 상단 "지금 수집" 클릭
  </span>
  ) : (
  <button
@@ -1934,7 +1934,7 @@ export default function Dashboard() {
 
  {platforms.filter(p => !p.connected && (platformReviews[p.id]?.length ?? 0) === 0).length > 0 && (
  <div className="mt-4 p-4 bg-[#F8F9FA] rounded-xl border border-dashed border-[#E0E0E0]">
- <p className="text-xs text-[#8B95A1] mb-2 font-medium">미연동 플랫폼 — 클릭하여 바로 연동</p>
+ <p className="text-xs text-[#8B95A1] mb-2 font-medium">미연동 플랫폼 · 클릭하여 바로 연동</p>
  <div className="flex flex-wrap gap-2">
  {platforms.filter(p => !p.connected && (platformReviews[p.id]?.length ?? 0) === 0).map(p => (
  <button

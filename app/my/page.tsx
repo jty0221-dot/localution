@@ -93,7 +93,7 @@ export default function MyPage() {
  }
  // 401 이어도 redirect 안 함 — 미들웨어가 진짜 로그아웃은 차단함
  })
- .catch(() => { /* 네트워크 오류 — 그냥 빈 상태 */ })
+ .catch(() => { /* 네트워크 오류 · 그냥 빈 상태 */ })
  .finally(() => setLoading(false))
  }, [router])
 
@@ -171,7 +171,7 @@ export default function MyPage() {
  icon=""
  logoNode={<UserCircle2 size={32} strokeWidth={2} className="text-white" />}
  title="내 정보"
- subtitle="내 활동과 즐겨찾는 기능을 한눈에 — 로컬루션이 당신의 비서"
+ subtitle="내 활동과 즐겨찾는 기능을 한눈에 · 로컬루션이 당신의 비서"
  variant="primary"
  />
 

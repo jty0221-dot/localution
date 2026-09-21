@@ -109,7 +109,7 @@ export default function AdminSubscriptionsPage() {
  return (
  <tr key={r.id} className="border-t border-[#F2F4F6]">
  <td className="px-4 py-3">
- <div className="font-semibold text-[#191F28] text-xs">{r.user_email ?? '—'}</div>
+ <div className="font-semibold text-[#191F28] text-xs">{r.user_email ?? '-'}</div>
  <div className="text-[10px] text-[#B0B8C1] font-mono">{r.user_id.slice(0, 8)}…</div>
  </td>
  <td className="px-4 py-3 text-[#4E5968] font-mono text-xs">{r.module_id}</td>
@@ -120,8 +120,8 @@ export default function AdminSubscriptionsPage() {
  </span>
  </td>
  <td className="px-4 py-3 text-right font-bold text-[#191F28]">₩{r.price_krw.toLocaleString()}</td>
- <td className="px-4 py-3 text-xs text-[#4E5968]">{r.current_period_end?.slice(0, 10) ?? '—'}</td>
- <td className="px-4 py-3 text-xs text-[#8B95A1]">{r.created_at?.slice(0, 10) ?? '—'}</td>
+ <td className="px-4 py-3 text-xs text-[#4E5968]">{r.current_period_end?.slice(0, 10) ?? '-'}</td>
+ <td className="px-4 py-3 text-xs text-[#8B95A1]">{r.created_at?.slice(0, 10) ?? '-'}</td>
  </tr>
  )
  })}

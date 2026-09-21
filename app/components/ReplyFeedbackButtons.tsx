@@ -39,7 +39,7 @@ export default function ReplyFeedbackButtons({ reviewId, compact = false }: Prop
     return (
       <span className={`inline-flex items-center gap-1 text-[10px] md:text-xs font-bold ${sent === 'good' ? 'text-emerald-600' : 'text-red-600'}`}>
         <CheckCircle2 size={12} />
-        {sent === 'good' ? '좋아요 저장됨' : '싫어요 저장됨 — AI 학습'}
+        {sent === 'good' ? '좋아요 저장됨' : '싫어요 저장됨 · AI 학습'}
       </span>
     )
   }

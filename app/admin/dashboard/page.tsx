@@ -137,7 +137,7 @@ export default function AdminDashboardPage() {
 
  {err && (
  <div className="bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] text-sm rounded-xl p-4 mb-5">
- {err} — 서비스 롤 키 또는 RLS 설정을 확인해주세요.
+ {err} · 서비스 롤 키 또는 RLS 설정을 확인해주세요.
  </div>
  )}
 
@@ -148,7 +148,7 @@ export default function AdminDashboardPage() {
  <k.Icon size={18} strokeWidth={2.5} />
  </div>
  <div className="text-2xl md:text-3xl font-black" style={{ color: k.color }}>
- {!data.loaded ? '—' : k.krw ? `₩${k.value.toLocaleString()}` : k.value.toLocaleString()}
+ {!data.loaded ? '-' : k.krw ? `₩${k.value.toLocaleString()}` : k.value.toLocaleString()}
  </div>
  <div className="text-xs text-[#8B95A1] font-medium mt-1">{k.label}</div>
  </div>
@@ -304,7 +304,7 @@ export default function AdminDashboardPage() {
  <div className="flex items-center justify-between">
  <Icon size={14} strokeWidth={2.5} style={{ color: k.color }} />
  <span className="text-xl font-black" style={{ color: k.color }}>
- {inqLoaded ? k.value.toLocaleString() : '—'}
+ {inqLoaded ? k.value.toLocaleString() : '-'}
  </span>
  </div>
  <div className="text-[10px] font-bold mt-0.5" style={{ color: k.color }}>{k.label}</div>

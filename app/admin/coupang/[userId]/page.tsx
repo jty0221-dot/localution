@@ -111,7 +111,7 @@ export default function CoupangUserDetailPage() {
   // 매장 정보 갱신 (이름/추가/삭제 통합)
   const saveStores = useCallback(async (newMeta: Array<{ id: string; name: string }>) => {
     if (newMeta.length === 0) {
-      if (!confirm('매장 0개 — 모든 매장을 삭제하시겠어요? 자동 fetch 가 멈춥니다.')) return
+      if (!confirm('매장 0개 · 모든 매장을 삭제하시겠어요? 자동 fetch 가 멈춥니다.')) return
     }
     setBusy(true); setActionResult(null)
     try {
@@ -159,8 +159,8 @@ export default function CoupangUserDetailPage() {
       '950251\n' +
       'https://store.coupangeats.com/merchant/management/reviews/950254\n' +
       '779523, 824040\n\n' +
-      '— URL 에서 매장 ID 자동 추출됩니다.\n' +
-      '— 매장명은 추가 후 [이름] 버튼으로 편집하세요.'
+      '· URL 에서 매장 ID 자동 추출됩니다.\n' +
+      '· 매장명은 추가 후 [이름] 버튼으로 편집하세요.'
     )
     if (!input) return
     if (!data) return
@@ -244,7 +244,7 @@ export default function CoupangUserDetailPage() {
 
   return (
     <div className="min-h-screen bg-[#F8F9FA]">
-      <div className="max-w-7xl mx-auto px-4 md:px-6 py-4 md:py-6">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* 헤더 */}
         <div className="mb-4 md:mb-6">
           <Link href="/admin/coupang-diagnostics"
@@ -265,7 +265,7 @@ export default function CoupangUserDetailPage() {
             <div className="flex gap-1.5 flex-shrink-0 flex-wrap">
               <button onClick={impersonate} disabled={busy}
                 className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#F04452] text-white text-xs md:text-sm font-bold hover:bg-[#DC2626] disabled:opacity-50"
-                title="이 사용자로 임시 로그인 — 사장님 화면 그대로 진단">
+                title="이 사용자로 임시 로그인 · 사장님 화면 그대로 진단">
                 이 사용자로 로그인
               </button>
               <button onClick={load} disabled={loading}
@@ -416,7 +416,7 @@ export default function CoupangUserDetailPage() {
 
               {filteredReviews.length === 0 ? (
                 <p className="text-xs text-[#8B95A1] text-center py-6">
-                  {data.recent_reviews.length === 0 ? '수집된 리뷰 없음 — 위에서 fetch 트리거 또는 재로그인 시도' : '필터 조건 매칭 없음'}
+                  {data.recent_reviews.length === 0 ? '수집된 리뷰 없음 · 위에서 fetch 트리거 또는 재로그인 시도' : '필터 조건 매칭 없음'}
                 </p>
               ) : (
                 <div className="space-y-2">

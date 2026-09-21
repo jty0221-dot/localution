@@ -126,7 +126,7 @@ export default function PlatformIssuesPage() {
               </div>
               <div>
                 <div className="text-base md:text-lg font-bold text-gray-900">매장 ID 누락 사용자</div>
-                <div className="text-xs text-gray-500">{data.null_place_id_users.length}건 — 답글 발행 불가 상태</div>
+                <div className="text-xs text-gray-500">{data.null_place_id_users.length}건 · 답글 발행 불가 상태</div>
               </div>
             </div>
             <div className="space-y-1.5">
@@ -156,7 +156,7 @@ export default function PlatformIssuesPage() {
               </div>
               <div>
                 <div className="text-base md:text-lg font-bold text-gray-900">정체 답글</div>
-                <div className="text-xs text-gray-500">{data.stuck_queued_sample.length}건 — 30분+ 처리 안 됨</div>
+                <div className="text-xs text-gray-500">{data.stuck_queued_sample.length}건 · 30분+ 처리 안 됨</div>
               </div>
             </div>
             <div className="space-y-1.5">

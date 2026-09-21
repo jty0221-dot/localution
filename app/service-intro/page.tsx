@@ -5,6 +5,8 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 import Link from 'next/link'
 import Footer from '../components/Footer'
+import AnswerBlock from '../components/seo/AnswerBlock'
+import { SITE } from '../lib/seo'
 import {
  ArrowLeft, ArrowRight, Star, RefreshCw, CheckCircle2,
  Loader2, Send,
@@ -13,7 +15,7 @@ import {
  UtensilsCrossed, Coffee, Store, Briefcase, Scissors, GraduationCap,
  Laptop,
  Bell, BellRing, Calendar, Megaphone, Image as ImageIcon, AtSign, Youtube,
- Sparkles, Headphones,
+ Sparkles, Headphones, Check,
  type LucideIcon,
 } from 'lucide-react'
 
@@ -134,8 +136,9 @@ function AnimatedCheck() {
  { x: 14, y: 20, delay: '0.95s', size: 6 },
  { x: 52, y: 50, delay: '0.9s', size: 7 },
  ].map((s, i) => (
- <text key={i} x={s.x} y={s.y} fontSize={s.size} textAnchor="middle"
- style={{ animation: `sparkle 0.6s ease-out ${s.delay} forwards`, opacity: 0 }}>✦</text>
+ <path key={i} fill="currentColor"
+ d={`M${s.x} ${s.y - s.size / 2} L${s.x + s.size / 6} ${s.y - s.size / 6} L${s.x + s.size / 2} ${s.y} L${s.x + s.size / 6} ${s.y + s.size / 6} L${s.x} ${s.y + s.size / 2} L${s.x - s.size / 6} ${s.y + s.size / 6} L${s.x - s.size / 2} ${s.y} L${s.x - s.size / 6} ${s.y - s.size / 6} Z`}
+ style={{ animation: `sparkle 0.6s ease-out ${s.delay} forwards`, opacity: 0 }} />
  ))}
  </svg>
  </div>
@@ -343,11 +346,11 @@ function QrDemo() {
  앱 설치 없이 고객 리뷰를 유도하고<br/>AI가 자동으로 완성해 플랫폼에 올립니다
  </p>
  <div className="flex items-center gap-3 text-[11px] text-[#4E5968] bg-[#F8F9FA] rounded-xl px-4 py-2.5 mb-5 flex-wrap justify-center">
- <span><span className="text-[#059669] font-bold mr-1">✓</span>앱 설치 불필요</span>
+ <span><Check size={13} strokeWidth={3} className="text-[#059669] inline -mt-0.5 mr-1" />앱 설치 불필요</span>
  <span className="text-[#E5E8EB]">|</span>
- <span><span className="text-[#059669] font-bold mr-1">✓</span>배치 비용 0원</span>
+ <span><Check size={13} strokeWidth={3} className="text-[#059669] inline -mt-0.5 mr-1" />배치 비용 0원</span>
  <span className="text-[#E5E8EB]">|</span>
- <span><span className="text-[#059669] font-bold mr-1">✓</span>즉시 사용</span>
+ <span><Check size={13} strokeWidth={3} className="text-[#059669] inline -mt-0.5 mr-1" />즉시 사용</span>
  </div>
  <button onClick={() => setStep(1)}
  className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#059669] text-white font-bold rounded-xl hover:bg-[#047857] transition-colors text-sm">
@@ -574,7 +577,7 @@ function ReviewDemo() {
  </div>
  {aiReplies[r.id] && (
  <div className="border-t border-[#E5E8EB] bg-[#F0F9FF] p-4">
- <p className="text-[10px] font-black text-[#3182F6] mb-2">✦ AI 생성 답글 — 수정 후 원클릭 게시</p>
+ <p className="text-[10px] font-black text-[#3182F6] mb-2"><Sparkles size={10} className="inline -mt-0.5 mr-1" />AI 생성 답글 · 수정 후 원클릭 게시</p>
  <textarea defaultValue={aiReplies[r.id]} rows={4}
  className="w-full border border-[#93C5FD] rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#3182F6] resize-none bg-white leading-relaxed" />
  <div className="flex gap-2 mt-3">
@@ -642,7 +645,7 @@ export default function ServiceIntro() {
  <span className="inline-flex items-center justify-center w-6 h-6 rounded-lg text-[11px] font-black shrink-0"
  style={{ background: c.bg, color: '#fff' }}>{c.letter}</span>
  <span className="text-white/90 text-[11px] font-bold">{c.label}</span>
- <span className="ml-auto text-yellow-300 text-[10px]">{'★'.repeat(c.stars)}</span>
+ <span className="ml-auto text-yellow-300 inline-flex">{Array.from({ length: c.stars }).map((_, i) => <Star key={i} size={10} className="fill-current" />)}</span>
  </div>
  <p className="text-white/80 text-[11px] leading-snug break-keep">{c.text}</p>
  </div>
@@ -662,7 +665,7 @@ export default function ServiceIntro() {
 
  {/* 카테고리 배지 — 별도 행 (위 백링크와 명확히 분리) */}
  <div className="inline-flex items-center gap-1.5 bg-white/15 border border-white/25 text-white/90 text-[11px] sm:text-xs font-bold px-3 sm:px-4 py-1.5 rounded-full mb-3 sm:mb-4 tracking-wide">
- <Zap size={11} strokeWidth={2.5} /> 리뷰 관리 완전 자동화 — 답글 + 리뷰 수집
+ <Zap size={11} strokeWidth={2.5} /> 리뷰 관리 완전 자동화 · 답글 + 리뷰 수집
  </div>
 
  <h1 className="text-2xl sm:text-4xl md:text-5xl font-black mb-3 sm:mb-4 leading-normal break-keep lg:max-w-xl">
@@ -671,7 +674,7 @@ export default function ServiceIntro() {
  </h1>
 
  <p className="text-white/80 text-sm sm:text-base leading-relaxed max-w-xl break-keep mb-6 sm:mb-8">
- QR 코드 하나로 고객 리뷰를 유도하고 — 쌓인 리뷰엔 AI가 매장 톤에 맞춘 답글을 3초 만에 만들어 원클릭으로 게시합니다.
+ QR 코드 하나로 고객 리뷰를 유도하고 · 쌓인 리뷰엔 AI가 매장 톤에 맞춘 답글을 3초 만에 만들어 원클릭으로 게시합니다.
  </p>
 
  <div className="grid grid-cols-2 sm:flex sm:gap-10 gap-x-6 gap-y-4">
@@ -692,6 +695,19 @@ export default function ServiceIntro() {
 
  {/* ── 본문 ───────────────────────────────────────── */}
  <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+
+ {/* AEO · GEO 답변 블록 : 질문 제목 + 두 문장 답 + 사실 목록 (수치는 SITE 정본만) */}
+ <AnswerBlock
+  className="mb-8 sm:mb-10"
+  question="로컬루션은 어떤 서비스인가요?"
+  answer={SITE.answer}
+  facts={[
+   `리뷰 플랫폼 ${SITE.platformCount}곳 통합 : ${SITE.platforms.join(' · ')}`,
+   `말투 ${SITE.toneCount}종으로 리뷰마다 다른 답글`,
+   `${SITE.pollingMinutes}분 간격 새 리뷰 확인 · 자동 등록`,
+   `${SITE.priceText}부터 · 신용카드 등록 없이 시작`,
+  ]}
+ />
 
  {/* ── STEP 1: QR 리뷰 수집 ───────────────────── */}
  <div className="mb-10 sm:mb-14">
@@ -851,11 +867,11 @@ export default function ServiceIntro() {
  <p className="text-[10px] font-bold text-[#B0B8C1] tracking-widest uppercase mb-4">최근 반영된 피드백</p>
  <div className="space-y-4">
  {([
- { from: '마케팅 대행사', Icon: BarChart3, color: '#3182F6', bg: '#EFF6FF', date: '04.25', update: '키워드 실시간 순위 조회 + 대시보드 연동 — "클라이언트에게 바로 보여줄 수 있게 됐어요"' },
- { from: '음식점 사장님', Icon: UtensilsCrossed, color: '#EA580C', bg: '#FFF7ED', date: '04.22', update: 'QR 리뷰 4단계 흐름 간소화 및 모바일 최적화 — "고객이 헷갈려하지 않고 끝까지 써요"' },
- { from: '블로거', Icon: PenLine, color: '#059669', bg: '#ECFDF5', date: '04.18', update: '블로그 게시글 키워드 순위 추적 기능 신규 추가 — "내 글이 몇 위인지 바로 보여서 좋아요"' },
- { from: '소상공인', Icon: Store, color: '#F59E0B', bg: '#FFFBEB', date: '04.15', update: 'AI 답글 톤 MZ체 추가 · 감성적 어조 개선 — "우리 가게 분위기에 딱 맞아요"' },
- { from: '카페 사장님', Icon: Coffee, color: '#8B5CF6', bg: '#F5F3FF', date: '04.10', update: '사장님 커뮤니티 지역별 게시판 및 포인트 시스템 오픈 — "다른 사장님들이랑 소통하니 도움돼요"' },
+ { from: '마케팅 대행사', Icon: BarChart3, color: '#3182F6', bg: '#EFF6FF', date: '04.25', update: '키워드 실시간 순위 조회 + 대시보드 연동 · "클라이언트에게 바로 보여줄 수 있게 됐어요"' },
+ { from: '음식점 사장님', Icon: UtensilsCrossed, color: '#EA580C', bg: '#FFF7ED', date: '04.22', update: 'QR 리뷰 4단계 흐름 간소화 및 모바일 최적화 · "고객이 헷갈려하지 않고 끝까지 써요"' },
+ { from: '블로거', Icon: PenLine, color: '#059669', bg: '#ECFDF5', date: '04.18', update: '블로그 게시글 키워드 순위 추적 기능 신규 추가 · "내 글이 몇 위인지 바로 보여서 좋아요"' },
+ { from: '소상공인', Icon: Store, color: '#F59E0B', bg: '#FFFBEB', date: '04.15', update: 'AI 답글 톤 MZ체 추가 · 감성적 어조 개선 · "우리 가게 분위기에 딱 맞아요"' },
+ { from: '카페 사장님', Icon: Coffee, color: '#8B5CF6', bg: '#F5F3FF', date: '04.10', update: '사장님 커뮤니티 지역별 게시판 및 포인트 시스템 오픈 · "다른 사장님들이랑 소통하니 도움돼요"' },
  ] as { from: string; Icon: LucideIcon; color: string; bg: string; date: string; update: string }[]).map((item, i) => (
  <div key={i} className="flex items-start gap-3">
  <div className="w-7 h-7 rounded-full flex items-center justify-center shrink-0 mt-0.5"
@@ -871,7 +887,7 @@ export default function ServiceIntro() {
  <p className="text-xs text-[#4E5968] break-keep leading-relaxed">{item.update}</p>
  </div>
  <div className="w-5 h-5 rounded-full bg-[#ECFDF5] flex items-center justify-center shrink-0 mt-0.5">
- <span className="text-[9px] text-[#059669] font-black">✓</span>
+ <Check size={10} strokeWidth={3} className="text-[#059669]" />
  </div>
  </div>
  ))}

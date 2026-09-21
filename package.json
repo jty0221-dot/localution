@@ -7,6 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
+    "check:geo": "node scripts/geo-check.mjs",
     "install:all": "npm install && cd worker && npm install",
     "build:check": "next build",
     "worker:dev": "cd worker && npm run dev",

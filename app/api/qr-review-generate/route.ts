@@ -153,7 +153,6 @@ export async function POST(req: NextRequest) {
 
  return NextResponse.json({
  receiptInfo: {
- items: correctedItems,
  items_raw: rawItems,
  matched: false,
  low_confidence: !!parsed.low_confidence,

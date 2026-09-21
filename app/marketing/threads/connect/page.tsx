@@ -54,7 +54,7 @@ const STEPS = [
  icon: CheckCircle2,
  title: 'Meta 권한 허용',
  desc: 'Meta 화면에서 로컬루션이 요청하는 두 가지 권한을 허용해주세요.',
- detail: '· threads_basic — 계정 정보 조회\n· threads_content_publish — 게시물 발행\n두 권한 모두 허용해야 자동 발행이 가능합니다.',
+ detail: '· threads_basic · 계정 정보 조회\n· threads_content_publish · 게시물 발행\n두 권한 모두 허용해야 자동 발행이 가능합니다.',
  from: 'from-[#059669]', to: 'to-[#0EA5E9]',
  },
  {
@@ -145,7 +145,7 @@ export default function ThreadsConnectPage() {
  <AlertTriangle size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-black text-[#92400E]">사전 등록 필수 — 현재 베타 운영 중</p>
+ <p className="text-sm font-black text-[#92400E]">사전 등록 필수 · 현재 베타 운영 중</p>
  <p className="text-xs text-[#B45309] mt-0.5">Meta 앱 검수 완료 전까지 사전 등록 사용자만 연결 가능합니다</p>
  </div>
  </div>

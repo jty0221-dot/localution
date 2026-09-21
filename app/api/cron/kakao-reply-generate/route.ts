@@ -101,25 +101,25 @@ export async function GET(req: Request) {
       }
 
       // 매장 정보 로드 (AI 컨텍스트)
-      const storeInfo = await loadStoreInfo(svc, userId).catch(() => null)
-      if (!storeInfo) {
-        stat.errors.push('store info 없음 — 매장 등록 필요')
+      const storeInfo = await loadStoreInfo(userId).catch(() => null)
+      if (!storeInfo || !storeInfo.storeName) {
+        stat.errors.push('store info 없음 · 매장 등록 필요')
         summary.push(stat)
         continue
       }
 
       for (const r of reviews) {
         try {
-          const draft = await generateNaverReply({
-            store: storeInfo,
-            review: {
+          const gen = await generateNaverReply(
+            storeInfo,
+            {
               content: r.content || '',
               rating: r.rating || null,
-              authorName: r.author_name || null,
-              photos: r.photos || [],
+              photos: Array.isArray(r.photos) ? r.photos : [],
             },
             tone,
-          })
+          )
+          const draft = gen.ok ? gen.reply : ''
           if (draft && draft.trim()) {
             // 카카오는 250자 제한 적용 (네이버와 비슷한 spam filter 가정)
             const trimmed = draft.length > 250 ? draft.slice(0, 247) + '...' : draft

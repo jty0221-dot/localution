@@ -108,7 +108,7 @@ export async function GET(req: NextRequest) {
  bodyShape = analyzeShape(json)
  // 첫 번째 review 객체 추출
  const arr = findFirstArray(json)
- if (arr && arr.length > 0) {
+ if (arr && arr.array.length > 0) {
  preview = {
  arrayPath: arr.path,
  arrayLength: arr.array.length,

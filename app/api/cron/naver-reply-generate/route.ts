@@ -145,7 +145,7 @@ export async function GET(req: Request) {
  .update({
  draft_reply: result.reply,
  reply_status: newStatus,
- reply_tone: tone,
+ reply_tone: result.tone || tone,   // 'auto' 면 실제로 쓰인 톤을 남긴다
  reply_queued_at: autoApprove ? nowIso : null,
  })
  .eq('id', rev.id)

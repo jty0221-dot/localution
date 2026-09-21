@@ -1,39 +1,27 @@
 // ═══════════════════════════════════════════════════════════
 // app/robots.ts
-// Next.js 15 App Router - /robots.txt 자동 생성
-// 검색엔진 크롤링 정책: 공개 페이지 허용 / 관리자·API 차단
+// /robots.txt 자동 생성 (Next.js App Router)
+// 검색 봇 · AI 봇 · SNS 미리보기 봇 전부 공개 페이지는 허용,
+// 로그인 뒤 화면과 API 는 전부 차단. 목록 정본은 app/lib/seo.ts
 // ═══════════════════════════════════════════════════════════
 
 import type { MetadataRoute } from 'next'
-
-const SITE_URL = 'https://www.localution.co.kr'
+import { SITE, SEARCH_BOTS, AI_BOTS, SOCIAL_BOTS, PRIVATE_PATHS } from './lib/seo'
 
 export default function robots(): MetadataRoute.Robots {
- return {
- rules: [
- {
- userAgent: '*',
- allow: '/',
- disallow: [
- '/api/',
- '/admin/',
- '/admin-biz',
- '/qr-admin',
- '/my',
- '/settings/',
- '/dashboard',
- '/review-admin/',
- '/crm',
- '/reservations',
- '/reviews',
- '/settlement',
- ],
- },
- // 네이버·다음 크롤러는 한국 시장 대응이라 별도 허용
- { userAgent: 'Yeti', allow: '/', disallow: ['/api/', '/admin/', '/admin-biz', '/my', '/settings/', '/dashboard'] },
- { userAgent: 'Googlebot', allow: '/', disallow: ['/api/', '/admin/', '/admin-biz', '/my', '/settings/', '/dashboard'] },
- ],
- sitemap: `${SITE_URL}/sitemap.xml`,
- host: SITE_URL,
- }
+  const disallow = [...PRIVATE_PATHS]
+  const rule = (userAgent: string | string[]) => ({ userAgent, allow: '/', disallow })
+
+  return {
+    rules: [
+      rule('*'),
+      rule([...SEARCH_BOTS]),
+      // AI 검색·답변 엔진 : 공개 페이지를 읽어야 AI 답변에 인용된다 (GEO)
+      rule([...AI_BOTS]),
+      // 카톡 · 페북 · 슬랙 미리보기 : OG 이미지를 가져가야 링크 카드가 뜬다
+      rule([...SOCIAL_BOTS]),
+    ],
+    sitemap: `${SITE.url}/sitemap.xml`,
+    host: SITE.url,
+  }
 }

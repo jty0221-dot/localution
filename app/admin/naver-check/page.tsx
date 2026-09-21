@@ -90,7 +90,7 @@ const OVERALL_ICON: Record<CheckStatus, React.ReactNode> = {
 const OVERALL_TITLE: Record<CheckStatus, string> = {
  ok: '네이버 연동 전체 정상',
  warn: '일부 항목 주의 필요',
- error: '오류 발견 — 즉시 확인 필요',
+ error: '오류 발견 · 즉시 확인 필요',
  skip: '진단 대기 중',
 }
 

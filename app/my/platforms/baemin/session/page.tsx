@@ -133,7 +133,7 @@ export default function BaeminSessionPage() {
  type="text"
  value={shopNo}
  onChange={e => setShopNo(e.target.value)}
- placeholder="URL의 숫자 (예: 14637452) — 비워도 자동 감지"
+ placeholder="URL의 숫자 (예: 14637452) · 비워도 자동 감지"
  className="w-full px-4 py-3 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FFBE00] focus:border-transparent"
  disabled={status === 'loading'}
  />

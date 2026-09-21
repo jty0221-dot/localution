@@ -6,7 +6,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const NAV_LINKS = [
- { href: '/about', label: '회사 소개' }, // 🆕 2026-04-19 — 대표의 편지 & 브랜드 스토리
+ { href: '/about', label: '회사 소개' }, // 신규 2026-04-19 · 대표의 편지 & 브랜드 스토리
  { href: '/service-intro', label: '서비스 소개' },
  { href: '/pricing', label: '요금' },
  { href: '/community', label: '커뮤니티' },
@@ -44,7 +44,7 @@ export default function TopNav() {
  }, [])
 
  return (
- <nav className="fixed top-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+ <nav className="fixed top-0 left-0 right-0 z-50 pt-safe bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
  <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
 
  {/* 로고 — 실제 로컬루션 로고 (LU 화살표 + LOCALUTION) */}

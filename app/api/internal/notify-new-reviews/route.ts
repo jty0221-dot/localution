@@ -43,7 +43,7 @@ export async function POST(req: NextRequest) {
  // 2) 알림 대상 리뷰 조회
  let q = svc
  .from('platform_reviews')
- .select('id, platform, platform_review_id, author_name, author_mask, rating, content, posted_at, collected_at')
+ .select('id, platform, platform_store_id, platform_review_id, author_name, author_mask, rating, content, posted_at, collected_at')
  .eq('user_id', userId)
  .eq('platform', platform)
  .order('collected_at', { ascending: false })
@@ -69,7 +69,9 @@ export async function POST(req: NextRequest) {
  // 3) triggerReviewNotifications 호출 (notification_log 중복 자동 처리)
  const rows = reviews.map((r: any) => ({
  id: r.id,
+ user_id: userId,
  platform: r.platform,
+ platform_store_id: r.platform_store_id ?? '',
  platform_review_id: r.platform_review_id,
  author_name: r.author_name,
  author_mask: r.author_mask,
