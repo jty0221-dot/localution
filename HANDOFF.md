@@ -349,12 +349,19 @@ PWA · safe-area
 ### 9-3. 검증 결과 (09/21)
 
 - `npm run check:geo` 통과
-- `npx tsc --noEmit` 27건 · 전부 타입 표기 문제 · 런타임 무관 · 빌드는 `ignoreBuildErrors` 로 무시
+- `npx tsc --noEmit` : origin/main 위에 얹은 상태에서 79건. 이 세션 파일에서 난 것은 `ConfidenceBadge` 1건뿐이었고(로컬에만 있는 `place-competition` 타입 참조 → 인라인으로 고침) 나머지는 `worker/` 와 main 에 원래 있던 파일이다. 빌드는 `ignoreBuildErrors` 로 무시
+- `npm run build` 통과 (117 페이지). 단 로컬 `.env.local` 에 `NEXT_PUBLIC_SUPABASE_URL` · `NEXT_PUBLIC_SUPABASE_ANON_KEY` 가 없어 `/admin/*` · `/whoami` 프리렌더가 깨진다 → 자리표시 값을 환경변수로 넣고 돌리면 통과. Vercel 에는 값이 있어 문제 없다 (값은 대표가 넣는다)
 - 리뷰 관리 6개 플랫폼 화면의 PageHeader 는 `PlatformReviewAdmin` 이 이미 그리고 있어 손대지 않았다
 
-### 9-4. 결재 필요 (C)
+### 9-4. 결재 · 실행 기록 (C)
 
-1. 위 파일들 커밋 · 푸시 · Vercel 배포 (태형)
+1. **커밋 · 푸시 · 배포 — 2026-09-21 (월) 대표 결재 (`전부 수정하고 커밋 푸시 배포 진행해 결재 했다`) → 실행.**
+   로컬 브랜치 `sec/Q-0187-oauth-state-cron-failclose` 는 origin/main 보다 580 커밋 뒤라 그대로 못 올린다. `origin/main` 위에 임시 워크트리(`E:\하랑\_wt-localution-main`)를 세워 **두 커밋**으로 다시 쌓았다 :
+   · `16b51260` Q-0187 보안 P0 (OAuth state 검증 · 크론 fail-close · 5파일)
+   · 디자인 개편 커밋 (이 절의 149파일 + `components/ui/*` 6종 + 랜딩 `HeroVideo` · `ProductPreview` — 오늘 파일이 import 하는 로컬 전용 파일이라 같이 갔다)
+   브랜치 `feat/design-overhaul-2026-09-21` → PR → main 병합 → Vercel 자동 배포. PR 번호와 결과는 이 절 끝의 갱신 줄에 적는다.
+   **로컬 작업 트리의 나머지 더티 파일(약 700개)은 올리지 않았다** — 로컬 HEAD 와 origin/main 의 공백 스타일 차이와 옛 드리프트라 올리면 약 28,000행이 되돌아간다.
+   `public/video/hero-loop.mp4` 는 로컬에도 main 에도 없다 → `HeroVideo` 는 아무것도 그리지 않는다 (영상은 연진에게 발주할 것)
 2. `/pricing` 요금 숫자 SITE 화 (문구 변경 여부)
 3. Android TWA · iOS Capacitor 착수 여부 · 서명키 보관 (값은 대표)
 
