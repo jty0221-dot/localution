@@ -7,6 +7,7 @@ import Footer from '../components/Footer'
 import PageHeader from '../components/PageHeader'
 import { BRAND_GRAD } from '../lib/brand-colors'
 import { useCustomers, type Customer, type CustomerTag } from '../hooks/useCustomers'
+import RevisitInsightCard from './RevisitInsightCard'
 import { Users, Star, Heart, Moon, MessageSquare, FileText, Check, type LucideIcon } from 'lucide-react'
 
 type Tag = CustomerTag
@@ -239,6 +240,9 @@ export default function CustomersPage() {
  ))}
  </div>
  )}
+
+ {/* 재방문 분석 — 스탬프카드가 있을 때만 (LU-017) */}
+ <RevisitInsightCard />
 
  {/* 필터 + 검색 + 리스트 — 손님 있을 때만 (Fragment 로 감싸서 형제 요소 허용) */}
  {!isEmpty && (
