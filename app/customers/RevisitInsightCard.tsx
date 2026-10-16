@@ -66,10 +66,17 @@ export default function RevisitInsightCard() {
         </div>
       </div>
 
-      {data.available === false || !s ? (
-        <p className="text-sm text-[#8B95A1] bg-[#F8F9FA] rounded-xl p-4">
-          적립 기록을 아직 불러올 수 없어요. 손님이 QR 로 스탬프를 적립하면 이곳에 재방문 흐름이 쌓입니다.
-        </p>
+      {data.available === false || !s || s.totalVisits === 0 ? (
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-[#F8F9FA] rounded-xl p-4">
+          <p className="text-sm text-[#4E5968] leading-relaxed">
+            아직 QR 스탬프 적립 기록이 없어요. 손님이 매장 QR 로 적립을 시작하면 재방문율 · 단골 주기 · 발길 끊길 단골이 여기 쌓입니다.
+          </p>
+          <a
+            href="/qr-admin"
+            className="shrink-0 text-center px-4 py-2.5 rounded-xl text-sm font-bold bg-[#3182F6] text-white hover:bg-[#1B64DA]">
+            스탬프 QR 설정하기
+          </a>
+        </div>
       ) : (
         <>
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
@@ -111,13 +118,13 @@ export default function RevisitInsightCard() {
               <p className="text-xs font-bold text-[#4E5968] mb-2">먼저 연락해 볼 단골</p>
               <ul className="divide-y divide-[#F2F4F6] border border-[#F2F4F6] rounded-xl">
                 {s.atRisk.map(r => (
-                  <li key={r.collectionId} className="flex items-center justify-between gap-3 px-3 py-2.5 text-sm">
-                    <div className="min-w-0">
+                  <li key={r.collectionId} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 sm:gap-3 px-3 py-2.5 text-sm">
+                    <div className="min-w-0 whitespace-nowrap">
                       <span className="font-bold text-[#191F28]">{r.name || '이름 없음'}</span>
                       <span className="text-xs text-[#8B95A1] ml-2">{r.phoneMasked}</span>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0 text-xs">
-                      <span className="text-[#4E5968]">평소 {r.avgGapDays}일마다 · 마지막 {r.daysSinceLastVisit}일 전</span>
+                    <div className="flex flex-wrap items-center gap-2 sm:shrink-0 text-xs">
+                      <span className="text-[#4E5968] whitespace-nowrap">평소 {r.avgGapDays}일마다 · 마지막 {r.daysSinceLastVisit}일 전</span>
                       {r.consentMarketing && (
                         <span className="px-2 py-0.5 rounded-lg bg-[#EFF6FF] text-[#3182F6] font-bold">수신 동의</span>
                       )}
