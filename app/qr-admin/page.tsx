@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
+import { useDialogFocus } from '../hooks/useDialogFocus'
 import { requestMutation } from '../lib/client-mutations'
 import Sidebar from '../components/Sidebar'
 import Footer from '../components/Footer'
@@ -414,6 +415,8 @@ export default function QRAdmin() {
  const [qrError, setQrError] = useState<string | null>(null)
  const [togglingId, setTogglingId] = useState<string | null>(null)
  const [previewQR, setPreviewQR] = useState<QRCode | null>(null)
+ const createDialogRef = useDialogFocus(showCreate, () => { if (!creating) setShowCreate(false) }, '#new-qr-name')
+ const previewDialogRef = useDialogFocus(!!previewQR, () => setPreviewQR(null))
  const [copiedId, setCopiedId] = useState<string | null>(null)
  const [downloading, setDownloading] = useState<string | null>(null)
 
@@ -1208,20 +1211,19 @@ export default function QRAdmin() {
  {/* ── 새 QR 만들기 모달 ── */}
  {showCreate && (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
- <div className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
+ <div ref={createDialogRef} role="dialog" aria-modal="true" aria-labelledby="qr-create-title" tabIndex={-1} className="bg-white rounded-2xl w-full max-w-md shadow-2xl">
  <div className="flex items-center justify-between p-6 border-b border-[#F2F4F6]">
- <h2 className="text-lg font-bold text-[#191F28]">새 QR 코드 만들기</h2>
- <button onClick={() => setShowCreate(false)} className="text-[#8B95A1] hover:text-[#191F28] text-2xl leading-none">×</button>
+ <h2 id="qr-create-title" className="text-lg font-bold text-[#191F28]">새 QR 코드 만들기</h2>
+ <button aria-label="QR 만들기 닫기" disabled={creating} onClick={() => setShowCreate(false)} className="text-[#8B95A1] hover:text-[#191F28] text-2xl leading-none">×</button>
  </div>
  <div className="p-6 space-y-5">
  <div>
- <label className="block text-sm font-semibold text-[#191F28] mb-2">QR 이름</label>
- <input
+ <label htmlFor="new-qr-name" className="block text-sm font-semibold text-[#191F28] mb-2">QR 이름</label>
+ <input id="new-qr-name"
  value={newQR.name}
  onChange={e => setNewQR(p => ({ ...p, name: e.target.value }))}
  placeholder="예: 입구 리뷰 QR, 테이블 QR #1"
  className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors"
- autoFocus
  />
  </div>
  <div>
@@ -1276,10 +1278,10 @@ export default function QRAdmin() {
  {/* ── QR 미리보기·다운로드 모달 ── */}
  {previewQR && (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
- <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl">
+ <div ref={previewDialogRef} role="dialog" aria-modal="true" aria-labelledby="qr-preview-title" tabIndex={-1} className="bg-white rounded-2xl w-full max-w-sm shadow-2xl">
  <div className="flex items-center justify-between p-6 border-b border-[#F2F4F6]">
- <h2 className="font-bold text-[#191F28]">{previewQR.name}</h2>
- <button onClick={() => setPreviewQR(null)} className="text-[#8B95A1] hover:text-[#191F28] text-2xl leading-none">×</button>
+ <h2 id="qr-preview-title" className="font-bold text-[#191F28]">{previewQR.name}</h2>
+ <button aria-label="QR 미리보기 닫기" onClick={() => setPreviewQR(null)} className="text-[#8B95A1] hover:text-[#191F28] text-2xl leading-none">×</button>
  </div>
  <div className="p-6 flex flex-col items-center gap-4">
  <div className="p-4 bg-white rounded-2xl border-2 border-[#E5E8EB] shadow-sm">

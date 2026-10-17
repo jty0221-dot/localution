@@ -134,7 +134,7 @@ export default function MenuPage() {
  }
 
  return (
- <div className="min-h-screen" style={{ background: TH.bg, fontFamily: '"Noto Serif KR", "Nanum Myeongjo", serif' }}>
+ <div className="min-h-screen" style={{ background: TH.bg, fontFamily: 'var(--lu-font)' }}>
  {/* 상단 작은 언어 선택 + 자동 번역 표시 */}
  <div className="sticky top-0 z-30 px-5 py-2.5 flex items-center justify-end gap-2 backdrop-blur-md" style={{ background: `${TH.bg}E0`, borderBottom: `1px solid ${TH.border}80` }}>
  {translating && (

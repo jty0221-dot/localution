@@ -33,9 +33,9 @@ export default function EmptyState({
       <div className="flex justify-center mb-4">
         <IconBadge icon={icon} tone={tone} size="lg" ring />
       </div>
-      <h3 className="font-bold text-[#191F28] text-[15px] mb-1.5">{title}</h3>
+      <h3 className="font-bold text-[#172B2F] text-[15px] mb-1.5">{title}</h3>
       {description && (
-        <div className="text-[13px] text-[#8B95A1] leading-relaxed mb-5 max-w-sm mx-auto">
+        <div className="text-[13px] text-[#53656A] leading-relaxed mb-5 max-w-sm mx-auto">
           {description}
         </div>
       )}

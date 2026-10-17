@@ -6,8 +6,6 @@ import Link from 'next/link'
 import Footer from './components/Footer'
 import TopNav from './components/TopNav'
 import HarangMarketingPopup from './components/HarangMarketingPopup'
-import ProductPreview from './components/landing/ProductPreview'
-import HeroVideo from './components/landing/HeroVideo'
 import { parseLandingContent } from './lib/landing-content'
 import JsonLd from './components/seo/JsonLd'
 import { SITE, graphLd, softwareApplicationLd, organizationLd, webSiteLd, faqPageLd, type FaqItem } from './lib/seo'
@@ -26,7 +24,7 @@ const FEATURES = [
  {
  Icon: MapPin,
  title: '네이버 플레이스 SEO',
- desc: '내 업체 노출 순위·키워드·진단을 실시간으로. 경쟁사 대비 위치까지 한눈에.',
+ desc: '매장 정보·키워드·진단을 살펴보세요. 순위는 실제 조회가 가능한 경우에만 표시해요.',
  color: 'from-emerald-500 to-teal-600',
  bg: 'bg-emerald-50',
  tags: ['순위 추적', '진단 점수', '개선 제안'],
@@ -452,123 +450,31 @@ export default function LandingPage() {
 
  <TopNav />
 
- {/* ── 히어로 ── */}
- <section className="pt-28 md:pt-36 pb-20 md:pb-24 px-4 bg-gradient-to-b from-[#F5F8FF] to-white relative overflow-hidden">
- {/* 배경 영상 — 데스크톱 · 동작 줄이기 해제 · 데이터 절약 꺼짐일 때만 재생.
-      영상이 없거나 실패하면 조용히 사라지고 아래 그라데이션만 남는다. */}
- <HeroVideo />
-
- {/* 은은한 광원 — 영상이 없을 때도 히어로가 밋밋하지 않도록 */}
- <div
- className="absolute -top-40 left-1/2 -translate-x-1/2 w-[720px] h-[720px] rounded-full pointer-events-none opacity-[0.07] blur-3xl"
- style={{ background: '#3182F6' }}
- aria-hidden="true"
- />
-
- <div className="max-w-4xl mx-auto text-center relative z-10">
- <div className="flex flex-wrap justify-center gap-2 mb-6">
- <Link href="/updates" className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-blue-200 transition-colors">
- <span className="w-1.5 h-1.5 bg-blue-500 rounded-full animate-pulse" />
- <Coffee size={12} strokeWidth={2.5} /> 커피 한 잔 값 6,900원 · 모든 플랫폼 리뷰 답글 자동
- </Link>
- <Link href="/updates" className="inline-flex items-center gap-1.5 bg-violet-100 text-violet-700 text-xs font-semibold px-3 py-1.5 rounded-full hover:bg-violet-200 transition-colors">
- <Sparkles size={12} strokeWidth={2.5} /> 5월 신기능 6개 보기
- </Link>
+ {/* 공개 홈은 실제 작업 도구와 이용 조건을 먼저 안내한다. */}
+ <section className="lu-hero" aria-labelledby="home-title">
+ <div className="lu-hero-grid">
+ <div>
+ <p className="lu-label mb-5 flex items-center gap-2"><span className="h-2 w-2 rounded-full bg-[var(--lu-accent)]" aria-hidden="true" />사장님을 위한 마케팅 작업 공간</p>
+ <h1 id="home-title" className="text-[var(--lu-ink)]">가게를 돌보는 일에<br />조금 더 집중하도록.</h1>
+ <p className="lu-hero-description">리뷰를 확인하고, 공지를 만들고, 홍보 비용을 비교하세요. 흩어진 마케팅 업무를 한곳에 모아 필요한 일부터 차근차근 시작해 보세요.</p>
+ <div className="lu-hero-actions">
+ <Link href="/marketing" className="lu-primary inline-flex items-center gap-3">마케팅 도구 시작하기<ArrowRight size={18} aria-hidden="true" /></Link>
+ <a href="#tools" className="inline-flex min-h-[44px] items-center gap-2 px-3 font-semibold text-[var(--lu-ink)]">전체 기능 살펴보기<ArrowRight size={16} aria-hidden="true" /></a>
  </div>
- {/* 원티드식 타이포 — 더 크게, 자간·행간은 더 좁게, 장식 없이 */}
- <h1 className="text-display2 md:text-display1 font-black text-[#191F28] mb-6">
- 필요한 것만 골라쓰는<br />
- <span className="text-[#3182F6]">사장님 마케팅 플랫폼</span>
- </h1>
- <p className="text-[15px] md:text-xl text-[#4E5968] mb-10 max-w-2xl mx-auto leading-relaxed text-left sm:text-center">
- 리뷰·QR·블로그·플레이스·CRM · 12개 모듈 중<br className="hidden md:block" />
- 내 매장에 필요한 것만 선택. 3개 묶으면 10% 할인.
- </p>
-
- <p className="mb-5 text-sm leading-6 text-[#4E5968]">플레이스 점검, 리뷰 관리, 콘텐츠 제작 중 필요한 작업부터 찾아보세요.</p>
- <div className="flex flex-col sm:flex-row gap-3 justify-center">
- <a href="#tools"
- className="inline-flex items-center justify-center gap-2 bg-[#3182F6] text-white font-bold text-base px-8 py-4 rounded-xl hover:bg-[#1B64DA] transition-all shadow-sm hover:-translate-y-0.5">
- 내 매장에 필요한 기능 찾기
- <ArrowRight size={18} strokeWidth={2.5} />
- </a>
- <Link href="/marketing/place"
- className="inline-flex items-center justify-center gap-2 bg-white text-[#191F28] font-semibold text-base px-8 py-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all hover:-translate-y-0.5">
- 플레이스 진단 살펴보기
- </Link>
+ <p className="lu-hero-footnote">계산·공지·홍보 링크 도구는 로그인 없이 사용할 수 있어요.<br />리뷰와 매장 검색은 로그인 및 서비스 연결이 필요해요.</p>
+ <Link href="/help#find-tools" className="mt-5 inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-[var(--lu-accent)]">내 업종에 맞는 작업 찾기<ArrowRight size={15} aria-hidden="true" /></Link>
  </div>
- <p className="mt-4 text-sm text-[#4E5968]">어디서 시작할지 모르겠다면 <Link href="/help#find-tools" className="inline-flex min-h-[44px] items-center font-semibold text-[#3182F6] underline underline-offset-4">필요한 작업 찾기</Link>에서 골라보세요.</p>
- <p className="text-xs text-[#8B95A1] mt-4 mb-8">회원가입 없이 진단 가능 · 신용카드 불필요 · 월 단위 결제</p>
-
- {/* ── 히어로 공감 카드 (Before / After) ── */}
- <div className="flex flex-col sm:flex-row items-stretch gap-3 max-w-2xl mx-auto mb-10">
- <div className="flex-1 bg-white border border-red-100 rounded-2xl p-5 text-left shadow-sm">
- <p className="text-xs font-bold text-red-400 mb-3 flex items-center gap-1.5">
- <span className="w-2 h-2 rounded-full bg-red-400 inline-block" />
- 지금 사장님 상황
- </p>
- <ul className="space-y-2">
+ <div className="lu-workbench">
+ <div className="mb-5 flex items-start justify-between gap-4 border-b border-[var(--lu-line)] pb-5"><div><p className="lu-label">필요한 일부터 하나씩</p><h2 className="mt-1 text-xl font-semibold text-[var(--lu-ink)]">우리 가게 업무 보드</h2></div><Layers size={20} className="mt-1 text-[var(--lu-accent)]" aria-hidden="true" /></div>
  {([
- [Frown, '리뷰 답글 10개 쌓였어요'],
- [Smartphone, '플랫폼 탭 5개 열어놓음'],
- [Clock, '새벽에 혼자 정산 중…'],
- [AlertTriangle, '나쁜 리뷰 답글 뭐라 해야 하지?'],
- ] as [LucideIcon, string][]).map(([Icon, text]) => (
- <li key={text} className="flex items-center gap-2 text-sm text-gray-600">
- <div className="w-5 h-5 rounded-md bg-red-100 text-red-500 flex items-center justify-center flex-shrink-0">
- <Icon size={11} strokeWidth={2.5} />
- </div>
- <span>{text}</span>
- </li>
- ))}
- </ul>
- </div>
-
- <div className="flex sm:flex-col items-center justify-center gap-1 py-1">
- <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
- <ArrowRight size={15} className="text-blue-500 rotate-90 sm:rotate-0" />
- </div>
- <span className="text-[10px] font-bold text-blue-400">AI 자동화</span>
- </div>
-
- <div className="flex-1 bg-blue-50 border border-blue-100 rounded-2xl p-5 text-left shadow-sm">
- <p className="text-xs font-bold text-blue-500 mb-3 flex items-center gap-1.5">
- <Sparkles size={11} strokeWidth={2.5} />
- 로컬루션 도입 후
- </p>
- <ul className="space-y-2">
- {([
- [CheckCircle2, 'AI가 30초 만에 답글 완성'],
- [Target, '6개 플랫폼 한 화면에서'],
- [Lightbulb, '매출 자동 정산, 일찍 퇴근'],
- [Trophy, '맞춤 AI 답글로 별점 UP'],
- ] as [LucideIcon, string][]).map(([Icon, text]) => (
- <li key={text} className="flex items-center gap-2 text-sm text-gray-700">
- <div className="w-5 h-5 rounded-md bg-blue-100 text-blue-500 flex items-center justify-center flex-shrink-0">
- <Icon size={11} strokeWidth={2.5} />
- </div>
- <span>{text}</span>
- </li>
- ))}
- </ul>
- </div>
- </div>
-
- {/* ── 제품 미리보기 ──
-      랜딩에 제품 화면이 하나도 없어 "무엇을 사는지" 보이지 않던 문제 해결.
-      가짜 스크린샷 대신 실제 UI 를 HTML 로 재현 · 항상 정확하고 선명하다. */}
- <div className="mt-14 md:mt-16">
- <ProductPreview />
+ { Icon: MessageCircle, title: '리뷰 확인과 답글', detail: '연결한 매장의 고객 의견을 살펴보세요.', href: '/review-admin', label: '로그인 필요' },
+ { Icon: FileText, title: '손님께 전할 공지', detail: '휴무·영업시간·예약 안내를 준비하세요.', href: '/marketing/notice', label: '바로 사용' },
+ { Icon: BarChart3, title: '행사 전에 수익 확인', detail: '할인과 홍보비가 남는 이익에 미치는 영향을 비교하세요.', href: '/marketing/promotion-profit', label: '바로 사용' },
+ ]).map(({Icon,title,detail,href,label}) => <Link key={href} href={href} className="lu-workbench-row"><span className="lu-soft-icon"><Icon size={18} strokeWidth={1.8} aria-hidden="true" /></span><span className="min-w-0 flex-1"><span className="block text-sm font-semibold text-[var(--lu-ink)]">{title}</span><span className="mt-1 block text-xs leading-5 text-[var(--lu-muted)]">{detail}</span></span><span className="shrink-0 text-[11px] font-medium text-[var(--lu-muted)]">{label}</span><ArrowRight size={14} className="shrink-0" aria-hidden="true" /></Link>)}
+ <p className="mt-4 text-xs leading-5 text-[var(--lu-muted)]">이용 흐름 안내입니다. 실제 매장 자료나 성과 수치를 표시한 화면이 아니에요.</p>
  </div>
  </div>
  </section>
-
- {/* wave divider */}
- <div className="relative -mt-1 overflow-hidden leading-[0]" aria-hidden="true">
- <svg viewBox="0 0 1440 48" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none" className="w-full h-10 md:h-12 block" fill="#ffffff">
- <path d="M0,32 C240,0 480,48 720,24 C960,0 1200,48 1440,32 L1440,48 L0,48 Z" />
- </svg>
- </div>
 
  {/* ── 통계 ── */}
  <section className="py-12 px-4 bg-white border-b border-gray-100">
@@ -780,8 +686,8 @@ export default function LandingPage() {
  {f.badge}
  </span>
  )}
- <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
- <f.Icon size={24} strokeWidth={2} className="text-white" />
+ <div className="lu-soft-icon mb-4">
+ <f.Icon size={20} strokeWidth={1.8} />
  </div>
  <h4 className="text-lg font-semibold text-[#191F28] mb-2 flex items-center gap-1.5">
  {f.title}
@@ -838,8 +744,8 @@ export default function LandingPage() {
  ].map((u) => (
  <div key={u.title} className="bg-[#FAFBFF] border border-gray-100 rounded-2xl p-4 hover:border-blue-200 hover:shadow-sm transition-all">
  <div className="flex items-start gap-3">
- <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${u.color} flex items-center justify-center shadow-sm flex-shrink-0`}>
- <u.Icon size={16} className="text-white" strokeWidth={2.5} />
+ <div className="lu-soft-icon">
+ <u.Icon size={18} strokeWidth={1.8} />
  </div>
  <div className="min-w-0 flex-1">
  <div className="flex items-center gap-1.5 mb-0.5">
@@ -865,7 +771,7 @@ export default function LandingPage() {
  {/* ── QR 리뷰 하이라이트 ── */}
  <section className="py-20 px-4 bg-white">
  <div className="max-w-5xl mx-auto">
- <div className="bg-gradient-to-br from-[#3182F6] to-[#1B64DA] rounded-3xl p-8 md:p-12 text-white">
+ <div className="bg-[var(--lu-accent)] rounded-[14px] p-8 md:p-12 text-white">
  <div className="flex flex-col md:flex-row items-center gap-8">
  <div className="flex-1">
  <div className="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-semibold px-3 py-1.5 rounded-full mb-4">

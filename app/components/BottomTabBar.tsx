@@ -24,27 +24,24 @@ const TABS: { key: TabKey; href: string; label: string; Icon: LucideIcon; prefix
  { key: 'settings', href: '/settings', label: '설정', Icon: Settings, prefix: ['/settings', '/my', '/inquiry', '/qr-admin'] },
 ]
 
-// 미답변 리뷰 개수 — 전역 localStorage 'localution.unanswered_count' 혹은 데모 기본값
-function readUnansweredCount(): number {
- if (typeof window === 'undefined') return 0
+// 미답변 리뷰 수: 수집된 값이 없는 상태와 실제 0건을 구분한다.
+function readUnansweredCount(): number | null {
+ if (typeof window === 'undefined') return null
  try {
  const raw = localStorage.getItem('localution.unanswered_count')
  if (raw !== null) {
- const n = parseInt(raw, 10)
- if (!isNaN(n) && n >= 0) return n
+ const n = Number(raw)
+ if (raw.trim() !== '' && Number.isSafeInteger(n) && n >= 0) return n
  }
- // 플랫폼 연결이 0개면 데모로 3 표시 (대시보드 RECENT_REVIEWS 기준)
- const linksRaw = localStorage.getItem('localution.platform_links')
- const links = linksRaw ? JSON.parse(linksRaw) : []
- const connected = Array.isArray(links) ? links.length : 0
- return connected === 0 ? 3 : 0
- } catch { return 0 }
+ // 수집 결과가 없으면 숫자를 만들어 표시하지 않는다.
+ return null
+ } catch { return null }
 }
 
 export default function BottomTabBar() {
  const pathname = usePathname() || '/'
  const [loggedIn, setLoggedIn] = useState(false)
- const [unanswered, setUnanswered] = useState(0)
+ const [unanswered, setUnanswered] = useState<number | null>(null)
 
  useEffect(() => {
  try {
@@ -92,25 +89,25 @@ export default function BottomTabBar() {
  if (hide || !loggedIn) return null
 
  return (
- <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 pb-safe bg-white border-t border-[#E5E8EB]">
+ <nav className="md:hidden fixed bottom-0 left-0 right-0 z-40 pb-safe bg-white border-t border-[#D5DEDC]">
  <div className="grid grid-cols-5 max-w-screen-sm mx-auto">
  {TABS.map(tab => {
  const active = tab.prefix.some(p => pathname === p || pathname.startsWith(p + '/'))
- const showBadge = tab.key === 'review' && unanswered > 0
+ const showBadge = tab.key === 'review' && unanswered !== null && unanswered > 0
  return (
  <Link key={tab.href} href={tab.href}
- className={`relative flex flex-col items-center justify-center gap-0.5 py-2.5 min-h-[52px] ${active ? 'text-[#3182F6]' : 'text-[#8B95A1]'} hover:text-[#3182F6] transition-colors`}>
+ className={`relative flex flex-col items-center justify-center gap-0.5 py-2.5 min-h-[56px] ${active ? 'text-[#16685D]' : 'text-[#53656A]'} hover:text-[#16685D] transition-colors`}>
  <span className="relative inline-flex items-center justify-center">
  <tab.Icon size={22} strokeWidth={active ? 2.25 : 2} />
  {showBadge && (
- <span className="absolute -top-1 -right-2 min-w-[16px] h-[16px] px-1 rounded-full bg-[#F04452] text-white text-[9px] font-black flex items-center justify-center leading-none shadow-sm border border-white"
+ <span className="absolute -top-1 -right-2 min-w-[16px] h-[16px] px-1 rounded-full bg-[#F04452] text-white text-[9px] font-semibold flex items-center justify-center leading-none shadow-none border border-white"
  aria-label={`미답변 ${unanswered}건`}>
- {unanswered > 99 ? '99+' : unanswered}
+ {unanswered !== null && unanswered > 99 ? '99+' : unanswered}
  </span>
  )}
  </span>
  <span className={`text-[10px] ${active ? 'font-bold' : 'font-medium'}`}>{tab.label}</span>
- {active && <span className="absolute top-0 w-8 h-0.5 rounded-b bg-[#3182F6]"/>}
+ {active && <span className="absolute top-0 w-8 h-0.5 rounded-b bg-[#16685D]"/>}
  </Link>
  )
  })}

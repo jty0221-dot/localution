@@ -31,7 +31,7 @@ export default function VintageParchmentTemplate({
  }
 
  return (
- <div className="min-h-screen pb-12" style={{ background: theme.bg_color, fontFamily: 'serif' }}>
+ <div className="min-h-screen pb-12" style={{ background: theme.bg_color, fontFamily: 'var(--lu-font)' }}>
  {/* 거친 종이 질감 효과 */}
  <div
  className="absolute inset-0 pointer-events-none opacity-30"

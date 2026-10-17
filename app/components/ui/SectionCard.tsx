@@ -34,18 +34,18 @@ export default function SectionCard({
 
   return (
     <section
-      className={`bg-white rounded-2xl border border-[#E5E8EB] shadow-sm overflow-hidden ${className}`}
+      className={`bg-white rounded-[10px] border border-[#D5DEDC] shadow-none overflow-hidden ${className}`}
     >
       {hasHeader && (
-        <header className="flex items-center justify-between gap-3 px-5 py-4 border-b border-[#F2F4F6]">
+        <header className="flex flex-wrap items-start justify-between gap-3 px-5 py-4 border-b border-[#F3F5F4]">
           <div className="flex items-center gap-2.5 min-w-0">
             {icon && <IconBadge icon={icon} tone={tone} size="sm" />}
             <div className="min-w-0">
               {title && (
-                <h3 className="text-[15px] font-bold text-[#191F28] truncate">{title}</h3>
+                <h3 className="text-[15px] font-semibold text-[#172B2F] break-keep">{title}</h3>
               )}
               {subtitle && (
-                <p className="text-[12px] text-[#8B95A1] mt-0.5 truncate">{subtitle}</p>
+                <p className="text-[12px] text-[#53656A] mt-0.5 break-keep">{subtitle}</p>
               )}
             </div>
           </div>

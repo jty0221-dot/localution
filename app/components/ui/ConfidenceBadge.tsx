@@ -20,16 +20,16 @@ const STYLE: Record<
 > = {
   measured: {
     label: '확정',
-    text: '#0F766E',
-    bg: '#F0FDFA',
-    border: '#99F6E4',
+    text: '#176047',
+    bg: '#EAF4EE',
+    border: '#D5DEDC',
     Icon: ShieldCheck,
   },
   estimated: {
     label: '추정',
-    text: '#B45309',
-    bg: '#FFFBEB',
-    border: '#FDE68A',
+    text: '#805515',
+    bg: '#FCF4E4',
+    border: '#D5DEDC',
     Icon: Sigma,
   },
 }
@@ -45,7 +45,7 @@ export default function ConfidenceBadge({
   const Icon = s.Icon
   return (
     <span
-      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-bold border whitespace-nowrap"
+      className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-md text-[10px] font-semibold border whitespace-nowrap"
       style={{ color: s.text, background: s.bg, borderColor: s.border }}
       title={
         confidence === 'measured'
@@ -53,7 +53,7 @@ export default function ConfidenceBadge({
           : '로컬루션이 계산한 해석 점수예요'
       }
     >
-      {withIcon && <Icon size={10} strokeWidth={3} />}
+      {withIcon && <Icon size={10} strokeWidth={1.8} />}
       {s.label}
     </span>
   )

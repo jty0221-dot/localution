@@ -13,7 +13,7 @@ function YogiyoLogo() {
  <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
  <rect width="56" height="56" fill="#E5007F"/>
  <text x="28" y="36" textAnchor="middle" fontSize="19" fontWeight="900"
- fill="white" fontFamily="'Apple SD Gothic Neo','Noto Sans KR',sans-serif"
+ fill="white" fontFamily={'\"Pretendard Variable\", Pretendard, sans-serif'}
  letterSpacing="-0.8">요기요</text>
  </svg>
  )

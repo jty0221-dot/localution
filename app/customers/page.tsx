@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState } from 'react'
+import { useDialogFocus } from '../hooks/useDialogFocus'
 import { smsBodyForRecipients } from '../lib/client-mutations'
 import Sidebar from '../components/Sidebar'
 import Footer from '../components/Footer'
@@ -42,6 +43,8 @@ export default function CustomersPage() {
  const [submitting, setSubmitting] = useState(false)
  const [addError, setAddError] = useState<string | null>(null)
  const [messageResult, setMessageResult] = useState('')
+ const addDialogRef = useDialogFocus(addOpen, () => { if (!submitting) setAddOpen(false) }, '#new-name')
+ const messageDialogRef = useDialogFocus(msgOpen, () => setMsgOpen(false), '#customer-message')
 
  const filtered = customers.filter(c => {
  const matchTag = filterTag === '전체' || c.tags.includes(filterTag)
@@ -384,8 +387,8 @@ export default function CustomersPage() {
  {/* 고객 추가 모달 */}
  {addOpen && (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4">
- <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
- <h3 className="text-lg font-black text-[#191F28] mb-1">고객 추가</h3>
+ <div ref={addDialogRef} role="dialog" aria-modal="true" aria-labelledby="add-customer-title" tabIndex={-1} className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+ <h3 id="add-customer-title" className="text-lg font-black text-[#191F28] mb-1">고객 추가</h3>
  <p className="text-xs text-[#8B95A1] mb-4">이름은 필수, 나머지는 선택입니다</p>
 
  <div className="space-y-3">
@@ -440,8 +443,8 @@ export default function CustomersPage() {
  {/* 메시지 발송 모달 */}
  {msgOpen && (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4">
- <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
- <h3 className="text-lg font-black text-[#191F28] mb-1">단체 메시지 발송</h3>
+ <div ref={messageDialogRef} role="dialog" aria-modal="true" aria-labelledby="customer-message-title" tabIndex={-1} className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
+ <h3 id="customer-message-title" className="text-lg font-black text-[#191F28] mb-1">단체 메시지 발송</h3>
  <p className="text-xs text-[#8B95A1] mb-3">선택한 {selected.length}명에게 발송됩니다</p>
 
  {/* 채널 선택 */}
@@ -460,7 +463,8 @@ export default function CustomersPage() {
  </button>
  </div>
 
- <textarea
+ <label htmlFor="customer-message" className="mb-2 block text-sm font-semibold text-[#191F28]">메시지 내용</label>
+ <textarea id="customer-message"
  value={msgText}
  onChange={e => setMsgText(e.target.value)}
  placeholder={`안녕하세요, {고객명}님!\n이번 주 특별 이벤트를 알려드립니다.\n...`}

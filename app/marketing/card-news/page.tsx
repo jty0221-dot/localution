@@ -102,12 +102,18 @@ export default function CardNewsPage() {
  const downloadPng = async (idx: number) => {
  const node = slidesRef.current[idx]
  if (!node) return
+ try {
+ await document.fonts.load('600 16px "Pretendard Variable"')
+ await document.fonts.ready
  const mod = await import('html-to-image')
  const dataUrl = await mod.toPng(node, { pixelRatio: 2, backgroundColor: '#fff' })
  const a = document.createElement('a')
  a.href = dataUrl
  a.download = `insta-carousel-${String(idx + 1).padStart(2, '0')}.png`
  a.click()
+ } catch {
+ setError('이미지를 내려받지 못했어요. 글꼴과 이미지 로딩을 확인한 뒤 다시 시도해 주세요.')
+ }
  }
 
  const downloadAll = async () => {
@@ -493,7 +499,7 @@ function SlideCard({
  display: 'flex',
  flexDirection: 'column',
  justifyContent: 'space-between',
- fontFamily: "'Pretendard', 'Noto Sans KR', -apple-system, sans-serif",
+ fontFamily: '"Pretendard Variable", Pretendard, sans-serif',
  position: 'relative',
  }}
  >

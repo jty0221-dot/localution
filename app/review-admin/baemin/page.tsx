@@ -16,7 +16,7 @@ function BaeminLogo() {
  <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
  <rect width="56" height="56" fill="#2DDDC8"/>
  <text x="28" y="36" textAnchor="middle" fontSize="22" fontWeight="900"
- fill="white" fontFamily="'Apple SD Gothic Neo','Noto Sans KR',sans-serif"
+ fill="white" fontFamily={'Pretendard Variable, Pretendard, sans-serif'}
  letterSpacing="-0.5">배민</text>
  </svg>
  )
@@ -98,7 +98,10 @@ function SystemHealthFloating() {
  const w = window.open('', '_blank')
  if (w) {
  w.document.body.innerText = JSON.stringify(data, null, 2)
- w.document.body.style.cssText = 'font-family:monospace;font-size:12px;white-space:pre;padding:20px;'
+ w.document.body.style.cssText = 'font-family:var(--lu-font),sans-serif;font-size:12px;white-space:pre;padding:20px;'
+ const fontStyle = w.document.createElement('style')
+ fontStyle.textContent = `@font-face { font-family: 'Pretendard Variable'; src: url('/fonts/pretendard/PretendardVariable.woff2') format('woff2'); font-weight: 100 900; font-display: swap; } :root { --lu-font: 'Pretendard Variable', Pretendard, sans-serif; }`
+ w.document.head.appendChild(fontStyle)
  w.document.title = '배민 API 진단 결과'
  }
  setMsg('진단 결과를 새 탭에 열었어요')
@@ -136,7 +139,10 @@ function SystemHealthFloating() {
  const w = window.open('', '_blank')
  if (w) {
  w.document.body.innerText = JSON.stringify(data, null, 2)
- w.document.body.style.cssText = 'font-family:monospace;font-size:12px;white-space:pre;padding:20px;'
+ w.document.body.style.cssText = 'font-family:var(--lu-font),sans-serif;font-size:12px;white-space:pre;padding:20px;'
+ const fontStyle = w.document.createElement('style')
+ fontStyle.textContent = `@font-face { font-family: 'Pretendard Variable'; src: url('/fonts/pretendard/PretendardVariable.woff2') format('woff2'); font-weight: 100 900; font-display: swap; } :root { --lu-font: 'Pretendard Variable', Pretendard, sans-serif; }`
+ w.document.head.appendChild(fontStyle)
  w.document.title = 'Worker 진단 결과'
  }
  const delta = data?.summary?.reviewCountDelta ?? 0

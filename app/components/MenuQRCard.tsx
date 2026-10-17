@@ -192,7 +192,7 @@ export default function MenuQRCard({ storeSlug: propSlug, storeName: propName }:
  style={{ background: 'linear-gradient(135deg, #FAF6F0 0%, #FDF4E7 100%)', border: '1px solid #E7DCC9' }}>
  <div className="text-center mb-2.5">
  <p className="text-[9px] tracking-[0.4em] font-bold text-[#92400E] mb-0.5">· MENU ·</p>
- <p className="text-sm font-black text-[#1F1612] truncate" style={{ fontFamily: 'serif' }} title={storeName || '우리 매장'}>
+ <p className="text-sm font-black text-[#1F1612] truncate" style={{ fontFamily: 'var(--lu-font)' }} title={storeName || '우리 매장'}>
  {storeName || '우리 매장'}
  </p>
  </div>

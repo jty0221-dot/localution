@@ -105,6 +105,7 @@ export default function RootLayout({
 }) {
  return (
  <html lang="ko">
+ <head><link rel="preload" href="/fonts/pretendard/PretendardVariable.woff2" as="font" type="font/woff2" crossOrigin="anonymous" /></head>
  <body className="font-sans">
  {/* 관리자 임시 로그인 배너 (impersonation 활성 시만 표시) */}
  <ImpersonationBanner />

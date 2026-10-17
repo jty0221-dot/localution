@@ -25,15 +25,15 @@ export default function Delta({
   showZero?: boolean
 }) {
   if (curr == null || prev == null) {
-    return <span className="text-[11px] text-[#C3CAD1]">-</span>
+    return <span className="text-[11px] text-[#53656A]">-</span>
   }
 
   const diff = curr - prev
   if (diff === 0) {
     if (!showZero) return null
     return (
-      <span className="inline-flex items-center text-[11px] text-[#C3CAD1]">
-        <Minus size={size - 1} strokeWidth={3} />
+      <span className="inline-flex items-center text-[11px] text-[#53656A]">
+        <Minus size={size - 1} strokeWidth={1.8} />
       </span>
     )
   }
@@ -41,20 +41,20 @@ export default function Delta({
   const rose = diff > 0
   // 좋은 방향인가
   const good = invert ? !rose : rose
-  const color = good ? '#059669' : '#DC2626'
+  const color = good ? '#176047' : '#A52C35'
   // 화살표 방향은 "값의 변화" 를 따른다 (순위 3→1 이면 숫자가 줄었으니 아래 화살표가 아니라
   // 사용자 직관상 '상승' 이므로, invert 인 경우 화살표도 뒤집는다)
   const ArrowUp = invert ? !rose : rose
 
   return (
     <span
-      className="inline-flex items-center gap-0.5 text-[11px] font-bold tabular-nums"
+      className="inline-flex items-center gap-0.5 text-[11px] font-semibold tabular-nums"
       style={{ color }}
     >
       {ArrowUp ? (
-        <TrendingUp size={size} strokeWidth={3} />
+        <TrendingUp size={size} strokeWidth={1.8} />
       ) : (
-        <TrendingDown size={size} strokeWidth={3} />
+        <TrendingDown size={size} strokeWidth={1.8} />
       )}
       {Math.abs(diff).toLocaleString('ko-KR')}
     </span>

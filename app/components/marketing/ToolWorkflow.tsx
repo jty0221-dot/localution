@@ -23,12 +23,12 @@ const related: Record<ToolId, ToolId[]> = {
   'business-search': ['notice', 'campaign-url'],
   'campaign-url': ['notice', 'business-search'],
 }
-const linkClass = 'inline-flex min-h-[44px] items-center gap-2 rounded-xl px-3 py-2 text-sm font-semibold text-[#3182F6] hover:bg-blue-50 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]'
+const linkClass = 'inline-flex min-h-[44px] items-center gap-2 rounded-[6px] px-3 py-2 text-sm font-semibold text-[var(--lu-accent)] hover:bg-[var(--lu-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lu-accent)]'
 
 export function ToolNavigation() {
-  return <div className="mb-5 space-y-2"><nav aria-label="도구 탐색" className="flex flex-wrap gap-2"><Link href="/marketing#marketing-tools" className={linkClass}><ArrowLeft size={16} aria-hidden="true" />마케팅 도구 목록</Link><Link href="/help#find-tools" className={linkClass}>업종별 작업 찾기<ArrowRight size={16} aria-hidden="true" /></Link></nav><p className="px-3 text-xs leading-5 text-[#8B95A1]">다른 도구로 이동하면 이 화면의 입력이 유지되지 않을 수 있어요. 필요한 결과를 먼저 저장하거나 복사해 주세요.</p></div>
+  return <div className="mb-5 space-y-2"><nav aria-label="도구 탐색" className="flex flex-wrap gap-2"><Link href="/marketing#marketing-tools" className={linkClass}><ArrowLeft size={16} aria-hidden="true" />마케팅 도구 목록</Link><Link href="/help#find-tools" className={linkClass}>업종별 작업 찾기<ArrowRight size={16} aria-hidden="true" /></Link></nav><p className="px-3 text-xs leading-5 text-[var(--lu-muted)]">다른 도구로 이동하면 이 화면의 입력이 유지되지 않을 수 있어요. 필요한 결과를 먼저 저장하거나 복사해 주세요.</p></div>
 }
 
 export function ToolNextSteps({ current }: { current: ToolId }) {
-  return <section aria-labelledby={`${current}-next-title`} className="mt-6 rounded-2xl border border-[#E5E8EB] bg-white p-4 shadow-sm md:p-5"><h2 id={`${current}-next-title`} className="text-base font-bold text-[#191F28]">다음 작업</h2><p className="mt-2 text-sm leading-6 text-[#4E5968]">{descriptions[current]}</p><p className="mt-2 text-xs leading-5 text-[#8B95A1]">다음 도구에서는 필요한 내용을 직접 입력해 주세요.</p><div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">{related[current].map(id => <Link key={id} href={tools[id].href} className={`${linkClass} justify-between border border-[#E5E8EB]`}>{tools[id].label}<ArrowRight size={16} className="shrink-0" aria-hidden="true" /></Link>)}</div></section>
+  return <section aria-labelledby={`${current}-next-title`} className="mt-6 rounded-[10px] border border-[var(--lu-line)] bg-white p-4 shadow-none md:p-5"><h2 id={`${current}-next-title`} className="text-base font-bold text-[var(--lu-ink)]">다음 작업</h2><p className="mt-2 text-sm leading-6 text-[var(--lu-muted)]">{descriptions[current]}</p><p className="mt-2 text-xs leading-5 text-[var(--lu-muted)]">다음 도구에서는 필요한 내용을 직접 입력해 주세요.</p><div className="mt-3 flex flex-col gap-2 sm:flex-row sm:flex-wrap">{related[current].map(id => <Link key={id} href={tools[id].href} className={`${linkClass} justify-between border border-[var(--lu-line)]`}>{tools[id].label}<ArrowRight size={16} className="shrink-0" aria-hidden="true" /></Link>)}</div></section>
 }

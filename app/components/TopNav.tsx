@@ -43,16 +43,23 @@ export default function TopNav() {
  check()
  }, [])
 
+ useEffect(() => { setMenuOpen(false) }, [pathname])
+ useEffect(() => {
+ const close = (event: KeyboardEvent) => { if (event.key === 'Escape') setMenuOpen(false) }
+ window.addEventListener('keydown', close)
+ return () => window.removeEventListener('keydown', close)
+ }, [])
+
  return (
- <nav className="fixed top-0 left-0 right-0 z-50 pt-safe bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-sm">
+ <nav className="fixed top-0 left-0 right-0 z-50 pt-safe bg-white/95 backdrop-blur-md border-b border-gray-100 shadow-none">
  <div className="max-w-6xl mx-auto px-4 h-16 flex items-center justify-between">
 
  {/* 로고 — 실제 로컬루션 로고 (LU 화살표 + LOCALUTION) */}
  <Link href="/" className="flex items-center gap-2 select-none active:opacity-70 transition-opacity">
- <div className="w-9 h-9 md:w-10 md:h-10 rounded-xl flex-shrink-0 bg-white flex items-center justify-center shadow-[0_2px_10px_rgba(49,130,246,0.18)] ring-1 ring-[#E8F4FD] overflow-hidden">
+ <div className="w-9 h-9 md:w-10 md:h-10 rounded-md flex-shrink-0 bg-white flex items-center justify-center shadow-none ring-1 ring-[#D5DEDC] overflow-hidden">
  <Image src="/logo-icon.svg" alt="로컬루션" width={36} height={36} priority />
  </div>
- <span className="text-base md:text-xl font-black text-[#191F28] tracking-tight">로컬루션</span>
+ <span className="text-base md:text-xl font-semibold text-[#172B2F] tracking-tight">로컬루션</span>
  </Link>
 
  {/* 데스크탑 메뉴 */}
@@ -63,8 +70,8 @@ export default function TopNav() {
  href={l.href}
  className={`text-sm font-medium transition-colors ${
  pathname === l.href
- ? 'text-[#3182F6] font-semibold'
- : 'text-[#4E5968] hover:text-[#3182F6]'
+ ? 'text-[#16685D] font-semibold'
+ : 'text-[#53656A] hover:text-[#16685D]'
  }`}
  >
  {l.label}
@@ -77,16 +84,16 @@ export default function TopNav() {
  {isLoggedIn ? (
  <Link
  href="/dashboard"
- className="text-sm font-semibold bg-[#3182F6] text-white px-4 py-2 rounded-xl hover:bg-[#1B64DA] transition-colors shadow-sm flex items-center gap-1"
+ className="min-h-11 inline-flex items-center justify-center text-sm font-semibold bg-[#16685D] text-white px-4 py-2 rounded-md hover:bg-[#105448] transition-colors shadow-none flex items-center gap-1"
  >
  대시보드 <span>→</span>
  </Link>
  ) : (
  <>
- <Link href="/login" className="text-sm text-[#4E5968] font-medium px-4 py-2 hover:text-[#3182F6] transition-colors">
+ <Link href="/login" className="text-sm text-[#53656A] font-medium px-4 py-2 hover:text-[#16685D] transition-colors">
  로그인
  </Link>
- <Link href="/signup" className="text-sm font-semibold bg-[#3182F6] text-white px-4 py-2 rounded-xl hover:bg-[#1B64DA] transition-colors shadow-sm">
+ <Link href="/signup" className="min-h-11 inline-flex items-center justify-center text-sm font-semibold bg-[#16685D] text-white px-4 py-2 rounded-md hover:bg-[#105448] transition-colors shadow-none">
  무료 시작하기
  </Link>
  </>
@@ -99,6 +106,7 @@ export default function TopNav() {
  onClick={() => setMenuOpen(!menuOpen)}
  aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
  aria-expanded={menuOpen}
+ aria-controls="public-mobile-menu"
  >
  <div className="w-5 h-0.5 bg-gray-600 mb-1" />
  <div className="w-5 h-0.5 bg-gray-600 mb-1" />
@@ -108,13 +116,13 @@ export default function TopNav() {
 
  {/* 모바일 드롭다운 */}
  {menuOpen && (
- <div className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-3">
+ <div id="public-mobile-menu" className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-3">
  {NAV_LINKS.map(l => (
  <Link
  key={l.href}
  href={l.href}
  className={`block text-sm font-medium py-1 ${
- pathname === l.href ? 'text-[#3182F6]' : 'text-[#4E5968]'
+ pathname === l.href ? 'text-[#16685D]' : 'text-[#53656A]'
  }`}
  onClick={() => setMenuOpen(false)}
  >
@@ -123,15 +131,15 @@ export default function TopNav() {
  ))}
  <div className="pt-2 flex flex-col gap-2">
  {isLoggedIn ? (
- <Link href="/dashboard" className="text-center text-sm font-semibold bg-[#3182F6] text-white py-2 rounded-xl">
+ <Link href="/dashboard" className="min-h-11 inline-flex items-center justify-center text-center text-sm font-semibold bg-[#16685D] text-white py-2 rounded-md">
  대시보드 →
  </Link>
  ) : (
  <>
- <Link href="/login" className="text-center text-sm text-[#4E5968] font-medium py-2 border border-gray-200 rounded-xl">
+ <Link href="/login" className="min-h-11 inline-flex items-center justify-center text-center text-sm text-[#53656A] font-medium py-2 border border-gray-200 rounded-md">
  로그인
  </Link>
- <Link href="/signup" className="text-center text-sm font-semibold bg-[#3182F6] text-white py-2 rounded-xl">
+ <Link href="/signup" className="min-h-11 inline-flex items-center justify-center text-center text-sm font-semibold bg-[#16685D] text-white py-2 rounded-md">
  무료 시작하기
  </Link>
  </>

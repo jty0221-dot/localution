@@ -43,19 +43,22 @@ export default function StatCard({
       onKeyDown={
         clickable
           ? e => {
-              if (e.key === 'Enter' || e.key === ' ') onClick?.()
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault()
+                onClick?.()
+              }
             }
           : undefined
       }
       className={
-        'bg-white rounded-2xl border border-[#E5E8EB] shadow-sm p-4 transition-colors ' +
-        (clickable ? 'cursor-pointer hover:border-[#3182F6]/40' : '')
+        'bg-white rounded-[10px] border border-[#D5DEDC] shadow-none p-4 transition-colors ' +
+        (clickable ? 'cursor-pointer hover:border-[#16685D] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#16685D]' : '')
       }
     >
       <div className="flex items-start justify-between gap-2 mb-3">
-        <span className="text-[12px] font-semibold text-[#4E5968]">{label}</span>
+        <span className="text-[12px] font-semibold text-[#53656A]">{label}</span>
         {badge && (
-          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#F2F4F6] text-[#4E5968] whitespace-nowrap">
+          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-md bg-[#F3F5F4] text-[#53656A] whitespace-nowrap">
             {badge}
           </span>
         )}
@@ -65,13 +68,13 @@ export default function StatCard({
         <IconBadge icon={icon} tone={tone} size="md" />
         <div className="min-w-0">
           <div className="flex items-baseline gap-0.5">
-            <span className="text-[22px] font-black text-[#191F28] tabular-nums leading-none">
+            <span className="text-[28px] font-semibold text-[#172B2F] tabular-nums leading-none">
               {value}
             </span>
-            {unit && <span className="text-[13px] font-bold text-[#8B95A1]">{unit}</span>}
+            {unit && <span className="text-[13px] font-bold text-[#53656A]">{unit}</span>}
           </div>
           {caption && (
-            <div className="text-[11px] text-[#8B95A1] mt-1 truncate">{caption}</div>
+            <div className="text-[11px] text-[#53656A] mt-1 break-words">{caption}</div>
           )}
         </div>
       </div>

@@ -31,7 +31,7 @@ export default function ElegantWesternTemplate({
  }
 
  return (
- <div className="min-h-screen pb-12" style={{ background: theme.bg_color, fontFamily: 'serif' }}>
+ <div className="min-h-screen pb-12" style={{ background: theme.bg_color, fontFamily: 'var(--lu-font)' }}>
  <div className="max-w-2xl mx-auto px-6 md:px-10 py-10">
  {/* 장식 프레임 헤더 */}
  <header className="text-center mb-10 relative">
@@ -48,7 +48,7 @@ export default function ElegantWesternTemplate({
  </h1>
  <p
  className="text-sm italic"
- style={{ color: theme.text_muted, fontFamily: '"Brush Script MT", cursive' }}
+ style={{ color: theme.text_muted, fontFamily: 'var(--lu-font)' }}
  >
  Bon Appétit
  </p>
@@ -63,7 +63,7 @@ export default function ElegantWesternTemplate({
  className="text-2xl md:text-3xl mb-1"
  style={{
  color: theme.primary_color,
- fontFamily: '"Brush Script MT", "Lucida Handwriting", cursive',
+ fontFamily: 'var(--lu-font)',
  }}
  >
  {cat}
@@ -111,7 +111,7 @@ export default function ElegantWesternTemplate({
  {it.name_en && (
  <p
  className="text-xs italic mb-1"
- style={{ color: theme.text_muted, fontFamily: '"Brush Script MT", cursive' }}
+ style={{ color: theme.text_muted, fontFamily: 'var(--lu-font)' }}
  >
  {it.name_en}
  </p>
@@ -139,7 +139,7 @@ export default function ElegantWesternTemplate({
  style={{
  border: `2px solid ${theme.primary_color}`,
  color: theme.primary_color,
- fontFamily: '"Brush Script MT", cursive',
+ fontFamily: 'var(--lu-font)',
  }}
  >
  <p className="text-base">{store.name} · Signature</p>

@@ -13,13 +13,13 @@ function CoupangEatsLogo() {
  <svg width="56" height="56" viewBox="0 0 56 56" fill="none">
  <rect width="56" height="56" fill="white"/>
  <text x="28" y="23" textAnchor="middle" fontSize="10" fontWeight="800"
- fontFamily="Arial,'Helvetica Neue',sans-serif" letterSpacing="0.3">
+ fontFamily={'Pretendard Variable, Pretendard, sans-serif'} letterSpacing="0.3">
  <tspan fill="#E31837">c</tspan><tspan fill="#F4A900">o</tspan><tspan fill="#E31837">u</tspan>
  <tspan fill="#5BAD48">p</tspan><tspan fill="#3B79BE">a</tspan><tspan fill="#E31837">n</tspan>
  <tspan fill="#F4A900">g</tspan>
  </text>
  <text x="28" y="41" textAnchor="middle" fontSize="18" fontWeight="900"
- fill="#5C3317" fontFamily="Arial,'Helvetica Neue',sans-serif">eats</text>
+ fill="#5C3317" fontFamily={'Pretendard Variable, Pretendard, sans-serif'}>eats</text>
  </svg>
  )
 }

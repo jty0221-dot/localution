@@ -70,7 +70,7 @@ function BaeminLogo({ size = 28 }: { size?: number }) {
  fontSize="18"
  fontWeight="900"
  fill="#1A1A1A"
- fontFamily="'Apple SD Gothic Neo','Noto Sans KR',sans-serif"
+ fontFamily={'\"Pretendard Variable\", Pretendard, sans-serif'}
  textAnchor="middle"
  letterSpacing="-0.5"
  >배민</text>
@@ -82,7 +82,7 @@ function YogiyoLogo({ size = 28 }: { size?: number }) {
  return (
  <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
  <rect width="48" height="48" rx="12" fill="#E5007F"/>
- <text x="24" y="23" fontSize="11" fontWeight="900" fill="white" fontFamily="'Apple SD Gothic Neo','Noto Sans KR',sans-serif" textAnchor="middle">요기요</text>
+ <text x="24" y="23" fontSize="11" fontWeight="900" fill="white" fontFamily={'\"Pretendard Variable\", Pretendard, sans-serif'} textAnchor="middle">요기요</text>
  <circle cx="24" cy="33" r="4" fill="white"/>
  <path d="M16 43 Q24 39 32 43" stroke="white" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
  </svg>
@@ -93,10 +93,10 @@ function CoupangEatsLogo({ size = 28 }: { size?: number }) {
  return (
  <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
  <rect width="48" height="48" rx="12" fill="white" stroke="#E5E7EB" strokeWidth="1.5"/>
- <text x="5" y="25" fontSize="9.5" fontWeight="800" fontFamily="Arial,sans-serif" letterSpacing="0.2">
+ <text x="5" y="25" fontSize="9.5" fontWeight="800" fontFamily={'\"Pretendard Variable\", Pretendard, sans-serif'} letterSpacing="0.2">
  <tspan fill="#E31837">c</tspan><tspan fill="#F4A900">o</tspan><tspan fill="#E31837">u</tspan><tspan fill="#5BAD48">p</tspan><tspan fill="#3B79BE">a</tspan><tspan fill="#E31837">n</tspan><tspan fill="#F4A900">g</tspan>
  </text>
- <text x="5" y="39" fontSize="13" fontWeight="900" fill="#4A2C0A" fontFamily="Arial,sans-serif">eats</text>
+ <text x="5" y="39" fontSize="13" fontWeight="900" fill="#4A2C0A" fontFamily={'\"Pretendard Variable\", Pretendard, sans-serif'}>eats</text>
  </svg>
  )
 }

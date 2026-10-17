@@ -7,13 +7,13 @@ import { Link2, ClipboardList, Store, Settings, MessageSquare, LogOut, BarChart3
 import { isAdminEmail } from '@/app/lib/admin-emails'
 
 const FLAT_NAV = [
- { href: '/dashboard', label: '대시보드', icon: 'DB', colors: { bg: '#EFF6FF', text: '#3182F6' } },
+ { href: '/dashboard', label: '대시보드', icon: 'DB', colors: { bg: '#E7F1ED', text: '#16685D' } },
  { href: '/qr-admin', label: 'QR 관리', icon: 'QR', colors: { bg: '#F5F3FF', text: '#8B5CF6' } },
  { href: '/customers', label: '고객 관리',icon: '고객', colors: { bg: '#ECFDF5', text: '#059669' } },
- { href: '/reservations', label: '예약·일정',icon: '예약', colors: { bg: '#EFF6FF', text: '#3182F6' } },
+ { href: '/reservations', label: '예약·일정',icon: '예약', colors: { bg: '#E7F1ED', text: '#16685D' } },
  { href: '/settings/profile', label: '매장 관리',icon: '매장', colors: { bg: '#FFF1F2', text: '#E11D48' } },
  { href: '/updates', label: '업데이트 내역', icon: 'NEW', colors: { bg: '#FFF7ED', text: '#EA580C' } },
- { href: '/help', label: '도움말·가이드', icon: '?', colors: { bg: '#EFF6FF', text: '#3182F6' } },
+ { href: '/help', label: '도움말·가이드', icon: '?', colors: { bg: '#E7F1ED', text: '#16685D' } },
 ]
 
 const REVIEW_SUB = [
@@ -116,7 +116,7 @@ function PlatformLogoSmall({ platform }: { platform: string }) {
  )
  if (platform === 'google') return (
  <svg width="18" height="18" viewBox="0 0 48 48" style={{flexShrink:0}}>
- <rect width="48" height="48" rx="10" fill="white" stroke="#E5E8EB" strokeWidth="1.5"/>
+ <rect width="48" height="48" rx="10" fill="white" stroke="#D5DEDC" strokeWidth="1.5"/>
  <path d="M43.6 24.5c0-1.5-.14-3-.38-4.5H24v8.5h10.94c-.5 2.5-1.96 4.6-4.16 6v5h6.74c3.94-3.62 6.08-9 6.08-15z" fill="#4285F4"/>
  <path d="M24 44c5.4 0 9.92-1.8 13.24-4.86l-6.46-5c-1.8 1.2-4.1 1.92-6.78 1.92-5.22 0-9.64-3.52-11.22-8.26H6.12v5.14C9.42 40.02 16.28 44 24 44z" fill="#34A853"/>
  <path d="M12.78 27.8A11.94 11.94 0 0112.2 24c0-1.32.22-2.6.58-3.8v-5.14H6.12A20 20 0 004 24c0 3.22.78 6.28 2.12 9.14l6.66-5.34z" fill="#FBBC05"/>
@@ -133,7 +133,7 @@ function PlatformLogoSmall({ platform }: { platform: string }) {
  <svg width="16" height="16" viewBox="0 0 32 32" fill="none" style={{flexShrink:0}}>
  <rect width="32" height="32" rx="7" fill="#2DDDC8"/>
  <text x="16" y="22" textAnchor="middle" fontSize="13" fontWeight="900"
- fill="white" fontFamily="'Apple SD Gothic Neo','Noto Sans KR',sans-serif"
+ fill="white" fontFamily="Pretendard,sans-serif"
  letterSpacing="-0.3">배민</text>
  </svg>
  )
@@ -141,7 +141,7 @@ function PlatformLogoSmall({ platform }: { platform: string }) {
  <svg width="18" height="18" viewBox="0 0 48 48" fill="none" style={{flexShrink:0}}>
  <rect width="48" height="48" rx="12" fill="#E5007F"/>
  <text x="24" y="32" textAnchor="middle" fontSize="16" fontWeight="900"
- fill="white" fontFamily="'Apple SD Gothic Neo','Noto Sans KR',sans-serif"
+ fill="white" fontFamily="Pretendard,sans-serif"
  letterSpacing="-0.8">요기요</text>
  </svg>
  )
@@ -149,13 +149,13 @@ function PlatformLogoSmall({ platform }: { platform: string }) {
  <svg width="18" height="18" viewBox="0 0 48 48" fill="none" style={{flexShrink:0}}>
  <rect width="48" height="48" rx="10" fill="white" stroke="#E5E7EB" strokeWidth="2"/>
  <text x="24" y="19" textAnchor="middle" fontSize="9" fontWeight="800"
- fontFamily="Arial,sans-serif" letterSpacing="0.3">
+ fontFamily="Pretendard,sans-serif" letterSpacing="0.3">
  <tspan fill="#E31837">c</tspan><tspan fill="#F4A900">o</tspan><tspan fill="#E31837">u</tspan>
  <tspan fill="#5BAD48">p</tspan><tspan fill="#3B79BE">a</tspan><tspan fill="#E31837">n</tspan>
  <tspan fill="#F4A900">g</tspan>
  </text>
  <text x="24" y="35" textAnchor="middle" fontSize="14" fontWeight="900"
- fill="#5C3317" fontFamily="Arial,sans-serif">eats</text>
+ fill="#5C3317" fontFamily="Pretendard,sans-serif">eats</text>
  </svg>
  )
  return null
@@ -336,6 +336,14 @@ export default function Sidebar() {
  router.refresh()
  }
 
+ useEffect(() => {
+ const close = (event: KeyboardEvent) => {
+ if (event.key === 'Escape') { setMobileOpen(false); setProfileOpen(false) }
+ }
+ window.addEventListener('keydown', close)
+ return () => window.removeEventListener('keydown', close)
+ }, [])
+
  const toggleRegion = (key: string) => setOpenRegion(prev => prev === key ? '' : key)
 
  const storeName = (storeInfo && storeInfo.storeName) ? storeInfo.storeName : ''
@@ -354,13 +362,13 @@ export default function Sidebar() {
  const active = pathname === item.href
  return (
  <Link key={item.href} href={item.href} onClick={() => setMobileOpen(false)}
- className={"flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all " + (active ? 'bg-[#EFF6FF] text-[#3182F6] font-semibold' : 'text-[#4E5968] hover:bg-[#F2F4F6] font-medium')}>
+ className={"flex items-center gap-3 min-h-11 px-3 py-2.5 rounded-md transition-colors " + (active ? 'bg-[#E7F1ED] text-[#16685D] font-semibold shadow-[inset_2px_0_0_#16685D]' : 'text-[#53656A] hover:bg-[#F3F5F4] font-medium')}>
  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
- style={active ? { background: '#3182F6', color: '#fff' } : { background: item.colors.bg, color: item.colors.text }}>
+ style={active ? { background: '#16685D', color: '#fff' } : { background: item.colors.bg, color: item.colors.text }}>
  {item.icon}
  </div>
  <span className="text-sm">{item.label}</span>
- {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#3182F6]" />}
+ {active && <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#16685D]" />}
  </Link>
  )
  }
@@ -373,50 +381,50 @@ export default function Sidebar() {
 
  {/* 1-1. 플랫폼 통합관리 — STEP 1 강조 */}
  <Link href="/my/platforms" onClick={() => setMobileOpen(false)}
- className={"relative flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all border " + (pathname === '/my/platforms' ? 'bg-[#EFF6FF] text-[#3182F6] font-semibold border-[#3182F6]/30' : 'bg-[#EFF6FF] text-[#1D4ED8] font-semibold border-[#BFDBFE] hover:bg-[#DBEAFE]')}>
+ className={"relative flex items-center gap-3 min-h-11 px-3 py-2.5 rounded-md transition-colors border " + (pathname === '/my/platforms' ? 'bg-[#E7F1ED] text-[#16685D] font-semibold border-[#16685D]/30' : 'bg-[#E7F1ED] text-[#16685D] font-semibold border-[#D5DEDC] hover:bg-[#E7F1ED]')}>
  <div className="relative w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
- style={{ background: '#3182F6', color: '#fff' }}>
+ style={{ background: '#16685D', color: '#fff' }}>
  <Link2 size={14} className="text-white" strokeWidth={2.5} />
  {pathname !== '/my/platforms' && (
- <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#EF4444] border-2 border-white animate-pulse" />
+ <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 rounded-full bg-[#EF4444] border-2 border-white " />
  )}
  </div>
  <div className="flex-1 min-w-0">
  <p className="text-xs font-bold leading-none">플랫폼 연결</p>
- <p className="text-[10px] text-[#3182F6] font-normal leading-none mt-0.5">리뷰·마케팅 시작 전 필수</p>
+ <p className="text-[10px] text-[#16685D] font-normal leading-none mt-0.5">리뷰·마케팅 시작 전 필수</p>
  </div>
  {pathname !== '/my/platforms' && (
- <span className="flex-shrink-0 text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#3182F6] text-white">STEP 1</span>
+ <span className="flex-shrink-0 text-[9px] font-semibold px-1.5 py-0.5 rounded-full bg-[#16685D] text-white">STEP 1</span>
  )}
  {pathname === '/my/platforms' && (
- <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#3182F6]" />
+ <span className="ml-auto w-1.5 h-1.5 rounded-full bg-[#16685D]" />
  )}
  </Link>
 
  {/* 2. 리뷰 관리 */}
  <div>
- <button onClick={() => setReviewOpen(v => !v)}
- className={"w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left " + (isReviewSection ? 'bg-[#FFFBEB] text-[#F59E0B] font-semibold' : 'text-[#4E5968] hover:bg-[#F2F4F6] font-medium')}>
+ <button aria-expanded={reviewOpen} onClick={() => setReviewOpen(v => !v)}
+ className={"w-full flex items-center gap-3 min-h-11 px-3 py-2.5 rounded-md transition-colors text-left " + (isReviewSection ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : 'text-[#53656A] hover:bg-[#F3F5F4] font-medium')}>
  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
- style={isReviewSection ? { background: '#F59E0B', color: '#fff' } : { background: '#FFFBEB', color: '#F59E0B' }}>리뷰</div>
+ style={isReviewSection ? { background: '#16685D', color: '#fff' } : { background: '#E7F1ED', color: '#16685D' }}>리뷰</div>
  <span className="text-sm">리뷰 관리</span>
  <span className={"ml-auto text-xs transition-transform duration-200 " + (reviewOpen ? 'rotate-180' : '')}>▾</span>
  </button>
  {reviewOpen && (
- <div className="mt-1 ml-3 pl-4 border-l-2 border-[#FDE68A] space-y-0.5">
+ <div className="mt-1 ml-3 pl-4 border-l-2 border-[#D5DEDC] space-y-0.5">
  <Link href="/review-admin" onClick={() => setMobileOpen(false)}
- className={"flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium " + (pathname === '/review-admin' ? 'bg-[#FFFBEB] text-[#F59E0B] font-semibold' : 'text-[#4E5968] hover:bg-[#F8F9FA]')}>
+ className={"flex items-center gap-2.5 min-h-11 md:min-h-0 px-3 py-2 rounded-md text-xs font-medium " + (pathname === '/review-admin' ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : 'text-[#53656A] hover:bg-[#F3F5F4]')}>
  <ClipboardList size={12} strokeWidth={2.5} /><span>전체 리뷰</span>
  </Link>
  <Link href="/review-admin/stats" onClick={() => setMobileOpen(false)}
- className={"flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium " + (pathname === '/review-admin/stats' ? 'bg-[#FFFBEB] text-[#F59E0B] font-semibold' : 'text-[#4E5968] hover:bg-[#F8F9FA]')}>
+ className={"flex items-center gap-2.5 min-h-11 md:min-h-0 px-3 py-2 rounded-md text-xs font-medium " + (pathname === '/review-admin/stats' ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : 'text-[#53656A] hover:bg-[#F3F5F4]')}>
  <BarChart3 size={12} strokeWidth={2.5} /><span>답글 발행 통계</span>
  </Link>
  {REVIEW_SUB.map(sub => {
  const active = pathname === sub.href || pathname.startsWith(sub.href + '/')
  return (
  <Link key={sub.href} href={sub.href} onClick={() => setMobileOpen(false)}
- className={"flex items-center gap-2.5 px-3 py-1.5 rounded-xl " + (active ? 'bg-[#FFFBEB] text-[#F59E0B] font-semibold' : 'text-[#4E5968] hover:bg-[#F8F9FA] font-medium')}>
+ className={"flex items-center gap-2.5 min-h-11 md:min-h-0 px-3 py-1.5 rounded-md " + (active ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : 'text-[#53656A] hover:bg-[#F3F5F4] font-medium')}>
  <PlatformLogoSmall platform={sub.platform} />
  <span className="text-xs">{sub.label}</span>
  </Link>
@@ -428,20 +436,20 @@ export default function Sidebar() {
 
  {/* 마케팅 관리 */}
  <div>
- <button onClick={() => setMarketingOpen(v => !v)}
- className={"w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left " + (isMarketingSection ? 'bg-[#FFF7ED] text-[#EA580C] font-semibold' : 'text-[#4E5968] hover:bg-[#F2F4F6] font-medium')}>
+ <button aria-expanded={marketingOpen} onClick={() => setMarketingOpen(v => !v)}
+ className={"w-full flex items-center gap-3 min-h-11 px-3 py-2.5 rounded-md transition-colors text-left " + (isMarketingSection ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : 'text-[#53656A] hover:bg-[#F3F5F4] font-medium')}>
  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
- style={isMarketingSection ? { background: '#EA580C', color: '#fff' } : { background: '#FFF7ED', color: '#EA580C' }}>마케</div>
+ style={isMarketingSection ? { background: '#16685D', color: '#fff' } : { background: '#E7F1ED', color: '#16685D' }}>마케</div>
  <span className="text-sm">마케팅 관리</span>
  <span className={"ml-auto text-xs transition-transform duration-200 " + (marketingOpen ? 'rotate-180' : '')}>▾</span>
  </button>
  {marketingOpen && (
- <div className="mt-1 ml-3 pl-4 border-l-2 border-[#FFE4CC] space-y-1">
+ <div className="mt-1 ml-3 pl-4 border-l-2 border-[#D5DEDC] space-y-1">
  {/* 플랫폼 그룹 */}
  {MARKETING_GROUPS.map(group => (
  <div key={group.platform}>
  <div className="flex items-center gap-2 px-3 py-1 mt-1">
- <span className="text-[10px] font-black tracking-wide" style={{ color: group.color }}>{group.platform}</span>
+ <span className="text-[10px] font-semibold tracking-wide" style={{ color: group.color }}>{group.platform}</span>
  <div className="flex-1 h-px" style={{ background: group.color + '33' }} />
  </div>
  <div className="space-y-0.5">
@@ -450,11 +458,11 @@ export default function Sidebar() {
  const isReady = !('badge' in sub && sub.badge === '준비중')
  return (
  <Link key={sub.href + si} href={isReady ? sub.href : '#'} onClick={() => isReady && setMobileOpen(false)}
- className={"flex items-center gap-2.5 px-3 py-1.5 rounded-xl " + (active ? 'bg-[#FFF7ED] text-[#EA580C] font-semibold' : isReady ? 'text-[#4E5968] hover:bg-[#F8F9FA] font-medium' : 'text-[#B0B8C1] cursor-default font-medium')}>
- <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: active ? '#EA580C' : isReady ? '#D1D5DB' : '#E5E8EB' }} />
+ className={"flex items-center gap-2.5 min-h-11 md:min-h-0 px-3 py-1.5 rounded-md " + (active ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : isReady ? 'text-[#53656A] hover:bg-[#F3F5F4] font-medium' : 'text-[#B0B8C1] cursor-default font-medium')}>
+ <span className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: active ? '#16685D' : isReady ? '#D1D5DB' : '#D5DEDC' }} />
  <span className="text-xs flex-1">{sub.label}</span>
  {'badge' in sub && sub.badge && (
- <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#F2F4F6] text-[#8B95A1] font-bold flex-shrink-0">{sub.badge}</span>
+ <span className="text-[8px] px-1.5 py-0.5 rounded-full bg-[#F3F5F4] text-[#53656A] font-bold flex-shrink-0">{sub.badge}</span>
  )}
  </Link>
  )
@@ -483,17 +491,17 @@ export default function Sidebar() {
 
  {/* 7. 커뮤니티 */}
  <div>
- <button onClick={() => setCommunityOpen(v => !v)}
- className={"w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-left " + (isCommunitySection ? 'bg-[#FDF2F8] text-[#EC4899] font-semibold' : 'text-[#4E5968] hover:bg-[#F2F4F6] font-medium')}>
+ <button aria-expanded={communityOpen} onClick={() => setCommunityOpen(v => !v)}
+ className={"w-full flex items-center gap-3 min-h-11 px-3 py-2.5 rounded-md transition-colors text-left " + (isCommunitySection ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : 'text-[#53656A] hover:bg-[#F3F5F4] font-medium')}>
  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
- style={isCommunitySection ? { background: '#EC4899', color: '#fff' } : { background: '#FDF2F8', color: '#EC4899' }}>커뮤</div>
+ style={isCommunitySection ? { background: '#16685D', color: '#fff' } : { background: '#E7F1ED', color: '#16685D' }}>커뮤</div>
  <span className="text-sm">커뮤니티</span>
  <span className={"ml-auto text-xs transition-transform duration-200 " + (communityOpen ? 'rotate-180' : '')}>▾</span>
  </button>
  {communityOpen && (
- <div className="mt-1 ml-3 pl-4 border-l-2 border-[#FBCFE8] space-y-0.5">
+ <div className="mt-1 ml-3 pl-4 border-l-2 border-[#D5DEDC] space-y-0.5">
  <Link href="/community" onClick={() => { setMobileOpen(false); setOpenRegion('') }}
- className={"flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium " + (pathname === '/community' && !currentRegion ? 'bg-[#FDF2F8] text-[#EC4899] font-semibold' : 'text-[#4E5968] hover:bg-[#F8F9FA]')}>
+ className={"flex items-center gap-2.5 min-h-11 md:min-h-0 px-3 py-2 rounded-md text-xs font-medium " + (pathname === '/community' && !currentRegion ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : 'text-[#53656A] hover:bg-[#F3F5F4]')}>
  <span></span><span>전국</span>
  </Link>
  {REGIONS.map(region => {
@@ -502,7 +510,7 @@ export default function Sidebar() {
  return (
  <div key={region.key}>
  <button onClick={() => toggleRegion(region.key)}
- className={"w-full flex items-center gap-2.5 px-3 py-1.5 rounded-xl text-left " + (isRegionActive ? 'bg-[#FDF2F8] text-[#EC4899] font-semibold' : 'text-[#4E5968] hover:bg-[#F8F9FA] font-medium')}>
+ className={"w-full flex items-center gap-2.5 min-h-11 md:min-h-0 px-3 py-1.5 rounded-md text-left " + (isRegionActive ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : 'text-[#53656A] hover:bg-[#F3F5F4] font-medium')}>
  <span className="text-sm w-5 text-center flex-shrink-0">{region.icon}</span>
  <Link href={"/community?r=" + encodeURIComponent(region.label)}
  onClick={e => { e.stopPropagation(); setMobileOpen(false) }}
@@ -510,15 +518,15 @@ export default function Sidebar() {
  <span className={"text-[10px] transition-transform duration-150 flex-shrink-0 " + (isRegionOpen ? 'rotate-180' : '')}>▾</span>
  </button>
  {isRegionOpen && (
- <div className="mt-0.5 ml-2 pl-3 border-l border-[#FBCFE8] space-y-0.5 max-h-48 overflow-y-auto">
+ <div className="mt-0.5 ml-2 pl-3 border-l border-[#D5DEDC] space-y-0.5 max-h-48 overflow-y-auto">
  {region.sub.map(district => {
  const active = currentRegion === region.label && currentDistrict === district
  return (
  <Link key={district}
  href={"/community?r=" + encodeURIComponent(region.label) + "&d=" + encodeURIComponent(district)}
  onClick={() => setMobileOpen(false)}
- className={"flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-[11px] " + (active ? 'bg-[#FDF2F8] text-[#EC4899] font-semibold' : 'text-[#8B95A1] hover:bg-[#F8F9FA] hover:text-[#4E5968]')}>
- <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: active ? '#EC4899' : '#D1D5DB' }} />
+ className={"flex items-center gap-2 min-h-11 md:min-h-0 px-2.5 py-1.5 rounded-lg text-[11px] " + (active ? 'bg-[#E7F1ED] text-[#16685D] font-semibold' : 'text-[#53656A] hover:bg-[#F3F5F4] hover:text-[#53656A]')}>
+ <span className="w-1 h-1 rounded-full flex-shrink-0" style={{ background: active ? '#16685D' : '#D1D5DB' }} />
  {district}
  </Link>
  )
@@ -537,7 +545,7 @@ export default function Sidebar() {
  return (
  <>
  {/* 모바일 상단 바 */}
- <div className="md:hidden fixed top-0 left-0 right-0 pt-safe bg-white border-b border-[#E5E8EB] z-30 flex items-center justify-between px-4 [&>*]:h-14">
+ <div className="md:hidden fixed top-0 left-0 right-0 pt-safe bg-white border-b border-[#D5DEDC] z-30 flex items-center justify-between px-4 [&>*]:h-14">
  <button
  onClick={() => {
  setMobileOpen(false)
@@ -547,32 +555,32 @@ export default function Sidebar() {
  router.push('/dashboard')
  }
  }}
- className="flex items-center -ml-1 px-1 py-1 rounded-lg active:bg-[#F2F4F6] transition-colors"
+ className="flex items-center -ml-1 px-1 py-1 rounded-lg active:bg-[#F3F5F4] transition-colors"
  aria-label="대시보드로 이동 또는 새로고침"
  >
- <span className="font-black text-[#191F28] text-lg tracking-tight">Localution</span>
- <span className="text-[11px] text-[#8B95A1] ml-1.5 font-medium">(로컬루션)</span>
+ <span className="font-semibold text-[#172B2F] text-lg tracking-tight">Localution</span>
+ <span className="text-[11px] text-[#53656A] ml-1.5 font-medium">(로컬루션)</span>
  </button>
- <button onClick={() => setMobileOpen(!mobileOpen)} className="w-9 h-9 flex flex-col justify-center items-center gap-1.5">
- <span className={"block w-5 h-0.5 bg-[#191F28] rounded transition-all " + (mobileOpen ? 'rotate-45 translate-y-2' : '')} />
- <span className={"block h-0.5 bg-[#191F28] rounded transition-all " + (mobileOpen ? 'opacity-0 w-0' : 'w-5')} />
- <span className={"block w-5 h-0.5 bg-[#191F28] rounded transition-all " + (mobileOpen ? '-rotate-45 -translate-y-2' : '')} />
+ <button aria-label={mobileOpen ? '메뉴 닫기' : '메뉴 열기'} aria-expanded={mobileOpen} onClick={() => setMobileOpen(!mobileOpen)} className="w-11 h-11 flex flex-col justify-center items-center gap-1.5">
+ <span className={"block w-5 h-0.5 bg-[#172B2F] rounded transition-colors " + (mobileOpen ? 'rotate-45 translate-y-2' : '')} />
+ <span className={"block h-0.5 bg-[#172B2F] rounded transition-colors " + (mobileOpen ? 'opacity-0 w-0' : 'w-5')} />
+ <span className={"block w-5 h-0.5 bg-[#172B2F] rounded transition-colors " + (mobileOpen ? '-rotate-45 -translate-y-2' : '')} />
  </button>
  </div>
 
  {mobileOpen && <div className="md:hidden fixed inset-0 bg-black/30 z-30" onClick={() => setMobileOpen(false)} />}
 
- <aside className={"fixed top-0 left-0 h-screen pt-safe w-[220px] bg-white border-r border-[#E5E8EB] z-40 flex flex-col transition-transform duration-300 " + (mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0')}>
+ <aside className={"fixed top-0 left-0 h-screen pt-safe w-[220px] bg-[#F3F5F4] border-r border-[#D5DEDC] z-40 flex flex-col transition-transform duration-300 " + (mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0')}>
  {/* 로고 */}
- <div className="px-5 py-5 border-b border-[#F2F4F6]">
+ <div className="px-5 py-5 border-b border-[#F3F5F4]">
  <Link href="/" className="block">
  <div className="flex items-center gap-2.5">
- <div className="w-8 h-8 rounded-lg bg-white ring-1 ring-[#E8F4FD] flex items-center justify-center overflow-hidden flex-shrink-0">
+ <div className="w-8 h-8 rounded-lg bg-white ring-1 ring-[#D5DEDC] flex items-center justify-center overflow-hidden flex-shrink-0">
  <img src="/logo-icon.svg" alt="로컬루션" width={32} height={32} />
  </div>
  <div>
- <p className="font-black text-[#191F28] text-sm tracking-tight leading-none">Localution</p>
- <p className="text-[10px] text-[#8B95A1] font-medium leading-none mt-0.5">로컬루션</p>
+ <p className="font-semibold text-[#172B2F] text-sm tracking-tight leading-none">Localution</p>
+ <p className="text-[10px] text-[#53656A] font-medium leading-none mt-0.5">로컬루션</p>
  </div>
  </div>
  </Link>
@@ -581,40 +589,40 @@ export default function Sidebar() {
  <NavItems />
 
  {/* 하단 매장 프로필 영역 */}
- <div className="px-4 py-4 border-t border-[#F2F4F6] relative" ref={profileRef}>
+ <div className="px-4 py-4 border-t border-[#F3F5F4] relative" ref={profileRef}>
 
  {profileOpen && (
- <div className="absolute bottom-[72px] left-4 right-4 bg-white rounded-xl shadow-lg border border-[#E5E8EB] overflow-hidden z-50">
+ <div className="absolute bottom-[72px] left-4 right-4 bg-white rounded-md shadow-lg border border-[#D5DEDC] overflow-hidden z-50">
  <Link href="/settings/profile"
  onClick={() => { setProfileOpen(false); setMobileOpen(false) }}
- className="flex items-center gap-3 px-4 py-3 text-sm text-[#4E5968] hover:bg-[#F2F4F6] transition-colors">
+ className="flex items-center gap-3 px-4 py-3 text-sm text-[#53656A] hover:bg-[#F3F5F4] transition-colors">
  <Store size={16} strokeWidth={2.5} />
  <span className="font-medium">매장 설정</span>
  </Link>
- <div className="h-px bg-[#F2F4F6]" />
+ <div className="h-px bg-[#F3F5F4]" />
  <Link href="/settings"
  onClick={() => { setProfileOpen(false); setMobileOpen(false) }}
- className="flex items-center gap-3 px-4 py-3 text-sm text-[#4E5968] hover:bg-[#F2F4F6] transition-colors">
+ className="flex items-center gap-3 px-4 py-3 text-sm text-[#53656A] hover:bg-[#F3F5F4] transition-colors">
  <Settings size={16} strokeWidth={2.5} />
  <span className="font-medium">설정</span>
  </Link>
- <div className="h-px bg-[#F2F4F6]" />
+ <div className="h-px bg-[#F3F5F4]" />
  <Link href="/help"
  onClick={() => { setProfileOpen(false); setMobileOpen(false) }}
- className="flex items-center gap-3 px-4 py-3 text-sm text-[#4E5968] hover:bg-[#F2F4F6] transition-colors">
+ className="flex items-center gap-3 px-4 py-3 text-sm text-[#53656A] hover:bg-[#F3F5F4] transition-colors">
  <HelpCircle size={16} strokeWidth={2.5} />
  <span className="font-medium">도움말·가이드</span>
  </Link>
- <div className="h-px bg-[#F2F4F6]" />
+ <div className="h-px bg-[#F3F5F4]" />
  <Link href="/inquiry"
  onClick={() => { setProfileOpen(false); setMobileOpen(false) }}
- className="flex items-center gap-3 px-4 py-3 text-sm text-[#4E5968] hover:bg-[#F2F4F6] transition-colors">
+ className="flex items-center gap-3 px-4 py-3 text-sm text-[#53656A] hover:bg-[#F3F5F4] transition-colors">
  <MessageSquare size={16} strokeWidth={2.5} />
  <span className="font-medium">1:1 문의</span>
  </Link>
  {isAdminEmail(userEmail) && (
  <>
- <div className="h-px bg-[#F2F4F6]" />
+ <div className="h-px bg-[#F3F5F4]" />
  <Link href="/admin/users"
  onClick={() => { setProfileOpen(false); setMobileOpen(false) }}
  className="flex items-center gap-3 px-4 py-3 text-sm text-[#DC2626] bg-[#FEF2F2] hover:bg-[#FEE2E2] transition-colors font-bold">
@@ -623,7 +631,7 @@ export default function Sidebar() {
  </Link>
  </>
  )}
- <div className="h-px bg-[#F2F4F6]" />
+ <div className="h-px bg-[#F3F5F4]" />
  <button
  onClick={handleLogout}
  className="w-full flex items-center gap-3 px-4 py-3 text-sm text-[#E11D48] hover:bg-[#FFF1F2] transition-colors">
@@ -635,15 +643,15 @@ export default function Sidebar() {
 
  <button
  onClick={() => setProfileOpen(v => !v)}
- className={"w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all " + (profileOpen ? 'bg-[#EFF6FF]' : 'bg-[#F8F9FA] hover:bg-[#F2F4F6]')}>
- <div className="w-8 h-8 rounded-full bg-[#3182F6] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
+ className={"w-full flex items-center gap-3 min-h-11 px-3 py-2.5 rounded-md transition-colors " + (profileOpen ? 'bg-[#E7F1ED]' : 'bg-[#F3F5F4] hover:bg-[#F3F5F4]')}>
+ <div className="w-8 h-8 rounded-full bg-[#16685D] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">
  {avatarChar}
  </div>
  <div className="min-w-0 flex-1 text-left">
- <p className="text-xs font-bold text-[#191F28] truncate">{displayName}</p>
- <p className="text-[10px] text-[#8B95A1] truncate">{displaySub}</p>
+ <p className="text-xs font-bold text-[#172B2F] truncate">{displayName}</p>
+ <p className="text-[10px] text-[#53656A] truncate">{displaySub}</p>
  </div>
- <span className={"text-[10px] text-[#8B95A1] flex-shrink-0 transition-transform " + (profileOpen ? 'rotate-180' : '')}>▴</span>
+ <span className={"text-[10px] text-[#53656A] flex-shrink-0 transition-transform " + (profileOpen ? 'rotate-180' : '')}>▴</span>
  </button>
  </div>
  </aside>

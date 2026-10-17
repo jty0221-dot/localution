@@ -33,7 +33,10 @@ export default function GlobalError({
 
  return (
  <html lang="ko">
- <body style={{ margin: 0, padding: 0, fontFamily: '-apple-system, BlinkMacSystemFont, "Noto Sans KR", sans-serif' }}>
+ <head>
+ <style>{`@font-face { font-family: 'Pretendard Variable'; src: url('/fonts/pretendard/PretendardVariable.woff2') format('woff2'); font-weight: 100 900; font-style: normal; font-display: swap; } button { font-family: inherit; }`}</style>
+ </head>
+ <body style={{ margin: 0, padding: 0, fontFamily: '"Pretendard Variable", Pretendard, sans-serif' }}>
  <div
  style={{
  minHeight: '100vh',
@@ -42,7 +45,7 @@ export default function GlobalError({
  display: 'flex',
  alignItems: 'center',
  justifyContent: 'center',
- background: '#F8F9FA',
+ background: '#F3F5F4',
  padding: 24,
  }}
  >
@@ -62,7 +65,7 @@ export default function GlobalError({
  style={{
  width: 72,
  height: 72,
- borderRadius: 12,
+ borderRadius: 6,
  background: 'linear-gradient(135deg, #EF4444, #E11D48)',
  margin: '0 auto 20px',
  display: 'flex',
@@ -74,15 +77,15 @@ export default function GlobalError({
  >
  <AlertCircle size={28} color="white" strokeWidth={2.5} />
  </div>
- <h1 style={{ fontSize: 22, fontWeight: 900, color: '#191F28', margin: '0 0 8px' }}>
+ <h1 style={{ fontSize: 22, fontWeight: 700, color: '#172B2F', margin: '0 0 8px' }}>
  시스템 오류가 발생했어요
  </h1>
- <p style={{ fontSize: 14, color: '#4E5968', lineHeight: 1.6, margin: '0 0 8px' }}>
+ <p style={{ fontSize: 14, color: '#53656A', lineHeight: 1.6, margin: '0 0 8px' }}>
  화면을 불러오지 못했어요.
  <br />잠시 후 다시 시도해주세요.
  </p>
  {error.digest && (
- <p style={{ fontSize: 12, color: '#8B95A1', overflowWrap: 'anywhere', margin: '0 0 24px' }}>
+ <p style={{ fontSize: 12, color: '#53656A', overflowWrap: 'anywhere', margin: '0 0 24px' }}>
  문의 시 알려주세요: {error.digest}
  </p>
  )}
@@ -93,12 +96,12 @@ export default function GlobalError({
  onClick={() => reset()}
  style={{
  padding: '14px 20px',
- borderRadius: 12,
- background: '#3182F6',
+ borderRadius: 6,
+ background: '#16685D',
  color: '#fff',
  border: 'none',
  fontSize: 14,
- fontWeight: 800,
+ fontWeight: 600,
  cursor: 'pointer',
  }}
  >
@@ -108,20 +111,20 @@ export default function GlobalError({
  href="/"
  style={{
  padding: '14px 20px',
- borderRadius: 12,
- background: '#F8F9FA',
- color: '#4E5968',
+ borderRadius: 6,
+ background: '#F3F5F4',
+ color: '#53656A',
  textDecoration: 'none',
  fontSize: 14,
- fontWeight: 800,
+ fontWeight: 600,
  }}
  >
  홈으로 돌아가기
  </a>
  </div>
 
- <p style={{ fontSize: 11, color: '#8B95A1', marginTop: 24, lineHeight: 1.6 }}>
- 문제가 계속되면 <a href="/inquiry" style={{ color: '#3182F6', display: 'inline-flex', alignItems: 'center', minHeight: 44, textDecoration: 'underline' }}>문의하기</a>에서 알려주세요.
+ <p style={{ fontSize: 11, color: '#53656A', marginTop: 24, lineHeight: 1.6 }}>
+ 문제가 계속되면 <a href="/inquiry" style={{ color: '#16685D', display: 'inline-flex', alignItems: 'center', minHeight: 44, textDecoration: 'underline' }}>문의하기</a>에서 알려주세요.
  </p>
  </div>
  </div>

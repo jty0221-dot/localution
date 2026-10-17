@@ -197,7 +197,7 @@ const FAQS = [
 
 // 카테고리별 가이드 anchor — Coins(정산) 제거 (settlement 페이지가 redirect-only)
 const SECTIONS = [
- { id: 'quick',     label: '처음 시작 가이드', Icon: Rocket,        color: 'from-[#3182F6] to-[#1B64DA]' },
+ { id: 'quick',     label: '처음 시작 가이드', Icon: Rocket,        color: 'from-[var(--lu-accent)] to-[var(--lu-accent-hover)]' },
  { id: 'features',  label: '기능별 사용법',   Icon: MessageSquare, color: 'from-[#F59E0B] to-[#D97706]' },
  { id: 'faq',       label: '자주 묻는 질문',  Icon: Megaphone,     color: 'from-[#EC4899] to-[#BE185D]' },
  { id: 'inquiry',   label: '1:1 문의',        Icon: Users,         color: 'from-[#10B981] to-[#059669]' },
@@ -220,13 +220,13 @@ export default function HelpPage() {
  }, [allGuides, search])
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <TopNav />
  <div className="flex min-h-screen flex-col pt-20">
  <header className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6">
- <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#3182F6] to-[#1B64DA] shadow-sm"><HelpCircle size={16} className="text-white" strokeWidth={2.5} aria-hidden="true" /></div>
- <h1 className="text-xl font-black text-[#191F28] md:text-2xl">가게 운영에 필요한 도구와 사용 안내</h1>
- <p className="mt-2 text-sm leading-6 text-[#4E5968]">처음 시작하는 분도, 여러 매장을 관리하는 분도 지금 필요한 작업부터 선택하세요.</p>
+ <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-[6px] bg-gradient-to-br from-[var(--lu-accent)] to-[var(--lu-accent-hover)] shadow-none"><HelpCircle size={16} className="text-[var(--lu-accent)]" strokeWidth={1.8} aria-hidden="true" /></div>
+ <h1 className="text-xl font-black text-[var(--lu-ink)] md:text-2xl">가게 운영에 필요한 도구와 사용 안내</h1>
+ <p className="mt-2 text-sm leading-6 text-[var(--lu-muted)]">처음 시작하는 분도, 여러 매장을 관리하는 분도 지금 필요한 작업부터 선택하세요.</p>
  </header>
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full space-y-5 md:space-y-6">
@@ -234,8 +234,8 @@ export default function HelpPage() {
  <TaskFinder />
 
  {/* 검색바 */}
- <div className="bg-white rounded-2xl shadow-sm p-3 md:p-4 flex items-center gap-2">
- <Search size={16} className="text-[#8B95A1] flex-shrink-0" strokeWidth={2.5} />
+ <div className="bg-white rounded-[10px] shadow-none p-3 md:p-4 flex items-center gap-2">
+ <Search size={16} className="text-[var(--lu-muted)] flex-shrink-0" strokeWidth={2.5} />
  <input
  id="help-guide-search"
  aria-label="기능별 사용법 검색"
@@ -243,10 +243,10 @@ export default function HelpPage() {
  value={search}
  onChange={e => setSearch(e.target.value)}
  placeholder="궁금한 기능을 검색하세요 (예: 답글, 키워드, QR)"
- className="min-w-0 flex-1 text-base bg-transparent focus:outline-none text-[#191F28] placeholder:text-[#8B95A1]"
+ className="min-w-0 flex-1 text-base bg-transparent focus:outline-none text-[var(--lu-ink)] placeholder:text-[var(--lu-muted)]"
  />
  {search && (
- <button onClick={() => setSearch('')} className="min-h-[44px] rounded-xl px-3 text-sm text-[#4E5968] hover:text-[#3182F6]">
+ <button onClick={() => setSearch('')} className="min-h-[44px] rounded-[6px] px-3 text-sm text-[var(--lu-muted)] hover:text-[var(--lu-accent)]">
  지우기
  </button>
  )}
@@ -257,11 +257,11 @@ export default function HelpPage() {
  <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
  {SECTIONS.map(s => (
  <a key={s.id} href={`#${s.id}`}
- className="flex flex-col items-center gap-1.5 p-3 rounded-xl bg-white border border-[#F2F4F6] hover:border-[#3182F6] hover:bg-[#FAFBFF] transition-all">
- <div className={`w-9 h-9 rounded-xl bg-gradient-to-br ${s.color} flex items-center justify-center shadow-sm`}>
- <s.Icon size={15} className="text-white" strokeWidth={2.5} />
+ className="flex flex-col items-center gap-1.5 p-3 rounded-[6px] bg-white border border-[#F2F4F6] hover:border-[var(--lu-accent)] hover:bg-[#FAFBFF] transition-all">
+ <div className={`w-9 h-9 rounded-[6px] bg-gradient-to-br ${s.color} flex items-center justify-center shadow-none`}>
+ <s.Icon size={15} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
- <p className="text-[11px] font-bold text-[#191F28] text-center leading-tight">{s.label}</p>
+ <p className="text-[11px] font-bold text-[var(--lu-ink)] text-center leading-tight">{s.label}</p>
  </a>
  ))}
  </div>
@@ -270,17 +270,17 @@ export default function HelpPage() {
  {/* 5분 시작 가이드 */}
  <section id="quick">
  <div className="flex items-center gap-2 mb-3">
- <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#3182F6] to-[#1B64DA] flex items-center justify-center shadow-sm">
- <Rocket size={14} className="text-white" strokeWidth={2.5} />
+ <div className="w-7 h-7 rounded-[6px] bg-gradient-to-br from-[var(--lu-accent)] to-[var(--lu-accent-hover)] flex items-center justify-center shadow-none">
+ <Rocket size={14} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
- <h2 className="text-base md:text-lg font-bold text-[#191F28]">처음이신가요? 시작 순서부터 확인하세요</h2>
+ <h2 className="text-base md:text-lg font-bold text-[var(--lu-ink)]">처음이신가요? 시작 순서부터 확인하세요</h2>
  </div>
  <div className="space-y-2">
  {(search ? filtered : QUICK_START).filter(g => g.category === '시작').map(g => (
  <GuideCard key={g.id} guide={g} open={openId === g.id} onToggle={() => setOpenId(openId === g.id ? null : g.id)} />
  ))}
  {search && filtered.filter(g => g.category === '시작').length === 0 && (
- <p className="text-xs text-[#8B95A1] text-center py-4">검색 결과 없음</p>
+ <p className="text-xs text-[var(--lu-muted)] text-center py-4">검색 결과 없음</p>
  )}
  </div>
  </section>
@@ -288,17 +288,17 @@ export default function HelpPage() {
  {/* 기능별 사용법 */}
  <section id="features" className="scroll-mt-20">
  <div className="flex items-center gap-2 mb-3">
- <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#6D28D9] flex items-center justify-center shadow-sm">
- <BookOpen size={14} className="text-white" strokeWidth={2.5} />
+ <div className="w-7 h-7 rounded-[6px] bg-gradient-to-br from-[#7C3AED] to-[#6D28D9] flex items-center justify-center shadow-none">
+ <BookOpen size={14} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
- <h2 className="text-base md:text-lg font-bold text-[#191F28]">기능별 사용법</h2>
+ <h2 className="text-base md:text-lg font-bold text-[var(--lu-ink)]">기능별 사용법</h2>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  {(search ? filtered : FEATURE_GUIDES).filter(g => g.category !== '시작').map(g => (
  <GuideCard key={g.id} guide={g} open={openId === g.id} onToggle={() => setOpenId(openId === g.id ? null : g.id)} />
  ))}
  {search && filtered.filter(g => g.category !== '시작').length === 0 && (
- <p className="text-xs text-[#8B95A1] text-center py-4 col-span-2">검색 결과 없음</p>
+ <p className="text-xs text-[var(--lu-muted)] text-center py-4 col-span-2">검색 결과 없음</p>
  )}
  </div>
  </section>
@@ -307,26 +307,26 @@ export default function HelpPage() {
  {!search && (
  <section id="faq" className="scroll-mt-20">
  <div className="flex items-center gap-2 mb-3">
- <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-sm">
- <Lightbulb size={14} className="text-white" strokeWidth={2.5} />
+ <div className="w-7 h-7 rounded-[6px] bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-none">
+ <Lightbulb size={14} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
- <h2 className="text-base md:text-lg font-bold text-[#191F28]">자주 묻는 질문</h2>
+ <h2 className="text-base md:text-lg font-bold text-[var(--lu-ink)]">자주 묻는 질문</h2>
  </div>
- <div className="bg-white rounded-2xl shadow-sm overflow-hidden divide-y divide-[#F2F4F6]">
+ <div className="bg-white rounded-[10px] shadow-none overflow-hidden divide-y divide-[#F2F4F6]">
  {FAQS.map((f, i) => {
  const isOpen = openFaq === i
  return (
  <div key={i}>
  <button onClick={() => setOpenFaq(isOpen ? null : i)}
  className="w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-[#FAFBFF] transition-colors">
- <span className="text-xs font-black text-[#3182F6] flex-shrink-0">Q.</span>
- <span className="flex-1 text-sm font-bold text-[#191F28]">{f.q}</span>
- {isOpen ? <ChevronDown size={14} className="text-[#8B95A1]" strokeWidth={2.5} />
- : <ChevronRight size={14} className="text-[#8B95A1]" strokeWidth={2.5} />}
+ <span className="text-xs font-black text-[var(--lu-accent)] flex-shrink-0">Q.</span>
+ <span className="flex-1 text-sm font-bold text-[var(--lu-ink)]">{f.q}</span>
+ {isOpen ? <ChevronDown size={14} className="text-[var(--lu-muted)]" strokeWidth={2.5} />
+ : <ChevronRight size={14} className="text-[var(--lu-muted)]" strokeWidth={2.5} />}
  </button>
  {isOpen && (
  <div className="px-4 pb-3 pt-1 bg-[#FAFBFF]">
- <p className="text-xs md:text-sm text-[#4E5968] leading-relaxed pl-4">{f.a}</p>
+ <p className="text-xs md:text-sm text-[var(--lu-muted)] leading-relaxed pl-4">{f.a}</p>
  </div>
  )}
  </div>
@@ -339,19 +339,19 @@ export default function HelpPage() {
  {/* 1:1 문의 CTA */}
  {!search && (
  <section id="inquiry" className="scroll-mt-20">
- <div className="rounded-2xl shadow-sm bg-gradient-to-br from-[#EFF6FF] to-[#F5F3FF] border border-[#DBEAFE] p-5 flex items-start gap-4">
- <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#3182F6] to-[#7C3AED] flex items-center justify-center flex-shrink-0 shadow-sm">
- <Mail size={20} className="text-white" strokeWidth={2.5} />
+ <div className="rounded-[10px] shadow-none bg-gradient-to-br from-[#EFF6FF] to-[#F5F3FF] border border-[#DBEAFE] p-5 flex items-start gap-4">
+ <div className="w-12 h-12 rounded-[10px] bg-gradient-to-br from-[var(--lu-accent)] to-[#7C3AED] flex items-center justify-center flex-shrink-0 shadow-none">
+ <Mail size={20} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
  <div className="flex-1">
- <h3 className="text-sm md:text-base font-bold text-[#191F28] mb-1">
+ <h3 className="text-sm md:text-base font-bold text-[var(--lu-ink)] mb-1">
  여기 없는 질문이 있으신가요?
  </h3>
- <p className="text-xs md:text-sm text-[#4E5968] mb-3 leading-relaxed">
+ <p className="text-xs md:text-sm text-[var(--lu-muted)] mb-3 leading-relaxed">
  1:1 문의로 보내주시면 평일 24시간 이내 답변 드려요. 사용 중 막히는 부분, 새로 만들어주셨으면 하는 기능, 뭐든 환영합니다.
  </p>
  <Link href="/inquiry"
- className="inline-flex items-center gap-1.5 bg-[#3182F6] text-white text-xs md:text-sm font-bold px-4 py-2 rounded-xl hover:bg-[#1B64DA] transition-colors shadow-sm">
+ className="inline-flex items-center gap-1.5 bg-[var(--lu-accent)] text-white text-xs md:text-sm font-bold px-4 py-2 rounded-[6px] hover:bg-[var(--lu-accent-hover)] transition-colors shadow-none">
  1:1 문의 보내기
  <ArrowRight size={14} strokeWidth={2.5} />
  </Link>
@@ -370,24 +370,24 @@ export default function HelpPage() {
 
 function GuideCard({ guide, open, onToggle }: { guide: Guide; open: boolean; onToggle: () => void }) {
  return (
- <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-transparent hover:border-[#3182F6]/20 transition-colors">
+ <div className="bg-white rounded-[10px] shadow-none overflow-hidden border border-transparent hover:border-[var(--lu-accent)]/20 transition-colors">
  <button onClick={onToggle}
  className="w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-[#FAFBFF] transition-colors">
- <span className="text-[10px] font-bold text-[#3182F6] bg-[#EFF6FF] px-1.5 py-0.5 rounded-full flex-shrink-0">
+ <span className="text-[10px] font-bold text-[var(--lu-accent)] bg-[#EFF6FF] px-1.5 py-0.5 rounded-full flex-shrink-0">
  {guide.category}
  </span>
- <span className="flex-1 text-sm font-bold text-[#191F28] truncate">{guide.title}</span>
- {open ? <ChevronDown size={14} className="text-[#8B95A1]" strokeWidth={2.5} />
- : <ChevronRight size={14} className="text-[#8B95A1]" strokeWidth={2.5} />}
+ <span className="flex-1 text-sm font-bold text-[var(--lu-ink)] truncate">{guide.title}</span>
+ {open ? <ChevronDown size={14} className="text-[var(--lu-muted)]" strokeWidth={2.5} />
+ : <ChevronRight size={14} className="text-[var(--lu-muted)]" strokeWidth={2.5} />}
  </button>
  {open && (
  <div className="px-4 pb-4 pt-0 space-y-1.5">
- <ol className="space-y-1.5 text-xs md:text-sm text-[#4E5968] leading-relaxed list-decimal list-inside">
+ <ol className="space-y-1.5 text-xs md:text-sm text-[var(--lu-muted)] leading-relaxed list-decimal list-inside">
  {guide.steps.map((s, i) => <li key={i} className="leading-relaxed">{s}</li>)}
  </ol>
  {guide.link && (
  <Link href={guide.link.href}
- className="inline-flex items-center gap-1 text-xs font-bold text-[#3182F6] hover:text-[#1B64DA] mt-2">
+ className="inline-flex items-center gap-1 text-xs font-bold text-[var(--lu-accent)] hover:text-[var(--lu-accent-hover)] mt-2">
  {guide.link.label}
  </Link>
  )}

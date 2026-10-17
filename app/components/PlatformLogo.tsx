@@ -73,7 +73,7 @@ export default function PlatformLogo({
  fontSize="17"
  fontWeight="900"
  fill="#111111"
- fontFamily="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif"
+ fontFamily={'Pretendard Variable, Pretendard, sans-serif'}
  textAnchor="middle"
  letterSpacing="-0.6"
  >
@@ -102,7 +102,7 @@ export default function PlatformLogo({
  fontSize="12"
  fontWeight="900"
  fill="#FFFFFF"
- fontFamily="'Apple SD Gothic Neo','Noto Sans KR',system-ui,sans-serif"
+ fontFamily={'Pretendard Variable, Pretendard, sans-serif'}
  textAnchor="middle"
  letterSpacing="-0.4"
  >
@@ -138,7 +138,7 @@ export default function PlatformLogo({
  y="21"
  fontSize="8"
  fontWeight="900"
- fontFamily="Arial,Helvetica,sans-serif"
+ fontFamily={'Pretendard Variable, Pretendard, sans-serif'}
  textAnchor="middle"
  letterSpacing="-0.1"
  >
@@ -156,7 +156,7 @@ export default function PlatformLogo({
  fontSize="13"
  fontWeight="900"
  fill="#F2622B"
- fontFamily="Arial,Helvetica,sans-serif"
+ fontFamily={'Pretendard Variable, Pretendard, sans-serif'}
  textAnchor="middle"
  letterSpacing="-0.3"
  >
@@ -207,7 +207,7 @@ export default function PlatformLogo({
  fontSize="20"
  fontWeight="900"
  fill="#FFFFFF"
- fontFamily="system-ui,sans-serif"
+ fontFamily={'Pretendard Variable, Pretendard, sans-serif'}
  textAnchor="middle"
  >
  {String(platform).charAt(0).toUpperCase()}

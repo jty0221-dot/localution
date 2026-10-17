@@ -1,8 +1,11 @@
-/* 원티드 본문 서체 Pretendard JP — 한글·영문·일문이 한 얼굴에 다 들어 있다.
-   dynamic subset 이라 실제로 화면에 뜬 글자만 내려받는다.
-   출처: Claude 디자인 시스템 · Wanted Design Library · tokens/fonts.css
-   CSS @import 는 반드시 다른 모든 규칙보다 앞에 있어야 한다 — 순서를 바꾸면 통째로 무시된다. */
-@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard-jp-dynamic-subset.min.css");
+/* Pretendard 1.3.9. Local font file and SIL Open Font License are in public/fonts/pretendard. */
+@font-face {
+  font-family: 'Pretendard Variable';
+  font-style: normal;
+  font-weight: 45 920;
+  font-display: swap;
+  src: url('/fonts/pretendard/PretendardVariable.woff2') format('woff2-variations');
+}
 
 @tailwind base;
 @tailwind components;
@@ -21,9 +24,9 @@ a, button, [role="button"], input[type="button"], input[type="submit"] {
 }
 
 body {
-  background-color: #F2F4F6;
-  color: #191F28;
-  font-family: 'Pretendard JP', Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  background-color: var(--lu-canvas);
+  color: var(--lu-ink);
+  font-family: var(--lu-font);
   -webkit-font-smoothing: antialiased;
 }
 
@@ -91,8 +94,8 @@ html, body {
    여기 변수는 Tailwind 가 닿지 않는 자리(인라인 style · 서드파티 위젯)용 사본이다.
    색은 가져오지 않았다 — 원티드는 #0066FF 지만 로컬루션은 #3182F6 이다. */
 :root {
-  --wd-font-core: 'Pretendard JP', Pretendard, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-  --wd-font-mono: 'SF Mono', ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  --wd-font-core: var(--lu-font);
+  --wd-font-mono: var(--lu-font);
 
   /* 본문 굵기는 Regular 가 아니라 Medium 이다. Regular 는 입력 필드 값에서만 쓴다 */
   --wd-weight-regular: 400;
@@ -142,3 +145,106 @@ html, body {
     --wd-card-padding: 16px;
   }
 }
+
+
+/* Localution workspace design. Existing safe-area and PWA rules above remain in force. */
+:root {
+ --lu-font: 'Pretendard Variable', 'Pretendard', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+ --lu-canvas: #F3F5F4;
+ --lu-surface: #FFFFFF;
+ --lu-ink: #172B2F;
+ --lu-muted: #53656A;
+ --lu-line: #D5DEDC;
+ --lu-accent: #16685D;
+ --lu-accent-hover: #105448;
+ --lu-accent-soft: #E7F1ED;
+ --lu-danger: #A52C35;
+ --lu-danger-soft: #FBEDEF;
+ --lu-warning: #805515;
+ --lu-warning-soft: #FCF4E4;
+ --lu-success: #176047;
+ --lu-success-soft: #EAF4EE;
+ --lu-info: #285C84;
+ --lu-info-soft: #EAF2F8;
+ --lu-radius-control: 6px;
+ --lu-radius-panel: 10px;
+ --lu-radius-dialog: 14px;
+ --lu-space-1: 4px;
+ --lu-space-2: 8px;
+ --lu-space-3: 12px;
+ --lu-space-4: 16px;
+ --lu-space-5: 24px;
+ --lu-space-6: 32px;
+ --lu-space-7: 48px;
+ --lu-shadow-overlay: 0 12px 40px rgb(23 43 47 / .12);
+ --lu-focus: 0 0 0 2px #FFFFFF, 0 0 0 4px #16685D;
+ /* 기존 Wanted 호환변수는 타이포까지 같은 Pretendard로 연결 */
+ --wd-font-core: var(--lu-font);
+ --wd-font-mono: var(--lu-font);
+}
+/* 다음선언은 실제레이아웃에 적용할 기초예시. svg/iconfont에 * font 강제하지 않음. */
+body { font-family: var(--lu-font); color: var(--lu-ink); background: var(--lu-canvas); }
+button, input, select, textarea { font: inherit; }
+.lu-panel { background: var(--lu-surface); border: 1px solid var(--lu-line); border-radius: var(--lu-radius-panel); box-shadow: none; }
+.lu-primary { min-height: 44px; padding: 10px 16px; border-radius: var(--lu-radius-control); background: var(--lu-accent); color: #fff; font-weight: 600; }
+.lu-primary:hover { background: var(--lu-accent-hover); }
+.lu-primary:focus-visible { outline: none; box-shadow: var(--lu-focus); }
+.lu-control { width: 100%; min-height: 44px; padding: 10px 12px; border: 1px solid var(--lu-line); border-radius: var(--lu-radius-control); background: var(--lu-surface); color: var(--lu-ink); font-size: 16px; }
+.lu-metric { font-variant-numeric: tabular-nums; }
+@media (prefers-reduced-motion: reduce) { .lu-primary { transition: none; } }
+
+html { scroll-padding-top: 88px; }
+body { font-size: 15px; line-height: 1.6; }
+button, input, select, textarea, table, code, pre, kbd, samp, .font-sans, .font-mono { font-family: var(--lu-font); }
+h1, h2, h3, h4 { letter-spacing: -.035em; word-break: keep-all; }
+button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 2px solid var(--lu-accent); outline-offset: 3px; }
+::selection { background: var(--lu-accent-soft); color: var(--lu-ink); }
+.lu-panel { transition: border-color 150ms ease; }
+.lu-panel:hover { border-color: #ADBDB8; }
+.lu-label { font-size: 12px; line-height: 18px; font-weight: 600; color: var(--lu-muted); }
+.lu-hero { position: relative; padding: 136px 24px 72px; background: var(--lu-canvas); border-bottom: 1px solid var(--lu-line); }
+.lu-hero-grid { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); align-items: center; gap: 56px; max-width: 1152px; margin: 0 auto; }
+.lu-hero h1 { font-size: clamp(32px,4.1vw,56px); line-height: 1.16; font-weight: 700; letter-spacing: -.055em; }
+.lu-hero-description { max-width: 42ch; margin-top: 24px; color: var(--lu-muted); font-size: 17px; line-height: 1.8; word-break: keep-all; }
+.lu-hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin-top: 32px; }
+.lu-workbench { min-width: 0; background: var(--lu-surface); border: 1px solid var(--lu-line); border-radius: 14px; padding: 28px; box-shadow: 0 16px 56px rgb(23 43 47 / .06); }
+.lu-workbench-row { display: flex; align-items: center; gap: 12px; min-height: 72px; padding: 14px 0; border-bottom: 1px solid var(--lu-line); }
+.lu-workbench-row:last-child { border: 0; }
+.lu-workbench-row:hover { color: var(--lu-accent); }
+.lu-soft-icon { display:flex; align-items:center; justify-content:center; flex-shrink:0; width:36px; height:36px; background:var(--lu-accent-soft); color:var(--lu-accent); border-radius:6px; }
+.lu-hero-footnote { margin-top: 20px; color: var(--lu-muted); font-size: 13px; line-height: 1.7; }
+.lu-tools-header { border-bottom: 1px solid var(--lu-line); padding-bottom: 24px; }
+.lu-tools-header h2 { font-size: 28px; line-height: 1.35; font-weight: 700; }
+.lu-tool-card { position:relative; border-radius:10px; border:1px solid var(--lu-line); background:var(--lu-surface); box-shadow:none; }
+.lu-tool-card:focus-within { border-color:var(--lu-accent); }
+/* Exact legacy design tokens only. Provider logos and platform-specific colors are not targeted. */
+[class~="bg-[#F8F9FA]"], [class~="bg-[#F2F4F6]"] { background-color:var(--lu-canvas); }
+[class~="bg-[#3182F6]"] { background-color:var(--lu-accent); }
+[class~="text-[#3182F6]"], [class~="text-[#1B64DA]"] { color:var(--lu-accent); }
+[class~="text-[#191F28]"] { color:var(--lu-ink); }
+[class~="text-[#4E5968]"], [class~="text-[#8B95A1]"] { color:var(--lu-muted); }
+[class~="border-[#E5E8EB]"] { border-color:var(--lu-line); }
+[class~="border-[#3182F6]"] { border-color:var(--lu-accent); }
+[class~="hover:bg-[#1B64DA]"]:hover { background-color:var(--lu-accent-hover); }
+[class~="focus:outline-[#3182F6]"]:focus { outline-color:var(--lu-accent); }
+.font-black { font-weight: 700; }
+@media (max-width: 767px) {
+ .lu-hero { padding: 104px 16px 40px; }
+ .lu-hero-grid { grid-template-columns:minmax(0,1fr); gap:32px; }
+ .lu-hero h1 { font-size:32px; line-height:1.25; }
+ .lu-hero-description { font-size:16px; line-height:1.7; }
+ .lu-hero-actions > a { width:100%; justify-content:center; }
+ .lu-workbench { padding:20px; }
+ .lu-tools-header h2 { font-size:24px; }
+}
+@media (prefers-reduced-motion: reduce) {
+ html { scroll-behavior:auto; }
+ .lu-panel, .lu-workbench-row, .lu-primary { transition:none; }
+}
+
+/* Keep legacy panels aligned with the shared workspace shape. */
+.rounded-2xl { border-radius: var(--lu-radius-panel); }
+.rounded-xl { border-radius: var(--lu-radius-control); }
+.shadow-sm { box-shadow:none; }
+button.rounded-2xl, a.rounded-2xl[role="button"] { border-radius:var(--lu-radius-control); }

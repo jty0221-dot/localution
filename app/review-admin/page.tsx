@@ -26,7 +26,7 @@ function BaeminLogo({ size = 28 }: { size?: number }) {
  <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
  <rect width="48" height="48" rx="12" fill="#2DDDC8"/>
  <text x="24" y="32" fontSize="19" fontWeight="900" fill="white"
- fontFamily="'Apple SD Gothic Neo','Noto Sans KR',sans-serif"
+ fontFamily="Pretendard, sans-serif"
  textAnchor="middle" letterSpacing="-0.5">배민</text>
  </svg>
  )
@@ -36,7 +36,7 @@ function YogiyoLogo({ size = 28 }: { size?: number }) {
  <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
  <rect width="48" height="48" rx="12" fill="#E5007F"/>
  <text x="24" y="32" textAnchor="middle" fontSize="16" fontWeight="900"
- fill="white" fontFamily="'Apple SD Gothic Neo','Noto Sans KR',sans-serif"
+ fill="white" fontFamily="Pretendard, sans-serif"
  letterSpacing="-0.8">요기요</text>
  </svg>
  )
@@ -46,13 +46,13 @@ function CoupangEatsLogo({ size = 28 }: { size?: number }) {
  <svg width={size} height={size} viewBox="0 0 48 48" fill="none">
  <rect width="48" height="48" rx="10" fill="white" stroke="#E5E7EB" strokeWidth="1.5"/>
  <text x="24" y="19" textAnchor="middle" fontSize="9" fontWeight="800"
- fontFamily="Arial,'Helvetica Neue',sans-serif" letterSpacing="0.3">
+ fontFamily="Pretendard, sans-serif" letterSpacing="0.3">
  <tspan fill="#E31837">c</tspan><tspan fill="#F4A900">o</tspan><tspan fill="#E31837">u</tspan>
  <tspan fill="#5BAD48">p</tspan><tspan fill="#3B79BE">a</tspan><tspan fill="#E31837">n</tspan>
  <tspan fill="#F4A900">g</tspan>
  </text>
  <text x="24" y="35" textAnchor="middle" fontSize="14" fontWeight="900"
- fill="#5C3317" fontFamily="Arial,'Helvetica Neue',sans-serif">eats</text>
+ fill="#5C3317" fontFamily="Pretendard, sans-serif">eats</text>
  </svg>
  )
 }
@@ -147,82 +147,61 @@ export default function ReviewAdminHub() {
  const [filter, setFilter] = useState<'all' | PlatformKey>('all')
 
  // ── 1) 플랫폼 통계 로드 (stores/me) ──────────────────────
+ const [statsError, setStatsError] = useState<string | null>(null)
+ const [statsReady, setStatsReady] = useState(false)
+ const [loginRequired, setLoginRequired] = useState(false)
+ const [feedError, setFeedError] = useState<string | null>(null)
  const loadStats = useCallback(async () => {
  setLoadingStats(true)
+ setStatsError(null)
+ setLoginRequired(false)
  try {
  const res = await fetch('/api/stores/me', { credentials: 'include', cache: 'no-store' })
- if (!res.ok) return
+ if (res.status === 401) { setLoginRequired(true); throw new Error('로그인이 필요해요. 로그인 후 연결 상태를 다시 확인해주세요.') }
+ if (!res.ok) throw new Error('플랫폼 연결 상태를 불러오지 못했어요. 잠시 후 다시 확인해주세요.')
  const j = await res.json()
- if (!j?.ok) return
-
- const slugMap: Record<string, PlatformKey> = {
- naver_place: 'naver', baemin: 'baemin',
- yogiyo: 'yogiyo', coupangeats: 'coupang', kakao_map: 'kakao',
- }
-
- setStats(prev => prev.map(s => {
- const slug = HUB_TO_SLUG[s.platform]
- const p = (j.platforms || []).find((x: any) => x.platform === slug)
- if (!p) return s
- return {
- platform: s.platform,
- connected: !!p.connected,
- externalName: p.platform_store_name || '',
- reviewCount: p.review_count ?? 0,
- avgRating: typeof p.rating_avg === 'number' ? p.rating_avg : null,
- unreplied: p.unreplied_count ?? 0,
- latestAt: p.latest_collected_at ?? null,
- }
+ if (!j?.ok || !Array.isArray(j.platforms)) throw new Error('플랫폼 연결 응답을 확인하지 못했어요.')
+ setStats(ALL_PLATFORMS.map(platform => {
+ const p = j.platforms.find((item: any) => item.platform === HUB_TO_SLUG[platform])
+ return { platform, connected: !!p?.connected, externalName: p?.platform_store_name || '',
+ reviewCount: p?.review_count ?? 0, avgRating: typeof p?.rating_avg === 'number' ? p.rating_avg : null,
+ unreplied: p?.unreplied_count ?? 0, latestAt: p?.latest_collected_at ?? null }
  }))
- } catch (_) {}
+ setStatsReady(true)
+ } catch (error) { setStatsError(error instanceof Error ? error.message : '연결 상태를 확인하지 못했어요. 인터넷 연결을 확인해주세요.') }
  finally { setLoadingStats(false) }
  }, [])
-
- useEffect(() => { loadStats() }, [loadStats])
-
- // ── 2) 리뷰 피드 로드 (/api/place/reviews) ───────────────
+ useEffect(() => { void loadStats() }, [loadStats])
  const loadFeed = useCallback(async () => {
  setLoadingFeed(true)
+ setFeedError(null)
+ const targets = stats.filter(s => s.connected || s.reviewCount > 0)
+ const succeeded: PlatformKey[] = []
+ const failed: PlatformKey[] = []
  const all: FeedReview[] = []
-
- await Promise.allSettled(
- stats
- .filter(s => s.connected || s.reviewCount > 0)
- .map(async (s) => {
+ await Promise.all(targets.map(async s => {
  try {
- const res = await fetch(
- `/api/place/reviews?platform=${HUB_TO_SLUG[s.platform]}&limit=100`,
- { credentials: 'include', cache: 'no-store' },
- )
- if (!res.ok) return
+ const res = await fetch(`/api/place/reviews?platform=${HUB_TO_SLUG[s.platform]}&limit=100`, { credentials: 'include', cache: 'no-store' })
+ if (res.status === 401) setLoginRequired(true)
+ if (!res.ok) throw new Error('request failed')
  const data = await res.json()
- if (!data?.ok || !Array.isArray(data.reviews)) return
- for (const r of data.reviews) {
- all.push({
- id: `${s.platform}-${r.id}`,
- platform: s.platform,
- rating: typeof r.rating === 'number' ? r.rating : null,
- author: r.author_mask || r.author_name || '익명',
- date: r.posted_at || r.collected_at || new Date().toISOString(),
- text: r.content || '',
- replied: !!r.has_reply,
+ if (!data?.ok || !Array.isArray(data.reviews)) throw new Error('invalid response')
+ for (const r of data.reviews) all.push({ id: `${s.platform}-${r.id}`, platform: s.platform,
+ rating: typeof r.rating === 'number' ? r.rating : null, author: r.author_mask || r.author_name || '익명',
+ date: r.posted_at || r.collected_at || '', text: r.content || '', replied: !!r.has_reply })
+ succeeded.push(s.platform)
+ } catch { failed.push(s.platform) }
+ }))
+ if (failed.length) setFeedError(`${failed.map(p => PLATFORM_META[p].label).join(' · ')} 리뷰를 확인하지 못했어요. 이전에 불러온 리뷰가 있으면 유지했어요. 다시 시도해주세요.`)
+ if (succeeded.length || targets.length === 0) setFeed(previous => {
+ const next = [...previous.filter(r => failed.includes(r.platform)), ...all]
+ return next.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
  })
- }
- } catch (_) {}
- })
- )
-
- all.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
- setFeed(all)
  setLoadingFeed(false)
  }, [stats])
-
- // stats 로드 완료 후 피드 자동 로드
  useEffect(() => {
- if (!loadingStats && stats.some(s => s.connected || s.reviewCount > 0)) {
- loadFeed()
- }
- }, [loadingStats]) // eslint-disable-line
+ if (statsReady && !loadingStats && !statsError) void loadFeed()
+ }, [statsReady, loadingStats, statsError, loadFeed])
 
  const activeCount = stats.filter(s => s.connected || s.reviewCount > 0).length
  const totalReviews = stats.reduce((a, s) => a + s.reviewCount, 0)
@@ -247,21 +226,28 @@ export default function ReviewAdminHub() {
  {/* ─── 플랫폼 자가점검 상태 ─── */}
  <PlatformHealthStatus />
 
+ <div className="mb-5 flex flex-wrap items-center gap-3">
+ <button type="button" onClick={loadStats} disabled={loadingStats} className="min-h-[44px] rounded-xl border border-[#E5E8EB] bg-white px-4 text-sm font-semibold disabled:opacity-50">{loadingStats ? '연결 확인 중' : '연결 상태 다시 확인'}</button>
+ {loginRequired && <Link href="/login?next=/review-admin" className="min-h-[44px] py-3 text-sm font-semibold underline">로그인하기</Link>}
+ </div>
+ {statsError && <p role="alert" className="mb-5 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">{statsError}{statsReady && ' 마지막으로 확인한 통계를 표시하고 있어요.'}</p>}
+ {feedError && <p role="alert" className="mb-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900">{feedError}</p>}
+ {statsReady && statsError && <p role="status" className="mb-3 text-sm text-[#4E5968]">현재 연결 상태와 다를 수 있어요.</p>}
  {/* ─── 요약 통계 ─── */}
  <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
  <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB]">
  <p className="text-[11px] md:text-xs text-[#8B95A1] font-medium mb-1">활성 플랫폼</p>
  <p className="text-xl md:text-2xl font-black text-[#191F28]">
- {activeCount}<span className="text-sm text-[#8B95A1] font-medium">/{ALL_PLATFORMS.length}</span>
+ {statsReady ? activeCount : '확인 전'}<span className="text-sm text-[#8B95A1] font-medium">/{ALL_PLATFORMS.length}</span>
  </p>
  </div>
  <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB]">
  <p className="text-[11px] md:text-xs text-[#8B95A1] font-medium mb-1">전체 리뷰</p>
- <p className="text-xl md:text-2xl font-black text-[#191F28]">{totalReviews}</p>
+ <p className="text-xl md:text-2xl font-black text-[#191F28]">{statsReady ? totalReviews : '확인 전'}</p>
  </div>
  <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB]">
  <p className="text-[11px] md:text-xs text-[#8B95A1] font-medium mb-1">미답변</p>
- <p className="text-xl md:text-2xl font-black text-[#F59E0B]">{totalUnreplied}</p>
+ <p className="text-xl md:text-2xl font-black text-[#F59E0B]">{statsReady ? totalUnreplied : '확인 전'}</p>
  </div>
  </div>
 
@@ -286,7 +272,7 @@ export default function ReviewAdminHub() {
  <p className="text-sm font-bold text-[#191F28]">{meta.label}</p>
  {loadingStats ? (
  <p className="text-[10px] text-[#8B95A1]">확인 중...</p>
- ) : stat.connected ? (
+ ) : !statsReady ? (<p className="text-[10px] text-[#8B95A1]">연결 확인 필요</p>) : stat.connected ? (
  <p className="text-[10px] text-[#10B981] font-semibold flex items-center gap-1">
  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />연결됨
  </p>
@@ -330,7 +316,7 @@ export default function ReviewAdminHub() {
  ) : (
  <>
  <p className="text-xs text-[#8B95A1] mb-3 leading-relaxed">
- 아직 연결되지 않았습니다.<br/>연동하면 리뷰가 자동 수집됩니다.
+ {statsReady ? '연결 정보가 없어요. 플랫폼별 관리에서 연결 상태를 확인해주세요.' : '연결 정보를 확인한 뒤 이용해주세요.'}
  </p>
  <div className="mt-auto flex flex-col gap-1.5">
  <Link href={meta.detailPath}
@@ -385,13 +371,15 @@ export default function ReviewAdminHub() {
  )}
 
  {/* 피드 본문 */}
- {activeCount === 0 ? (
+ {!statsReady ? (
+ <div role="status" className="rounded-2xl border border-[#E5E8EB] bg-white p-8 text-sm text-[#4E5968]">{loadingStats ? '플랫폼 연결 상태를 확인하고 있어요.' : '연결 상태를 확인하지 못했어요. 위에서 로그인하거나 다시 확인해주세요.'}</div>
+ ) : activeCount === 0 ? (
  <div className="bg-white rounded-2xl border border-[#E5E8EB] p-8 md:p-12 text-center">
  <div className="w-14 h-14 rounded-2xl bg-[#F2F4F6] flex items-center justify-center mx-auto mb-3">
  <Inbox size={26} className="text-[#8B95A1]" strokeWidth={2} />
  </div>
  <p className="text-sm font-bold text-[#191F28] mb-1">아직 수집된 리뷰가 없어요</p>
- <p className="text-xs text-[#8B95A1] mb-4">각 플랫폼 페이지에서 시드 데이터를 심거나 플랫폼을 연결해주세요.</p>
+ <p className="text-xs text-[#8B95A1] mb-4">각 플랫폼 관리 화면에서 연결 상태를 확인해주세요.</p>
  </div>
  ) : loadingFeed ? (
  <div className="bg-white rounded-2xl border border-[#E5E8EB] p-12 text-center text-sm text-[#8B95A1]">

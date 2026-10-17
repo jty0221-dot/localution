@@ -1,16 +1,6 @@
 // app/components/ui/IconBadge.tsx
-// ============================================================
-// 그라데이션 아이콘 배지 — CLAUDE.md 가 지정한 표준 패턴의 단일 구현
-//
-// 배경:
-//   `w-9 h-9 rounded-xl bg-gradient-to-br from-X to-Y shadow-sm` 조합이
-//   레포 78곳에 복붙되어 있었다. 크기·라운드·아이콘 굵기가 조금씩 달라
-//   화면마다 톤이 어긋나 보이는 주된 원인이었다.
-//
-// 사용:
-//   <IconBadge icon={Trophy} tone="primary" />
-//   <IconBadge icon={Store} tone="success" size="lg" />
-// ============================================================
+// 단색 상태 아이콘 배지. 청록 업무 보드의 의미 색상과 작은 아이콘 크기를 공유한다.
+// 기존 tone/size/ring props는 유지하며 장식 그라데이션을 사용하지 않는다.
 import type { LucideIcon } from 'lucide-react'
 
 export type IconBadgeTone =
@@ -24,18 +14,18 @@ export type IconBadgeTone =
 export type IconBadgeSize = 'sm' | 'md' | 'lg'
 
 const TONE_CLASS: Record<IconBadgeTone, string> = {
-  primary: 'bg-gradient-to-br from-[#3182F6] to-[#1B64DA] ring-[#3182F6]/20',
-  accent: 'bg-gradient-to-br from-[#8B5CF6] to-[#6D28D9] ring-[#8B5CF6]/20',
-  success: 'bg-gradient-to-br from-[#12B76A] to-[#059669] ring-[#12B76A]/20',
-  warn: 'bg-gradient-to-br from-[#F59E0B] to-[#D97706] ring-[#F59E0B]/20',
-  danger: 'bg-gradient-to-br from-[#F04452] to-[#DC2626] ring-[#F04452]/20',
-  neutral: 'bg-gradient-to-br from-[#8B95A1] to-[#6B7280] ring-[#8B95A1]/20',
+ primary: 'bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] ring-[var(--lu-line)]',
+ accent: 'bg-[#EEEBF5] text-[#65547D] ring-[#DAD3E4]',
+ success: 'bg-[var(--lu-success-soft)] text-[var(--lu-success)] ring-[var(--lu-line)]',
+ warn: 'bg-[var(--lu-warning-soft)] text-[var(--lu-warning)] ring-[var(--lu-line)]',
+ danger: 'bg-[var(--lu-danger-soft)] text-[var(--lu-danger)] ring-[var(--lu-line)]',
+ neutral: 'bg-[var(--lu-canvas)] text-[var(--lu-muted)] ring-[var(--lu-line)]',
 }
 
 const SIZE_CLASS: Record<IconBadgeSize, { box: string; icon: number }> = {
   sm: { box: 'w-7 h-7 rounded-lg', icon: 13 },
-  md: { box: 'w-9 h-9 rounded-xl', icon: 16 },
-  lg: { box: 'w-11 h-11 rounded-xl', icon: 19 },
+  md: { box: 'w-8 h-8 rounded-md', icon: 16 },
+  lg: { box: 'w-10 h-10 rounded-md', icon: 19 },
 }
 
 export default function IconBadge({
@@ -58,14 +48,14 @@ export default function IconBadge({
       className={[
         s.box,
         TONE_CLASS[tone],
-        'flex items-center justify-center flex-shrink-0 shadow-sm',
-        ring ? 'ring-4' : '',
+        'flex items-center justify-center flex-shrink-0 shadow-none',
+        ring ? 'ring-1' : '',
         className,
       ]
         .filter(Boolean)
         .join(' ')}
     >
-      <Icon size={s.icon} className="text-white" strokeWidth={2.5} />
+      <Icon size={s.icon} className="text-current" strokeWidth={1.8} />
     </div>
   )
 }

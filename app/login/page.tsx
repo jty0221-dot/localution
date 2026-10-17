@@ -177,7 +177,7 @@ export default function LoginPage() {
  @keyframes particleFloat { 0% { opacity:0; transform: translateY(100vh) translateX(0); } 10% { opacity:0.6; } 90% { opacity:0.6; } 100% { opacity:0; transform: translateY(-100vh) translateX(80px); } }
  @keyframes glowPulse { 0%,100% { box-shadow: 0 0 20px rgba(59,130,246,0.1); } 50% { box-shadow: 0 0 40px rgba(59,130,246,0.2); } }
 
- body, html { margin:0; padding:0; background:#060D1A; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; overflow-x:hidden; }
+ body, html { margin:0; padding:0; background:#060D1A; font-family: var(--lu-font); overflow-x:hidden; }
  /* 데스크톱: 풀스크린 고정 / 모바일: 자연 스크롤 허용 (loginCard 가 길어도 안 잘림) */
  .loginContainer { position:fixed; top:0; left:0; width:100%; height:100%; background: linear-gradient(135deg, #060D1A 0%, #0f1e3c 50%, #060D1A 100%); background-size: 200% 200%; animation: orbitGrad 15s ease infinite; display:flex; align-items:center; justify-content:center; overflow:hidden; }
  @media (max-width: 1100px) {
@@ -323,6 +323,34 @@ export default function LoginPage() {
  .brandName { font-size:20px; }
  .loginTitle { font-size:20px; margin-bottom:22px; }
  }
+
+ /* Calm workspace login. Provider button identities and authentication handlers are unchanged. */
+ body, html { background: var(--lu-canvas); }
+ .loginContainer { background:var(--lu-canvas); animation:none; }
+ .particles { display:none; }
+ .mainWrap { max-width:1152px; }
+ .heroTitle, .statNum, .brandName, .loginTitle, .mobileTopBar .brandText, .liveStatCard .liveStatValue { color:var(--lu-ink); font-weight:700; }
+ .heroHighlight, .trustText strong, .consentMsg a { color:var(--lu-accent); }
+ .heroSub, .graphLabel, .statLabel, .trustText, .tagline, .footer, .footerLinks a, .accountSwitch span { color:var(--lu-muted); }
+ .graphCard, .statCard, .loginCard { background:var(--lu-surface); border:1px solid var(--lu-line); border-radius:10px; box-shadow:none; animation:none; transform:none; }
+ .loginCard { backdrop-filter:none; padding:36px 28px; }
+ .growthScene { animation:none; }
+ .logoImg { filter:none; }
+ .sBtn { border-radius:6px; min-height:48px; transition:background-color 150ms,border-color 150ms; }
+ .sBtn:hover, .sBtn:active { transform:none; box-shadow:none; }
+ .accountSwitch, .consentMsg { border:1px solid var(--lu-line); background:var(--lu-canvas); border-radius:6px; color:var(--lu-muted); }
+ .accountSwitch input { accent-color:var(--lu-accent); }
+ .mobileTopBar { background:var(--lu-surface); border-bottom:1px solid var(--lu-line); backdrop-filter:none; }
+ .liveStatCard { background:var(--lu-surface); border-color:var(--lu-line); }
+ .liveStatCard .liveStatValue, .graphBadge svg, .mobileTopBar .liveDot { animation:none; }
+ .graphBadge, .statChange { color:var(--lu-success); }
+ .graphBadge { background:var(--lu-success-soft); }
+ .mobileTopBar .brandTagline, .barLabel, .liveStatCard .liveStatLabel { color:var(--lu-muted); }
+ .mobileTopBar .liveBadge, .liveStatCard .liveStatChange { color:var(--lu-success); }
+ .liveStatCard.featured .liveStatValue { color:var(--lu-ink); }
+ .errMsg { background:var(--lu-danger-soft); border-color:var(--lu-danger); color:var(--lu-danger); border-radius:6px; }
+ .footerLinks a:hover { color:var(--lu-accent); }
+ @media(prefers-reduced-motion:reduce) { .bar,.statCard,.loginCard,.growthScene {animation:none;} }
  `}</style>
 
  {/* 모바일 상단 브랜드 바 (1100px 이하 노출) · 실제 로고 + 실시간 통계 카드 3종 */}
@@ -492,7 +520,7 @@ export default function LoginPage() {
 
  <h1 className='loginTitle'>{isSignup ? '무료 시작하기' : '로그인'}</h1>
  {isSignup && (
- <p style={{ textAlign: 'center', color: '#8B95A1', fontSize: 13, marginTop: -8, marginBottom: 16 }}>
+ <p style={{ textAlign: 'center', color: 'var(--lu-muted)', fontSize: 13, marginTop: -8, marginBottom: 16 }}>
  카카오·네이버·구글 계정으로 1분만에 가입 → 바로 시작
  </p>
  )}

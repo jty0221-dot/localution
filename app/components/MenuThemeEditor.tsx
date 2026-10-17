@@ -135,10 +135,10 @@ export default function MenuThemeEditor({ storeSlug }: { storeSlug?: string | nu
  <span className="text-[9px] tracking-[0.4em] font-bold" style={{ color: effective.accent_color }}>MENU</span>
  <span className="w-8 h-[1px]" style={{ background: effective.text_muted, opacity: 0.4 }} />
  </div>
- <p className="text-lg font-black" style={{ color: effective.text_color, fontFamily: 'serif' }}>우리 매장</p>
+ <p className="text-lg font-black" style={{ color: effective.text_color, fontFamily: 'var(--lu-font)' }}>우리 매장</p>
  <p className="text-[10px] italic mt-0.5" style={{ color: effective.text_muted }}>오늘도 정성껏 준비했습니다</p>
  </div>
- <div className="p-4 space-y-3" style={{ fontFamily: 'serif' }}>
+ <div className="p-4 space-y-3" style={{ fontFamily: 'var(--lu-font)' }}>
  <div className="flex items-baseline gap-2">
  <span className="font-bold text-sm" style={{ color: effective.text_color }}>샘플 메뉴 1</span>
  <span className="flex-1 border-b border-dotted mx-1" style={{ borderColor: effective.text_muted, opacity: 0.5 }} />

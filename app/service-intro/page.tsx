@@ -72,32 +72,32 @@ function QrScanSvg() {
  <div className="relative w-24 h-24 flex-shrink-0">
  <svg width="96" height="96" viewBox="0 0 96 96" fill="none">
  {/* 좌상 코너 박스 */}
- <rect x="6" y="6" width="30" height="30" rx="4" stroke="#191F28" strokeWidth="3.5" fill="none"/>
- <rect x="13" y="13" width="16" height="16" rx="2" fill="#191F28"/>
+ <rect x="6" y="6" width="30" height="30" rx="4" stroke="var(--lu-ink)" strokeWidth="3.5" fill="none"/>
+ <rect x="13" y="13" width="16" height="16" rx="2" fill="var(--lu-ink)"/>
  {/* 우상 코너 박스 */}
- <rect x="60" y="6" width="30" height="30" rx="4" stroke="#191F28" strokeWidth="3.5" fill="none"/>
- <rect x="67" y="13" width="16" height="16" rx="2" fill="#191F28"/>
+ <rect x="60" y="6" width="30" height="30" rx="4" stroke="var(--lu-ink)" strokeWidth="3.5" fill="none"/>
+ <rect x="67" y="13" width="16" height="16" rx="2" fill="var(--lu-ink)"/>
  {/* 좌하 코너 박스 */}
- <rect x="6" y="60" width="30" height="30" rx="4" stroke="#191F28" strokeWidth="3.5" fill="none"/>
- <rect x="13" y="67" width="16" height="16" rx="2" fill="#191F28"/>
+ <rect x="6" y="60" width="30" height="30" rx="4" stroke="var(--lu-ink)" strokeWidth="3.5" fill="none"/>
+ <rect x="13" y="67" width="16" height="16" rx="2" fill="var(--lu-ink)"/>
  {/* 데이터 셀들 */}
- <rect x="44" y="6" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="44" y="18" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="6" y="44" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="18" y="44" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="44" y="44" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="56" y="44" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="68" y="44" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="82" y="6" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="82" y="18" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="82" y="30" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="44" y="56" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="68" y="56" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="56" y="68" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="44" y="80" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="68" y="80" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="82" y="68" width="8" height="8" rx="1.5" fill="#191F28"/>
- <rect x="82" y="80" width="8" height="8" rx="1.5" fill="#191F28"/>
+ <rect x="44" y="6" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="44" y="18" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="6" y="44" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="18" y="44" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="44" y="44" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="56" y="44" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="68" y="44" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="82" y="6" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="82" y="18" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="82" y="30" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="44" y="56" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="68" y="56" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="56" y="68" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="44" y="80" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="68" y="80" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="82" y="68" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
+ <rect x="82" y="80" width="8" height="8" rx="1.5" fill="var(--lu-ink)"/>
  </svg>
  {/* 스캔 레이저 빔 */}
  <div
@@ -189,7 +189,7 @@ const PLATFORMS = [
 
 const TONES = [
  { key: 'friendly', title: '따뜻한', color: '#F59E0B' },
- { key: 'expert', title: '전문적', color: '#1B64DA' },
+ { key: 'expert', title: '전문적', color: 'var(--lu-accent-hover)' },
  { key: 'witty', title: '유쾌한', color: '#8B5CF6' },
  { key: 'simple', title: '심플', color: '#10B981' },
  { key: 'emo', title: '감성적', color: '#EC4899' },
@@ -249,7 +249,7 @@ const MORE_FEATURE_GROUPS = [
  {
  category: '준비중',
  color: '#B0B8C1',
- bg: '#F8F9FA',
+ bg: 'var(--lu-canvas)',
  badge: true,
  items: [
  { icon: <Zap size={20} strokeWidth={2} />, title: '매출·정산 자동화', desc: '배달앱·카드 매출 자동 집계. 월별 정산 리포트 자동 생성.' },
@@ -264,8 +264,8 @@ function Stars({ n }: { n: number }) {
  <span className="inline-flex items-center gap-0.5">
  {Array.from({ length: 5 }).map((_, i) => (
  <Star key={i} size={13} strokeWidth={0}
- fill={i < n ? '#F59E0B' : '#E5E8EB'}
- className={i < n ? 'text-[#F59E0B]' : 'text-[#E5E8EB]'} />
+ fill={i < n ? '#F59E0B' : 'var(--lu-line)'}
+ className={i < n ? 'text-[#F59E0B]' : 'text-[var(--lu-line)]'} />
  ))}
  </span>
  )
@@ -329,7 +329,7 @@ function QrDemo() {
  <span className={`text-[9px] mt-1 font-medium whitespace-nowrap ${step >= i ? 'text-[#059669]' : 'text-[#B0B8C1]'}`}>{label}</span>
  </div>
  {i < steps.length - 1 && (
- <div className={`h-0.5 flex-1 mb-3.5 mx-0.5 transition-all ${step > i ? 'bg-[#059669]' : 'bg-[#E5E8EB]'}`} />
+ <div className={`h-0.5 flex-1 mb-3.5 mx-0.5 transition-all ${step > i ? 'bg-[#059669]' : 'bg-[var(--lu-line)]'}`} />
  )}
  </div>
  ))}
@@ -337,23 +337,23 @@ function QrDemo() {
 
  {/* Step 0 — QR 스캔 */}
  {step === 0 && (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-6 flex flex-col items-center text-center">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-6 flex flex-col items-center text-center">
  <div className="mb-4">
  <QrScanSvg />
  </div>
- <p className="text-base font-black text-[#191F28] mb-1 break-keep">테이블 위 QR 코드 한 번이면</p>
- <p className="text-sm text-[#8B95A1] mb-5 break-keep leading-relaxed">
+ <p className="text-base font-black text-[var(--lu-ink)] mb-1 break-keep">테이블 위 QR 코드 한 번이면</p>
+ <p className="text-sm text-[var(--lu-muted)] mb-5 break-keep leading-relaxed">
  앱 설치 없이 고객 리뷰를 유도하고<br/>AI가 자동으로 완성해 플랫폼에 올립니다
  </p>
- <div className="flex items-center gap-3 text-[11px] text-[#4E5968] bg-[#F8F9FA] rounded-xl px-4 py-2.5 mb-5 flex-wrap justify-center">
+ <div className="flex items-center gap-3 text-[11px] text-[var(--lu-muted)] bg-[var(--lu-canvas)] rounded-[6px] px-4 py-2.5 mb-5 flex-wrap justify-center">
  <span><Check size={13} strokeWidth={3} className="text-[#059669] inline -mt-0.5 mr-1" />앱 설치 불필요</span>
- <span className="text-[#E5E8EB]">|</span>
+ <span className="text-[var(--lu-line)]">|</span>
  <span><Check size={13} strokeWidth={3} className="text-[#059669] inline -mt-0.5 mr-1" />배치 비용 0원</span>
- <span className="text-[#E5E8EB]">|</span>
+ <span className="text-[var(--lu-line)]">|</span>
  <span><Check size={13} strokeWidth={3} className="text-[#059669] inline -mt-0.5 mr-1" />즉시 사용</span>
  </div>
  <button onClick={() => setStep(1)}
- className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#059669] text-white font-bold rounded-xl hover:bg-[#047857] transition-colors text-sm">
+ className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 py-3 bg-[#059669] text-white font-bold rounded-[6px] hover:bg-[#047857] transition-colors text-sm">
  고객 화면 직접 체험하기 <ArrowRight size={15} strokeWidth={2.5} />
  </button>
  </div>
@@ -361,27 +361,27 @@ function QrDemo() {
 
  {/* Step 1 — 키워드 선택 */}
  {step === 1 && (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] overflow-hidden">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] overflow-hidden">
  <div className="px-5 py-4" style={{ background: 'linear-gradient(135deg,#059669,#10B981)' }}>
  <p className="text-white font-black text-sm">타이백스트릿 해운대점</p>
  <p className="text-white/75 text-xs mt-0.5">오늘 방문 경험을 알려주세요</p>
  </div>
  <div className="p-5">
- <p className="text-sm font-bold text-[#191F28] mb-3 break-keep">어떤 점이 좋으셨나요? <span className="text-[#8B95A1] font-normal">(복수 선택 가능)</span></p>
+ <p className="text-sm font-bold text-[var(--lu-ink)] mb-3 break-keep">어떤 점이 좋으셨나요? <span className="text-[var(--lu-muted)] font-normal">(복수 선택 가능)</span></p>
  <div className="flex flex-wrap gap-2 mb-5">
  {QR_KEYWORDS.map(kw => (
  <button key={kw} onClick={() => toggle(kw)}
  className={`px-3 py-1.5 rounded-full text-xs font-bold border-2 transition-all ${
  selected.includes(kw)
  ? 'bg-[#059669] border-[#059669] text-white'
- : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:border-[#059669]'
+ : 'bg-white border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[#059669]'
  }`}>
  {kw}
  </button>
  ))}
  </div>
  <button onClick={handleGenerate} disabled={selected.length === 0}
- className="w-full py-3 bg-[#059669] text-white font-bold rounded-xl hover:bg-[#047857] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm break-keep">
+ className="w-full py-3 bg-[#059669] text-white font-bold rounded-[6px] hover:bg-[#047857] disabled:opacity-40 disabled:cursor-not-allowed transition-colors text-sm break-keep">
  {selected.length === 0 ? '키워드를 선택해 주세요' : `AI 리뷰 만들어줘 (${selected.length}개 선택)`}
  </button>
  </div>
@@ -390,12 +390,12 @@ function QrDemo() {
 
  {/* Step 2 — AI 생성 */}
  {step === 2 && (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5">
  {generating ? (
  <div className="flex flex-col items-center py-10 gap-3">
  <Loader2 size={34} strokeWidth={2} className="text-[#059669] animate-spin" />
- <p className="text-sm font-bold text-[#191F28] break-keep">AI가 리뷰를 작성하고 있어요...</p>
- <p className="text-xs text-[#8B95A1]">선택한 키워드로 자연스러운 리뷰 생성 중</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)] break-keep">AI가 리뷰를 작성하고 있어요...</p>
+ <p className="text-xs text-[var(--lu-muted)]">선택한 키워드로 자연스러운 리뷰 생성 중</p>
  </div>
  ) : (
  <>
@@ -406,17 +406,17 @@ function QrDemo() {
  <p className="text-xs font-black text-[#059669]">AI 생성 완료 · 직접 수정도 가능해요</p>
  </div>
  <textarea defaultValue={aiText} rows={4}
- className="w-full border border-[#6EE7B7] rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#059669] resize-none bg-[#F0FDF4] leading-relaxed mb-4" />
- <p className="text-xs text-[#8B95A1] mb-3 break-keep">어느 플랫폼에 올릴까요?</p>
+ className="w-full border border-[#6EE7B7] rounded-[6px] px-3 py-2.5 text-sm outline-none focus:border-[#059669] resize-none bg-[#F0FDF4] leading-relaxed mb-4" />
+ <p className="text-xs text-[var(--lu-muted)] mb-3 break-keep">어느 플랫폼에 올릴까요?</p>
  <div className="grid grid-cols-3 gap-2">
  {['naver','google','coupang'].map(pk => {
  const p = PLATFORMS.find(x => x.key === pk)!
  return (
  <button key={pk} onClick={handlePost}
- className="flex flex-col items-center gap-1.5 py-3 rounded-xl border-2 border-[#E5E8EB] hover:border-[#059669] transition-colors bg-white">
+ className="flex flex-col items-center gap-1.5 py-3 rounded-[6px] border-2 border-[var(--lu-line)] hover:border-[#059669] transition-colors bg-white">
  <span className="inline-flex items-center justify-center w-7 h-7 rounded-lg text-xs font-black"
  style={{ background: p.bg, color: p.text }}>{p.letter}</span>
- <span className="text-[10px] font-bold text-[#4E5968]">{p.label}</span>
+ <span className="text-[10px] font-bold text-[var(--lu-muted)]">{p.label}</span>
  </button>
  )
  })}
@@ -428,23 +428,23 @@ function QrDemo() {
 
  {/* Step 3 — 게시 완료 */}
  {step === 3 && (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-6 flex flex-col items-center text-center">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-6 flex flex-col items-center text-center">
  <div className="mb-3">
  <AnimatedCheck />
  </div>
- <p className="text-base font-black text-[#191F28] mb-1">리뷰 등록 완료!</p>
- <p className="text-xs text-[#8B95A1] mb-5 break-keep leading-relaxed">
+ <p className="text-base font-black text-[var(--lu-ink)] mb-1">리뷰 등록 완료!</p>
+ <p className="text-xs text-[var(--lu-muted)] mb-5 break-keep leading-relaxed">
  고객이 직접 쓴 것처럼 자연스러운 리뷰가<br/>네이버 플레이스에 게시됐습니다
  </p>
- <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-4 mb-5 text-left w-full">
+ <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[6px] p-4 mb-5 text-left w-full">
  <p className="text-[10px] font-bold text-[#059669] mb-1.5">게시된 리뷰</p>
- <p className="text-xs text-[#4E5968] leading-relaxed break-keep">{QR_AI_REVIEW.slice(0, 70)}...</p>
+ <p className="text-xs text-[var(--lu-muted)] leading-relaxed break-keep">{QR_AI_REVIEW.slice(0, 70)}...</p>
  </div>
  <div className="grid grid-cols-3 gap-2 w-full mb-5">
  {[['리뷰 1건','방금 등록'],['별점 5점','AI 최적화'],['소요시간','약 1분']].map(([v,l]) => (
- <div key={l} className="bg-[#F8F9FA] rounded-xl p-2.5 text-center">
- <p className="text-xs font-black text-[#191F28]">{v}</p>
- <p className="text-[9px] text-[#8B95A1] mt-0.5">{l}</p>
+ <div key={l} className="bg-[var(--lu-canvas)] rounded-[6px] p-2.5 text-center">
+ <p className="text-xs font-black text-[var(--lu-ink)]">{v}</p>
+ <p className="text-[9px] text-[var(--lu-muted)] mt-0.5">{l}</p>
  </div>
  ))}
  </div>
@@ -498,24 +498,24 @@ function ReviewDemo() {
  return (
  <div className="space-y-4">
  {/* 설정 */}
- <div className="bg-[#F8F9FA] rounded-2xl p-4 space-y-3">
+ <div className="bg-[var(--lu-canvas)] rounded-[10px] p-4 space-y-3">
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
  {[['매장명', storeName, setStoreName], ['지역', region, setRegion], ['업종', bizType, setBizType]].map(([label, val, fn]) => (
  <div key={label as string}>
- <label className="text-[10px] font-bold text-[#8B95A1] block mb-1">{label as string}</label>
+ <label className="text-[10px] font-bold text-[var(--lu-muted)] block mb-1">{label as string}</label>
  <input value={val as string} onChange={e => (fn as (v: string) => void)(e.target.value)}
- className="w-full border border-[#E5E8EB] rounded-lg px-3 py-2 text-sm outline-none focus:border-[#3182F6] bg-white" />
+ className="w-full border border-[var(--lu-line)] rounded-lg px-3 py-2 text-sm outline-none focus:border-[var(--lu-accent)] bg-white" />
  </div>
  ))}
  </div>
  {/* 톤 */}
  <div>
- <p className="text-[10px] font-bold text-[#8B95A1] mb-1.5">답글 톤</p>
+ <p className="text-[10px] font-bold text-[var(--lu-muted)] mb-1.5">답글 톤</p>
  <div className="flex gap-1.5 flex-wrap">
  {TONES.map(t => (
  <button key={t.key} onClick={() => setTone(t.key)}
  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${
- tone === t.key ? 'text-white border-transparent' : 'border-[#E5E8EB] bg-white text-[#4E5968] hover:border-[#3182F6]'
+ tone === t.key ? 'text-white border-transparent' : 'border-[var(--lu-line)] bg-white text-[var(--lu-muted)] hover:border-[var(--lu-accent)]'
  }`}
  style={tone === t.key ? { background: t.color, borderColor: t.color } : {}}>
  {t.title}
@@ -526,23 +526,23 @@ function ReviewDemo() {
  {/* 고객 프로필 */}
  <div className="flex gap-4 flex-wrap">
  <div>
- <p className="text-[10px] font-bold text-[#8B95A1] mb-1.5">성별</p>
+ <p className="text-[10px] font-bold text-[var(--lu-muted)] mb-1.5">성별</p>
  <div className="flex gap-1.5">
  {GENDERS.map(g => (
  <button key={g.key} onClick={() => setGender(g.key)}
  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${
- gender === g.key ? 'bg-[#3182F6] border-[#3182F6] text-white' : 'border-[#E5E8EB] bg-white text-[#4E5968]'
+ gender === g.key ? 'bg-[var(--lu-accent)] border-[var(--lu-accent)] text-white' : 'border-[var(--lu-line)] bg-white text-[var(--lu-muted)]'
  }`}>{g.label}</button>
  ))}
  </div>
  </div>
  <div>
- <p className="text-[10px] font-bold text-[#8B95A1] mb-1.5">연령대</p>
+ <p className="text-[10px] font-bold text-[var(--lu-muted)] mb-1.5">연령대</p>
  <div className="flex gap-1.5 flex-wrap">
  {AGES.map(a => (
  <button key={a} onClick={() => setAge(a)}
  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all ${
- age === a ? 'bg-[#3182F6] border-[#3182F6] text-white' : 'border-[#E5E8EB] bg-white text-[#4E5968]'
+ age === a ? 'bg-[var(--lu-accent)] border-[var(--lu-accent)] text-white' : 'border-[var(--lu-line)] bg-white text-[var(--lu-muted)]'
  }`}>{a}</button>
  ))}
  </div>
@@ -552,23 +552,23 @@ function ReviewDemo() {
 
  {/* 리뷰 카드 */}
  {SAMPLE_REVIEWS.map(r => (
- <div key={r.id} className={`rounded-2xl border-2 overflow-hidden transition-all bg-white ${
- selected === r.id ? 'border-[#3182F6]' : 'border-[#E5E8EB]'
+ <div key={r.id} className={`rounded-[10px] border-2 overflow-hidden transition-all bg-white ${
+ selected === r.id ? 'border-[var(--lu-accent)]' : 'border-[var(--lu-line)]'
  }`}>
  <div className="p-4">
  <div className="flex items-center gap-2 mb-2 flex-wrap">
- <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[#3182F6] to-[#8B5CF6] flex items-center justify-center text-white text-[10px] font-black shrink-0">
+ <div className="w-7 h-7 rounded-full bg-gradient-to-br from-[var(--lu-accent)] to-[#8B5CF6] flex items-center justify-center text-white text-[10px] font-black shrink-0">
  {r.author[0]}
  </div>
- <span className="font-bold text-sm text-[#191F28]">{r.author}</span>
+ <span className="font-bold text-sm text-[var(--lu-ink)]">{r.author}</span>
  <PlatformBadge pKey={r.platform} />
  <Stars n={r.rating} />
  <span className="text-[10px] text-[#B0B8C1] ml-auto shrink-0">{r.date}</span>
  </div>
- <p className="text-sm text-[#4E5968] bg-[#F8F9FA] rounded-xl p-3 mb-3 leading-relaxed break-keep">{r.text}</p>
+ <p className="text-sm text-[var(--lu-muted)] bg-[var(--lu-canvas)] rounded-[6px] p-3 mb-3 leading-relaxed break-keep">{r.text}</p>
  {!aiReplies[r.id] && (
  <button onClick={() => generate(r.id, r.text)} disabled={loading[r.id]}
- className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[#3182F6] text-white text-sm font-bold rounded-xl hover:bg-[#1B64DA] disabled:opacity-50 transition-colors">
+ className="w-full sm:w-auto inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[var(--lu-accent)] text-white text-sm font-bold rounded-[6px] hover:bg-[var(--lu-accent-hover)] disabled:opacity-50 transition-colors">
  {loading[r.id]
  ? <><Loader2 size={13} strokeWidth={2.5} className="animate-spin" /> 생성 중...</>
  : <>AI 답글 생성 <ArrowRight size={13} strokeWidth={2.5} /></>}
@@ -576,17 +576,17 @@ function ReviewDemo() {
  )}
  </div>
  {aiReplies[r.id] && (
- <div className="border-t border-[#E5E8EB] bg-[#F0F9FF] p-4">
- <p className="text-[10px] font-black text-[#3182F6] mb-2"><Sparkles size={10} className="inline -mt-0.5 mr-1" />AI 생성 답글 · 수정 후 원클릭 게시</p>
+ <div className="border-t border-[var(--lu-line)] bg-[#F0F9FF] p-4">
+ <p className="text-[10px] font-black text-[var(--lu-accent)] mb-2"><Sparkles size={10} className="inline -mt-0.5 mr-1" />AI 생성 답글 · 수정 후 원클릭 게시</p>
  <textarea defaultValue={aiReplies[r.id]} rows={4}
- className="w-full border border-[#93C5FD] rounded-xl px-3 py-2.5 text-sm outline-none focus:border-[#3182F6] resize-none bg-white leading-relaxed" />
+ className="w-full border border-[#93C5FD] rounded-[6px] px-3 py-2.5 text-sm outline-none focus:border-[var(--lu-accent)] resize-none bg-white leading-relaxed" />
  <div className="flex gap-2 mt-3">
  <button onClick={() => generate(r.id, r.text)} disabled={loading[r.id] || postStatus[r.id] === 'posting'}
- className="flex-1 inline-flex items-center justify-center gap-1 text-sm px-3 py-2.5 border-2 border-[#3182F6] text-[#3182F6] rounded-xl hover:bg-[#EFF6FF] font-bold transition-colors disabled:opacity-50">
+ className="flex-1 inline-flex items-center justify-center gap-1 text-sm px-3 py-2.5 border-2 border-[var(--lu-accent)] text-[var(--lu-accent)] rounded-[6px] hover:bg-[#EFF6FF] font-bold transition-colors disabled:opacity-50">
  <RefreshCw size={13} strokeWidth={2.5} /> 재생성
  </button>
  <button onClick={() => post(r.id)} disabled={postStatus[r.id] === 'posting' || postStatus[r.id] === 'done'}
- className="flex-[2] inline-flex items-center justify-center gap-1 text-sm px-3 py-2.5 bg-[#3182F6] text-white rounded-xl hover:bg-[#1B64DA] font-bold disabled:opacity-70 transition-colors">
+ className="flex-[2] inline-flex items-center justify-center gap-1 text-sm px-3 py-2.5 bg-[var(--lu-accent)] text-white rounded-[6px] hover:bg-[var(--lu-accent-hover)] font-bold disabled:opacity-70 transition-colors">
  {postStatus[r.id] === 'posting' ? (
  <><Loader2 size={13} className="animate-spin" /> 게시 중...</>
  ) : postStatus[r.id] === 'done' ? (
@@ -613,11 +613,11 @@ function ReviewDemo() {
 // ── 메인 페이지 ───────────────────────────────────────────
 export default function ServiceIntro() {
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <style>{GLOBAL_STYLES}</style>
 
  {/* ── 히어로 ─────────────────────────────────────── */}
- <div style={{ background: 'linear-gradient(135deg,#1B3FD8 0%,#3182F6 100%)' }} className="text-white relative overflow-hidden">
+ <div style={{ background: 'linear-gradient(135deg,#1B3FD8 0%,var(--lu-accent) 100%)' }} className="text-white relative overflow-hidden">
  {/* SVG 배경 — 격자 dot pattern */}
  <svg className="absolute inset-0 w-full h-full pointer-events-none opacity-10" aria-hidden="true">
  <defs>
@@ -635,7 +635,7 @@ export default function ServiceIntro() {
  <div className="hidden lg:block absolute right-8 top-0 bottom-0 w-64 pointer-events-none">
  {FLOAT_CARDS.map((c, i) => (
  <div key={i}
- className="absolute bg-white/15 backdrop-blur-sm border border-white/25 rounded-2xl p-3 w-52"
+ className="absolute bg-white/15 backdrop-blur-sm border border-white/25 rounded-[10px] p-3 w-52"
  style={{
  top: `${18 + i * 30}%`,
  right: `${i * 12}px`,
@@ -720,8 +720,8 @@ export default function ServiceIntro() {
  <span className="absolute text-white text-sm font-black">1</span>
  </div>
  <div>
- <p className="text-sm sm:text-base font-black text-[#191F28] break-keep">QR 리뷰 수집 자동화</p>
- <p className="text-xs text-[#8B95A1] break-keep mt-0.5">고객 입장에서 QR 체험 흐름을 직접 눌러보세요. 키워드 선택 → AI 생성 → 플랫폼 등록까지 1분.</p>
+ <p className="text-sm sm:text-base font-black text-[var(--lu-ink)] break-keep">QR 리뷰 수집 자동화</p>
+ <p className="text-xs text-[var(--lu-muted)] break-keep mt-0.5">고객 입장에서 QR 체험 흐름을 직접 눌러보세요. 키워드 선택 → AI 생성 → 플랫폼 등록까지 1분.</p>
  </div>
  </div>
  <QrDemo />
@@ -733,22 +733,22 @@ export default function ServiceIntro() {
  <defs>
  <linearGradient id="line1" x1="0" y1="0" x2="0" y2="1">
  <stop offset="0%" stopColor="#059669" />
- <stop offset="100%" stopColor="#3182F6" />
+ <stop offset="100%" stopColor="var(--lu-accent)" />
  </linearGradient>
  </defs>
  <rect x="0" y="0" width="2" height="32" fill="url(#line1)" rx="1" />
  </svg>
- <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[#E5E8EB] shadow-sm">
+ <div className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white border border-[var(--lu-line)] shadow-none">
  <svg width="12" height="12" viewBox="0 0 12 12" aria-hidden="true">
- <circle cx="6" cy="6" r="5" fill="#EFF6FF" stroke="#3182F6" strokeWidth="1.5" />
- <circle cx="6" cy="6" r="2" fill="#3182F6" />
+ <circle cx="6" cy="6" r="5" fill="#EFF6FF" stroke="var(--lu-accent)" strokeWidth="1.5" />
+ <circle cx="6" cy="6" r="2" fill="var(--lu-accent)" />
  </svg>
- <span className="text-[10px] font-bold tracking-widest uppercase text-[#8B95A1]">수집된 리뷰에</span>
+ <span className="text-[10px] font-bold tracking-widest uppercase text-[var(--lu-muted)]">수집된 리뷰에</span>
  </div>
  <svg width="2" height="32" viewBox="0 0 2 32" aria-hidden="true">
  <defs>
  <linearGradient id="line2" x1="0" y1="0" x2="0" y2="1">
- <stop offset="0%" stopColor="#3182F6" />
+ <stop offset="0%" stopColor="var(--lu-accent)" />
  <stop offset="100%" stopColor="#1B3FD8" />
  </linearGradient>
  </defs>
@@ -765,14 +765,14 @@ export default function ServiceIntro() {
  <div className="flex items-center gap-3 mb-5">
  <div className="relative shrink-0 w-10 h-10 flex items-center justify-center">
  <svg width="40" height="40" viewBox="0 0 40 40" aria-hidden="true">
- <circle cx="20" cy="20" r="19" fill="#3182F6" />
+ <circle cx="20" cy="20" r="19" fill="var(--lu-accent)" />
  <circle cx="20" cy="20" r="15" fill="none" stroke="white" strokeWidth="1" strokeDasharray="4 3" strokeOpacity="0.4" />
  </svg>
  <span className="absolute text-white text-sm font-black">2</span>
  </div>
  <div>
- <p className="text-sm sm:text-base font-black text-[#191F28] break-keep">AI 리뷰 답글 자동 생성</p>
- <p className="text-xs text-[#8B95A1] break-keep mt-0.5">아래 리뷰 중 하나를 골라 [AI 답글 생성]을 눌러보세요. 3초 안에 답글이 완성됩니다.</p>
+ <p className="text-sm sm:text-base font-black text-[var(--lu-ink)] break-keep">AI 리뷰 답글 자동 생성</p>
+ <p className="text-xs text-[var(--lu-muted)] break-keep mt-0.5">아래 리뷰 중 하나를 골라 [AI 답글 생성]을 눌러보세요. 3초 안에 답글이 완성됩니다.</p>
  </div>
  </div>
  <ReviewDemo />
@@ -781,18 +781,18 @@ export default function ServiceIntro() {
  {/* ── 더 많은 기능 ────────────────────────────── */}
  <div className="mb-10 sm:mb-14">
  <div className="text-center mb-6 sm:mb-8">
- <div className="inline-block bg-[#EFF6FF] text-[#3182F6] text-[10px] sm:text-xs font-black px-3 sm:px-4 py-1.5 rounded-full mb-2 sm:mb-3 tracking-wide">
+ <div className="inline-block bg-[#EFF6FF] text-[var(--lu-accent)] text-[10px] sm:text-xs font-black px-3 sm:px-4 py-1.5 rounded-full mb-2 sm:mb-3 tracking-wide">
  이 외에도
  </div>
- <h2 className="text-lg sm:text-2xl md:text-3xl font-black text-[#191F28] mb-2 sm:mb-3 break-keep">
+ <h2 className="text-lg sm:text-2xl md:text-3xl font-black text-[var(--lu-ink)] mb-2 sm:mb-3 break-keep">
  사장님이 필요한 것,<br className="sm:hidden" /> 로컬루션에 다 있어요
  </h2>
- <p className="text-xs sm:text-sm text-[#8B95A1] max-w-sm sm:max-w-lg mx-auto break-keep leading-relaxed">
+ <p className="text-xs sm:text-sm text-[var(--lu-muted)] max-w-sm sm:max-w-lg mx-auto break-keep leading-relaxed">
  리뷰·마케팅부터 고객 관리, 정산까지<br className="sm:hidden" /> 하나의 플랫폼에서 모두 해결하세요.
  </p>
  </div>
 
- <p className="mb-5 text-center text-sm text-[#4E5968]">설명을 읽었다면 필요한 도구를 선택해 보세요.</p>
+ <p className="mb-5 text-center text-sm text-[var(--lu-muted)]">설명을 읽었다면 필요한 도구를 선택해 보세요.</p>
  <div className="space-y-6 sm:space-y-8 mb-6 sm:mb-8">
  {MORE_FEATURE_GROUPS.map(group => (
  <div key={group.category}>
@@ -808,21 +808,21 @@ export default function ServiceIntro() {
  const action = 'action' in f ? f.action : undefined
  const content = <>
  <div className="flex items-center gap-2.5 mb-3">
- <div className="w-9 h-9 rounded-xl shadow-sm ring-1 ring-black/5 flex items-center justify-center shrink-0"
+ <div className="w-9 h-9 rounded-[6px] shadow-none ring-1 ring-black/5 flex items-center justify-center shrink-0"
  style={{ background: `linear-gradient(135deg, ${group.color}, ${group.color}CC)`, color: '#fff' }}>
  {f.icon}
  </div>
  {group.badge && (
- <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#F2F4F6] text-[#8B95A1]">준비중</span>
+ <span className="text-[9px] font-black px-1.5 py-0.5 rounded-full bg-[#F2F4F6] text-[var(--lu-muted)]">준비중</span>
  )}
  </div>
- <p className="text-sm font-black text-[#191F28] mb-1 break-keep">{f.title}</p>
- <p className="text-xs text-[#8B95A1] leading-relaxed break-keep">{f.desc}</p>
+ <p className="text-sm font-black text-[var(--lu-ink)] mb-1 break-keep">{f.title}</p>
+ <p className="text-xs text-[var(--lu-muted)] leading-relaxed break-keep">{f.desc}</p>
 
- {action && <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-[#3182F6]">{action}<ArrowRight size={14} aria-hidden="true" /></p>}
+ {action && <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-[var(--lu-accent)]">{action}<ArrowRight size={14} aria-hidden="true" /></p>}
  </>
- const className = "block min-w-0 rounded-2xl border border-[#E5E8EB] bg-white p-4 shadow-sm transition-colors sm:p-5"
- return href ? <Link key={f.title} href={href} className={`${className} hover:border-[#3182F6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]`}>{content}</Link> : <div key={f.title} className={className}>{content}</div>
+ const className = "block min-w-0 rounded-[10px] border border-[var(--lu-line)] bg-white p-4 shadow-none transition-colors sm:p-5"
+ return href ? <Link key={f.title} href={href} className={`${className} hover:border-[var(--lu-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lu-accent)]`}>{content}</Link> : <div key={f.title} className={className}>{content}</div>
  })}
  </div>
  </div>
@@ -831,24 +831,24 @@ export default function ServiceIntro() {
 
  {/* ── 실사용자 피드백 기반 업데이트 ────────── */}
  <div className="mb-6 sm:mb-8">
- <div className="bg-white rounded-2xl border border-[#E5E8EB] overflow-hidden">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] overflow-hidden">
 
  {/* 헤더 */}
  <div className="px-5 sm:px-8 py-5 sm:py-6 border-b border-[#F2F4F6]">
- <div className="inline-flex items-center gap-1.5 bg-[#EFF6FF] text-[#3182F6] text-[10px] font-black px-3 py-1 rounded-full mb-3">
+ <div className="inline-flex items-center gap-1.5 bg-[#EFF6FF] text-[var(--lu-accent)] text-[10px] font-black px-3 py-1 rounded-full mb-3">
  <RefreshCw size={10} strokeWidth={2.5} /> 실사용자 기반 지속 업그레이드
  </div>
- <h3 className="text-base sm:text-lg font-black text-[#191F28] break-keep mb-1.5">
+ <h3 className="text-base sm:text-lg font-black text-[var(--lu-ink)] break-keep mb-1.5">
  고객의 목소리로 매일 더 나아지고 있어요
  </h3>
- <p className="text-xs sm:text-sm text-[#8B95A1] break-keep leading-relaxed max-w-xl">
+ <p className="text-xs sm:text-sm text-[var(--lu-muted)] break-keep leading-relaxed max-w-xl">
  자영업자·소상공인·블로거·프리랜서 등 실제로 쓰는 분들의 피드백을 직접 수용하고,
  매주 기능을 개선·추가하며 함께 만들어가고 있습니다.
  </p>
  </div>
 
  {/* 사용 중인 분들 */}
- <div className="px-5 sm:px-8 py-4 bg-[#F8F9FA] border-b border-[#F2F4F6]">
+ <div className="px-5 sm:px-8 py-4 bg-[var(--lu-canvas)] border-b border-[#F2F4F6]">
  <p className="text-[10px] font-bold text-[#B0B8C1] tracking-widest uppercase mb-2.5">지금 함께하고 있는 분들</p>
  <div className="flex flex-wrap gap-2">
  {([
@@ -862,8 +862,8 @@ export default function ServiceIntro() {
  { label: '학원·교습소', Icon: GraduationCap },
  ] as { label: string; Icon: LucideIcon }[]).map(u => (
  <span key={u.label}
- className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold bg-white border border-[#E5E8EB] text-[#4E5968]">
- <u.Icon size={11} strokeWidth={2.5} className="text-[#3182F6]" /> {u.label}
+ className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-full text-[11px] font-bold bg-white border border-[var(--lu-line)] text-[var(--lu-muted)]">
+ <u.Icon size={11} strokeWidth={2.5} className="text-[var(--lu-accent)]" /> {u.label}
  </span>
  ))}
  </div>
@@ -874,7 +874,7 @@ export default function ServiceIntro() {
  <p className="text-[10px] font-bold text-[#B0B8C1] tracking-widest uppercase mb-4">최근 반영된 피드백</p>
  <div className="space-y-4">
  {([
- { from: '마케팅 대행사', Icon: BarChart3, color: '#3182F6', bg: '#EFF6FF', date: '04.25', update: '키워드 실시간 순위 조회 + 대시보드 연동 · "클라이언트에게 바로 보여줄 수 있게 됐어요"' },
+ { from: '마케팅 대행사', Icon: BarChart3, color: 'var(--lu-accent)', bg: '#EFF6FF', date: '04.25', update: '키워드 실시간 순위 조회 + 대시보드 연동 · "클라이언트에게 바로 보여줄 수 있게 됐어요"' },
  { from: '음식점 사장님', Icon: UtensilsCrossed, color: '#EA580C', bg: '#FFF7ED', date: '04.22', update: 'QR 리뷰 4단계 흐름 간소화 및 모바일 최적화 · "고객이 헷갈려하지 않고 끝까지 써요"' },
  { from: '블로거', Icon: PenLine, color: '#059669', bg: '#ECFDF5', date: '04.18', update: '블로그 게시글 키워드 순위 추적 기능 신규 추가 · "내 글이 몇 위인지 바로 보여서 좋아요"' },
  { from: '소상공인', Icon: Store, color: '#F59E0B', bg: '#FFFBEB', date: '04.15', update: 'AI 답글 톤 MZ체 추가 · 감성적 어조 개선 · "우리 가게 분위기에 딱 맞아요"' },
@@ -891,7 +891,7 @@ export default function ServiceIntro() {
  style={{ background: item.bg, color: item.color }}>{item.from} 피드백</span>
  <span className="text-[10px] text-[#B0B8C1]">{item.date}</span>
  </div>
- <p className="text-xs text-[#4E5968] break-keep leading-relaxed">{item.update}</p>
+ <p className="text-xs text-[var(--lu-muted)] break-keep leading-relaxed">{item.update}</p>
  </div>
  <div className="w-5 h-5 rounded-full bg-[#ECFDF5] flex items-center justify-center shrink-0 mt-0.5">
  <Check size={10} strokeWidth={3} className="text-[#059669]" />
@@ -902,11 +902,11 @@ export default function ServiceIntro() {
 
  {/* 하단 */}
  <div className="mt-5 pt-4 border-t border-[#F2F4F6] flex items-center justify-between gap-3 flex-wrap">
- <p className="text-[11px] text-[#8B95A1] break-keep">
+ <p className="text-[11px] text-[var(--lu-muted)] break-keep">
  쓰면서 불편하신 점, 원하는 기능이 있으면 언제든 알려주세요. 다음 업데이트에 반영할게요.
  </p>
  <Link href="/inquiry"
- className="text-[11px] font-black text-[#3182F6] hover:underline shrink-0">
+ className="text-[11px] font-black text-[var(--lu-accent)] hover:underline shrink-0">
  피드백 남기기 →
  </Link>
  </div>
@@ -915,14 +915,14 @@ export default function ServiceIntro() {
  </div>
 
  {/* ── 5월 신규 업데이트 — 소상공인 입장 ── */}
- <div className="bg-white rounded-2xl p-5 sm:p-7 shadow-sm border border-[#E5E8EB] mb-8">
+ <div className="bg-white rounded-[10px] p-5 sm:p-7 shadow-none border border-[var(--lu-line)] mb-8">
  <div className="flex items-center gap-2 mb-1">
- <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center shadow-sm">
- <Sparkles size={14} className="text-white" strokeWidth={2.5} />
+ <div className="w-8 h-8 rounded-[6px] bg-gradient-to-br from-[#7C3AED] to-[#5B21B6] flex items-center justify-center shadow-none">
+ <Sparkles size={14} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
- <h2 className="text-base sm:text-lg font-black text-[#191F28]">2026년 5월 신규 추가 기능</h2>
+ <h2 className="text-base sm:text-lg font-black text-[var(--lu-ink)]">2026년 5월 신규 추가 기능</h2>
  </div>
- <p className="text-xs text-[#8B95A1] mb-4 ml-10 break-keep">사장님 피드백을 그대로 반영해서 매주 새 기능이 들어옵니다.</p>
+ <p className="text-xs text-[var(--lu-muted)] mb-4 ml-10 break-keep">사장님 피드백을 그대로 반영해서 매주 새 기능이 들어옵니다.</p>
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  {[
@@ -939,7 +939,7 @@ export default function ServiceIntro() {
  href: '/review-admin',
  },
  {
- Icon: MessageSquare, color: 'from-[#3182F6] to-[#1B64DA]',
+ Icon: MessageSquare, color: 'from-[var(--lu-accent)] to-[var(--lu-accent-hover)]',
  title: 'AI 답글 톤 11종 + 사장님 맞춤',
  desc: '친근·전문·유머·심플·감성·MZ·공식·감사·사과·미식 10종 + 사장님이 직접 정의하는 맞춤 톤. 부정 리뷰엔 사과 톤, 음식점은 미식 톤.',
  href: '/review-admin',
@@ -988,17 +988,17 @@ export default function ServiceIntro() {
  },
  ].map((f) => (
  <Link key={f.title} href={f.href}
- className="group bg-[#FAFBFF] hover:bg-white border border-transparent hover:border-[#3182F6]/20 hover:shadow-sm rounded-2xl p-4 transition-all flex items-start gap-3">
- <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${f.color} flex items-center justify-center shadow-sm flex-shrink-0`}>
- <f.Icon size={16} className="text-white" strokeWidth={2.5} />
+ className="group bg-[#FAFBFF] hover:bg-white border border-transparent hover:border-[var(--lu-accent)]/20 hover:shadow-none rounded-[10px] p-4 transition-all flex items-start gap-3">
+ <div className={`w-10 h-10 rounded-[6px] bg-gradient-to-br ${f.color} flex items-center justify-center shadow-none flex-shrink-0`}>
+ <f.Icon size={16} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-1 mb-1">
- <h3 className="text-sm font-bold text-[#191F28] truncate">{f.title}</h3>
+ <h3 className="text-sm font-bold text-[var(--lu-ink)] truncate">{f.title}</h3>
  <span className="text-[9px] font-bold text-[#7C3AED] bg-[#F3E8FF] px-1.5 py-0.5 rounded-full flex-shrink-0">NEW</span>
  </div>
- <p className="text-xs text-[#4E5968] leading-relaxed break-keep">{f.desc}</p>
- <div className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[#3182F6] group-hover:text-[#1B64DA]">
+ <p className="text-xs text-[var(--lu-muted)] leading-relaxed break-keep">{f.desc}</p>
+ <div className="mt-2 inline-flex items-center gap-1 text-[11px] font-bold text-[var(--lu-accent)] group-hover:text-[var(--lu-accent-hover)]">
  자세히 보기 <ArrowRight size={11} strokeWidth={2.5} />
  </div>
  </div>
@@ -1007,19 +1007,19 @@ export default function ServiceIntro() {
  </div>
 
  <div className="mt-5 flex items-center justify-between gap-3 pt-4 border-t border-[#F2F4F6] flex-wrap">
- <p className="text-[11px] text-[#8B95A1] break-keep">
+ <p className="text-[11px] text-[var(--lu-muted)] break-keep">
  더 많은 기능과 앞으로 출시 예정인 기능을 확인하세요.
  </p>
  <Link href="/updates"
- className="inline-flex items-center gap-1 text-xs font-bold text-[#3182F6] hover:text-[#1B64DA]">
+ className="inline-flex items-center gap-1 text-xs font-bold text-[var(--lu-accent)] hover:text-[var(--lu-accent-hover)]">
  전체 업데이트 내역 →
  </Link>
  </div>
  </div>
 
  {/* 후킹 CTA */}
- <div className="rounded-2xl p-5 sm:p-8 text-white text-center"
- style={{ background: 'linear-gradient(135deg,#1B3FD8 0%,#3182F6 100%)' }}>
+ <div className="rounded-[10px] p-5 sm:p-8 text-white text-center"
+ style={{ background: 'linear-gradient(135deg,#1B3FD8 0%,var(--lu-accent) 100%)' }}>
  <div className="inline-flex items-center gap-1.5 bg-white/20 rounded-full px-3 py-1.5 text-[10px] sm:text-xs font-bold mb-3 sm:mb-4">
  <Shield size={11} strokeWidth={2.5} /> 7일 무료 체험 · 카드 등록 불필요
  </div>
@@ -1031,11 +1031,11 @@ export default function ServiceIntro() {
  </p>
  <div className="flex gap-2 sm:gap-3 justify-center flex-col sm:flex-row">
  <Link href="/login"
- className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-[#1B3FD8] font-black rounded-xl hover:bg-[#F0F4FF] transition-colors text-sm">
+ className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white text-[#1B3FD8] font-black rounded-[6px] hover:bg-[#F0F4FF] transition-colors text-sm">
  무료로 시작하기 <ArrowRight size={15} strokeWidth={2.5} />
  </Link>
  <Link href="/pricing"
- className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white/15 text-white border border-white/30 font-bold rounded-xl hover:bg-white/25 transition-colors text-sm">
+ className="inline-flex items-center justify-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white/15 text-white border border-white/30 font-bold rounded-[6px] hover:bg-white/25 transition-colors text-sm">
  요금제 보기
  </Link>
  </div>
@@ -1043,25 +1043,25 @@ export default function ServiceIntro() {
  </div>
 
  {/* 안내 박스 */}
- <div className="bg-white rounded-2xl p-5 sm:p-8 shadow-sm border border-[#E5E8EB] mb-8">
- <h2 className="text-base sm:text-lg font-black text-[#191F28] mb-4">서비스 이용 안내</h2>
+ <div className="bg-white rounded-[10px] p-5 sm:p-8 shadow-none border border-[var(--lu-line)] mb-8">
+ <h2 className="text-base sm:text-lg font-black text-[var(--lu-ink)] mb-4">서비스 이용 안내</h2>
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
  {[
  { title: '원클릭 자동 게시', desc: '매장 플랫폼 연동만 완료하면 버튼 한 번으로 답글이 자동 게시됩니다.', color: '#F0FDF4', border: '#BBF7D0', tc: '#166534' },
- { title: 'AI 처리 범위', desc: '공개된 리뷰 텍스트와 사업자가 입력한 매장 정보만 AI 처리에 사용됩니다.', color: '#EFF6FF', border: '#93C5FD', tc: '#1B64DA' },
+ { title: 'AI 처리 범위', desc: '공개된 리뷰 텍스트와 사업자가 입력한 매장 정보만 AI 처리에 사용됩니다.', color: '#EFF6FF', border: '#93C5FD', tc: 'var(--lu-accent-hover)' },
  { title: '데이터 보관', desc: '매장 연동 정보는 사용자 브라우저에만 저장됩니다. 서버에 개인 식별 데이터를 저장하지 않습니다.', color: '#FFF7ED', border: '#FED7AA', tc: '#9A3412' },
  { title: '서비스 대상', desc: '카페, 음식점, 미용실 같은 소상공인과 여러 매장을 관리하는 마케팅 대행사를 위한 서비스입니다.', color: '#F5F3FF', border: '#C4B5FD', tc: '#5B21B6' },
  ].map(item => (
- <div key={item.title} className="rounded-xl p-4" style={{ background: item.color, border: `1px solid ${item.border}` }}>
+ <div key={item.title} className="rounded-[6px] p-4" style={{ background: item.color, border: `1px solid ${item.border}` }}>
  <p className="font-black text-xs sm:text-sm mb-1" style={{ color: item.tc }}>{item.title}</p>
- <p className="text-xs sm:text-sm text-[#4E5968] leading-relaxed break-keep">{item.desc}</p>
+ <p className="text-xs sm:text-sm text-[var(--lu-muted)] leading-relaxed break-keep">{item.desc}</p>
  </div>
  ))}
  </div>
  </div>
 
  <div className="text-center">
- <Link href="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-[#E5E8EB] text-[#4E5968] text-sm font-bold rounded-xl hover:bg-[#F8F9FA] transition-colors">
+ <Link href="/" className="inline-flex items-center gap-2 px-5 py-2.5 bg-white border border-[var(--lu-line)] text-[var(--lu-muted)] text-sm font-bold rounded-[6px] hover:bg-[var(--lu-canvas)] transition-colors">
  <ArrowLeft size={14} strokeWidth={2.5} /> 대시보드로 돌아가기
  </Link>
  </div>
