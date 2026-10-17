@@ -149,11 +149,11 @@ export default function AdminNaverCheckPage() {
  <div className="mb-6 flex flex-wrap items-center gap-3">
  <div>
  <div className="flex items-center gap-2">
- <h1 className="text-xl font-black text-[#0F172A]">네이버 연동 진단</h1>
- <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] px-2 py-0.5 rounded-full">
+ <h1 className="text-xl font-semibold text-[#0F172A]">네이버 연동 진단</h1>
+ <span className="inline-flex items-center gap-1 text-xs font-bold bg-[#FEF3C7] text-[#92400E] border border-[#FDE68A] px-2 py-0.5 rounded-full">
  <Lock size={9} strokeWidth={2.5} /> ADMIN ONLY
  </span>
- <span className="inline-flex items-center gap-1 text-[10px] font-semibold bg-[#EFF6FF] text-[#3182F6] border border-[#BFDBFE] px-2 py-0.5 rounded-full">
+ <span className="inline-flex items-center gap-1 text-xs font-semibold bg-[var(--lu-accent-soft)] text-[#16685D] border border-[#BFDBFE] px-2 py-0.5 rounded-full">
  <Zap size={9} />실시간
  </span>
  </div>
@@ -165,7 +165,7 @@ export default function AdminNaverCheckPage() {
  {/* 컨트롤 */}
  <div className="ml-auto flex items-center gap-3 flex-wrap">
  {lastAt && (
- <span className="text-[11px] text-[#94A3B8] flex items-center gap-1">
+ <span className="text-xs text-[#94A3B8] flex items-center gap-1">
  <Clock size={11} />
  {lastAt.toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
  </span>
@@ -177,14 +177,14 @@ export default function AdminNaverCheckPage() {
  >
  <span className={`absolute top-0.5 w-4 h-4 rounded-full bg-white shadow transition-all ${autoRefresh ? 'left-4' : 'left-0.5'}`} />
  </div>
- <span className="text-[12px] text-[#4E5968]">
+ <span className="text-[12px] text-[var(--lu-muted)]">
  {autoRefresh ? `자동갱신 ${countdown}s` : '자동갱신 꺼짐'}
  </span>
  </label>
  <button
  onClick={fetchHealth}
  disabled={loading}
- className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#0F172A] text-white text-[12px] font-bold hover:bg-[#1E293B] disabled:opacity-50 transition"
+ className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] bg-[#0F172A] text-white text-[12px] font-bold hover:bg-[#1E293B] disabled:opacity-50 transition"
  >
  <RefreshCw size={13} className={loading ? 'animate-spin' : ''} />
  {loading ? '체크 중...' : '다시 체크'}
@@ -194,7 +194,7 @@ export default function AdminNaverCheckPage() {
 
  {/* ── 에러 ── */}
  {err && (
- <div className="mb-5 p-4 rounded-xl bg-[#FFF1F2] border border-[#FECDD3] text-[#9F1239] text-sm flex items-start gap-2">
+ <div className="mb-5 p-4 rounded-[6px] bg-[#FFF1F2] border border-[#FECDD3] text-[#9F1239] text-sm flex items-start gap-2">
  <XCircle size={15} className="mt-0.5 flex-shrink-0" />
  진단 실패: {err}
  </div>
@@ -204,7 +204,7 @@ export default function AdminNaverCheckPage() {
  {loading && !report && (
  <div className="space-y-3">
  {[1, 2, 3].map(i => (
- <div key={i} className="h-20 bg-[#F1F5F9] rounded-2xl animate-pulse" />
+ <div key={i} className="h-20 bg-[#F1F5F9] rounded-[10px] animate-pulse" />
  ))}
  </div>
  )}
@@ -212,7 +212,7 @@ export default function AdminNaverCheckPage() {
  {report && (
  <>
  {/* ── Overall 배너 ── */}
- <div className={`mb-6 p-5 rounded-2xl bg-gradient-to-r border ${OVERALL_BG[overall]}`}>
+ <div className={`mb-6 p-5 rounded-[10px] bg-gradient-to-r border ${OVERALL_BG[overall]}`}>
  <div className="flex items-center gap-4">
  <div className="flex-shrink-0">{OVERALL_ICON[overall]}</div>
  <div className="flex-1">
@@ -225,11 +225,11 @@ export default function AdminNaverCheckPage() {
  { label: '오류', count: summary.error, cls: 'bg-[#FFE4E6] text-[#9F1239]' },
  { label: '건너뜀', count: summary.skip, cls: 'bg-[#F1F5F9] text-[#64748B]' },
  ].map(s => (
- <span key={s.label} className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold ${s.cls}`}>
+ <span key={s.label} className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-xs font-bold ${s.cls}`}>
  {s.label} {s.count}
  </span>
  ))}
- <span className="text-[11px] text-[#8B95A1] self-center">
+ <span className="text-xs text-[var(--lu-muted)] self-center">
  · 총 {Object.values(summary).reduce((a, b) => a + b, 0)}항목
  </span>
  </div>
@@ -241,12 +241,12 @@ export default function AdminNaverCheckPage() {
  {/* ── 카테고리별 체크 카드 ── */}
  <div className="space-y-4">
  {grouped.map(({ cat, items }) => (
- <div key={cat} className="bg-white border border-[#E2E8F0] rounded-2xl shadow-sm overflow-hidden">
+ <div key={cat} className="bg-white border border-[#E2E8F0] rounded-[10px] shadow-none overflow-hidden">
  {/* 카테고리 헤더 */}
  <div className="flex items-center gap-2 px-5 py-2.5 bg-[#F8FAFC] border-b border-[#F1F5F9]">
  <span className="text-[#64748B]">{CATEGORY_ICON[cat]}</span>
  <span className="text-[12px] font-bold text-[#334155]">{cat}</span>
- <span className="ml-auto text-[10px] text-[#94A3B8]">{items.length}개 항목</span>
+ <span className="ml-auto text-xs text-[#94A3B8]">{items.length}개 항목</span>
  </div>
 
  {/* 항목 리스트 */}
@@ -259,19 +259,19 @@ export default function AdminNaverCheckPage() {
  <div className="flex-1 min-w-0">
  <div className="flex flex-wrap items-center gap-2 mb-0.5">
  <span className="text-[13px] font-semibold text-[#1E293B]">{item.label}</span>
- <span className={`inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold border border-transparent ${sc.badge}`}>
+ <span className={`inline-flex px-2 py-0.5 rounded-full text-xs font-bold border border-transparent ${sc.badge}`}>
  {sc.label}
  </span>
  </div>
  <p className="text-[12px] text-[#475569]">{item.message}</p>
  {item.detail && (
- <p className="text-[11px] text-[#94A3B8] mt-0.5">{item.detail}</p>
+ <p className="text-xs text-[#94A3B8] mt-0.5">{item.detail}</p>
  )}
  </div>
  {item.value !== null && item.value !== undefined && (
  <div className="flex-shrink-0 text-right">
- <span className="text-[18px] font-black text-[#1E293B]">{item.value}</span>
- <p className="text-[10px] text-[#94A3B8]">건</p>
+ <span className="text-[18px] font-semibold text-[#1E293B]">{item.value}</span>
+ <p className="text-xs text-[#94A3B8]">건</p>
  </div>
  )}
  {item.action_url && (
@@ -279,7 +279,7 @@ export default function AdminNaverCheckPage() {
  href={item.action_url}
  target={item.action_url.startsWith('http') ? '_blank' : '_self'}
  rel="noopener noreferrer"
- className="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] text-[11px] font-semibold text-[#475569] hover:text-[#3182F6] hover:border-[#3182F6] bg-white transition"
+ className="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg border border-[#E2E8F0] text-xs font-semibold text-[#475569] hover:text-[#16685D] hover:border-[#16685D] bg-white transition"
  >
  {item.action_url.startsWith('http') ? '설정' : '이동'}
  <ExternalLink size={10} />
@@ -294,9 +294,9 @@ export default function AdminNaverCheckPage() {
  </div>
 
  {/* ── 가이드 ── */}
- <div className="mt-5 p-4 rounded-xl bg-[#F8FAFC] border border-[#E2E8F0]">
- <p className="text-[11px] font-bold text-[#475569] mb-1.5 flex items-center gap-1"><Pin size={11} strokeWidth={2.5} /> 진단 가이드 (관리자용)</p>
- <div className="space-y-1 text-[11px] text-[#64748B]">
+ <div className="mt-5 p-4 rounded-[6px] bg-[#F8FAFC] border border-[#E2E8F0]">
+ <p className="text-xs font-bold text-[#475569] mb-1.5 flex items-center gap-1"><Pin size={11} strokeWidth={2.5} /> 진단 가이드 (관리자용)</p>
+ <div className="space-y-1 text-xs text-[#64748B]">
  <p>• <b>환경변수 오류</b>: Vercel 대시보드 → Settings → Environment Variables 에서 키 추가</p>
  <p>• <b>리뷰 수집 지연</b>: 크론이 KST 4시간 주기 실행. Vercel Pro 미사용 시 크론 중단 가능.</p>
  <p>• <b>광고 API 오류</b>: 네이버 광고 계정의 일일 API 호출 한도 초과 여부 확인.</p>
@@ -304,7 +304,7 @@ export default function AdminNaverCheckPage() {
  </div>
  </div>
 
- <div className="mt-3 text-center text-[10px] text-[#CBD5E1]">
+ <div className="mt-3 text-center text-xs text-[#CBD5E1]">
  진단 시각: {new Date(report.checked_at).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' })}
  </div>
  </>

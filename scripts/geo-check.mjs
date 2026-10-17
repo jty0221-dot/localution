@@ -87,9 +87,9 @@ const tsx = files.filter((f) => f.endsWith('.tsx'))
 // ─── S1 홈 FAQ 정합 ──────────────────────────────────────────
 {
   const home = read(join(APP, 'page.tsx'))
-  const hasArray = /const HOME_FAQS\s*:\s*FaqItem\[\]\s*=/.test(home)
+  const hasArray = /const HOME_FAQS\s*:\s*(?:import\([^)]*\)\.)?FaqItem\[\]\s*=/.test(home)
   const schemaUsesArray = /faqPageLd\(\s*HOME_FAQS/.test(home)
-  const visibleUsesArray = /<FaqSlider\s+faqs=\{HOME_FAQS\}/.test(home)
+  const visibleUsesArray = /<FaqSlider\s+faqs=\{HOME_FAQS\}/.test(home) || /HOME_FAQS\.map\(item\s*=>\s*<details/.test(home)
   if (!hasArray) fail('S1', 'app/page.tsx 에 HOME_FAQS 배열이 없다')
   if (!schemaUsesArray) fail('S1', 'FAQPage 스키마가 HOME_FAQS 에서 나오지 않는다 (faqPageLd(HOME_FAQS ...))')
   if (!visibleUsesArray) fail('S1', '화면 FAQ 가 HOME_FAQS 에서 나오지 않는다 (<FaqSlider faqs={HOME_FAQS} />)')

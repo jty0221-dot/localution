@@ -49,7 +49,7 @@ export default function PlatformIssuesPage() {
   const platforms = Object.keys(pc).sort()
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-[var(--lu-canvas)]">
       <PageHeader
         title="플랫폼 이슈 모니터"
         subtitle="자격증명/누락/적체/실패 전체 한눈에"
@@ -79,9 +79,9 @@ export default function PlatformIssuesPage() {
         </div>
 
         {/* 플랫폼별 사용자 카운트 */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6">
+        <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
           <div className="flex items-center gap-2 mb-3">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-sm flex items-center justify-center">
+            <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center">
               <Users size={16} className="text-white" strokeWidth={2.5} />
             </div>
             <div>
@@ -119,9 +119,9 @@ export default function PlatformIssuesPage() {
 
         {/* 매장 ID 누락 사용자 */}
         {data?.null_place_id_users && data.null_place_id_users.length > 0 && (
-          <div className="bg-white rounded-2xl border border-amber-200 shadow-sm p-4 md:p-6">
+          <div className="bg-white rounded-[10px] border border-amber-200 shadow-none p-4 md:p-6">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 shadow-sm flex items-center justify-center">
+              <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center">
                 <Link2 size={16} className="text-white" strokeWidth={2.5} />
               </div>
               <div>
@@ -134,14 +134,14 @@ export default function PlatformIssuesPage() {
                 <div key={i} className="flex items-center justify-between p-2 md:p-3 bg-amber-50 rounded-lg text-xs md:text-sm">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="font-mono text-gray-600 truncate">{u.user_id}</span>
-                    <span className="px-2 py-0.5 bg-white border border-amber-200 rounded-md text-[10px] md:text-xs font-medium text-amber-700">
+                    <span className="px-2 py-0.5 bg-white border border-amber-200 rounded-md text-xs md:text-xs font-medium text-amber-700">
                       {u.platform}
                     </span>
                   </div>
                 </div>
               ))}
             </div>
-            <p className="text-[11px] text-amber-700 mt-3">
+            <p className="text-xs text-amber-700 mt-3">
               해결: naver_place 는 <code className="bg-amber-100 px-1 rounded">/api/admin/sync-naver-store-ids?dry=0</code> 호출. 기타는 사용자에게 재연결 요청.
             </p>
           </div>
@@ -149,9 +149,9 @@ export default function PlatformIssuesPage() {
 
         {/* 정체 답글 */}
         {data?.stuck_queued_sample && data.stuck_queued_sample.length > 0 && (
-          <div className="bg-white rounded-2xl border border-blue-200 shadow-sm p-4 md:p-6">
+          <div className="bg-white rounded-[10px] border border-blue-200 shadow-none p-4 md:p-6">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 shadow-sm flex items-center justify-center">
+              <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center">
                 <Clock size={16} className="text-white" strokeWidth={2.5} />
               </div>
               <div>
@@ -164,17 +164,17 @@ export default function PlatformIssuesPage() {
                 <div key={i} className="flex items-center justify-between p-2 bg-blue-50 rounded-lg text-xs md:text-sm">
                   <div className="flex items-center gap-2 min-w-0 flex-1">
                     <span className="font-mono text-gray-600 truncate">{u.user_id}</span>
-                    <span className="px-2 py-0.5 bg-white border border-blue-200 rounded-md text-[10px] md:text-xs font-medium text-blue-700">
+                    <span className="px-2 py-0.5 bg-white border border-blue-200 rounded-md text-xs md:text-xs font-medium text-blue-700">
                       {u.platform}
                     </span>
                   </div>
-                  <span className="text-[10px] md:text-xs text-gray-500 flex-shrink-0">
+                  <span className="text-xs md:text-xs text-gray-500 flex-shrink-0">
                     {new Date(u.queued_at).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })}
                   </span>
                 </div>
               ))}
             </div>
-            <p className="text-[11px] text-blue-700 mt-3">
+            <p className="text-xs text-blue-700 mt-3">
               해결: <a href="/admin/queue-control" className="font-bold underline">/admin/queue-control</a> 의 "prioritized → waiting 변환" 또는 retry-queued-replies 호출.
             </p>
           </div>
@@ -182,9 +182,9 @@ export default function PlatformIssuesPage() {
 
         {/* 답글 실패 패턴 */}
         {data?.failed_replies_pattern && Object.keys(data.failed_replies_pattern).length > 0 && (
-          <div className="bg-white rounded-2xl border border-purple-200 shadow-sm p-4 md:p-6">
+          <div className="bg-white rounded-[10px] border border-purple-200 shadow-none p-4 md:p-6">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 shadow-sm flex items-center justify-center">
+              <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center">
                 <AlertTriangle size={16} className="text-white" strokeWidth={2.5} />
               </div>
               <div>
@@ -196,7 +196,7 @@ export default function PlatformIssuesPage() {
               {Object.entries(data.failed_replies_pattern).sort((a, b) => b[1] - a[1]).map(([pattern, count]) => (
                 <div key={pattern} className="flex items-center justify-between p-2 bg-purple-50 rounded-lg text-xs md:text-sm">
                   <span className="font-medium text-gray-900">{pattern}</span>
-                  <span className="px-2 py-0.5 bg-purple-600 text-white rounded-md text-[10px] md:text-xs font-bold">
+                  <span className="px-2 py-0.5 bg-purple-600 text-white rounded-md text-xs md:text-xs font-bold">
                     {count}건
                   </span>
                 </div>
@@ -206,7 +206,7 @@ export default function PlatformIssuesPage() {
         )}
 
         {/* 안내 박스 */}
-        <div className="bg-gradient-to-br from-emerald-50 to-green-50 rounded-2xl border border-emerald-200 p-4 md:p-6">
+        <div className="bg-[var(--lu-accent)] rounded-[10px] border border-emerald-200 p-4 md:p-6">
           <div className="flex items-center gap-2 mb-2">
             <Activity size={16} className="text-emerald-600" />
             <div className="text-sm md:text-base font-bold text-emerald-900">자동 모니터링</div>
@@ -226,12 +226,12 @@ export default function PlatformIssuesPage() {
 
 function SumCard({ label, value, icon: Icon, color, highlight }: any) {
   return (
-    <div className={`bg-gradient-to-br ${color} rounded-xl p-3 md:p-4 text-white shadow-sm ${highlight ? 'ring-2 ring-yellow-400 ring-offset-2' : ''}`}>
+    <div className={`bg-gradient-to-br ${color} rounded-[6px] p-3 md:p-4 text-white shadow-none ${highlight ? 'ring-2 ring-yellow-400 ring-offset-2' : ''}`}>
       <div className="flex items-center gap-2">
         <Icon size={14} strokeWidth={2.5} />
-        <div className="text-[10px] md:text-xs font-medium opacity-90">{label}</div>
+        <div className="text-xs md:text-xs font-medium opacity-90">{label}</div>
       </div>
-      <div className="text-2xl md:text-3xl font-black mt-1">{value}</div>
+      <div className="text-2xl md:text-3xl font-semibold mt-1">{value}</div>
     </div>
   )
 }

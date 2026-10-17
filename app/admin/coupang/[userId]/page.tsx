@@ -243,33 +243,33 @@ export default function CoupangUserDetailPage() {
   const filteredReviews = data?.recent_reviews.filter(r => filterStore === 'all' || r.store_id === filterStore) || []
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-[var(--lu-canvas)]">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* 헤더 */}
         <div className="mb-4 md:mb-6">
           <Link href="/admin/coupang-diagnostics"
-            className="inline-flex items-center gap-1 text-xs md:text-sm text-[#3182F6] hover:underline mb-2">
+            className="inline-flex items-center gap-1 text-xs md:text-sm text-[#16685D] hover:underline mb-2">
             <ArrowLeft size={14} strokeWidth={2.5} />
             진단 페이지로
           </Link>
           <div className="flex items-start justify-between gap-3 flex-wrap">
             <div className="min-w-0 flex-1">
-              <h1 className="text-xl md:text-2xl font-black text-[#191F28] flex items-center gap-2">
+              <h1 className="text-xl md:text-2xl font-semibold text-[var(--lu-ink)] flex items-center gap-2">
                 <Store size={22} className="text-[#FF4B30] flex-shrink-0" strokeWidth={2.5} />
                 쿠팡이츠 사용자 상세
               </h1>
-              <p className="text-xs md:text-sm text-[#4E5968] mt-1 font-mono">
+              <p className="text-xs md:text-sm text-[var(--lu-muted)] mt-1 font-mono">
                 {userId.slice(0, 8)}... · 계정 {data ? maskId(data.account_id) : '...'}
               </p>
             </div>
             <div className="flex gap-1.5 flex-shrink-0 flex-wrap">
               <button onClick={impersonate} disabled={busy}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#F04452] text-white text-xs md:text-sm font-bold hover:bg-[#DC2626] disabled:opacity-50"
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[6px] bg-[#F04452] text-white text-xs md:text-sm font-bold hover:bg-[#DC2626] disabled:opacity-50"
                 title="이 사용자로 임시 로그인 · 사장님 화면 그대로 진단">
                 이 사용자로 로그인
               </button>
               <button onClick={load} disabled={loading}
-                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#3182F6] text-white text-xs md:text-sm font-bold hover:bg-[#1B64DA] disabled:opacity-50">
+                className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[6px] bg-[#16685D] text-white text-xs md:text-sm font-bold hover:bg-[#105448] disabled:opacity-50">
                 <RefreshCw size={14} className={loading ? 'animate-spin' : ''} strokeWidth={2.5} />
                 새로고침
               </button>
@@ -278,13 +278,13 @@ export default function CoupangUserDetailPage() {
         </div>
 
         {error && (
-          <div className="mb-4 p-3 md:p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-sm">
+          <div className="mb-4 p-3 md:p-4 rounded-[10px] bg-red-50 border border-red-200 text-red-800 text-sm">
             {error}
           </div>
         )}
 
         {actionResult && (
-          <div className="mb-4 p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs md:text-sm text-blue-900">
+          <div className="mb-4 p-3 rounded-[6px] bg-blue-50 border border-blue-200 text-xs md:text-sm text-blue-900">
             {actionResult}
           </div>
         )}
@@ -300,15 +300,15 @@ export default function CoupangUserDetailPage() {
             </section>
 
             {/* 로그인 상태 */}
-            <section className="mb-4 p-3 md:p-4 rounded-2xl bg-white shadow-sm">
+            <section className="mb-4 p-3 md:p-4 rounded-[10px] bg-white shadow-none">
               <div className="flex items-start justify-between gap-2 mb-2 flex-wrap">
-                <h2 className="text-sm md:text-base font-bold text-[#191F28]">로그인 / 세션</h2>
+                <h2 className="text-sm md:text-base font-bold text-[var(--lu-ink)]">로그인 / 세션</h2>
                 <button onClick={retryLogin} disabled={busy}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F04452] text-white text-[11px] md:text-xs font-bold hover:bg-[#DC2626] disabled:opacity-50">
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F04452] text-white text-xs md:text-xs font-bold hover:bg-[#DC2626] disabled:opacity-50">
                   재로그인 시도
                 </button>
               </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px] md:text-xs">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-xs md:text-xs">
                 <InfoRow label="last_login_status" value={data.last_login_status || '-'} mono />
                 <InfoRow label="last_login_at" value={fmtDate(data.last_login_at)} />
                 <InfoRow label="coupang_login_at" value={fmtDate(data.coupang_login_at)} />
@@ -319,69 +319,69 @@ export default function CoupangUserDetailPage() {
             </section>
 
             {/* 매장 관리 */}
-            <section className="mb-4 p-3 md:p-4 rounded-2xl bg-white shadow-sm">
+            <section className="mb-4 p-3 md:p-4 rounded-[10px] bg-white shadow-none">
               <div className="flex items-start justify-between gap-2 mb-3 flex-wrap">
-                <h2 className="text-sm md:text-base font-bold text-[#191F28] flex items-center gap-2">
+                <h2 className="text-sm md:text-base font-bold text-[var(--lu-ink)] flex items-center gap-2">
                   <Store size={16} className="text-[#FF4B30]" strokeWidth={2.5} />
                   매장 ({data.stores.length}개)
                 </h2>
                 <button onClick={addStore} disabled={busy}
-                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#059669] text-white text-[11px] md:text-xs font-bold hover:bg-[#047857] disabled:opacity-50">
+                  className="inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#059669] text-white text-xs md:text-xs font-bold hover:bg-[#047857] disabled:opacity-50">
                   + 매장 추가
                 </button>
               </div>
               {data.stores.length === 0 ? (
-                <p className="text-xs text-[#8B95A1]">등록된 매장 없음. 우상단 [+ 매장 추가] 또는 진단 페이지에서 [매장 발견] 시도.</p>
+                <p className="text-xs text-[var(--lu-muted)]">등록된 매장 없음. 우상단 [+ 매장 추가] 또는 진단 페이지에서 [매장 발견] 시도.</p>
               ) : (
                 <div className="space-y-2">
                   {data.stores.map((s, i) => (
-                    <div key={s.id} className="border border-[#E5E8EB] rounded-xl p-3">
+                    <div key={s.id} className="border border-[var(--lu-line)] rounded-[6px] p-3">
                       <div className="flex items-start justify-between gap-2 mb-2 flex-wrap">
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center gap-2 mb-0.5 flex-wrap">
-                            {i === 0 && <span className="text-[10px] font-black text-white bg-[#F97316] px-1.5 py-0.5 rounded">main</span>}
-                            <span className="text-sm font-bold text-[#191F28]">
-                              {s.name || <span className="italic text-[#8B95A1]">매장명 미등록</span>}
+                            {i === 0 && <span className="text-xs font-semibold text-white bg-[#F97316] px-1.5 py-0.5 rounded">main</span>}
+                            <span className="text-sm font-bold text-[var(--lu-ink)]">
+                              {s.name || <span className="italic text-[var(--lu-muted)]">매장명 미등록</span>}
                             </span>
                           </div>
-                          <div className="text-[11px] text-[#7C3AED] font-mono">매장 ID: {s.id}</div>
+                          <div className="text-xs text-[#7C3AED] font-mono">매장 ID: {s.id}</div>
                         </div>
                         <div className="flex gap-1 flex-shrink-0">
                           <button onClick={() => renameStore(s.id, s.name)} disabled={busy}
-                            className="text-[10px] font-bold px-2 py-1 rounded bg-[#3182F6] text-white hover:bg-[#1B64DA] disabled:opacity-50">
+                            className="text-xs font-bold px-2 py-1 rounded bg-[#16685D] text-white hover:bg-[#105448] disabled:opacity-50">
                             <Edit2 size={11} className="inline mr-0.5" strokeWidth={2.5} />이름
                           </button>
                           <button onClick={() => removeStore(s.id)} disabled={busy}
-                            className="text-[10px] font-bold px-2 py-1 rounded bg-[#DC2626] text-white hover:bg-[#B91C1C] disabled:opacity-50">
+                            className="text-xs font-bold px-2 py-1 rounded bg-[#DC2626] text-white hover:bg-[#B91C1C] disabled:opacity-50">
                             <Trash2 size={11} className="inline mr-0.5" strokeWidth={2.5} />제거
                           </button>
                         </div>
                       </div>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-[11px] mb-2">
+                      <div className="grid grid-cols-2 md:grid-cols-4 gap-2 text-xs mb-2">
                         <div className="p-2 rounded-lg bg-[#FAFBFF]">
-                          <div className="text-[#8B95A1] font-bold">리뷰</div>
-                          <div className="text-base font-black tabular-nums" style={{ color: s.review_count > 0 ? '#191F28' : '#DC2626' }}>{s.review_count}</div>
+                          <div className="text-[var(--lu-muted)] font-bold">리뷰</div>
+                          <div className="text-base font-semibold tabular-nums" style={{ color: s.review_count > 0 ? '#191F28' : '#DC2626' }}>{s.review_count}</div>
                         </div>
                         <div className="p-2 rounded-lg bg-[#FFF1F0]">
-                          <div className="text-[#8B95A1] font-bold">미답변</div>
-                          <div className="text-base font-black text-[#F04452] tabular-nums">{s.unreplied}</div>
+                          <div className="text-[var(--lu-muted)] font-bold">미답변</div>
+                          <div className="text-base font-semibold text-[#F04452] tabular-nums">{s.unreplied}</div>
                         </div>
                         <div className="p-2 rounded-lg bg-[#FAFBFF]">
-                          <div className="text-[#8B95A1] font-bold">최근 수집</div>
-                          <div className="text-[10px] text-[#4E5968]">{fmtDate(s.last_collected_at)}</div>
+                          <div className="text-[var(--lu-muted)] font-bold">최근 수집</div>
+                          <div className="text-xs text-[var(--lu-muted)]">{fmtDate(s.last_collected_at)}</div>
                         </div>
                         <div className="p-2 rounded-lg bg-[#FAFBFF]">
-                          <div className="text-[#8B95A1] font-bold">최근 리뷰</div>
-                          <div className="text-[10px] text-[#4E5968]">{fmtDate(s.last_review_posted_at)}</div>
+                          <div className="text-[var(--lu-muted)] font-bold">최근 리뷰</div>
+                          <div className="text-xs text-[var(--lu-muted)]">{fmtDate(s.last_review_posted_at)}</div>
                         </div>
                       </div>
                       <div className="flex gap-1.5 flex-wrap">
                         <button onClick={() => fetchStore(s.id, 14)} disabled={busy}
-                          className="text-[10px] font-bold px-2 py-1 rounded bg-[#3182F6] text-white hover:bg-[#1B64DA] disabled:opacity-50">
+                          className="text-xs font-bold px-2 py-1 rounded bg-[#16685D] text-white hover:bg-[#105448] disabled:opacity-50">
                           14d fetch
                         </button>
                         <button onClick={() => fetchStore(s.id, 180)} disabled={busy}
-                          className="text-[10px] font-bold px-2 py-1 rounded bg-[#7C3AED] text-white hover:bg-[#6D28D9] disabled:opacity-50">
+                          className="text-xs font-bold px-2 py-1 rounded bg-[#7C3AED] text-white hover:bg-[#6D28D9] disabled:opacity-50">
                           180d fetch
                         </button>
                       </div>
@@ -392,21 +392,21 @@ export default function CoupangUserDetailPage() {
             </section>
 
             {/* 최근 리뷰 */}
-            <section className="mb-4 p-3 md:p-4 rounded-2xl bg-white shadow-sm">
+            <section className="mb-4 p-3 md:p-4 rounded-[10px] bg-white shadow-none">
               <div className="flex items-start justify-between gap-2 mb-3 flex-wrap">
-                <h2 className="text-sm md:text-base font-bold text-[#191F28] flex items-center gap-2">
-                  <MessageSquare size={16} className="text-[#3182F6]" strokeWidth={2.5} />
+                <h2 className="text-sm md:text-base font-bold text-[var(--lu-ink)] flex items-center gap-2">
+                  <MessageSquare size={16} className="text-[#16685D]" strokeWidth={2.5} />
                   최근 리뷰 ({filteredReviews.length} / 전체 {data.recent_reviews.length})
                 </h2>
                 <div className="flex gap-1.5 flex-wrap">
                   <button onClick={() => setFilterStore('all')}
-                    className={'text-[11px] md:text-xs font-bold px-2.5 py-1 rounded ' +
-                      (filterStore === 'all' ? 'bg-[#191F28] text-white' : 'bg-[#F2F4F6] text-[#4E5968]')}>
+                    className={'text-xs md:text-xs font-bold px-2.5 py-1 rounded ' +
+                      (filterStore === 'all' ? 'bg-[var(--lu-ink)] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]')}>
                     전체
                   </button>
                   {data.stores.map(s => (
                     <button key={s.id} onClick={() => setFilterStore(s.id)}
-                      className={'text-[11px] md:text-xs font-bold px-2.5 py-1 rounded ' +
+                      className={'text-xs md:text-xs font-bold px-2.5 py-1 rounded ' +
                         (filterStore === s.id ? 'bg-[#7C3AED] text-white' : 'bg-[#F5F3FF] text-[#7C3AED]')}>
                       {s.name || s.id.slice(0, 6)}
                     </button>
@@ -415,38 +415,38 @@ export default function CoupangUserDetailPage() {
               </div>
 
               {filteredReviews.length === 0 ? (
-                <p className="text-xs text-[#8B95A1] text-center py-6">
+                <p className="text-xs text-[var(--lu-muted)] text-center py-6">
                   {data.recent_reviews.length === 0 ? '수집된 리뷰 없음 · 위에서 fetch 트리거 또는 재로그인 시도' : '필터 조건 매칭 없음'}
                 </p>
               ) : (
                 <div className="space-y-2">
                   {filteredReviews.map(r => (
-                    <div key={r.id} className="border border-[#F2F4F6] rounded-xl p-3 hover:bg-[#FAFBFF]">
+                    <div key={r.id} className="border border-[var(--lu-canvas)] rounded-[6px] p-3 hover:bg-[#FAFBFF]">
                       <div className="flex items-start justify-between gap-2 mb-1 flex-wrap">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <span className="text-xs font-bold text-[#191F28]">{r.author}</span>
+                          <span className="text-xs font-bold text-[var(--lu-ink)]">{r.author}</span>
                           {r.rating !== null && (
                             <span className="inline-flex items-center gap-0.5 text-xs font-bold tabular-nums" style={{ color: r.rating <= 2 ? '#F04452' : r.rating <= 3 ? '#F59E0B' : '#191F28' }}>
                               <Star size={11} fill="currentColor" strokeWidth={0} />
                               {r.rating}
                             </span>
                           )}
-                          {r.has_photos && <Camera size={11} className="text-[#8B95A1]" strokeWidth={2.5} />}
-                          <span className="text-[10px] text-[#7C3AED] font-mono">{r.store_id}</span>
+                          {r.has_photos && <Camera size={11} className="text-[var(--lu-muted)]" strokeWidth={2.5} />}
+                          <span className="text-xs text-[#7C3AED] font-mono">{r.store_id}</span>
                         </div>
-                        <div className="text-[10px] text-[#8B95A1] flex-shrink-0">
+                        <div className="text-xs text-[var(--lu-muted)] flex-shrink-0">
                           {fmtDate(r.posted_at)}
                         </div>
                       </div>
-                      <p className="text-xs text-[#4E5968] leading-relaxed mb-1.5 break-words">{r.content || <span className="italic text-[#B0B8C1]">내용 없음</span>}</p>
+                      <p className="text-xs text-[var(--lu-muted)] leading-relaxed mb-1.5 break-words">{r.content || <span className="italic text-[#B0B8C1]">내용 없음</span>}</p>
                       {r.has_reply && r.reply_preview && (
                         <div className="mt-2 p-2 rounded-lg bg-emerald-50 border border-emerald-100">
-                          <div className="text-[10px] font-bold text-emerald-700 mb-0.5">사장님 답글</div>
-                          <p className="text-[11px] text-emerald-900 leading-relaxed">{r.reply_preview}</p>
+                          <div className="text-xs font-bold text-emerald-700 mb-0.5">사장님 답글</div>
+                          <p className="text-xs text-emerald-900 leading-relaxed">{r.reply_preview}</p>
                         </div>
                       )}
                       {!r.has_reply && (
-                        <div className="text-[10px] text-[#F04452] font-bold">미답변</div>
+                        <div className="text-xs text-[#F04452] font-bold">미답변</div>
                       )}
                     </div>
                   ))}
@@ -454,7 +454,7 @@ export default function CoupangUserDetailPage() {
               )}
             </section>
 
-            <div className="mt-4 text-[10px] md:text-[11px] text-[#8B95A1] text-right">
+            <div className="mt-4 text-xs md:text-xs text-[var(--lu-muted)] text-right">
               마지막 갱신: {fmtDate(data.updated_at)}
             </div>
           </>
@@ -466,9 +466,9 @@ export default function CoupangUserDetailPage() {
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="p-3 md:p-4 rounded-2xl bg-white shadow-sm">
-      <div className="text-[11px] md:text-xs font-bold text-[#8B95A1]">{label}</div>
-      <div className="text-xl md:text-2xl font-black tabular-nums" style={{ color }}>{value}</div>
+    <div className="p-3 md:p-4 rounded-[10px] bg-white shadow-none">
+      <div className="text-xs md:text-xs font-bold text-[var(--lu-muted)]">{label}</div>
+      <div className="text-xl md:text-2xl font-semibold tabular-nums" style={{ color }}>{value}</div>
     </div>
   )
 }
@@ -476,8 +476,8 @@ function StatCard({ label, value, color }: { label: string; value: number; color
 function InfoRow({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
     <div className="flex items-center gap-2 p-2 rounded-lg bg-[#FAFBFF]">
-      <span className="text-[#8B95A1] font-bold flex-shrink-0">{label}</span>
-      <span className={'text-[#191F28] truncate ' + (mono ? 'font-mono' : '')} title={value}>{value}</span>
+      <span className="text-[var(--lu-muted)] font-bold flex-shrink-0">{label}</span>
+      <span className={'text-[var(--lu-ink)] truncate ' + (mono ? 'font-mono' : '')} title={value}>{value}</span>
     </div>
   )
 }

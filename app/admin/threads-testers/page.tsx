@@ -76,16 +76,16 @@ export default function ThreadsTestersPage() {
  <header className="mb-6 flex items-start justify-between gap-4">
  <div>
  <div className="flex items-center gap-3 mb-1">
- <div className="w-9 h-9 bg-gradient-to-br from-[#111827] to-[#374151] rounded-xl flex items-center justify-center">
+ <div className="w-9 h-9 bg-[var(--lu-accent)] rounded-[6px] flex items-center justify-center">
  <Send size={16} className="text-white" strokeWidth={2.5} />
  </div>
- <h1 className="text-2xl font-black text-[#191F28] tracking-tight">Threads 테스터 신청</h1>
+ <h1 className="text-2xl font-semibold text-[var(--lu-ink)] tracking-tight">Threads 테스터 신청</h1>
  </div>
- <p className="text-sm text-[#8B95A1] ml-12">
+ <p className="text-sm text-[var(--lu-muted)] ml-12">
  신청자를 Meta Developer에서 테스터로 추가한 후 상태를 업데이트하세요
  </p>
  </div>
- <button onClick={load} className="flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#111827] bg-white border border-[#E5E8EB] rounded-xl px-3 py-2 transition-colors">
+ <button onClick={load} className="flex items-center gap-1.5 text-sm text-[#6B7280] hover:text-[#111827] bg-white border border-[var(--lu-line)] rounded-[6px] px-3 py-2 transition-colors">
  <RefreshCw size={13} strokeWidth={2} />
  새로고침
  </button>
@@ -99,15 +99,15 @@ export default function ThreadsTestersPage() {
  { label: '처리중', value: counts.processing, color: '#2563EB' },
  { label: '등록완료', value: counts.done, color: '#059669' },
  ].map(s => (
- <div key={s.label} className="bg-white rounded-xl border border-[#E5E8EB] p-4 text-center">
- <div className="text-2xl font-black" style={{ color: s.color }}>{s.value}</div>
- <div className="text-xs text-[#8B95A1] mt-0.5">{s.label}</div>
+ <div key={s.label} className="bg-white rounded-[6px] border border-[var(--lu-line)] p-4 text-center">
+ <div className="text-2xl font-semibold" style={{ color: s.color }}>{err ? '확인 필요' : loading ? '-' : s.value}</div>
+ <div className="text-xs text-[var(--lu-muted)] mt-0.5">{s.label}</div>
  </div>
  ))}
  </div>
 
  {err && (
- <div className="bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] text-sm rounded-xl p-4 mb-5">{err}</div>
+ <div className="bg-[#FEF2F2] border border-[#FCA5A5] text-[#991B1B] text-sm rounded-[6px] p-4 mb-5">{err}</div>
  )}
 
  {loading ? (
@@ -115,8 +115,8 @@ export default function ThreadsTestersPage() {
  <Loader2 size={24} className="animate-spin text-[#9CA3AF]" strokeWidth={2} />
  </div>
  ) : rows.length === 0 ? (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-12 text-center">
- <div className="w-12 h-12 bg-[#F9FAFB] rounded-xl flex items-center justify-center mx-auto mb-3">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-12 text-center">
+ <div className="w-12 h-12 bg-[#F9FAFB] rounded-[6px] flex items-center justify-center mx-auto mb-3">
  <User size={20} className="text-[#9CA3AF]" strokeWidth={2} />
  </div>
  <p className="text-sm font-semibold text-[#374151]">신청 내역이 없습니다</p>
@@ -128,7 +128,7 @@ export default function ThreadsTestersPage() {
  const sm = STATUS_META[row.status] ?? STATUS_META.pending
  const isUpdating = updating === row.id
  return (
- <div key={row.id} className="bg-white rounded-2xl border border-[#E5E8EB] shadow-sm p-5">
+ <div key={row.id} className="bg-white rounded-[10px] border border-[var(--lu-line)] shadow-none p-5">
  <div className="flex items-start justify-between gap-4">
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 flex-wrap mb-2">
@@ -143,7 +143,7 @@ export default function ThreadsTestersPage() {
  </span>
  </div>
  <div className="flex items-center gap-2 mb-1">
- <span className="text-base font-black text-[#111827]">@{row.instagram_id}</span>
+ <span className="text-base font-semibold text-[#111827]">@{row.instagram_id}</span>
  {row.store_name && (
  <span className="text-sm text-[#6B7280]">· {row.store_name}</span>
  )}
@@ -160,7 +160,7 @@ export default function ThreadsTestersPage() {
  <button
  onClick={() => updateStatus(row.id, 'processing')}
  disabled={isUpdating}
- className="flex items-center gap-1.5 text-xs font-semibold bg-[#EFF6FF] hover:bg-[#DBEAFE] text-[#1D4ED8] px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
+ className="flex items-center gap-1.5 text-xs font-semibold bg-[var(--lu-accent-soft)] hover:bg-[#DBEAFE] text-[#1D4ED8] px-3 py-2 rounded-lg transition-colors disabled:opacity-50"
  >
  {isUpdating ? <Loader2 size={12} className="animate-spin" strokeWidth={2} /> : <Clock size={12} strokeWidth={2.5} />}
  처리중으로
@@ -197,7 +197,7 @@ export default function ThreadsTestersPage() {
  value={memo[row.id] ?? ''}
  onChange={e => setMemo(prev => ({ ...prev, [row.id]: e.target.value }))}
  placeholder="처리 메모 (선택)"
- className="w-full text-xs px-3 py-2 border border-[#E5E8EB] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3182F6]/30 focus:border-[#3182F6] bg-[#F9FAFB]"
+ className="w-full text-xs px-3 py-2 border border-[var(--lu-line)] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#16685D]/30 focus:border-[#16685D] bg-[#F9FAFB]"
  />
  </div>
  )}

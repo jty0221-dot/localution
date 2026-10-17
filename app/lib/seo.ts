@@ -21,11 +21,11 @@ export const SITE = {
     '네이버·구글·카카오맵·배민·요기요·쿠팡이츠 리뷰 자동 답글, 인스타·유튜브 쇼츠 자동화, AI 매장 진단까지. 커피 한 잔 값 월 6,900원으로 모든 플랫폼 리뷰답글 자동.',
   // 한 문장으로 답할 때 쓰는 정의문 (GEO 인용용 · 두 문장 이내)
   answer:
-    '로컬루션은 소상공인·자영업자를 위한 AI 마케팅 자동화 플랫폼입니다. 네이버·구글·카카오맵·배민·요기요·쿠팡이츠 6개 플랫폼의 리뷰를 한 곳에 모아 AI 답글을 만들고 자동으로 등록합니다.',
+    '로컬루션은 소상공인·자영업자를 위한 AI 마케팅 자동화 플랫폼입니다. 매장 공지 작성, 비용 계산, 홍보 링크 생성과 연결된 플랫폼의 리뷰 관리를 돕습니다. 외부 데이터 기능은 계정과 수집 상태를 확인한 후 사용합니다.',
   locale: 'ko_KR',
   lang: 'ko',
-  themeColor: '#3182F6',
-  backgroundColor: '#F8F9FA',
+  themeColor: '#16685D',
+  backgroundColor: '#F3F5F4',
   logo: '/logo.png', // 512x512
   ogImage: '/opengraph-image', // app/opengraph-image.tsx 자동 생성 1200x630
   ogAlt: '로컬루션 · 사장님 마케팅 플랫폼',
@@ -66,6 +66,8 @@ export type PublicRoute = {
 }
 
 export const PUBLIC_ROUTES: PublicRoute[] = [
+  { path: 'support', title: '소상공인 지원사업', summary: '기업마당 공고 조회와 소상공인24, K-Startup 공식 지원 안내', priority: 0.8, freq: 'daily' },
+  { path: 'partners', title: '광고·공공홍보 협업', summary: '민간 광고와 공공기관 홍보 협업 범위를 정리하고 문의 초안 준비', priority: 0.7, freq: 'monthly' },
   { path: '', title: '홈', summary: SITE.answer, priority: 1.0, freq: 'weekly' },
   { path: 'service-intro', title: '서비스 소개', summary: '리뷰 자동 답글 · SNS 자동 발행 · QR 리뷰 · 플레이스 진단까지 로컬루션이 하는 일 전체', priority: 0.9, freq: 'monthly' },
   { path: 'pricing', title: '요금제', summary: '월 6,900원부터 필요한 기능만 고르는 선택형 요금제. 신용카드 없이 시작', priority: 0.9, freq: 'monthly' },
@@ -208,11 +210,11 @@ export function softwareApplicationLd() {
     inLanguage: SITE.lang,
     description: SITE.answer,
     featureList: [
-      '6개 플랫폼 리뷰 자동 수집 · AI 답글 (톤 11종)',
-      '블로그 · 릴스 · 카드뉴스 · 스레드 · 유튜브 커뮤니티 자동 발행',
+      '연결된 플랫폼의 리뷰 조회와 AI 답글 초안',
+      '블로그 · 릴스 · 카드뉴스 초안 작성과 연결 상태에 따른 발행',
       'QR 리뷰 수집',
       '네이버 플레이스 SEO 진단 · 키워드 순위 추적',
-      '답글 발행 통계 · 15분 단위 실시간 알림',
+      '실제 수집 이력과 지원사업 공식 안내',
     ],
     offers: {
       '@type': 'Offer',

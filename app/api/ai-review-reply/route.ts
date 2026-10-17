@@ -566,20 +566,7 @@ export async function POST(req: NextRequest) {
 
  // 5) API 키 없으면 목업
  const apiKey = process.env.ANTHROPIC_API_KEY
- if (!apiKey) {
- const name = storeName || '저희 매장'
- const reg = region || ''
- const prefix = (reg ? reg + ' ' : '') + name
- const mocks: Record<string, string> = {
- positive: `${prefix} 찾아 주셔서 감사해요. 리뷰 읽으면서 저희도 기분 좋아졌거든요. 다음에도 같은 정성으로 준비해 둘게요.`,
- negative: `불편하셨던 부분 정말 죄송해요. 말씀해 주신 내용 꼼꼼히 보고 바로잡을게요. 다시 한 번 기회 주시면 더 나아진 모습으로 맞이할게요.`,
- neutral: `리뷰 남겨 주셔서 감사해요. 부족했던 부분 다듬어서 다음엔 더 좋은 경험 드릴게요.`,
- empty: `${prefix} 방문해 주셔서 감사해요. 다음에 오시면 더 좋은 시간 드릴게요.`,
- photo_only: `${prefix} 사진까지 남겨 주셔서 감사해요. 다음 방문 때도 같은 느낌 드리려고 준비해 둘게요.`,
- }
- const reply = mocks[reviewType] || mocks.positive
- return NextResponse.json({ ok: true, reply, lang, reviewType, mode: 'mock', meta: { tone: toneUsed } })
- }
+ if (!apiKey) return NextResponse.json({ ok: false, error: 'AI 답글 연결이 설정되지 않았어요.', code: 'not_configured' }, { status: 503 })
 
  // 6) 모델 후보 — 최신 우선 (동적 조회 제거: /v1/models 6초 + 모델 404 fallback 누적으로 timeout 발생)
  //    Haiku 4.5 가 가장 빠르고 답글 생성에 충분

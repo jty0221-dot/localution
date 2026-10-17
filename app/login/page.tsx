@@ -5,93 +5,11 @@ import Image from 'next/image'
 export default function LoginPage() {
  const cardRef = useRef<HTMLDivElement>(null)
  const [error, setError] = useState('')
- const [counters, setCounters] = useState({ visitors: 0, reviews: 0, rank: 0 })
  // 회원가입 모드 여부 (/signup → /login?mode=signup 로 rewrite 되거나, 직접 쿼리로 접근)
  const [isSignup, setIsSignup] = useState(false)
  // 다른 계정으로 로그인 (네이버/카카오/구글에 reset 쿼리 전달 · 계정 선택/재로그인 강제)
  const [useDifferentAccount, setUseDifferentAccount] = useState(false)
  const oauthQuery = useDifferentAccount ? '?reset=1' : ''
-
- // 모바일 상단 · 실시간 데이터 (단조 증가, 영속, 절대 내려가지 않음)
- //   · 사장님 수: 142명에서 시작 (출시 시점), 매우 느린 자연 증가
- //   · 새로고침해도 localStorage 에 저장된 마지막 값 + 시간 경과분 합산 → 내려가지 않음
- //   · 다른 기기에서도 동일하게 보이도록 base 는 출시일 기준 deterministic 계산
- const LAUNCH_TS = new Date('2026-05-06T00:00:00+09:00').getTime()
- const STATS_KEY = 'localution.live_stats_v1'
-
- // 출시일 기준 시간 경과 → deterministic owners count
- //   하루에 평균 0.8명, 30분에 0.017명 ≒ 30분에 0~1명 (느린 자연 증가)
- function computeBaseOwners(now: number) {
- const minutesSinceLaunch = Math.max(0, (now - LAUNCH_TS) / 60000)
- // 하루 = 1440분, 하루 0.8명 → 분당 0.000556
- // floor 적용하면 ~28시간마다 +1 자연증가
- return 142 + Math.floor(minutesSinceLaunch / (1440 / 0.8))
- }
- function computeBaseReviews(now: number) {
- const minutesSinceLaunch = Math.max(0, (now - LAUNCH_TS) / 60000)
- // 하루 ~12건씩 · 분당 0.0083
- return 12 + Math.floor(minutesSinceLaunch * 0.0083)
- }
- function computeBaseTotalReplies(now: number) {
- const minutesSinceLaunch = Math.max(0, (now - LAUNCH_TS) / 60000)
- return 384 + Math.floor(minutesSinceLaunch * 0.5)
- }
-
- const [liveStats, setLiveStats] = useState(() => {
- // SSR 에서는 LAUNCH_TS 기준값만 (Date.now 차이로 hydration mismatch 방지)
- const baseTs = LAUNCH_TS
- return {
- owners: computeBaseOwners(baseTs),
- reviewsToday: computeBaseReviews(baseTs),
- avgRatingLift: 0.6,
- keywordRank: 3,
- monthlyReplies: computeBaseTotalReplies(baseTs),
- placesTracked: computeBaseOwners(baseTs),
- }
- })
-
- useEffect(() => {
- // 페이지 로드 시: localStorage 저장값 vs 현재 시간 기준값 중 큰 쪽 채택 (단조 증가 보장)
- function pullStats() {
- const now = Date.now()
- let saved: any = {}
- try { saved = JSON.parse(localStorage.getItem(STATS_KEY) || '{}') } catch {}
- const next = {
- owners: Math.max(saved.owners || 0, computeBaseOwners(now)),
- reviewsToday: Math.max(saved.reviewsToday || 0, computeBaseReviews(now)),
- avgRatingLift: 0.6,
- keywordRank: 3,
- monthlyReplies: Math.max(saved.monthlyReplies || 0, computeBaseTotalReplies(now)),
- placesTracked: Math.max(saved.placesTracked || 0, computeBaseOwners(now)),
- }
- setLiveStats(next)
- try { localStorage.setItem(STATS_KEY, JSON.stringify(next)) } catch {}
- }
- pullStats()
- // 매 30초마다 자연 증가분만 반영 (단조 증가만 · 절대 감소 X)
- //   사장님: ~28시간마다 +1, 답글: 30초마다 ~0.25 → 가끔 +1
- //   페이지를 오래 열어둬도 너무 자주 안 변하도록
- const t = setInterval(() => {
- setLiveStats(prev => {
- const now = Date.now()
- // 누적 답글은 약 2분에 +1 페이스 · 살아있는 느낌
- const nudgeReplies = Math.random() < 0.25 ? 1 : 0
- // 오늘 답글은 약 5분에 +1 페이스
- const nudgeToday = Math.random() < 0.1 ? 1 : 0
- const next = {
- ...prev,
- // 사장님은 base 가 시간으로 자연 증가하므로 별도 nudge 안 함 · 새로고침으로 갱신
- owners: Math.max(prev.owners, computeBaseOwners(now)),
- reviewsToday: Math.max(prev.reviewsToday + nudgeToday, computeBaseReviews(now)),
- monthlyReplies: Math.max(prev.monthlyReplies + nudgeReplies, computeBaseTotalReplies(now)),
- placesTracked: Math.max(prev.placesTracked, computeBaseOwners(now)),
- }
- try { localStorage.setItem(STATS_KEY, JSON.stringify(next)) } catch {}
- return next
- })
- }, 30000)
- return () => clearInterval(t)
- }, [])
 
  useEffect(function() {
  const params = new URLSearchParams(window.location.search)
@@ -115,26 +33,6 @@ export default function LoginPage() {
  const safe = redirect && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard'
  window.location.href = safe
  }
- }, [])
-
- useEffect(function() {
- const targets = { visitors: 2847, reviews: 142, rank: 3 }
- const duration = 2000
- const steps = 60
- const interval = duration / steps
- let step = 0
- const timer = setInterval(function() {
- step++
- const progress = step / steps
- const eased = 1 - Math.pow(1 - progress, 3)
- setCounters({
- visitors: Math.round(targets.visitors * eased),
- reviews: Math.round(targets.reviews * eased),
- rank: Math.round(targets.rank * eased),
- })
- if (step >= steps) clearInterval(timer)
- }, interval)
- return function() { clearInterval(timer) }
  }, [])
 
  useEffect(function() {
@@ -365,147 +263,20 @@ export default function LoginPage() {
  <div className='brandTagline'>AI 사장님 마케팅 플랫폼</div>
  </div>
  </div>
- <div className='liveBadge'>
- <span className='liveDot' />
- <span>실시간</span>
+ <span className="text-xs text-[var(--lu-muted)]">매장 계정 연결</span>
  </div>
- </div>
-
- {/* 실시간 통계 3 카드 · 매 3초마다 자연스럽게 갱신 */}
- <div className='liveStats'>
- <div className='liveStatCard featured'>
- <svg className='liveStatIcon' width="11" height="11" viewBox="0 0 12 12" fill="none">
- <path d="M3 9 L6 4 L9 7" stroke="#60a5fa" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
- </svg>
- <div className='liveStatLabel'>사장님</div>
- <div className='liveStatValue'>{liveStats.owners.toLocaleString()}+</div>
- <div className='liveStatChange'>방금 가입</div>
- </div>
- <div className='liveStatCard'>
- <svg className='liveStatIcon' width="11" height="11" viewBox="0 0 12 12" fill="none">
- <path d="M2 4 L6 8 L10 4" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
- </svg>
- <div className='liveStatLabel'>오늘 답글</div>
- <div className='liveStatValue'>{liveStats.reviewsToday}건</div>
- <div className='liveStatChange'>+{Math.floor(liveStats.reviewsToday / 12)} 1시간</div>
- </div>
- <div className='liveStatCard'>
- <svg className='liveStatIcon' width="11" height="11" viewBox="0 0 12 12" fill="none">
- <polygon points="6,2 7.5,5 11,5.5 8.5,7.5 9,11 6,9 3,11 3.5,7.5 1,5.5 4.5,5" fill="#fbbf24"/>
- </svg>
- <div className='liveStatLabel'>별점 상승</div>
- <div className='liveStatValue'>+{liveStats.avgRatingLift.toFixed(1)}점</div>
- <div className='liveStatChange'>평균</div>
- </div>
- </div>
- </div>
-
- <div className='particles'>
- {Array.from({length:20}).map(function(_,i) {
- var size = 2 + Math.random() * 4
- return <div key={i} className='p' style={{
- width: size, height: size,
- left: Math.random()*100+'%',
- background: i%3===0 ? 'rgba(59,130,246,0.5)' : i%3===1 ? 'rgba(34,197,94,0.4)' : 'rgba(139,92,246,0.4)',
- animation: 'particleFloat '+(12+Math.random()*20)+'s linear '+(Math.random()*10)+'s infinite',
- }} />
- })}
+ <p className="mt-3 text-xs leading-5 text-[var(--lu-muted)]">로그인 후 연결한 계정의 실제 정보를 확인하세요.</p>
  </div>
 
  <div className='mainWrap'>
  <div className='leftArea'>
  <div className='growthScene'>
- <p className='heroTitle'>
- 고객이 늘고, 순위가 오르고<br/>
- <span className='heroHighlight'>매출이 성장합니다</span>
- </p>
- <p className='heroSub'>
- 로컬루션이 리뷰 관리부터 고객 재방문까지<br/>
- AI로 자동화하여 사장님의 매장을 성장시킵니다
- </p>
-
- <div className='graphCard'>
- <div className='graphHeader'>
- <span className='graphLabel'>월별 매장 순위 변화</span>
- <span className='graphBadge'>
- <svg width="12" height="12" viewBox="0 0 12 12" fill="none"><path d="M6 9V3M6 3L3 6M6 3l3 3" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
- 12위 상승
- </span>
- </div>
-
- <svg className='lineGraph' viewBox="0 0 460 100" fill="none">
- <defs>
- <linearGradient id="lineGrad" x1="0" y1="0" x2="460" y2="0">
- <stop offset="0%" stopColor="#3b82f6" stopOpacity="0.3"/>
- <stop offset="100%" stopColor="#22c55e"/>
- </linearGradient>
- <linearGradient id="areaGrad" x1="230" y1="0" x2="230" y2="100">
- <stop offset="0%" stopColor="#22c55e" stopOpacity="0.15"/>
- <stop offset="100%" stopColor="#22c55e" stopOpacity="0"/>
- </linearGradient>
- </defs>
- <path d="M0 85 C30 82, 60 80, 80 78 C100 76, 130 75, 160 68 C190 61, 210 55, 240 45 C270 35, 300 30, 330 22 C360 16, 390 12, 420 8 L460 4 L460 100 L0 100Z" fill="url(#areaGrad)"/>
- <path d="M0 85 C30 82, 60 80, 80 78 C100 76, 130 75, 160 68 C190 61, 210 55, 240 45 C270 35, 300 30, 330 22 C360 16, 390 12, 420 8 L460 4" stroke="url(#lineGrad)" strokeWidth="2.5" strokeLinecap="round"/>
- <circle cx="460" cy="4" r="4" fill="#22c55e"><animate attributeName="r" values="4;6;4" dur="2s" repeatCount="indefinite"/></circle>
- <text x="5" y="98" fill="#64748b" fontSize="10">1월</text>
- <text x="75" y="98" fill="#64748b" fontSize="10">2월</text>
- <text x="150" y="98" fill="#64748b" fontSize="10">3월</text>
- <text x="225" y="98" fill="#64748b" fontSize="10">4월</text>
- <text x="300" y="98" fill="#64748b" fontSize="10">5월</text>
- <text x="375" y="98" fill="#64748b" fontSize="10">6월</text>
- <text x="442" y="98" fill="#64748b" fontSize="10">7월</text>
- </svg>
-
- <div className='barChart'>
- {[
- {h:35,c:'#3b82f6',l:'1분기'},
- {h:50,c:'#22c55e',l:''},
- {h:45,c:'#8b5cf6',l:''},
- {h:60,c:'#3b82f6',l:'2분기'},
- {h:72,c:'#22c55e',l:''},
- {h:65,c:'#8b5cf6',l:''},
- {h:80,c:'#3b82f6',l:'3분기'},
- {h:92,c:'#22c55e',l:''},
- {h:88,c:'#8b5cf6',l:''},
- ].map(function(bar,i) {
- return <div key={i} className='bar' style={{
- background: 'linear-gradient(180deg, '+bar.c+', '+bar.c+'44)',
- '--bar-h': bar.h+'%',
- animationDelay: (i*0.1)+'s',
- } as React.CSSProperties}>
- {bar.l && <span className='barLabel'>{bar.l}</span>}
- </div>
- })}
- </div>
- </div>
-
- <div className='statCards'>
- <div className='statCard'>
- <div className='statNum'>{counters.visitors.toLocaleString()}</div>
- <div className='statLabel'>이번 달 방문자</div>
- <div className='statChange'>▲ +12.4%</div>
- </div>
- <div className='statCard'>
- <div className='statNum'>{counters.reviews}건</div>
- <div className='statLabel'>총 리뷰 수</div>
- <div className='statChange'>▲ +34건 이번 주</div>
- </div>
- <div className='statCard'>
- <div className='statNum'>TOP {counters.rank}</div>
- <div className='statLabel'>지역 내 순위</div>
- <div className='statChange'>▲ 12위 상승</div>
- </div>
- </div>
-
- <div className='trustRow'>
- <div className='trustDots'>
- <div className='trustDot' style={{background:'#3b82f6'}}>김</div>
- <div className='trustDot' style={{background:'#8b5cf6'}}>이</div>
- <div className='trustDot' style={{background:'#22c55e'}}>박</div>
- <div className='trustDot' style={{background:'#f59e0b'}}>최</div>
- <div className='trustDot' style={{background:'#ef4444'}}>+</div>
- </div>
- <div className='trustText'><strong>1,200+</strong> 사장님이 이미 사용 중</div>
+ <h1 className='heroTitle'>매장 운영에 필요한 도구를<br /><span className='heroHighlight'>한곳에서 확인하세요</span></h1>
+ <p className='heroSub'>리뷰와 고객 관리는 계정을 연결한 뒤 이용하세요.<br />먼저 살펴볼 수 있는 도구와 사용 안내도 준비되어 있습니다.</p>
+ <div className="grid gap-4 pt-6">
+ <a href="/marketing" className="min-h-11 rounded-[10px] border border-[var(--lu-line)] bg-white p-5 text-base font-semibold text-[var(--lu-accent)]">마케팅 도구 살펴보기</a>
+ <a href="/help/videos" className="min-h-11 rounded-[10px] border border-[var(--lu-line)] bg-white p-5 text-base font-semibold text-[var(--lu-accent)]">기능별 사용 영상 보기</a>
+ <a href="/support" className="min-h-11 rounded-[10px] border border-[var(--lu-line)] bg-white p-5 text-base font-semibold text-[var(--lu-accent)]">공식 지원정보 확인하기</a>
  </div>
  </div>
  </div>

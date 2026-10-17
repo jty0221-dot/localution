@@ -9,121 +9,18 @@
 //     - QuickActions 추가 금지 (/DO_NOT_TOUCH.md)
 //     - 부모는 xl:grid xl:grid-cols-[1fr_280px] 로 공간 분배 (콘텐츠 침범 방지)
 // ============================================================
-import { useState, useEffect } from 'react'
 import Link from 'next/link'
 import {
   ArrowRight, BellRing, HelpCircle, Mail, Sparkles, ArrowUp, ArrowDown, Minus,
 } from 'lucide-react'
 
-// 인기 서비스 TOP 10 (실시간 순위 애니메이션)
-const SERVICE_RANKING_INIT = [
-  { id: 1, name: 'AI 리뷰 자동 답글', category: '리뷰', badge: 'HOT', color: '#F04452' },
-  { id: 2, name: '네이버 플레이스 관리', category: '플레이스', badge: '', color: '#03C75A' },
-  { id: 3, name: 'QR 리뷰 자동화', category: 'QR', badge: 'NEW', color: '#7C3AED' },
-  { id: 4, name: '매출 캘린더 · 정산', category: '정산', badge: '', color: '#16685D' },
-  { id: 5, name: '고객 CRM 관리', category: 'CRM', badge: '', color: '#F59E0B' },
-  { id: 6, name: '키워드 순위 추적', category: 'SEO', badge: '', color: '#10B981' },
-  { id: 7, name: '숏폼 퍼블리셔', category: '마케팅', badge: '', color: '#EC4899' },
-  { id: 8, name: '배민 리뷰 연동', category: '배달', badge: '', color: '#2AC1BC' },
-  { id: 9, name: '구글 리뷰 연동', category: '구글', badge: '', color: '#4285F4' },
-  { id: 10, name: '세금계산서 자동 발행', category: '행정', badge: '', color: '#6B7280' },
-]
-
-// 한국 증시 컨벤션: 상승 = 빨강 / 하락 = 파랑 / 변동 없음 = 회색
-function RankBadge({ diff }: { diff: number }) {
-  if (diff > 0) return (
-    <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[#DC2626] tabular-nums">
-      <ArrowUp size={11} strokeWidth={3} /> {diff}
-    </span>
-  )
-  if (diff < 0) return (
-    <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[#16685D] tabular-nums">
-      <ArrowDown size={11} strokeWidth={3} /> {Math.abs(diff)}
-    </span>
-  )
-  return (
-    <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[#9CA3AF]">
-      <Minus size={11} strokeWidth={3} />
-    </span>
-  )
-}
-
+// 실제 이용 집계가 연결되기 전에는 인기 순위를 만들지 않는다.
 function ServiceRankingMini() {
-  const [items, setItems] = useState(
-    SERVICE_RANKING_INIT.map((s, i) => ({ ...s, rank: i + 1, prevRank: i + 1, score: 100 - i * 8 }))
-  )
-  const [isShuffling, setIsShuffling] = useState(false)
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setIsShuffling(true)
-      setTimeout(() => {
-        setItems(prev => {
-          const arr = prev.map(p => ({ ...p }))
-          const swapCount = 2 + Math.floor(Math.random() * 2)
-          for (let s = 0; s < swapCount; s++) {
-            const a = Math.floor(Math.random() * arr.length)
-            let b = Math.floor(Math.random() * arr.length)
-            while (b === a) b = Math.floor(Math.random() * arr.length)
-            arr[a].score += Math.floor(Math.random() * 10) - 4
-            arr[b].score += Math.floor(Math.random() * 10) - 4
-          }
-          arr.sort((a, b) => b.score - a.score)
-          arr.forEach((item, i) => {
-            item.prevRank = item.rank
-            item.rank = i + 1
-          })
-          return arr
-        })
-        setIsShuffling(false)
-      }, 300)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [])
-
-  return (
-    <div className="bg-white rounded-[10px] shadow-none overflow-hidden">
-      <div className="px-4 py-3 border-b border-[var(--lu-canvas)]">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <span className="text-[14px] font-bold text-[var(--lu-ink)]">인기 서비스 TOP 10</span>
-            <span className="w-1.5 h-1.5 rounded-full bg-[#F04452] animate-pulse inline-block" />
-          </div>
-          <span className="text-[11px] font-bold text-[var(--lu-muted)]">실시간</span>
-        </div>
-      </div>
-      <div>
-        {items.map((item) => {
-          const diff = item.prevRank - item.rank
-          return (
-            <div
-              key={item.id}
-              className="px-4 py-2.5 flex items-center gap-2.5 border-b border-[var(--lu-canvas)] last:border-0 hover:bg-[#FAFBFF]"
-              style={{
-                opacity: isShuffling ? 0.7 : 1,
-                transform: isShuffling ? 'translateX(2px)' : 'translateX(0)',
-                transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
-              }}
-            >
-              <div className={'w-6 h-6 rounded-md flex items-center justify-center text-[12px] font-semibold flex-shrink-0 tabular-nums ' + (item.rank <= 3 ? 'bg-[#16685D] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]')}>
-                {item.rank}
-              </div>
-              <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                <span className="text-[13px] font-bold text-[var(--lu-ink)] truncate leading-tight">{item.name}</span>
-                {item.badge && (
-                  <span className="text-[10px] font-semibold text-white px-1.5 py-0.5 rounded flex-shrink-0 leading-none"
-                    style={{ background: item.color }}>
-                    {item.badge}
-                  </span>
-                )}
-              </div>
-              <RankBadge diff={diff} />
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
+ return <section className="rounded-[10px] border border-[var(--lu-line)] bg-white p-4">
+ <h3 className="text-sm font-semibold text-[var(--lu-ink)]">서비스 이용 안내</h3>
+ <p className="mt-2 text-xs leading-5 text-[var(--lu-muted)]">인기 서비스 순위는 이용 집계가 연결된 뒤 안내합니다.</p>
+ <Link href="/marketing" className="mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-[var(--lu-accent)]">사용할 도구 찾기<ArrowRight size={15} /></Link>
+ </section>
 }
 
 // 사이드바 카드 3종 (재사용 — desktop sticky / mobile inline 양쪽에 동일하게 사용)
@@ -133,14 +30,14 @@ function SidebarCards() {
       {/* 1) 인기 서비스 TOP 10 */}
       <ServiceRankingMini />
 
-      {/* 2) 실시간 리뷰 알림 */}
-      <div className="rounded-[10px] bg-[var(--lu-accent)] border border-[#FDE68A] p-4">
+      {/* 2) 리뷰 알림 연결 안내 */}
+      <div className="rounded-[10px] bg-white border border-[var(--lu-line)] p-4">
         <div className="flex items-center gap-2 mb-2">
-          <BellRing size={16} className="text-[#D97706]" strokeWidth={2.5} />
-          <h3 className="text-[14px] font-bold text-[#92400E]">실시간 리뷰 알림</h3>
+          <BellRing size={16} className="text-[var(--lu-accent)]" strokeWidth={2.5} />
+          <h3 className="text-[14px] font-bold text-[var(--lu-muted)]">리뷰 알림 연결 안내</h3>
         </div>
-        <p className="text-[12px] text-[#92400E] leading-relaxed">
-          15분 자동 수집 · 별점 1-2점 부정 리뷰 우선 알림 (웹푸시·카카오톡)
+        <p className="text-[12px] text-[var(--lu-muted)] leading-relaxed">
+          리뷰 계정을 연결한 뒤 수집 상태와 알림 설정을 확인하세요.
         </p>
       </div>
 
@@ -149,19 +46,19 @@ function SidebarCards() {
         <h3 className="text-[14px] font-bold text-[var(--lu-ink)] mb-2.5">도움이 필요하세요?</h3>
         <div className="space-y-1">
           <Link href="/help"
-            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[var(--lu-muted)] transition-colors">
+            className="flex min-h-11 items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[var(--lu-muted)] transition-colors">
             <HelpCircle size={15} className="text-[#16685D]" strokeWidth={2.5} />
             <span>도움말 · 가이드</span>
             <ArrowRight size={12} className="ml-auto text-[#D1D5DB]" strokeWidth={2.5} />
           </Link>
           <Link href="/inquiry"
-            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[var(--lu-muted)] transition-colors">
+            className="flex min-h-11 items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[var(--lu-muted)] transition-colors">
             <Mail size={15} className="text-[#7C3AED]" strokeWidth={2.5} />
             <span>1:1 문의</span>
             <ArrowRight size={12} className="ml-auto text-[#D1D5DB]" strokeWidth={2.5} />
           </Link>
           <Link href="/updates"
-            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[var(--lu-muted)] transition-colors">
+            className="flex min-h-11 items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[var(--lu-muted)] transition-colors">
             <Sparkles size={15} className="text-[#EC4899]" strokeWidth={2.5} />
             <span>업데이트 내역</span>
             <ArrowRight size={12} className="ml-auto text-[#D1D5DB]" strokeWidth={2.5} />
@@ -183,7 +80,7 @@ function SidebarCards() {
 export default function DashboardRightSidebar() {
   return (
     <div
-      className="hidden xl:block fixed top-20 right-4 w-[320px] z-30 space-y-3.5"
+      className="hidden 2xl:block fixed top-20 right-4 w-[280px] z-30 space-y-3.5"
       style={{
         bottom: '1rem',
         overflowY: 'auto',
@@ -200,7 +97,7 @@ export default function DashboardRightSidebar() {
 // xl 미만 (1280px 미만): 메인 콘텐츠 하단에 인라인 표시 (lg+ 3열, mobile 1열)
 export function DashboardRightSidebarMobile() {
   return (
-    <div className="xl:hidden mt-6">
+    <div className="2xl:hidden mt-6">
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         <SidebarCards />
       </div>

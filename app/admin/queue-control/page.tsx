@@ -79,7 +79,7 @@ export default function QueueControlPage() {
   const counts = status?.counts || { waiting: 0, prioritized: 0, active: 0, completed: 0, failed: 0, delayed: 0 }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-[var(--lu-canvas)]">
       <PageHeader
         title="큐 비상 제어"
         subtitle="BullMQ 적체 / 중복 / hang 즉시 복구"
@@ -118,18 +118,18 @@ export default function QueueControlPage() {
 
         {/* 큐 상태 카드 */}
         <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
-          <StatCard label="대기" value={counts.waiting} color="bg-gradient-to-br from-blue-500 to-blue-600" />
-          <StatCard label="우선순위" value={counts.prioritized} color="bg-gradient-to-br from-purple-500 to-purple-600" highlight={counts.prioritized > 10} />
-          <StatCard label="처리중" value={counts.active} color="bg-gradient-to-br from-emerald-500 to-emerald-600" />
-          <StatCard label="완료" value={counts.completed} color="bg-gradient-to-br from-gray-500 to-gray-600" />
-          <StatCard label="실패" value={counts.failed} color="bg-gradient-to-br from-red-500 to-red-600" highlight={counts.failed > 5} />
-          <StatCard label="지연" value={counts.delayed} color="bg-gradient-to-br from-amber-500 to-amber-600" />
+          <StatCard label="대기" value={counts.waiting} color="bg-[var(--lu-accent)]" />
+          <StatCard label="우선순위" value={counts.prioritized} color="bg-[var(--lu-accent)]" highlight={counts.prioritized > 10} />
+          <StatCard label="처리중" value={counts.active} color="bg-[var(--lu-accent)]" />
+          <StatCard label="완료" value={counts.completed} color="bg-[var(--lu-accent)]" />
+          <StatCard label="실패" value={counts.failed} color="bg-[var(--lu-accent)]" highlight={counts.failed > 5} />
+          <StatCard label="지연" value={counts.delayed} color="bg-[var(--lu-accent)]" />
         </div>
 
         {/* 비상 액션 버튼들 */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6">
+        <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
           <div className="flex items-center gap-2 mb-3 md:mb-4">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-rose-500 to-pink-600 shadow-sm flex items-center justify-center">
+            <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center">
               <Zap size={16} className="text-white" strokeWidth={2.5} />
             </div>
             <div>
@@ -172,7 +172,7 @@ export default function QueueControlPage() {
 
         {/* prioritized 잡 상세 (있을 때만) */}
         {status?.prioritized && status.prioritized.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6">
+          <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
             <div className="flex items-center justify-between mb-3">
               <div className="text-base font-bold text-gray-900">
                 Prioritized 잡 ({status.prioritized.length}건)
@@ -183,13 +183,13 @@ export default function QueueControlPage() {
               {status.prioritized.slice(0, 15).map((j: any) => (
                 <div key={j.id} className="flex items-center gap-2 p-2 md:p-3 bg-gray-50 rounded-lg text-xs md:text-sm">
                   <div className="flex-1 min-w-0">
-                    <div className="font-mono text-[11px] md:text-xs text-gray-500 truncate">
+                    <div className="font-mono text-xs md:text-xs text-gray-500 truncate">
                       {String(j.id).slice(0, 24)}
                     </div>
                     <div className="font-medium text-gray-900 truncate">
                       {j.platform} · {j.action}
                     </div>
-                    <div className="text-[11px] md:text-xs text-gray-500 truncate">
+                    <div className="text-xs md:text-xs text-gray-500 truncate">
                       {j.userId || ''} · review {String(j.platform_review_id || '').slice(0, 16)}
                     </div>
                   </div>
@@ -206,7 +206,7 @@ export default function QueueControlPage() {
 
         {/* 최근 액션 결과 */}
         {results.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6">
+          <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
             <div className="flex items-center gap-2 mb-3">
               <div className="text-base font-bold text-gray-900">최근 액션 결과</div>
               <div className="text-xs text-gray-500">최대 10건</div>
@@ -219,9 +219,9 @@ export default function QueueControlPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="font-medium text-gray-900">{r.label}</div>
-                    <div className="text-[11px] md:text-xs text-gray-600 break-words">{r.message}</div>
+                    <div className="text-xs md:text-xs text-gray-600 break-words">{r.message}</div>
                   </div>
-                  <div className="flex-shrink-0 text-[10px] md:text-xs text-gray-400">
+                  <div className="flex-shrink-0 text-xs md:text-xs text-gray-400">
                     {new Date(r.ts).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })}
                   </div>
                 </div>
@@ -231,7 +231,7 @@ export default function QueueControlPage() {
         )}
 
         {/* 운영 가이드 */}
-        <div className="bg-gradient-to-br from-rose-50 to-pink-50 rounded-2xl border border-rose-200 p-4 md:p-6">
+        <div className="bg-[var(--lu-accent)] rounded-[10px] border border-rose-200 p-4 md:p-6">
           <div className="flex items-center gap-2 mb-2">
             <AlertTriangle size={16} className="text-rose-600" />
             <div className="text-sm md:text-base font-bold text-rose-900">언제 사용?</div>
@@ -251,7 +251,7 @@ export default function QueueControlPage() {
             </li>
             <li className="flex items-start gap-1.5">
               <ArrowRight size={12} className="mt-0.5 flex-shrink-0" />
-              <span>자세한 가이드: <code className="bg-rose-100 px-1 rounded text-[11px]">worker/BULLMQ_QUEUE_PRIORITY_INCIDENT_v38.md</code></span>
+              <span>자세한 가이드: <code className="bg-rose-100 px-1 rounded text-xs">worker/BULLMQ_QUEUE_PRIORITY_INCIDENT_v38.md</code></span>
             </li>
           </ul>
         </div>
@@ -262,9 +262,9 @@ export default function QueueControlPage() {
 
 function StatCard({ label, value, color, highlight }: { label: string; value: number; color: string; highlight?: boolean }) {
   return (
-    <div className={`${color} rounded-xl p-2.5 md:p-3 text-white shadow-sm ${highlight ? 'ring-2 ring-yellow-400' : ''}`}>
-      <div className="text-[10px] md:text-xs font-medium opacity-90">{label}</div>
-      <div className="text-lg md:text-2xl font-black mt-0.5">{value}</div>
+    <div className={`${color} rounded-[6px] p-2.5 md:p-3 text-white shadow-none ${highlight ? 'ring-2 ring-yellow-400' : ''}`}>
+      <div className="text-xs md:text-xs font-medium opacity-90">{label}</div>
+      <div className="text-lg md:text-2xl font-semibold mt-0.5">{value}</div>
     </div>
   )
 }
@@ -280,13 +280,13 @@ function ActionButton({ label, desc, busy, onClick, color }: {
     <button
       onClick={onClick}
       disabled={busy}
-      className={`text-left p-3 md:p-4 rounded-xl bg-gradient-to-br ${color} text-white shadow-sm hover:shadow-md transition disabled:opacity-50`}
+      className={`text-left p-3 md:p-4 rounded-[6px] bg-gradient-to-br ${color} text-white shadow-none hover:shadow-md transition disabled:opacity-50`}
     >
       <div className="flex items-center gap-2 mb-1">
         {busy ? <Loader2 size={14} className="animate-spin" /> : <Zap size={14} />}
         <div className="text-sm md:text-base font-bold">{label}</div>
       </div>
-      <div className="text-[11px] md:text-xs opacity-90 leading-snug">{desc}</div>
+      <div className="text-xs md:text-xs opacity-90 leading-snug">{desc}</div>
     </button>
   )
 }

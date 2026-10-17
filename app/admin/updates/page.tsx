@@ -140,7 +140,7 @@ export default function AdminUpdatesPage() {
  }
 
  return (
- <main className="min-h-screen bg-[#F8F9FA] pb-24">
+ <main className="min-h-screen bg-[var(--lu-canvas)] pb-24">
  <div className="max-w-5xl mx-auto px-5 pt-8 md:pt-12">
  {/* 헤더 */}
  <div className="flex items-center justify-between mb-6">
@@ -169,7 +169,7 @@ export default function AdminUpdatesPage() {
  ) : null}
 
  {/* 테이블 */}
- <div className="bg-white rounded-2xl shadow-sm ring-1 ring-slate-100 overflow-hidden">
+ <div className="bg-white rounded-[10px] shadow-none ring-1 ring-slate-100 overflow-hidden">
  <table className="w-full text-sm">
  <thead className="bg-slate-50 text-slate-600">
  <tr>
@@ -190,7 +190,7 @@ export default function AdminUpdatesPage() {
  <tr key={row.id} className="border-t border-slate-100 align-top">
  <td className="px-4 py-3 text-slate-700">{row.released_at}</td>
  <td className="px-4 py-3">
- <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
+ <span className={`text-xs font-bold px-2 py-0.5 rounded ${
  row.category === 'feature' ? 'bg-blue-100 text-blue-700' :
  row.category === 'fix' ? 'bg-amber-100 text-amber-700' :
  row.category === 'beta' ? 'bg-purple-100 text-purple-700' :
@@ -233,7 +233,7 @@ export default function AdminUpdatesPage() {
  {/* ---- 추가/수정 모달 ---- */}
  {draft ? (
  <div className="fixed inset-0 z-50 bg-black/40 grid place-items-center px-4">
- <div className="w-full max-w-lg bg-white rounded-2xl shadow-xl p-6 max-h-[90vh] overflow-y-auto">
+ <div className="w-full max-w-lg bg-white rounded-[10px] shadow-xl p-6 max-h-[90vh] overflow-y-auto">
  <div className="flex items-center justify-between mb-4">
  <h2 className="text-lg font-bold text-slate-900">
  {draft.id ? '업데이트 수정' : '새 업데이트 추가'}

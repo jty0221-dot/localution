@@ -7,7 +7,8 @@ import { usePathname } from 'next/navigation'
 
 const NAV_LINKS = [
  { href: '/help/videos', label: '기능 영상' },
- { href: '/about', label: '회사 소개' }, // 신규 2026-04-19 · 대표의 편지 & 브랜드 스토리
+ { href: '/support', label: '지원사업' },
+ { href: '/partners', label: '광고·공공홍보' },
  { href: '/service-intro', label: '서비스 소개' },
  { href: '/pricing', label: '요금' },
  { href: '/community', label: '커뮤니티' },
@@ -64,7 +65,7 @@ export default function TopNav() {
  </Link>
 
  {/* 데스크탑 메뉴 */}
- <div className="hidden md:flex items-center gap-5 lg:gap-6">
+ <div className="hidden xl:flex items-center gap-5 lg:gap-6">
  {NAV_LINKS.map(l => (
  <Link
  key={l.href}
@@ -81,7 +82,7 @@ export default function TopNav() {
  </div>
 
  {/* 우측 버튼 */}
- <div className="hidden md:flex items-center gap-2">
+ <div className="hidden xl:flex items-center gap-2">
  {isLoggedIn ? (
  <Link
  href="/dashboard"
@@ -103,7 +104,7 @@ export default function TopNav() {
 
  {/* 모바일 메뉴 버튼 */}
  <button
- className="md:hidden p-2 min-w-[44px] min-h-[44px] flex flex-col items-center justify-center"
+ className="xl:hidden p-2 min-w-[44px] min-h-[44px] flex flex-col items-center justify-center"
  onClick={() => setMenuOpen(!menuOpen)}
  aria-label={menuOpen ? '메뉴 닫기' : '메뉴 열기'}
  aria-expanded={menuOpen}
@@ -117,7 +118,7 @@ export default function TopNav() {
 
  {/* 모바일 드롭다운 */}
  {menuOpen && (
- <div id="public-mobile-menu" className="md:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-3">
+ <div id="public-mobile-menu" className="xl:hidden bg-white border-t border-gray-100 px-4 py-4 space-y-3">
  {NAV_LINKS.map(l => (
  <Link
  key={l.href}

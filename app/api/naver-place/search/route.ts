@@ -38,25 +38,7 @@ export async function GET(req: NextRequest) {
  const clientSecret = process.env.NAVER_CLIENT_SECRET
 
  if (!clientId || !clientSecret) {
- // 개발 환경에서 키 미설정 시 목업 데이터 반환 (UI 테스트용)
- const mockData = {
- items: [
- {
- title: rawQuery.includes('http') ? '연동할 매장 이름' : rawQuery,
- link: 'https://map.naver.com',
- category: '카페·베이커리',
- description: '',
- telephone: '02-0000-0000',
- address: '서울시 마포구 합정동 123-4',
- roadAddress: '서울시 마포구 합정로 12',
- mapx: '126.901234',
- mapy: '37.549876',
- }
- ],
- _mock: true,
- _message: 'NAVER_CLIENT_ID / NAVER_CLIENT_SECRET 환경변수를 설정해주세요',
- }
- return NextResponse.json(mockData)
+ return NextResponse.json({ code: 'not_configured', error: '네이버 검색 연결이 준비되지 않았습니다.' }, { status: 503 })
  }
 
  // 네이버 지역검색 API 호출
@@ -83,9 +65,10 @@ export async function GET(req: NextRequest) {
  }
 
  const data = await res.json()
+ if (!Array.isArray(data.items)) return NextResponse.json({ code: 'upstream_failed', error: '네이버 검색 응답 형식을 확인할 수 없습니다.' }, { status: 502 })
 
  // HTML 태그 제거 후 반환
- const items = (data.items || []).map((item: Record<string, string>) => ({
+ const items = data.items.map((item: Record<string, string>) => ({
  ...item,
  title: stripHtml(item.title),
  category: stripHtml(item.category),
@@ -99,7 +82,7 @@ export async function GET(req: NextRequest) {
  console.error('[Naver API Fetch Error]', err)
  return NextResponse.json(
  { error: '네이버 API 연결에 실패했습니다' },
- { status: 500 }
+ { status: 502 }
  )
  }
 }

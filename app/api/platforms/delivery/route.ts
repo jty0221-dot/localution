@@ -55,26 +55,6 @@ function extractDeliveryId(platform: DeliveryPlatform, input: string): string | 
  return null
 }
 
-// ── 목업 리뷰 생성 ────────────────────────────────────────────
-function mockReviews(platform: DeliveryPlatform, storeId: string) {
- const reviewsByPlatform = {
- baemin: [
- { id: `b-${storeId}-1`, rating: 5, author: '배**', date: '2026-04-13', text: '배달 빠르고 음식 맛있어요! 포장도 깔끔합니다.', replied: false },
- { id: `b-${storeId}-2`, rating: 4, author: '민**', date: '2026-04-10', text: '양 많고 맛있는데 좀 짜요.', replied: true },
- { id: `b-${storeId}-3`, rating: 5, author: '김**', date: '2026-04-08', text: '사장님이 친절하게 메모도 써주셨어요 감동', replied: true },
- ],
- yogiyo: [
- { id: `y-${storeId}-1`, rating: 5, author: '요**', date: '2026-04-12', text: '항상 맛있게 잘 먹고 있어요!', replied: false },
- { id: `y-${storeId}-2`, rating: 3, author: '기**', date: '2026-04-09', text: '배달은 빠른데 음식이 식어서 왔어요.', replied: false },
- ],
- coupangeats: [
- { id: `c-${storeId}-1`, rating: 5, author: '쿠**', date: '2026-04-11', text: '할인 쿠폰 써서 가성비 최고였어요!', replied: false },
- { id: `c-${storeId}-2`, rating: 4, author: '팡**', date: '2026-04-06', text: '쿠팡이츠 배달 빠르네요. 음식도 맛있음.', replied: true },
- ],
- }
- return reviewsByPlatform[platform]
-}
-
 // ── POST /api/platforms/delivery ─────────────────────────────
 export async function POST(req: NextRequest) {
  try {
@@ -100,8 +80,11 @@ export async function POST(req: NextRequest) {
  externalId,
  name: `${meta.name} 매장 (${externalId})`,
  url: meta.storeUrl(externalId),
- verified: true,
- })
+ verified: false,
+ inputValidated: true,
+ code: 'not_configured',
+ error: '주소 형식만 확인했습니다. 실제 플랫폼 연결 검증이 준비되지 않았습니다.',
+ }, { status: 503 })
  }
 
  return NextResponse.json({ error: 'unknown action' }, { status: 400 })
@@ -126,8 +109,7 @@ export async function GET(req: NextRequest) {
  return NextResponse.json({
  platform,
  storeId,
- source: 'mock',
- reviews: mockReviews(platform, storeId),
- stats: { total: platform === 'baemin' ? 243 : platform === 'yogiyo' ? 118 : 87, avg: 4.5, replied: 0 },
- })
+ code: 'not_configured',
+ error: '배달 플랫폼 리뷰 수집 연결이 준비되지 않았습니다.',
+ }, { status: 503 })
 }

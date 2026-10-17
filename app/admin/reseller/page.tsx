@@ -75,7 +75,7 @@ export default function ResellerPage() {
   }) || []
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-[var(--lu-canvas)]">
       <PageHeader
         title="Reseller 대시보드"
         subtitle="모든 사장님 한 화면에서 관리 · impersonate 1클릭"
@@ -96,7 +96,7 @@ export default function ResellerPage() {
         )}
 
         {/* 필터 */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-3 md:p-4 space-y-3">
+        <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-3 md:p-4 space-y-3">
           <div className="flex items-center gap-2">
             <div className="flex-1 relative">
               <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -126,7 +126,7 @@ export default function ResellerPage() {
               <button
                 key={f.v}
                 onClick={() => setFilter(f.v as any)}
-                className={`px-2.5 py-1 rounded-md text-[11px] md:text-xs font-bold transition ${
+                className={`px-2.5 py-1 rounded-md text-xs md:text-xs font-bold transition ${
                   filter === f.v ? 'bg-purple-500 text-white' : 'bg-gray-100 text-gray-700'
                 }`}
               >
@@ -138,9 +138,9 @@ export default function ResellerPage() {
 
         {/* 사용자 리스트 */}
         <div className="space-y-2">
-          <div className="text-xs md:text-sm text-gray-500 px-1">{filtered.length} / {data?.total_users || 0}명 표시</div>
+          <div className="text-xs md:text-sm text-gray-500 px-1">{data ? `${filtered.length} / ${data.total_users}명 표시` : '사용자 집계 확인 필요'}</div>
           {filtered.map(u => (
-            <div key={u.user_id} className={`bg-white rounded-2xl border shadow-sm p-3 md:p-4 ${u.has_login_issue ? 'border-red-200' : 'border-gray-200'}`}>
+            <div key={u.user_id} className={`bg-white rounded-[10px] border shadow-none p-3 md:p-4 ${u.has_login_issue ? 'border-red-200' : 'border-gray-200'}`}>
               <div className="flex items-start justify-between gap-3 mb-2 flex-wrap">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -148,19 +148,19 @@ export default function ResellerPage() {
                       {u.display_name || u.email || u.user_id_short}
                     </div>
                     {u.has_login_issue && (
-                      <span className="text-[10px] md:text-xs font-bold text-red-700 px-1.5 py-0.5 bg-red-50 rounded">
+                      <span className="text-xs md:text-xs font-bold text-red-700 px-1.5 py-0.5 bg-red-50 rounded">
                         로그인 이슈
                       </span>
                     )}
                   </div>
                   {u.email && (
-                    <div className="text-[11px] md:text-xs text-gray-500">{u.email}</div>
+                    <div className="text-xs md:text-xs text-gray-500">{u.email}</div>
                   )}
-                  <div className="text-[10px] md:text-xs text-gray-400 font-mono">{u.user_id_short}</div>
+                  <div className="text-xs md:text-xs text-gray-400 font-mono">{u.user_id_short}</div>
                 </div>
                 <button
                   onClick={() => impersonate(u.user_id)}
-                  className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 bg-gradient-to-br from-purple-500 to-violet-600 text-white text-[11px] md:text-xs font-bold rounded-lg hover:shadow-md transition"
+                  className="flex-shrink-0 inline-flex items-center gap-1 px-3 py-1.5 bg-[var(--lu-accent)] text-white text-xs md:text-xs font-bold rounded-lg hover:shadow-md transition"
                 >
                   Impersonate <ArrowRight size={11} />
                 </button>
@@ -168,7 +168,7 @@ export default function ResellerPage() {
 
               <div className="flex items-center gap-1.5 flex-wrap mb-2">
                 {u.platforms.map(p => (
-                  <span key={p} className="text-[10px] md:text-xs font-bold px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded">
+                  <span key={p} className="text-xs md:text-xs font-bold px-1.5 py-0.5 bg-gray-100 text-gray-700 rounded">
                     {p}
                   </span>
                 ))}
@@ -182,8 +182,8 @@ export default function ResellerPage() {
               </div>
             </div>
           ))}
-          {filtered.length === 0 && (
-            <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center text-sm text-gray-400">
+          {data && filtered.length === 0 && (
+            <div className="bg-white rounded-[10px] border border-gray-200 p-8 text-center text-sm text-gray-400">
               해당하는 사용자 없음
             </div>
           )}
@@ -195,12 +195,12 @@ export default function ResellerPage() {
 
 function Card({ label, value, icon: Icon, color, highlight }: any) {
   return (
-    <div className={`bg-gradient-to-br ${color} rounded-xl p-3 md:p-4 text-white shadow-sm ${highlight ? 'ring-2 ring-yellow-400' : ''}`}>
+    <div className={`bg-gradient-to-br ${color} rounded-[6px] p-3 md:p-4 text-white shadow-none ${highlight ? 'ring-2 ring-yellow-400' : ''}`}>
       <div className="flex items-center gap-1.5 mb-1">
         <Icon size={12} strokeWidth={2.5} />
-        <div className="text-[10px] md:text-xs font-medium opacity-90">{label}</div>
+        <div className="text-xs md:text-xs font-medium opacity-90">{label}</div>
       </div>
-      <div className="text-2xl md:text-3xl font-black mt-0.5">{value}</div>
+      <div className="text-2xl md:text-3xl font-semibold mt-0.5">{value}</div>
     </div>
   )
 }
@@ -209,7 +209,7 @@ function Mini({ label, value, highlight }: any) {
   const color = highlight === 'bad' ? 'text-red-600' : highlight === 'warn' ? 'text-amber-600' : 'text-gray-900'
   return (
     <div>
-      <div className="text-[10px] md:text-xs text-gray-500 mb-0.5">{label}</div>
+      <div className="text-xs md:text-xs text-gray-500 mb-0.5">{label}</div>
       <div className={`text-sm md:text-base font-bold ${color}`}>{value}</div>
     </div>
   )

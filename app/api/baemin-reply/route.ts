@@ -36,13 +36,8 @@ export async function POST(req: NextRequest) {
  }
  }
 
- // API 키 없으면 데모 응답
  if (!bearerToken) {
- return NextResponse.json({
- ok: true,
- demo: true,
- message: '데모 모드 — 실제 배민 API Key가 있어야 등록됩니다'
- })
+ return NextResponse.json({ ok: false, code: 'not_configured', error: '배민 답글 등록 연결이 준비되지 않았습니다.' }, { status: 503 })
  }
 
  try {
@@ -56,10 +51,10 @@ export async function POST(req: NextRequest) {
  )
  if (!res.ok) {
  const err = await res.text()
- return NextResponse.json({ ok: false, error: `배민 API 오류 (${res.status}): ${err}` }, { status: res.status })
+ return NextResponse.json({ ok: false, error: `배민 API 오류 (${res.status}): ${err}` }, { status: 502 })
  }
  return NextResponse.json({ ok: true })
  } catch (e: any) {
- return NextResponse.json({ ok: false, error: e.message }, { status: 500 })
+ return NextResponse.json({ ok: false, error: e.message }, { status: 502 })
  }
 }

@@ -314,28 +314,28 @@ export default function CoupangDiagnosticsPage() {
   const filteredUsers = data?.users.filter(u => filter === 'all' || u.likely_issue === filter) || []
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-[var(--lu-canvas)]">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* 헤더 */}
         <div className="flex items-start justify-between gap-3 mb-4 md:mb-6 flex-wrap">
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl md:text-2xl font-black text-[#191F28] flex items-center gap-2">
+            <h1 className="text-xl md:text-2xl font-semibold text-[var(--lu-ink)] flex items-center gap-2">
               <Activity size={22} className="text-[#FF4B30] flex-shrink-0" strokeWidth={2.5} />
               쿠팡이츠 연동 진단
             </h1>
-            <p className="text-xs md:text-sm text-[#4E5968] mt-1">
+            <p className="text-xs md:text-sm text-[var(--lu-muted)] mt-1">
               전체 사장님 연결 상태 + 환경변수 + 큐 점검
             </p>
           </div>
           <button onClick={load} disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 md:px-4 md:py-2.5 rounded-xl bg-[#3182F6] text-white text-xs md:text-sm font-bold hover:bg-[#1B64DA] disabled:opacity-50 flex-shrink-0">
+            className="inline-flex items-center gap-1.5 px-3 py-2 md:px-4 md:py-2.5 rounded-[6px] bg-[#16685D] text-white text-xs md:text-sm font-bold hover:bg-[#105448] disabled:opacity-50 flex-shrink-0">
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} strokeWidth={2.5} />
             새로고침
           </button>
         </div>
 
         {error && (
-          <div className="mb-4 p-3 md:p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-sm">
+          <div className="mb-4 p-3 md:p-4 rounded-[10px] bg-red-50 border border-red-200 text-red-800 text-sm">
             <strong>오류:</strong> {error}
           </div>
         )}
@@ -343,73 +343,73 @@ export default function CoupangDiagnosticsPage() {
         {data && (
           <>
             {/* 환경변수 */}
-            <section className="mb-4 p-3 md:p-4 rounded-2xl bg-white shadow-sm">
-              <h2 className="text-sm md:text-base font-bold text-[#191F28] mb-2 md:mb-3 flex items-center gap-2">
-                <Server size={16} className="text-[#3182F6]" strokeWidth={2.5} />
+            <section className="mb-4 p-3 md:p-4 rounded-[10px] bg-white shadow-none">
+              <h2 className="text-sm md:text-base font-bold text-[var(--lu-ink)] mb-2 md:mb-3 flex items-center gap-2">
+                <Server size={16} className="text-[#16685D]" strokeWidth={2.5} />
                 환경변수
               </h2>
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-1.5 md:gap-2">
                 {Object.entries(data.env).map(([k, v]) => (
-                  <div key={k} className={'flex items-center gap-1.5 p-2 rounded-lg text-[11px] md:text-xs font-bold ' + (v ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700')}>
+                  <div key={k} className={'flex items-center gap-1.5 p-2 rounded-lg text-xs md:text-xs font-bold ' + (v ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700')}>
                     {v ? <CheckCircle2 size={13} strokeWidth={2.5} className="flex-shrink-0" /> : <XCircle size={13} strokeWidth={2.5} className="flex-shrink-0" />}
                     <span className="truncate">{k}</span>
                   </div>
                 ))}
               </div>
               {!data.env.PROXY_HOST && (
-                <div className="mt-3 p-2.5 md:p-3 rounded-lg bg-amber-50 border border-amber-200 text-[11px] md:text-xs text-amber-900 leading-relaxed">
+                <div className="mt-3 p-2.5 md:p-3 rounded-lg bg-amber-50 border border-amber-200 text-xs md:text-xs text-amber-900 leading-relaxed">
                   <strong>PROXY_HOST 없음</strong> · Akamai 통과 불가. iproyal residential proxy 환경변수 설정 필수.
                 </div>
               )}
               {!data.env.ENCRYPTION_KEK_HEX && (
-                <div className="mt-3 p-2.5 md:p-3 rounded-lg bg-red-50 border border-red-200 text-[11px] md:text-xs text-red-900 leading-relaxed">
+                <div className="mt-3 p-2.5 md:p-3 rounded-lg bg-red-50 border border-red-200 text-xs md:text-xs text-red-900 leading-relaxed">
                   <strong>ENCRYPTION_KEK_HEX 잘못됨</strong> · 64 hex 필요. 비밀번호/쿠키 저장 불가.
                 </div>
               )}
             </section>
 
             {/* 시스템 활성 테스트 */}
-            <section className="mb-4 p-3 md:p-4 rounded-2xl bg-white shadow-sm">
+            <section className="mb-4 p-3 md:p-4 rounded-[10px] bg-white shadow-none">
               <div className="flex items-start justify-between gap-2 mb-2 md:mb-3 flex-wrap">
-                <h2 className="text-sm md:text-base font-bold text-[#191F28] flex items-center gap-2">
+                <h2 className="text-sm md:text-base font-bold text-[var(--lu-ink)] flex items-center gap-2">
                   <Zap size={16} className="text-[#F59E0B]" strokeWidth={2.5} />
                   시스템 활성 테스트
                 </h2>
                 <div className="flex gap-1.5 flex-wrap">
                   <button onClick={runProbe} disabled={probing}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg bg-[#F59E0B] text-white text-[11px] md:text-xs font-bold hover:bg-[#D97706] disabled:opacity-50">
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg bg-[#F59E0B] text-white text-xs md:text-xs font-bold hover:bg-[#D97706] disabled:opacity-50">
                     <PlayCircle size={13} className={probing ? 'animate-pulse' : ''} strokeWidth={2.5} />
                     {probing ? '실행 중...' : '지금 테스트'}
                   </button>
                   <button onClick={triggerCron} disabled={probing}
-                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg bg-[#7C3AED] text-white text-[11px] md:text-xs font-bold hover:bg-[#6D28D9] disabled:opacity-50">
+                    className="inline-flex items-center gap-1.5 px-2.5 py-1.5 md:px-3 md:py-2 rounded-lg bg-[#7C3AED] text-white text-xs md:text-xs font-bold hover:bg-[#6D28D9] disabled:opacity-50">
                     <Zap size={13} strokeWidth={2.5} />
                     Cron 수동
                   </button>
                 </div>
               </div>
-              <p className="text-[11px] md:text-xs text-[#8B95A1] mb-2 md:mb-3">
+              <p className="text-xs md:text-xs text-[var(--lu-muted)] mb-2 md:mb-3">
                 proxy / Redis / 암호화 / Supabase / 쿠팡 endpoint 7단계 능동 검증 (5~15초)
               </p>
 
               {probe && (
                 <div className="space-y-2">
-                  <div className={'p-2.5 md:p-3 rounded-lg text-[11px] md:text-xs font-bold ' + (probe.ok ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-800')}>
+                  <div className={'p-2.5 md:p-3 rounded-lg text-xs md:text-xs font-bold ' + (probe.ok ? 'bg-emerald-50 text-emerald-800' : 'bg-red-50 text-red-800')}>
                     {probe.summary}
                   </div>
                   <div className="space-y-1">
                     {probe.steps.map((s, i) => (
-                      <div key={i} className={'p-2 rounded-lg flex items-start gap-2 text-[11px] md:text-xs ' + (s.ok ? 'bg-emerald-50' : 'bg-red-50')}>
+                      <div key={i} className={'p-2 rounded-lg flex items-start gap-2 text-xs md:text-xs ' + (s.ok ? 'bg-emerald-50' : 'bg-red-50')}>
                         {s.ok
                           ? <CheckCircle2 size={14} className="text-emerald-600 flex-shrink-0 mt-0.5" strokeWidth={2.5} />
                           : <XCircle size={14} className="text-red-600 flex-shrink-0 mt-0.5" strokeWidth={2.5} />}
                         <div className="flex-1 min-w-0">
-                          <div className="font-bold text-[#191F28] flex items-center gap-1.5 flex-wrap">
+                          <div className="font-bold text-[var(--lu-ink)] flex items-center gap-1.5 flex-wrap">
                             <span>{s.name}</span>
-                            <span className="text-[#8B95A1] font-normal text-[10px]">({s.latency_ms}ms)</span>
+                            <span className="text-[var(--lu-muted)] font-normal text-xs">({s.latency_ms}ms)</span>
                           </div>
                           {s.error && <div className="text-red-700 mt-0.5 break-all">{s.error}</div>}
-                          {s.result && <div className="text-[#4E5968] mt-0.5 font-mono text-[10px] break-all">{JSON.stringify(s.result)}</div>}
+                          {s.result && <div className="text-[var(--lu-muted)] mt-0.5 font-mono text-xs break-all">{JSON.stringify(s.result)}</div>}
                         </div>
                       </div>
                     ))}
@@ -419,25 +419,25 @@ export default function CoupangDiagnosticsPage() {
             </section>
 
             {fetchResult && (
-              <div className="mb-4 p-3 rounded-xl bg-blue-50 border border-blue-200 text-xs md:text-sm text-blue-900">
+              <div className="mb-4 p-3 rounded-[6px] bg-blue-50 border border-blue-200 text-xs md:text-sm text-blue-900">
                 <strong>실행 결과:</strong> {fetchResult}
               </div>
             )}
 
             {/* BullMQ 큐 */}
-            <section className="mb-4 p-3 md:p-4 rounded-2xl bg-white shadow-sm">
+            <section className="mb-4 p-3 md:p-4 rounded-[10px] bg-white shadow-none">
               <div className="flex items-start justify-between gap-2 mb-2 md:mb-3 flex-wrap">
-                <h2 className="text-sm md:text-base font-bold text-[#191F28] flex items-center gap-2">
+                <h2 className="text-sm md:text-base font-bold text-[var(--lu-ink)] flex items-center gap-2">
                   <Clock size={16} className="text-[#7C3AED]" strokeWidth={2.5} />
                   BullMQ 큐
                 </h2>
                 <div className="flex gap-1.5 flex-wrap">
                   <button onClick={() => clearFailed(false)} disabled={probing}
-                    className="text-[11px] md:text-xs font-bold px-2.5 py-1.5 rounded-lg bg-[#F59E0B] text-white hover:bg-[#D97706] disabled:opacity-50">
+                    className="text-xs md:text-xs font-bold px-2.5 py-1.5 rounded-lg bg-[#F59E0B] text-white hover:bg-[#D97706] disabled:opacity-50">
                     Failed 정리
                   </button>
                   <button onClick={() => clearFailed(true)} disabled={probing}
-                    className="text-[11px] md:text-xs font-bold px-2.5 py-1.5 rounded-lg bg-[#DC2626] text-white hover:bg-[#B91C1C] disabled:opacity-50"
+                    className="text-xs md:text-xs font-bold px-2.5 py-1.5 rounded-lg bg-[#DC2626] text-white hover:bg-[#B91C1C] disabled:opacity-50"
                     title="active stalled 까지 강제 제거 · 워커 처리 중 job 도 끊어짐">
                     강제 정리
                   </button>
@@ -447,15 +447,15 @@ export default function CoupangDiagnosticsPage() {
                 <div className="text-xs text-red-700">큐 조회 실패: {data.queue.error}</div>
               ) : (
                 <>
-                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5 md:gap-2 text-[11px] md:text-xs">
+                  <div className="grid grid-cols-3 sm:grid-cols-5 gap-1.5 md:gap-2 text-xs md:text-xs">
                     {Object.entries(data.queue.counts || {}).map(([k, v]: any) => (
-                      <div key={k} className="p-2 rounded-lg bg-[#F2F4F6] min-w-0">
-                        <div className="text-[#8B95A1] font-bold truncate">{k}</div>
-                        <div className="text-base md:text-lg font-black text-[#191F28] tabular-nums">{v}</div>
+                      <div key={k} className="p-2 rounded-lg bg-[var(--lu-canvas)] min-w-0">
+                        <div className="text-[var(--lu-muted)] font-bold truncate">{k}</div>
+                        <div className="text-base md:text-lg font-semibold text-[var(--lu-ink)] tabular-nums">{v}</div>
                       </div>
                     ))}
                   </div>
-                  <div className="mt-2 md:mt-3 grid grid-cols-2 gap-1.5 md:gap-2 text-[11px] md:text-xs">
+                  <div className="mt-2 md:mt-3 grid grid-cols-2 gap-1.5 md:gap-2 text-xs md:text-xs">
                     <div className="p-2 rounded-lg bg-[#FFE7E3] text-[#8B0F00]">
                       <span className="font-bold">쿠팡 waiting</span>
                       <span className="float-right tabular-nums">{data.queue.coupang_waiting || 0}</span>
@@ -467,18 +467,18 @@ export default function CoupangDiagnosticsPage() {
                   </div>
                   {Array.isArray(data.queue.coupang_failed_recent) && data.queue.coupang_failed_recent.length > 0 && (
                     <div className="mt-3 p-2.5 md:p-3 rounded-lg bg-red-50 border border-red-200">
-                      <div className="text-[11px] md:text-xs font-bold text-red-800 mb-2">
+                      <div className="text-xs md:text-xs font-bold text-red-800 mb-2">
                         최근 실패 잡 ({data.queue.coupang_failed_recent.length})
                       </div>
                       <div className="space-y-1">
                         {data.queue.coupang_failed_recent.map((f: any, i: number) => (
-                          <div key={i} className="text-[10px] md:text-[11px] text-red-700 leading-relaxed break-words">
+                          <div key={i} className="text-xs md:text-xs text-red-700 leading-relaxed break-words">
                             <code className="font-mono bg-white px-1 rounded">{f.user_id?.slice(0, 8)}</code>
                             <span className="mx-1">·</span>
                             {f.action}
                             <span className="mx-1">·</span>
                             {f.attempts}회
-                            <div className="text-[10px] text-red-600 mt-0.5 break-all">{f.reason}</div>
+                            <div className="text-xs text-red-600 mt-0.5 break-all">{f.reason}</div>
                           </div>
                         ))}
                       </div>
@@ -490,35 +490,35 @@ export default function CoupangDiagnosticsPage() {
 
             {/* 요약 */}
             <section className="mb-4 grid grid-cols-2 md:grid-cols-3 gap-2 md:gap-3">
-              <div className="p-3 md:p-4 rounded-2xl bg-white shadow-sm">
-                <div className="text-[11px] md:text-xs font-bold text-[#8B95A1]">전체 사용자</div>
-                <div className="text-xl md:text-2xl font-black text-[#191F28] tabular-nums">{data.summary.total_users}</div>
+              <div className="p-3 md:p-4 rounded-[10px] bg-white shadow-none">
+                <div className="text-xs md:text-xs font-bold text-[var(--lu-muted)]">전체 사용자</div>
+                <div className="text-xl md:text-2xl font-semibold text-[var(--lu-ink)] tabular-nums">{data.summary.total_users}</div>
               </div>
-              <div className="p-3 md:p-4 rounded-2xl bg-emerald-50 shadow-sm">
-                <div className="text-[11px] md:text-xs font-bold text-emerald-700">정상</div>
-                <div className="text-xl md:text-2xl font-black text-emerald-700 tabular-nums">{data.summary.ok_users}</div>
+              <div className="p-3 md:p-4 rounded-[10px] bg-emerald-50 shadow-none">
+                <div className="text-xs md:text-xs font-bold text-emerald-700">정상</div>
+                <div className="text-xl md:text-2xl font-semibold text-emerald-700 tabular-nums">{data.summary.ok_users}</div>
               </div>
-              <div className="col-span-2 md:col-span-1 p-3 md:p-4 rounded-2xl bg-red-50 shadow-sm">
-                <div className="text-[11px] md:text-xs font-bold text-red-700 mb-1.5">문제 분포</div>
+              <div className="col-span-2 md:col-span-1 p-3 md:p-4 rounded-[10px] bg-red-50 shadow-none">
+                <div className="text-xs md:text-xs font-bold text-red-700 mb-1.5">문제 분포</div>
                 <div className="flex flex-wrap gap-1">
                   {Object.entries(data.summary.issues).filter(([k]) => k !== 'ok').map(([k, v]) => (
                     <button key={k} onClick={() => setFilter(k)}
-                      className="text-[10px] md:text-[11px] font-bold px-1.5 py-0.5 rounded text-white"
+                      className="text-xs md:text-xs font-bold px-1.5 py-0.5 rounded text-white"
                       style={{ background: ISSUE_COLOR[k] || '#6B7280' }}>
                       {ISSUE_LABEL[k] || k}: {v}
                     </button>
                   ))}
                   {Object.entries(data.summary.issues).filter(([k]) => k !== 'ok').length === 0 && (
-                    <span className="text-[11px] text-[#8B95A1]">문제 없음</span>
+                    <span className="text-xs text-[var(--lu-muted)]">문제 없음</span>
                   )}
                 </div>
               </div>
             </section>
 
             {/* Legend (접기/펼치기) */}
-            <details className="mb-4 p-3 md:p-4 rounded-2xl bg-[#FAFBFF] border border-[#E5E8EB]" open={showLegend} onToggle={(e) => setShowLegend((e.target as HTMLDetailsElement).open)}>
-              <summary className="text-xs md:text-sm font-bold cursor-pointer text-[#191F28]">진단 코드 설명</summary>
-              <div className="mt-2 space-y-1 text-[11px] md:text-xs text-[#4E5968]">
+            <details className="mb-4 p-3 md:p-4 rounded-[10px] bg-[#FAFBFF] border border-[var(--lu-line)]" open={showLegend} onToggle={(e) => setShowLegend((e.target as HTMLDetailsElement).open)}>
+              <summary className="text-xs md:text-sm font-bold cursor-pointer text-[var(--lu-ink)]">진단 코드 설명</summary>
+              <div className="mt-2 space-y-1 text-xs md:text-xs text-[var(--lu-muted)]">
                 {Object.entries(data.legend).map(([k, v]) => (
                   <div key={k} className="leading-relaxed break-words">
                     <span className="font-bold inline-block w-20 md:w-24" style={{ color: ISSUE_COLOR[k] || '#6B7280' }}>
@@ -534,13 +534,13 @@ export default function CoupangDiagnosticsPage() {
             <div className="mb-3 -mx-1 px-1 overflow-x-auto scrollbar-hide">
               <div className="flex items-center gap-1.5 flex-nowrap">
                 <button onClick={() => setFilter('all')}
-                  className={'flex-shrink-0 px-3 py-1.5 rounded-lg text-[11px] md:text-xs font-bold whitespace-nowrap ' +
-                    (filter === 'all' ? 'bg-[#191F28] text-white' : 'bg-white border border-[#E5E8EB] text-[#4E5968]')}>
+                  className={'flex-shrink-0 px-3 py-1.5 rounded-lg text-xs md:text-xs font-bold whitespace-nowrap ' +
+                    (filter === 'all' ? 'bg-[var(--lu-ink)] text-white' : 'bg-white border border-[var(--lu-line)] text-[var(--lu-muted)]')}>
                   전체 ({data.users.length})
                 </button>
                 {Object.entries(data.summary.issues).map(([k, v]) => (
                   <button key={k} onClick={() => setFilter(k)}
-                    className={'flex-shrink-0 px-3 py-1.5 rounded-lg text-[11px] md:text-xs font-bold whitespace-nowrap border ' +
+                    className={'flex-shrink-0 px-3 py-1.5 rounded-lg text-xs md:text-xs font-bold whitespace-nowrap border ' +
                       (filter === k ? 'text-white' : 'bg-white')}
                     style={filter === k
                       ? { background: ISSUE_COLOR[k], borderColor: ISSUE_COLOR[k] }
@@ -560,14 +560,14 @@ export default function CoupangDiagnosticsPage() {
                 return <UserCard key={u.user_id} u={u} fetchingUser={fetchingUser} onFetch={triggerManualFetch} onRetryLogin={retryLogin} onSetStores={() => setStoreIds(u.user_id, meta)} onDiscover={discoverStores} onTestFetch={testFetch} />
               })}
               {filteredUsers.length === 0 && (
-                <div className="p-6 text-center text-sm text-[#8B95A1] bg-white rounded-2xl">조건에 맞는 사용자 없음</div>
+                <div className="p-6 text-center text-sm text-[var(--lu-muted)] bg-white rounded-[10px]">조건에 맞는 사용자 없음</div>
               )}
             </div>
 
-            <div className="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="hidden md:block bg-white rounded-[10px] shadow-none overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead className="bg-[#F2F4F6] text-[#191F28] font-bold">
+                  <thead className="bg-[var(--lu-canvas)] text-[var(--lu-ink)] font-bold">
                     <tr>
                       <th className="px-3 py-2 text-left">상태</th>
                       <th className="px-3 py-2 text-left">User</th>
@@ -582,35 +582,35 @@ export default function CoupangDiagnosticsPage() {
                   </thead>
                   <tbody>
                     {filteredUsers.map(u => (
-                      <tr key={u.user_id} className="border-b border-[#F2F4F6] hover:bg-[#FAFBFF]">
+                      <tr key={u.user_id} className="border-b border-[var(--lu-canvas)] hover:bg-[#FAFBFF]">
                         <td className="px-3 py-2.5">
-                          <span className="text-[10px] font-black text-white px-1.5 py-0.5 rounded whitespace-nowrap"
+                          <span className="text-xs font-semibold text-white px-1.5 py-0.5 rounded whitespace-nowrap"
                             style={{ background: ISSUE_COLOR[u.likely_issue] || '#6B7280' }}>
                             {ISSUE_LABEL[u.likely_issue] || u.likely_issue}
                           </span>
                         </td>
-                        <td className="px-3 py-2.5 font-mono text-[#3182F6]">{u.user_id.slice(0, 8)}</td>
-                        <td className="px-3 py-2.5 text-[#191F28] font-bold max-w-[260px]" title={u.store_name || ''}>
+                        <td className="px-3 py-2.5 font-mono text-[#16685D]">{u.user_id.slice(0, 8)}</td>
+                        <td className="px-3 py-2.5 text-[var(--lu-ink)] font-bold max-w-[260px]" title={u.store_name || ''}>
                           {u.store_meta && u.store_meta.length > 0 ? (
                             <div className="space-y-0.5">
                               {u.store_meta.map((m, i) => (
                                 <div key={m.id} className="leading-tight">
                                   <div className="text-[12px] truncate" title={m.name || ''}>
-                                    {i === 0 && <span className="text-[9px] text-[#F97316] mr-1">[main]</span>}
-                                    {m.name || <span className="italic text-[#8B95A1]">매장명 미등록</span>}
+                                    {i === 0 && <span className="text-xs text-[#F97316] mr-1">[main]</span>}
+                                    {m.name || <span className="italic text-[var(--lu-muted)]">매장명 미등록</span>}
                                   </div>
-                                  <div className="text-[10px] text-[#7C3AED] font-mono">{m.id}</div>
+                                  <div className="text-xs text-[#7C3AED] font-mono">{m.id}</div>
                                 </div>
                               ))}
                             </div>
                           ) : (
                             <>
                               <div className="truncate">{u.store_name || '-'}</div>
-                              {u.store_id && <div className="text-[10px] text-[#8B95A1] font-mono">{u.store_id}</div>}
+                              {u.store_id && <div className="text-xs text-[var(--lu-muted)] font-mono">{u.store_id}</div>}
                             </>
                           )}
                         </td>
-                        <td className="px-3 py-2.5 font-mono text-[#4E5968]">{u.account_id_mask || '-'}</td>
+                        <td className="px-3 py-2.5 font-mono text-[var(--lu-muted)]">{u.account_id_mask || '-'}</td>
                         <td className="px-3 py-2.5">
                           {u.has_session_cookies ? (
                             <span className="text-emerald-700 font-bold">
@@ -619,73 +619,73 @@ export default function CoupangDiagnosticsPage() {
                             </span>
                           ) : <span className="text-red-700 font-bold">없음</span>}
                         </td>
-                        <td className="px-3 py-2.5 text-[#4E5968] max-w-[180px]">
-                          <div className="font-mono text-[11px] truncate" title={u.last_login_status || ''}>
+                        <td className="px-3 py-2.5 text-[var(--lu-muted)] max-w-[180px]">
+                          <div className="font-mono text-xs truncate" title={u.last_login_status || ''}>
                             {u.last_login_status || '-'}
                           </div>
-                          <div className="text-[10px] text-[#8B95A1]">{fmtDate(u.last_login_at)}</div>
+                          <div className="text-xs text-[var(--lu-muted)]">{fmtDate(u.last_login_at)}</div>
                         </td>
-                        <td className="px-3 py-2.5 text-right font-black text-base tabular-nums" style={{ color: u.review_count > 0 ? '#191F28' : '#DC2626' }}>
+                        <td className="px-3 py-2.5 text-right font-semibold text-base tabular-nums" style={{ color: u.review_count > 0 ? '#191F28' : '#DC2626' }}>
                           {u.review_count}
                         </td>
-                        <td className="px-3 py-2.5 text-[10px] text-[#4E5968]">
+                        <td className="px-3 py-2.5 text-xs text-[var(--lu-muted)]">
                           {fmtDate(u.last_collected_at)}
                           {u.collected_age_hours !== null && (
-                            <div className="text-[#8B95A1]">{ageBadge(u.collected_age_hours)} 전</div>
+                            <div className="text-[var(--lu-muted)]">{ageBadge(u.collected_age_hours)} 전</div>
                           )}
                         </td>
                         <td className="px-3 py-2.5 text-center whitespace-nowrap">
                           <Link href={'/admin/coupang/' + u.user_id}
-                            className="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-1.5 rounded bg-[#191F28] text-white hover:bg-[#0F172A] mr-1"
+                            className="inline-flex items-center gap-0.5 text-xs font-bold px-2 py-1.5 rounded bg-[var(--lu-ink)] text-white hover:bg-[#0F172A] mr-1"
                             title="사용자 상세 페이지 · 매장별 리뷰·미답변·관리 액션">
                             상세 <ExternalLink size={10} strokeWidth={2.5} />
                           </Link>
                           <button onClick={() => discoverStores(u.user_id)}
                             disabled={fetchingUser === u.user_id}
-                            className="text-[10px] font-bold px-2 py-1.5 rounded bg-[#0891B2] text-white hover:bg-[#0E7490] disabled:opacity-50 mr-1"
+                            className="text-xs font-bold px-2 py-1.5 rounded bg-[#0891B2] text-white hover:bg-[#0E7490] disabled:opacity-50 mr-1"
                             title="저장된 쿠키로 whoami 호출 → 모든 매장 발견 + 자동 등록">
                             매장발견
                           </button>
                           <button onClick={() => testFetch(u.user_id)}
                             disabled={fetchingUser === u.user_id}
-                            className="text-[10px] font-bold px-2 py-1.5 rounded bg-[#F59E0B] text-white hover:bg-[#D97706] disabled:opacity-50 mr-1"
+                            className="text-xs font-bold px-2 py-1.5 rounded bg-[#F59E0B] text-white hover:bg-[#D97706] disabled:opacity-50 mr-1"
                             title="특정 storeId 직접 입력 → 즉시 fetch 테스트 (워커 거치지 X)">
                             테스트
                           </button>
                           <button onClick={() => setStoreIds(u.user_id, u.store_meta && u.store_meta.length > 0 ? u.store_meta : (u.all_store_ids || []).map(id => ({ id, name: id === u.store_id ? u.store_name : null })))}
                             disabled={fetchingUser === u.user_id}
-                            className="text-[10px] font-bold px-2 py-1.5 rounded bg-[#059669] text-white hover:bg-[#047857] disabled:opacity-50 mr-1"
+                            className="text-xs font-bold px-2 py-1.5 rounded bg-[#059669] text-white hover:bg-[#047857] disabled:opacity-50 mr-1"
                             title="매장 ID + 매장명 직접 입력 (다중 매장)">
                             매장ID
                           </button>
                           <button onClick={() => retryLogin(u.user_id)}
                             disabled={fetchingUser === u.user_id}
-                            className="text-[10px] font-bold px-2 py-1.5 rounded bg-[#F04452] text-white hover:bg-[#DC2626] disabled:opacity-50 mr-1"
+                            className="text-xs font-bold px-2 py-1.5 rounded bg-[#F04452] text-white hover:bg-[#DC2626] disabled:opacity-50 mr-1"
                             title="저장된 비밀번호로 save-login 재시도">
                             재로그인
                           </button>
                           <button onClick={() => triggerManualFetch(u.user_id, 14)}
                             disabled={fetchingUser === u.user_id}
-                            className="text-[10px] font-bold px-2 py-1.5 rounded bg-[#3182F6] text-white hover:bg-[#1B64DA] disabled:opacity-50 mr-1">
+                            className="text-xs font-bold px-2 py-1.5 rounded bg-[#16685D] text-white hover:bg-[#105448] disabled:opacity-50 mr-1">
                             14d
                           </button>
                           <button onClick={() => triggerManualFetch(u.user_id, 180)}
                             disabled={fetchingUser === u.user_id}
-                            className="text-[10px] font-bold px-2 py-1.5 rounded bg-[#7C3AED] text-white hover:bg-[#6D28D9] disabled:opacity-50">
+                            className="text-xs font-bold px-2 py-1.5 rounded bg-[#7C3AED] text-white hover:bg-[#6D28D9] disabled:opacity-50">
                             180d
                           </button>
                         </td>
                       </tr>
                     ))}
                     {filteredUsers.length === 0 && (
-                      <tr><td colSpan={9} className="px-3 py-6 text-center text-[#8B95A1]">조건에 맞는 사용자 없음</td></tr>
+                      <tr><td colSpan={9} className="px-3 py-6 text-center text-[var(--lu-muted)]">조건에 맞는 사용자 없음</td></tr>
                     )}
                   </tbody>
                 </table>
               </div>
             </div>
 
-            <div className="mt-4 text-[10px] md:text-[11px] text-[#8B95A1] text-right">
+            <div className="mt-4 text-xs md:text-xs text-[var(--lu-muted)] text-right">
               생성 시각: {fmtDate(data.generated_at)}
             </div>
           </>
@@ -706,10 +706,10 @@ function UserCard({ u, fetchingUser, onFetch, onRetryLogin, onSetStores, onDisco
   onTestFetch: (uid: string) => void
 }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-3.5 border-l-4" style={{ borderLeftColor: ISSUE_COLOR[u.likely_issue] || '#6B7280' }}>
+    <div className="bg-white rounded-[10px] shadow-none p-3.5 border-l-4" style={{ borderLeftColor: ISSUE_COLOR[u.likely_issue] || '#6B7280' }}>
       <div className="flex items-start justify-between gap-2 mb-2">
         <div className="min-w-0 flex-1">
-          <span className="text-[10px] font-black text-white px-1.5 py-0.5 rounded inline-block mb-1.5"
+          <span className="text-xs font-semibold text-white px-1.5 py-0.5 rounded inline-block mb-1.5"
             style={{ background: ISSUE_COLOR[u.likely_issue] || '#6B7280' }}>
             {ISSUE_LABEL[u.likely_issue] || u.likely_issue}
           </span>
@@ -717,23 +717,23 @@ function UserCard({ u, fetchingUser, onFetch, onRetryLogin, onSetStores, onDisco
             <div className="space-y-1">
               {u.store_meta.map((m, i) => (
                 <div key={m.id} className="text-sm">
-                  <div className="font-black text-[#191F28] truncate" title={m.name || ''}>
-                    <Store size={12} className="inline mr-1 -mt-0.5 text-[#8B95A1]" strokeWidth={2.5} />
-                    {i === 0 && <span className="text-[10px] text-[#F97316] mr-1">[main]</span>}
-                    {m.name || <span className="italic text-[#8B95A1] font-normal">매장명 미등록</span>}
+                  <div className="font-semibold text-[var(--lu-ink)] truncate" title={m.name || ''}>
+                    <Store size={12} className="inline mr-1 -mt-0.5 text-[var(--lu-muted)]" strokeWidth={2.5} />
+                    {i === 0 && <span className="text-xs text-[#F97316] mr-1">[main]</span>}
+                    {m.name || <span className="italic text-[var(--lu-muted)] font-normal">매장명 미등록</span>}
                   </div>
-                  <div className="text-[11px] text-[#7C3AED] font-mono ml-4">매장 ID: {m.id}</div>
+                  <div className="text-xs text-[#7C3AED] font-mono ml-4">매장 ID: {m.id}</div>
                 </div>
               ))}
-              <div className="text-[10px] text-[#8B95A1] font-mono mt-1">user: {u.user_id.slice(0, 8)}</div>
+              <div className="text-xs text-[var(--lu-muted)] font-mono mt-1">user: {u.user_id.slice(0, 8)}</div>
             </div>
           ) : (
             <>
-              <div className="text-sm font-black text-[#191F28] truncate" title={u.store_name || ''}>
-                <Store size={12} className="inline mr-1 -mt-0.5 text-[#8B95A1]" strokeWidth={2.5} />
+              <div className="text-sm font-semibold text-[var(--lu-ink)] truncate" title={u.store_name || ''}>
+                <Store size={12} className="inline mr-1 -mt-0.5 text-[var(--lu-muted)]" strokeWidth={2.5} />
                 {u.store_name || '매장명 미등록'}
               </div>
-              <div className="text-[11px] text-[#8B95A1] font-mono mt-0.5 truncate">
+              <div className="text-xs text-[var(--lu-muted)] font-mono mt-0.5 truncate">
                 {u.user_id.slice(0, 8)}
                 {u.store_id && <span> · {u.store_id}</span>}
               </div>
@@ -741,22 +741,22 @@ function UserCard({ u, fetchingUser, onFetch, onRetryLogin, onSetStores, onDisco
           )}
         </div>
         <div className="text-right flex-shrink-0">
-          <div className="text-[10px] text-[#8B95A1] font-bold">리뷰</div>
-          <div className="text-2xl font-black tabular-nums" style={{ color: u.review_count > 0 ? '#191F28' : '#DC2626' }}>
+          <div className="text-xs text-[var(--lu-muted)] font-bold">리뷰</div>
+          <div className="text-2xl font-semibold tabular-nums" style={{ color: u.review_count > 0 ? '#191F28' : '#DC2626' }}>
             {u.review_count}
           </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-2 gap-2 text-[11px] mb-2">
+      <div className="grid grid-cols-2 gap-2 text-xs mb-2">
         <div className="p-2 rounded-lg bg-[#FAFBFF]">
-          <div className="text-[#8B95A1] font-bold flex items-center gap-1">
+          <div className="text-[var(--lu-muted)] font-bold flex items-center gap-1">
             <UserIcon size={11} strokeWidth={2.5} />계정
           </div>
-          <div className="font-mono text-[#4E5968] truncate">{u.account_id_mask || '-'}</div>
+          <div className="font-mono text-[var(--lu-muted)] truncate">{u.account_id_mask || '-'}</div>
         </div>
         <div className="p-2 rounded-lg bg-[#FAFBFF]">
-          <div className="text-[#8B95A1] font-bold flex items-center gap-1">
+          <div className="text-[var(--lu-muted)] font-bold flex items-center gap-1">
             <Cookie size={11} strokeWidth={2.5} />쿠키
           </div>
           {u.has_session_cookies ? (
@@ -767,24 +767,24 @@ function UserCard({ u, fetchingUser, onFetch, onRetryLogin, onSetStores, onDisco
         </div>
       </div>
 
-      <div className="text-[11px] text-[#4E5968] mb-2 break-words">
-        <span className="font-bold text-[#8B95A1]">로그인 상태: </span>
+      <div className="text-xs text-[var(--lu-muted)] mb-2 break-words">
+        <span className="font-bold text-[var(--lu-muted)]">로그인 상태: </span>
         <span className="font-mono">{u.last_login_status || '-'}</span>
-        {u.last_login_at && <span className="text-[#8B95A1] ml-1">({fmtDate(u.last_login_at)})</span>}
+        {u.last_login_at && <span className="text-[var(--lu-muted)] ml-1">({fmtDate(u.last_login_at)})</span>}
       </div>
 
       {u.last_collected_at && (
-        <div className="text-[11px] text-[#4E5968] mb-3">
-          <span className="font-bold text-[#8B95A1]">최근 수집: </span>
+        <div className="text-xs text-[var(--lu-muted)] mb-3">
+          <span className="font-bold text-[var(--lu-muted)]">최근 수집: </span>
           {fmtDate(u.last_collected_at)}
           {u.collected_age_hours !== null && (
-            <span className="text-[#8B95A1] ml-1">({ageBadge(u.collected_age_hours)} 전)</span>
+            <span className="text-[var(--lu-muted)] ml-1">({ageBadge(u.collected_age_hours)} 전)</span>
           )}
         </div>
       )}
 
       <Link href={'/admin/coupang/' + u.user_id}
-        className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-bold py-2.5 rounded-lg bg-[#191F28] text-white hover:bg-[#0F172A] mb-2">
+        className="w-full inline-flex items-center justify-center gap-1.5 text-xs font-bold py-2.5 rounded-lg bg-[var(--lu-ink)] text-white hover:bg-[#0F172A] mb-2">
         상세 보기 (매장·리뷰·관리)
         <ExternalLink size={12} strokeWidth={2.5} />
       </Link>
@@ -815,7 +815,7 @@ function UserCard({ u, fetchingUser, onFetch, onRetryLogin, onSetStores, onDisco
       <div className="flex gap-2">
         <button onClick={() => onFetch(u.user_id, 14)}
           disabled={fetchingUser === u.user_id}
-          className="flex-1 text-xs font-bold py-2.5 rounded-lg bg-[#3182F6] text-white hover:bg-[#1B64DA] disabled:opacity-50">
+          className="flex-1 text-xs font-bold py-2.5 rounded-lg bg-[#16685D] text-white hover:bg-[#105448] disabled:opacity-50">
           14일치 fetch
         </button>
         <button onClick={() => onFetch(u.user_id, 180)}

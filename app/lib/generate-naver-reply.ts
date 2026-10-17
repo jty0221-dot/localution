@@ -30,7 +30,7 @@ export interface ReviewInfo {
 }
 
 export type GenerateResult =
-  | { ok: true; reply: string; mode: 'vision' | 'text' | 'mock'; tone?: string }
+  | { ok: true; reply: string; mode: 'vision' | 'text'; tone?: string }
   | { ok: false; error: string }
 
 // ── 내부 유틸 ────────────────────────────────────────────────
@@ -266,15 +266,7 @@ export async function generateNaverReply(
 ): Promise<GenerateResult> {
   // tone 'auto' 는 리뷰 성격(긍정 · 중립 · 부정)에 맞는 풀에서 리뷰마다 돌려 가며 고른다
   const apiKey = process.env.ANTHROPIC_API_KEY
-  if (!apiKey) {
-    const name = store.storeName || '저희 매장'
-    const prefix = store.region ? `${store.region} ${name}` : name
-    return {
-      ok: true,
-      reply: `${prefix} 찾아 주셔서 감사해요. 다음에도 편하게 들러주세요.`,
-      mode: 'mock',
-    }
-  }
+  if (!apiKey) return { ok: false, error: 'AI 답글 연결이 설정되지 않았어요.' }
 
   const { system, userText, reviewType, tone: toneUsed } = buildPrompt(store, review, tone)
   const hasPhotos = review.photos.length > 0

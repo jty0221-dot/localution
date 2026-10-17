@@ -196,22 +196,11 @@ const KW_PATTERNS: Record<string, string[]> = {
  '피트니스': ['헬스장', 'PT', '필라테스', '요가', '크로스핏'],
  '병원': ['병원', '의원', '진료', '예약', '상담'],
 }
-const KW_RANKS = [3, 7, 12, 21, 34] as const
-const KW_PREV = [5, 7, 15, 18, null] as const
 
-// 플레이스(실시간) 페이지의 buildMockData 와 동일한 키워드 생성
-function generateRegionKeywords(region: string, storeName?: string, category?: string): KeywordRank[] {
- const cat = category || '맛집'
- const suffixes = KW_PATTERNS[cat] || KW_PATTERNS['맛집']
- const times = ['방금 전', '3분 전', '10분 전', '18분 전', '방금 전']
- return [
- { keyword: `${region} ${suffixes[0]}`, rank: KW_RANKS[0], prevRank: KW_PREV[0] ?? null, area: region, updatedAt: times[0] },
- { keyword: storeName ? `${storeName} ${region}` : `${region}역 ${suffixes[0]}`, rank: KW_RANKS[1], prevRank: KW_PREV[1] ?? null, area: region, updatedAt: times[1] },
- { keyword: `${region}역 ${suffixes[0]}`, rank: KW_RANKS[2], prevRank: KW_PREV[2] ?? null, area: region, updatedAt: times[2] },
- { keyword: `${region} ${suffixes[3] || suffixes[0]}`, rank: KW_RANKS[3], prevRank: KW_PREV[3] ?? null, area: region, updatedAt: times[3] },
- { keyword: `${region} ${suffixes[1] || suffixes[0]}`, rank: KW_RANKS[4], prevRank: KW_PREV[4] ?? null, area: region, updatedAt: times[4] },
- ]
-}
+
+
+// 플레이스(실시간) 페이지의 현재 화면에서는 순위 미집계
+function generateRegionKeywords(_region: string, _storeName?: string, _category?: string): KeywordRank[] { return [] }
 
 function inferCategoryFromStore(name: string): string | null {
  if (!name) return null
@@ -226,14 +215,8 @@ function inferCategoryFromStore(name: string): string | null {
  return null
 }
 
-const RECENT_REVIEWS = [
- { platform: '네이버', name: '이**', rating: 1, text: '대기 시간이 너무 길었고 음식도 식어서 나왔습니다. 재방문은 어려울 것 같아요.', time: '1시간 전', replied: false, color: '#03C75A' },
- { platform: '네이버', name: '김**', rating: 5, text: '음식도 맛있고 직원분들도 친절해요. 주차도 편하고 재방문 의사 있습니다!', time: '2시간 전', replied: false, color: '#03C75A' },
- { platform: '구글', name: 'J**', rating: 4, text: 'Great food and cozy atmosphere. Service was excellent. Will definitely come back!', time: '5시간 전', replied: true, color: '#4285F4' },
- { platform: '구글', name: '최**', rating: 2, text: '주차 안내가 불친절했고 계산 시 실수가 있어 당황스러웠습니다.', time: '7시간 전', replied: false, color: '#4285F4' },
- { platform: '네이버', name: '박**', rating: 5, text: '회식으로 왔는데 음식 양도 많고 맛도 좋았어요. 사장님도 친절하시고 너무 좋았습니다', time: '어제', replied: false, color: '#03C75A' },
- { platform: '구글', name: 'L**', rating: 3, text: 'Food was okay but waiting time was a bit long. Interior is nice though.', time: '어제', replied: false, color: '#4285F4' },
-]
+type ReviewPreview = { platform: string; name: string; rating: number; text: string; time: string; replied: boolean; color: string };
+const RECENT_REVIEWS: ReviewPreview[] = []
 
 // 30차-23: 실제 platform_reviews 레코드 (요약 카드·하단 최근 리뷰 용)
 interface RealReview {
@@ -543,7 +526,7 @@ interface ReplyModalProps {
 function AIReplyModal({ review, onClose }: ReplyModalProps) {
  const [loading, setLoading] = useState(false)
  const [reply, setReply] = useState('')
- const [posted, setPosted] = useState(false)
+ const posted = false
  const [error, setError] = useState('')
 
  const generate = useCallback(async () => {
@@ -592,10 +575,7 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
 
  useEffect(() => { generate() }, [generate])
 
- const post = () => {
- setPosted(true)
- setTimeout(onClose, 1200)
- }
+ const post = () => { window.location.assign('/review-admin') }
 
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="ai-reply-modal-title">
@@ -660,7 +640,7 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
  disabled={loading || !reply.trim() || posted}
  className="min-h-11 flex-1 bg-[var(--lu-accent)] text-white py-2.5 rounded-[6px] text-sm font-bold hover:bg-[var(--lu-accent-hover)] disabled:opacity-40"
  >
- {posted ? '게시 완료' : '답변 게시하기'}
+ 리뷰 관리에서 답글 확인하기
  </button>
  </div>
  </div>
@@ -677,18 +657,7 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
 // ═══════════════════════════════════════════════════════════
 // 인기 서비스 TOP 10 (순위 애니메이션)
 // ═══════════════════════════════════════════════════════════
-const SERVICE_RANKING_INIT = [
- { id: 1, name: 'AI 리뷰 자동 답글', category: '리뷰', badge: 'HOT', color: '#F04452' },
- { id: 2, name: '네이버 플레이스 관리', category: '플레이스', badge: '', color: '#03C75A' },
- { id: 3, name: 'QR 리뷰 자동화', category: 'QR', badge: 'NEW', color: '#7C3AED' },
- { id: 4, name: '매출 캘린더 · 정산', category: '정산', badge: '', color: 'var(--lu-accent)' },
- { id: 5, name: '고객 CRM 관리', category: 'CRM', badge: '', color: '#F59E0B' },
- { id: 6, name: '키워드 순위 추적', category: 'SEO', badge: '', color: '#10B981' },
- { id: 7, name: '숏폼 퍼블리셔', category: '마케팅', badge: '', color: '#EC4899' },
- { id: 8, name: '배민 리뷰 연동', category: '배달', badge: '', color: '#2AC1BC' },
- { id: 9, name: '구글 리뷰 연동', category: '구글', badge: '', color: '#4285F4' },
- { id: 10, name: '세금계산서 자동 발행', category: '행정', badge: '', color: '#6B7280' },
-]
+
 
 // [주의] DO NOT RE-ADD <QuickNav /> 호출 — 사장님 요청으로 우측 사이드바(DashboardRightSidebar)로 대체됨 (2026-04-28, 2026-05-06 재확인)
 // 함수 정의는 남아있지만 JSX 에서 호출하지 마세요. 자세한 내용은 /DO_NOT_TOUCH.md 참조.
@@ -723,95 +692,7 @@ function QuickNav() {
  )
 }
 
-function ServiceRanking() {
- const [items, setItems] = useState(SERVICE_RANKING_INIT.map((s, i) => ({ ...s, rank: i + 1, prevRank: i + 1, score: 100 - i * 8 })))
- const [isShuffling, setIsShuffling] = useState(false)
-
- useEffect(() => {
- const timer = setInterval(() => {
- setIsShuffling(true)
- setTimeout(() => {
- setItems(prev => {
- const arr = [...prev]
- const swapCount = 2 + Math.floor(Math.random() * 2)
- for (let s = 0; s < swapCount; s++) {
- const a = Math.floor(Math.random() * arr.length)
- let b = Math.floor(Math.random() * arr.length)
- while (b === a) b = Math.floor(Math.random() * arr.length)
- arr[a].score += Math.floor(Math.random() * 10) - 4
- arr[b].score += Math.floor(Math.random() * 10) - 4
- }
- arr.sort((a, b) => b.score - a.score)
- arr.forEach((item, i) => {
- item.prevRank = item.rank
- item.rank = i + 1
- })
- return arr
- })
- setIsShuffling(false)
- }, 300)
- }, 5000)
- return () => clearInterval(timer)
- }, [])
-
- return (
- <div className="bg-white rounded-[10px] shadow-none overflow-hidden flex flex-col">
- <div className="px-5 py-4 border-b border-[var(--lu-canvas)] flex items-center justify-between">
- <div>
- <div className="flex items-center gap-2">
- <span className="text-sm font-bold text-[var(--lu-ink)]">인기 서비스 TOP 10</span>
- <span className="w-1.5 h-1.5 rounded-full bg-[#F04452] animate-pulse inline-block"/>
- </div>
- <p className="text-[10px] text-[var(--lu-muted)] mt-0.5">실시간 사용량 기준</p>
- </div>
- <span className="text-[10px] text-[var(--lu-muted)] bg-[var(--lu-canvas)] px-2 py-1 rounded-full">5초마다 갱신</span>
- </div>
- <div className="flex-1">
- {items.map((item) => {
- const diff = item.prevRank - item.rank
- return (
- <div
- key={item.id}
- className="px-5 py-3 flex items-center gap-3 border-b border-[var(--lu-canvas)] hover:bg-[#FAFBFF] transition-colors duration-500"
- style={{
- transform: isShuffling ? 'translateX(4px)' : 'translateX(0)',
- opacity: isShuffling ? 0.7 : 1,
- transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
- }}
- >
- <div className={'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-semibold flex-shrink-0 ' + (item.rank <= 3 ? 'bg-[var(--lu-accent)] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]')}>
- {item.rank}
- </div>
- <div className="flex-1 min-w-0">
- <div className="flex items-center gap-1.5">
- <span className="text-sm font-semibold text-[var(--lu-ink)] truncate">{item.name}</span>
- {item.badge && (
- <span className={'text-[9px] px-1.5 py-0.5 rounded-full font-bold ' + (item.badge === 'HOT' ? 'bg-[#FFF0F0] text-[#F04452]' : 'bg-[var(--lu-accent-soft)] text-[var(--lu-accent)]')}>{item.badge}</span>
- )}
- </div>
- <span className="text-[10px] text-[var(--lu-muted)]">{item.category}</span>
- </div>
- <div className="flex-shrink-0 w-12 text-right">
- {/* 한국 증시 컨벤션: 상승 빨강 / 하락 파랑 */}
- {diff > 0 && (
- <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[#DC2626]">
- <ArrowUp size={10} strokeWidth={3} />{diff}
- </span>
- )}
- {diff < 0 && (
- <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[var(--lu-accent)]">
- <ArrowDown size={10} strokeWidth={3} />{Math.abs(diff)}
- </span>
- )}
- {diff === 0 && <span className="text-[11px] text-[var(--lu-muted)]">-</span>}
- </div>
- </div>
- )
- })}
- </div>
- </div>
- )
-}
+function ServiceRanking() { return <section className="lu-panel p-5"><h2 className="font-semibold">서비스 이용 현황</h2><p className="mt-2 text-sm text-[var(--lu-muted)]">서비스별 이용 순위는 아직 집계하지 않아요.</p><Link href="/marketing" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--lu-accent)]">마케팅 도구 보기</Link></section> }
 
 
 // ═══════════════════════════════════════════════════════════
@@ -856,7 +737,7 @@ export default function Dashboard() {
  const [platforms, setPlatforms] = useState(INITIAL_PLATFORMS)
  const [keywords, setKeywords] = useState<KeywordRank[]>([])
  const [storeRegion, setStoreRegion] = useState<string | null>(null)
- const [lastSync, setLastSync] = useState('방금 전')
+ const [lastSync, setLastSync] = useState('미집계')
  const [isSyncing, setIsSyncing] = useState(false)
  const [mainKeyword, setMainKeyword] = useState('')
 
@@ -1363,25 +1244,10 @@ export default function Dashboard() {
  }
 
  const refreshKeywords = useCallback(async () => {
- setIsSyncing(true)
- try {
- await new Promise(r => setTimeout(r, 800))
- setKeywords(prev => prev.map(k => ({
- ...k,
- prevRank: k.rank,
- rank: Math.max(1, k.rank + Math.floor(Math.random() * 3) - 1),
- updatedAt: '방금 전',
- })))
- setLastSync('방금 전')
- } finally {
- setIsSyncing(false)
- }
- }, [mainKeyword])
-
- useEffect(() => {
- const id = setInterval(refreshKeywords, 600_000)
- return () => clearInterval(id)
- }, [refreshKeywords])
+ setKeywords([])
+ setLastSync('미집계')
+ toast.error('순위는 플레이스 순위 조회 화면에서 실제 조회 결과를 확인해주세요.')
+ }, [])
 
  // v1.6r: 모든 플랫폼 골고루 표시 — 플랫폼별로 라운드 로빈 정렬
  // 기존 단순 최신순: 한 플랫폼이 많은 리뷰 가지면 다른 플랫폼이 안 보임
@@ -1419,7 +1285,7 @@ export default function Dashboard() {
  })()
  const hasRealReviews = mergedRealReviews.length > 0
 
- // 리뷰 감정 분석 — 실데이터가 있으면 실데이터, 없으면 RECENT_REVIEWS (데모)
+ // 리뷰 감정 분석 — 실데이터가 있으면 실데이터, 없으면 미집계
  const sentimentSource: Array<{ rating: number | null; has_reply?: boolean; replied?: boolean }> = hasRealReviews
  ? mergedRealReviews.map((r) => ({ rating: r.rating, has_reply: r.has_reply }))
  : RECENT_REVIEWS.map((r) => ({ rating: r.rating, replied: r.replied }))
@@ -1462,7 +1328,7 @@ export default function Dashboard() {
  // 실 데이터 연결 전 가짜 숫자 노출 금지 — 데이터 없으면 '—'로 표시
  const stats = [
  { label: '이번 달 방문자', value: '-', sub: '데이터 수집 중', up: false, color: 'var(--lu-accent)', ring: 'var(--lu-accent-soft)' },
- { label: '총 리뷰 수', value: totalReviews ? totalReviews + '건' : '-', sub: hasRealReviews ? '실시간 동기화됨' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#03C75A', ring: '#E8FFF0' },
+ { label: '총 리뷰 수', value: totalReviews ? totalReviews + '건' : '-', sub: hasRealReviews ? '수집된 리뷰 기준' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#03C75A', ring: '#E8FFF0' },
  { label: '평균 별점', value: avgRating ? avgRating + '점' : '-', sub: hasRealReviews ? '리뷰 기반 자동 계산' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#F5A623', ring: '#FFF7E8' },
  { label: '키워드 상위', value: '-', sub: '키워드 추적 시작 시 표시', up: false, color: '#9B5CFB', ring: '#F3ECFF' },
  { label: '이번 주 매출', value: totalWeekSale > 0 ? totalWeekSale + '만원' : '-', sub: '매출 연동 시 표시', up: totalWeekSale > 0, color: '#F04452', ring: '#FFF0F0' },
@@ -1514,10 +1380,10 @@ export default function Dashboard() {
  connectHref: '/customers',
  requiredLabel: '고객 DB',
  label: '재방문 유도',
- count: anyPlatformConnected ? 5 : 0,
+ count: 0,
  unit: '명',
  color: '#F59E0B',
- ready: anyPlatformConnected,
+ ready: false,
  },
  {
  key: 'reservations-today',
@@ -1641,19 +1507,19 @@ export default function Dashboard() {
  <div className="flex items-center gap-2 mb-1">
  <h1 className="text-xl font-semibold text-[var(--lu-ink)]">오늘 처리할 작업</h1>
  {!reviewPlatformConnected && (
- <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">데모</span>
+ <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">연결 필요</span>
  )}
  </div>
  <p className="text-xs text-[var(--lu-muted)]">
  {!reviewPlatformConnected
- ? '샘플 데이터입니다. 리뷰 플랫폼(네이버·구글·배민·요기요·쿠팡)을 연결하면 실시간으로 표시됩니다'
+ ? '리뷰 플랫폼을 연결하고 실제 수집 결과를 확인해주세요.'
  : new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'long' }) + ' · 우선순위가 높은 작업 순으로 표시됩니다'
  }
  </p>
  </div>
  <div className="flex items-center gap-1.5">
  <span className={`w-1.5 h-1.5 rounded-full inline-block ${!reviewPlatformConnected ? 'bg-[#F59E0B]' : 'bg-[#12B76A] animate-pulse'}`}/>
- <span className="text-[10px] text-[var(--lu-muted)] font-medium">{!reviewPlatformConnected ? '데모 데이터' : '실시간 업데이트'}</span>
+ <span className="text-[10px] text-[var(--lu-muted)] font-medium">{!reviewPlatformConnected ? '연결 필요' : '수집 결과 기준'}</span>
  </div>
  </div>
  </div>
@@ -1771,7 +1637,7 @@ export default function Dashboard() {
  {/* ── 통계 카드 6개 ── */}
  {!reviewPlatformConnected && (
  <div className="mb-2 flex items-center gap-2">
- <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">샘플 데이터</span>
+ <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">미집계</span>
  <span className="text-xs text-[var(--lu-muted)]">리뷰 플랫폼(네이버·구글·배민·요기요·쿠팡)을 연동하면 실데이터로 자동 교체됩니다</span>
  </div>
  )}
@@ -1963,13 +1829,13 @@ export default function Dashboard() {
  <TrendingUp size={14} strokeWidth={2.25} className="text-[var(--lu-accent)]" />
  주요 키워드 순위
  {!platforms.find(p => p.id === 'naver_place')?.connected && (
- <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">데모</span>
+ <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">연결 필요</span>
  )}
  </span>
  <div className="flex items-center gap-1.5 mt-0.5">
  <span className={`w-1.5 h-1.5 rounded-full inline-block ${platforms.find(p => p.id === 'naver_place')?.connected ? 'bg-[#12B76A] animate-pulse' : 'bg-[#F59E0B]'}`}/>
  <span className="text-[10px] text-[var(--lu-muted)]">
- {platforms.find(p => p.id === 'naver_place')?.connected ? `실시간 · ${lastSync}` : '플레이스 연동 시 실시간 조회'}
+ {platforms.find(p => p.id === 'naver_place')?.connected ? `조회 상태 · ${lastSync}` : '순위 조회 필요'}
  </span>
  </div>
  </div>
@@ -1979,14 +1845,14 @@ export default function Dashboard() {
  className="min-h-11 text-[11px] text-[var(--lu-accent)] font-semibold border border-[var(--lu-accent)] px-2.5 py-1 rounded-lg hover:bg-[var(--lu-accent-soft)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
  title={!platforms.find(p => p.id === 'naver_place')?.connected ? '네이버 플레이스 연동 후 가능' : ''}
  >
- {isSyncing ? '갱신 중...' : '새로고침'}
+ 순위 조회 안내
  </button>
  </div>
 
  {!platforms.find(p => p.id === 'naver_place')?.connected && (
  <div className="px-5 py-4 bg-[#FFFBEB] border-b border-[#FEF3C7]">
  <p className="text-[11px] font-semibold text-[#92400E] mb-1 flex items-center gap-1">
- <Lock size={11} strokeWidth={2.5}/> 아래는 샘플 데이터
+ <Lock size={11} strokeWidth={2.5}/> 아직 조회한 순위가 없어요
  {storeRegion && (
  <span className="ml-1 bg-white text-[#92400E] border border-[#FDE68A] px-1.5 py-0.5 rounded-full text-[9px]">
  내 매장 지역: {storeRegion}
@@ -1995,8 +1861,8 @@ export default function Dashboard() {
  </p>
  <p className="text-[10px] text-[#92400E] leading-relaxed">
  {storeRegion
- ? `'${storeRegion}' 기준 예시 키워드입니다. 네이버 플레이스를 연동하면 실제 순위가 실시간으로 표시돼요. `
- : '프로필에 매장 주소를 등록하면 내 지역 키워드가 자동으로 뜹니다. '}
+ ? `'${storeRegion}' 매장의 순위는 플레이스 순위 조회 화면에서 확인해주세요. `
+ : '조회한 순위가 없어요. 플레이스 순위 조회 화면을 이용해주세요. '}
  <button
  onClick={() => handlePlatformClick(platforms.find(p => p.id === 'naver_place')!)}
  className="min-h-11 text-[#92400E] font-bold underline inline-flex items-center gap-0.5"
@@ -2060,7 +1926,7 @@ export default function Dashboard() {
  <div className="flex items-center gap-1.5 md:gap-2 flex-wrap min-w-0">
  <span className="text-sm font-bold text-[var(--lu-ink)] shrink-0">최근 리뷰</span>
  {!hasRealReviews && (
- <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">데모</span>
+ <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">연결 필요</span>
  )}
  {hasRealReviews && (
  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] font-bold">전 플랫폼 통합</span>
@@ -2094,7 +1960,7 @@ export default function Dashboard() {
  {!hasRealReviews && !reviewPlatformConnected && (
  <div className="px-5 py-4 bg-[#FFFBEB] border-b border-[#FEF3C7]">
  <p className="text-[11px] font-semibold text-[#92400E] mb-1 flex items-center gap-1">
- <Lock size={11} strokeWidth={2.5}/> 아래는 샘플 리뷰입니다
+ <Lock size={11} strokeWidth={2.5}/> 수집된 리뷰가 없어요
  </p>
  <p className="text-[10px] text-[#92400E] leading-relaxed">
  네이버·구글·배민 등 리뷰 플랫폼을 연동하면 실제 리뷰가 이 자리에 자동으로 들어옵니다.{' '}
@@ -2124,6 +1990,7 @@ export default function Dashboard() {
  </div>
  )}
  <div className="divide-y divide-[var(--lu-canvas)]">
+ {!hasRealReviews && <p role="status" className="px-5 py-6 text-sm text-[var(--lu-muted)]">아직 표시할 수집 리뷰가 없어요. 연결 상태와 최근 수집 결과를 확인해주세요.</p>}
  {hasRealReviews ? (
  mergedRealReviews.slice(0, 10).map((r) => {
  const pf = platforms.find((x) => x.id === r._platformId)

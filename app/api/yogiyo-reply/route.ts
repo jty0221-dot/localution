@@ -14,10 +14,7 @@ export async function POST(req: NextRequest) {
  const apiToken = token || process.env.YOGIYO_API_KEY || ''
 
  if (!apiToken) {
- return NextResponse.json({
- ok: true, demo: true,
- message: '데모 모드 — 실제 요기요 파트너 API Key 필요'
- })
+ return NextResponse.json({ ok: false, code: 'not_configured', error: '요기요 답글 등록 연결이 준비되지 않았습니다.' }, { status: 503 })
  }
 
  try {
@@ -31,10 +28,10 @@ export async function POST(req: NextRequest) {
  )
  if (!res.ok) {
  const err = await res.text()
- return NextResponse.json({ ok: false, error: `요기요 API 오류 (${res.status}): ${err}` }, { status: res.status })
+ return NextResponse.json({ ok: false, error: `요기요 API 오류 (${res.status}): ${err}` }, { status: 502 })
  }
  return NextResponse.json({ ok: true })
  } catch (e: any) {
- return NextResponse.json({ ok: false, error: e.message }, { status: 500 })
+ return NextResponse.json({ ok: false, error: e.message }, { status: 502 })
  }
 }

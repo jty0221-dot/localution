@@ -444,8 +444,8 @@ export default function CustomersPage() {
  {msgOpen && (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4">
  <div ref={messageDialogRef} role="dialog" aria-modal="true" aria-labelledby="customer-message-title" tabIndex={-1} className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
- <h3 id="customer-message-title" className="text-lg font-black text-[#191F28] mb-1">단체 메시지 발송</h3>
- <p className="text-xs text-[#8B95A1] mb-3">선택한 {selected.length}명에게 발송됩니다</p>
+ <h3 id="customer-message-title" className="text-lg font-black text-[#191F28] mb-1">단체 메시지 전송 준비</h3>
+ <p className="text-xs text-[#8B95A1] mb-3">선택한 {selected.length}명의 메시지를 준비합니다. 실제 전송은 메시지 앱에서 직접 확인해주세요.</p>
 
  {/* 채널 선택 */}
  <div className="grid grid-cols-2 gap-2 mb-3">
@@ -458,7 +458,7 @@ export default function CustomersPage() {
  <button
  onClick={() => setSendMode('sms')}
  className={`py-2.5 rounded-lg text-xs font-bold transition-colors ${sendMode === 'sms' ? 'bg-[#3182F6] text-white' : 'bg-[#F2F4F6] text-[#8B95A1]'}`}>
- SMS 직발송
+ SMS 앱에서 보내기
  <div className="text-[10px] opacity-70 font-normal">모바일 권장</div>
  </button>
  </div>
@@ -509,7 +509,7 @@ export default function CustomersPage() {
  </button>
  <button onClick={sendMessage} disabled={!msgText.trim() || selected.length === 0}
  className="flex-1 bg-[#3182F6] text-white py-3 rounded-xl text-sm font-bold hover:bg-[#1B64DA] disabled:opacity-40 transition-colors">
- {sendMode === 'kakao' ? '복사 + 카카오톡 열기' : 'SMS 발송'}
+ {sendMode === 'kakao' ? '복사 + 카카오톡 열기' : '문자 앱 열기'}
  </button>
  </div>
  )}

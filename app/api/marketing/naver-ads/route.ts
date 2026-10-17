@@ -92,13 +92,6 @@ function expandHints(kw: string): string[] {
  return [...new Set(hints)].slice(0, 25)
 }
 
-// compIdx 기반 순위별 추정 입찰가 테이블 (네이버 광고 시장 평균)
-const BID_TABLE: Record<string, { pc: number[]; mobile: number[] }> = {
- '높음': { pc: [4500, 3000, 2200, 1600, 1200], mobile: [3000, 2000, 1500, 1100, 800] },
- '중간': { pc: [1200, 850, 620, 450, 320], mobile: [800, 580, 420, 300, 220] },
- '낮음': { pc: [350, 250, 180, 130, 100], mobile: [240, 170, 120, 90, 70] },
-}
-
 export async function GET(req: NextRequest) {
  // 인증 + rate limit (네이버 광고 유료 API 보호)
  const auth = await requireUser()
@@ -155,39 +148,28 @@ export async function GET(req: NextRequest) {
  })
  }
 
- // ── 파워링크 입찰가 (keywordstool compIdx 기반 추정) ──────────────
+ // 실제 키워드 메타데이터만 확인. 순위별 입찰가는 미집계.
  if (type === 'bid') {
  const kw = kwList[0]
  const result = await queryKeywords([kw])
  if (!result.ok) return queryFailure([result])
  const item = result.keywords.find(k => k.relKeyword.replace(/\s+/g, '') === kw.replace(/\s+/g, '')) || result.keywords[0]
  if (!item) return NextResponse.json({
- ok: true, type: 'bid', keyword: kw, estimated: true, empty: true,
+ ok: true, type: 'bid', keyword: kw, estimated: false, empty: true, unavailable: 'bid_not_collected',
  compIdx: null, pcVol: null, mobileVol: null, avgPcCtr: null, avgMobileCtr: null, rows: [],
  })
- const compIdx = typeof item.compIdx === 'string' && Object.prototype.hasOwnProperty.call(BID_TABLE, item.compIdx) ? item.compIdx : null
+ const compIdx = typeof item.compIdx === 'string' && ['높음', '중간', '낮음'].includes(item.compIdx) ? item.compIdx : null
  const metric = (value: unknown) => value === null || value === undefined || value === '' || !Number.isFinite(Number(value)) ? null : Number(value)
  const pcVol = metric(item.monthlyPcQcCnt)
  const mobileVol = metric(item.monthlyMobileQcCnt)
  const avgPcCtr = metric(item.monthlyAvePcCtr)
  const avgMobileCtr = metric(item.monthlyAveMobileCtr)
 
- if (!compIdx) return NextResponse.json({
- ok: true, type: 'bid', keyword: kw, estimated: false, unavailable: 'competition_missing',
- compIdx: null, pcVol, mobileVol, avgPcCtr, avgMobileCtr, rows: [],
- })
- const table = BID_TABLE[compIdx]
- const rows = [1, 2, 3, 4, 5].map((rank, i) => ({
- rank,
- pc: table.pc[i],
- mobile: table.mobile[i],
- }))
-
+ // Keyword Tool returns measured keyword metadata, not rank-specific bid prices.
+ // No observed bid adapter exists: do not manufacture prices from competition labels.
  return NextResponse.json({
- ok: true, type: 'bid', keyword: kw,
- estimated: true,
- compIdx, pcVol, mobileVol, avgPcCtr, avgMobileCtr,
- rows,
+ ok: true, type: 'bid', keyword: kw, estimated: false, unavailable: 'bid_not_collected',
+ compIdx, pcVol, mobileVol, avgPcCtr, avgMobileCtr, rows: [],
  })
  }
 

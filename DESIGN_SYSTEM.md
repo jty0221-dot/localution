@@ -1,3 +1,11 @@
+## 2026-10-18 owner-film and management consistency update
+
+- Public hero: full-bleed owner empathy film, persistent high-contrast copy, one primary task CTA, optional full film, manual pause and reduced-motion poster. Do not reuse unlicensed people footage.
+- Typeface is Pretendard Variable everywhere in product UI; body 15px/1.65, main text 14 or16px/1.65, support text no smaller than12px/1.5, input16px. Weights400/500/600 with700 for strongest headings. Semantic hierarchy remains intentional.
+- Panels use24px padding/gap on desktop and16px on mobile. Header, sidebar and content widths must align. Main buttons and controls are at least44px high, with explicit exceptions for native checkboxes/radios/color controls.
+- Admin and normal workspaces share the same canvas, type scale, line and spacing tokens. Admin authorization and mutation behavior remain unchanged. Tables scroll inside their own region on small screens; do not hide clipped content behind body overflow.
+- Four widths375/768/1280/1920 plus200percent reflow, keyboard, menus/dialogs and isolated admin UI fixtures are acceptance checks. Fixture layout verification is not authenticated backend verification.
+
 ## 2026-10-18 current design contract
 
 The current product design is the calm workspace. This supersedes earlier Toss-style color, gradient-icon-box, and identical rounded-card requirements. Functional exclusions and removed routes/widgets remain unchanged.

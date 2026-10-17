@@ -27,31 +27,11 @@ export async function GET(req: NextRequest) {
 
  // ── 연동 테스트 모드 ──
  if (isTest) {
- // 프로덕션 가드 (2026-04-19)
- // 실제 파트너 API 계약이 체결되기 전까지 production 환경에서는 user-supplied token만으로
- // "연동됨" 상태를 반환하지 않는다. BAEMIN_CLIENT_ID/SECRET 환경변수가 모두 세팅되어야만
- // 정식 연동으로 간주한다. (false-positive 차단)
- const isProd = process.env.NODE_ENV === 'production'
- const hasPartnerCreds = Boolean(clientId && clientSec)
-
- if (isProd && !hasPartnerCreds) {
- return NextResponse.json({
- error: '배민 파트너 API 연동이 아직 준비 중입니다.\n제휴 심사 완료 후 사용하실 수 있습니다.\n(현재 단계: 파트너 계약 진행 중)',
- helpUrl: 'https://developers.baemin.com',
- pending: true,
- }, { status: 503 })
+ const configured = Boolean(clientId && clientSec)
+ if (!configured) {
+ return NextResponse.json({ ok: false, code: 'not_configured', error: '배민 연동 설정이 준비되지 않았습니다.', verified: false }, { status: 503 })
  }
-
- if (!token && !clientId) {
- return NextResponse.json({
- error: '배민 API Token 또는 환경변수(BAEMIN_CLIENT_ID)가 없습니다.\n배민사장님광장에서 API를 신청해주세요.',
- helpUrl: 'https://developers.baemin.com'
- }, { status: 401 })
- }
- return NextResponse.json({
- ok: true,
- message: hasPartnerCreds ? '연동 준비 완료' : '연동 준비 완료 (개발 환경)',
- })
+ return NextResponse.json({ configured: true, verified: false, status: 'verification_required', message: '설정은 있으나 실제 조회로 연결 상태를 확인해야 합니다.' })
  }
 
  // ── OAuth 토큰 취득 (환경변수 방식) ──
@@ -77,38 +57,7 @@ export async function GET(req: NextRequest) {
  }
 
  if (!bearerToken) {
- // ── 데모 모드: 환경변수 없을 때 샘플 데이터 반환 ──
- return NextResponse.json({
- reviews: [
- {
- id: 'bm_demo_1', rating: 5,
- author: '테스트고객님',
- date: new Date().toLocaleDateString('ko-KR'),
- text: '배달도 빠르고 음식도 맛있어요! 다음에 또 시킬게요 ',
- menuItems: ['대표 메뉴 A', '사이드 B'],
- replied: false,
- },
- {
- id: 'bm_demo_2', rating: 3,
- author: '익명',
- date: new Date().toLocaleDateString('ko-KR'),
- text: '맛은 좋은데 배달이 조금 늦었어요',
- menuItems: ['메뉴 C'],
- replied: false,
- },
- {
- id: 'bm_demo_3', rating: 5,
- author: '단골손님',
- date: new Date().toLocaleDateString('ko-KR'),
- text: '',
- menuItems: ['대표 메뉴 A'],
- replied: true,
- replyText: '감사합니다! 다음에도 맛있게 드실 수 있도록 최선을 다하겠습니다 ',
- },
- ],
- demo: true,
- message: 'BAEMIN API 키 없음 — 샘플 데이터 표시 중',
- })
+ return NextResponse.json({ ok: false, code: 'not_configured', error: '배민 리뷰 조회 연결이 준비되지 않았습니다.' }, { status: 503 })
  }
 
  // ── 실제 배민 API 호출 ──
@@ -121,10 +70,12 @@ export async function GET(req: NextRequest) {
  })
  if (!res.ok) {
  const errBody = await res.text()
- return NextResponse.json({ error: `배민 API 오류 (${res.status}): ${errBody}` }, { status: res.status })
+ return NextResponse.json({ error: `배민 API 오류 (${res.status}): ${errBody}` }, { status: 502 })
  }
  const data = await res.json()
- const reviews = (data.content || data.reviews || []).map((r: any) => ({
+ const rawReviews = data.content ?? data.reviews
+ if (!Array.isArray(rawReviews)) return NextResponse.json({ code: 'upstream_failed', error: '배민 리뷰 응답 형식을 확인할 수 없습니다.' }, { status: 502 })
+ const reviews = rawReviews.map((r: any) => ({
  id: r.reviewId || r.id,
  rating: r.starRating || r.rating,
  author: r.writerNickname || r.author || '손님',
@@ -136,6 +87,6 @@ export async function GET(req: NextRequest) {
  }))
  return NextResponse.json({ reviews })
  } catch (e: any) {
- return NextResponse.json({ error: e.message }, { status: 500 })
+ return NextResponse.json({ code: 'upstream_failed', error: '리뷰 공급자에 연결하지 못했습니다.' }, { status: 502 })
  }
 }

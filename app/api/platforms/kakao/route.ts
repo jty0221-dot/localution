@@ -28,7 +28,7 @@ function extractKakaoId(input: string): string | null {
 // ── 카카오 로컬 검색 API ─────────────────────────────────────
 async function searchKakaoLocal(query: string, x?: string, y?: string) {
  const apiKey = process.env.KAKAO_REST_API_KEY
- if (!apiKey) return { error: 'KAKAO_REST_API_KEY 환경변수가 없습니다' }
+ if (!apiKey) return { code: 'not_configured', status: 503, error: '카카오 검색 연결이 준비되지 않았습니다.' }
 
  let url = `https://dapi.kakao.com/v2/local/search/keyword.json?query=${encodeURIComponent(query)}&size=5`
  if (x && y) url += `&x=${x}&y=${y}&radius=2000`
@@ -36,11 +36,12 @@ async function searchKakaoLocal(query: string, x?: string, y?: string) {
  const res = await fetch(url, {
  headers: { Authorization: `KakaoAK ${apiKey}` },
  })
- if (!res.ok) return { error: '카카오 API 요청 실패' }
+ if (!res.ok) return { code: 'upstream_failed', status: 502, error: '카카오 API 요청에 실패했습니다.' }
  const data = await res.json()
+ if (!Array.isArray(data.documents)) return { code: 'upstream_failed', status: 502, error: '카카오 검색 응답 형식을 확인할 수 없습니다.' }
 
  return {
- items: (data.documents || []).map((d: any) => ({
+ items: data.documents.map((d: any) => ({
  kakaoId: d.id,
  name: d.place_name,
  address: d.road_address_name || d.address_name,
@@ -90,6 +91,7 @@ export async function POST(req: NextRequest) {
  const kakaoId = extractKakaoId(input || '') || input?.trim()
  if (!kakaoId) return NextResponse.json({ error: 'ID를 찾을 수 없습니다' }, { status: 400 })
  const meta = await fetchKakaoMeta(kakaoId)
+ if (!meta?.name) return NextResponse.json({ verified: false, code: 'upstream_failed', error: '카카오 장소를 확인하지 못했습니다.' }, { status: 502 })
  return NextResponse.json({
  kakaoId,
  verified: !!meta,
@@ -103,11 +105,7 @@ export async function POST(req: NextRequest) {
  if (!query) return NextResponse.json({ error: '검색어 필요' }, { status: 400 })
  const result = await searchKakaoLocal(query)
  if ('error' in result) {
- // 목업
- return NextResponse.json({
- items: [{ kakaoId: '123456789', name: query + ' (목업)', address: 'KAKAO_REST_API_KEY 설정 필요', phone: '', category: '음식점', url: 'https://place.map.kakao.com/123456789' }],
- mock: true,
- })
+ return NextResponse.json({ code: result.code, error: result.error }, { status: result.status })
  }
  return NextResponse.json(result)
  }
@@ -115,23 +113,18 @@ export async function POST(req: NextRequest) {
  return NextResponse.json({ error: 'unknown action' }, { status: 400 })
  } catch (err) {
  console.error('kakao platform error:', err)
- return NextResponse.json({ error: '서버 오류' }, { status: 500 })
+ return NextResponse.json({ code: 'upstream_failed', error: '카카오 연결 처리에 실패했습니다.' }, { status: 502 })
  }
 }
 
-// ── GET /api/platforms/kakao?kakaoId=xxx (리뷰 목업) ──────────
+// GET /api/platforms/kakao?kakaoId=xxx: 리뷰 연결 상태
 export async function GET(req: NextRequest) {
  const kakaoId = req.nextUrl.searchParams.get('kakaoId')
  if (!kakaoId) return NextResponse.json({ error: 'kakaoId 필요' }, { status: 400 })
 
- // 카카오맵 리뷰는 공식 API 미제공 → Selenium 연동 예정
  return NextResponse.json({
  kakaoId,
- source: 'mock',
- reviews: [
- { id: `k-${kakaoId}-1`, rating: 5, author: '박**', date: '2026-04-12', text: '맛도 좋고 사장님도 친절해요!', replied: false },
- { id: `k-${kakaoId}-2`, rating: 4, author: '최**', date: '2026-04-07', text: '분위기 좋아요. 또 올게요.', replied: false },
- ],
- stats: { total: 64, avg: 4.4, replied: 38 },
- })
+ code: 'not_configured',
+ error: '카카오 리뷰 수집 연결이 준비되지 않았습니다.',
+ }, { status: 503 })
 }

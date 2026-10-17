@@ -55,7 +55,7 @@ export default function ReplyQualityPage() {
   useEffect(() => { load() }, [days])
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-[var(--lu-canvas)]">
       <PageHeader
         title="AI 답글 품질 모니터"
         subtitle="톤별 성공률 · silent reject 분석 · 길이 분포"
@@ -98,9 +98,9 @@ export default function ReplyQualityPage() {
             </div>
 
             {/* 톤별 통계 */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6">
+            <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 shadow-sm flex items-center justify-center">
+                <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center">
                   <Sparkles size={16} className="text-white" strokeWidth={2.5} />
                 </div>
                 <div>
@@ -119,13 +119,13 @@ export default function ReplyQualityPage() {
                       <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
                         <div className="flex items-center gap-2">
                           <div className={`w-7 h-7 rounded-md bg-gradient-to-br ${color} flex items-center justify-center`}>
-                            <span className="text-[10px] font-black text-white">{label.slice(0, 2)}</span>
+                            <span className="text-xs font-semibold text-white">{label.slice(0, 2)}</span>
                           </div>
                           <span className="text-sm font-bold text-gray-900">{label}</span>
                           <span className="text-xs text-gray-500">{t.total}건</span>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className={`text-sm font-black ${t.success_rate_pct >= 90 ? 'text-emerald-600' : t.success_rate_pct >= 70 ? 'text-amber-600' : 'text-red-600'}`}>
+                          <span className={`text-sm font-semibold ${t.success_rate_pct >= 90 ? 'text-emerald-600' : t.success_rate_pct >= 70 ? 'text-amber-600' : 'text-red-600'}`}>
                             {t.success_rate_pct}%
                           </span>
                           <span className="text-xs text-gray-500">· 평균 {t.avg_length}자</span>
@@ -145,7 +145,7 @@ export default function ReplyQualityPage() {
 
             {/* 답글 길이 분포 + silent reject */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6">
+              <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
                 <div className="text-sm md:text-base font-bold text-gray-900 mb-3">답글 길이 분포</div>
                 <div className="space-y-1.5">
                   {Object.entries(stats.length_distribution).map(([range, count]) => {
@@ -174,7 +174,7 @@ export default function ReplyQualityPage() {
                 )}
               </div>
 
-              <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6">
+              <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
                 <div className="text-sm md:text-base font-bold text-gray-900 mb-3">실패 원인 분석</div>
                 {stats.error_patterns.length === 0 ? (
                   <div className="text-center py-6 text-sm text-gray-400">실패 없음</div>
@@ -183,7 +183,7 @@ export default function ReplyQualityPage() {
                     {stats.error_patterns.map(e => (
                       <div key={e.pattern} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-xs md:text-sm">
                         <span className="font-medium text-gray-900">{e.pattern}</span>
-                        <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-md font-bold text-[11px]">
+                        <span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-md font-bold text-xs">
                           {e.count}건
                         </span>
                       </div>
@@ -194,7 +194,7 @@ export default function ReplyQualityPage() {
             </div>
 
             {/* 플랫폼별 */}
-            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-4 md:p-6">
+            <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
               <div className="text-sm md:text-base font-bold text-gray-900 mb-3">플랫폼별 성공률</div>
               <div className="overflow-x-auto -mx-2 md:mx-0">
                 <table className="w-full text-xs md:text-sm min-w-[400px]">
@@ -214,7 +214,7 @@ export default function ReplyQualityPage() {
                         <td className="px-2 py-2 text-center">{p.total}</td>
                         <td className="px-2 py-2 text-center text-emerald-600 font-semibold">{p.submitted}</td>
                         <td className="px-2 py-2 text-center text-red-600 font-semibold">{p.failed}</td>
-                        <td className="px-2 py-2 text-center font-black"
+                        <td className="px-2 py-2 text-center font-semibold"
                           style={{ color: p.success_rate >= 90 ? '#059669' : p.success_rate >= 70 ? '#D97706' : '#DC2626' }}>
                           {p.success_rate}%
                         </td>
@@ -233,12 +233,12 @@ export default function ReplyQualityPage() {
 
 function SumCard({ label, value, icon: Icon, color }: any) {
   return (
-    <div className={`bg-gradient-to-br ${color} rounded-xl p-3 md:p-4 text-white shadow-sm`}>
+    <div className={`bg-gradient-to-br ${color} rounded-[6px] p-3 md:p-4 text-white shadow-none`}>
       <div className="flex items-center gap-1.5 mb-1">
         <Icon size={12} strokeWidth={2.5} />
-        <div className="text-[10px] md:text-xs font-medium opacity-90">{label}</div>
+        <div className="text-xs md:text-xs font-medium opacity-90">{label}</div>
       </div>
-      <div className="text-2xl md:text-3xl font-black mt-0.5">{value}</div>
+      <div className="text-2xl md:text-3xl font-semibold mt-0.5">{value}</div>
     </div>
   )
 }

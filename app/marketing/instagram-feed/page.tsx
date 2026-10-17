@@ -1,7 +1,7 @@
 'use client'
 
 // ============================================================
-// /marketing/instagram-feed — 인스타그램 피드 자동 발행
+// /marketing/instagram-feed — 인스타그램 피드 작성 발행
 // · 매장 사진 업로드 → AI 캡션 + 해시태그 자동 생성
 // · 즉시 발행 / 예약 발행
 // · 스레드·카드뉴스와 동일 발행 채널 패턴
@@ -61,36 +61,8 @@ export default function InstagramFeedPage() {
  setImages(prev => prev.filter((_, i) => i !== idx))
  }
 
- async function generateCaption() {
- if (generating) return
- setGenerating(true)
- try {
- // 베타: 클라이언트 mock 생성. AI 연동 시 /api/instagram/caption 호출
- await new Promise(r => setTimeout(r, 1500))
- const moods: Record<string, { caption: string; tags: string[] }> = {
- casual: {
- caption: `오늘도 우리 매장 들러주신 손님들 덕분에 행복한 하루였어요${topic ? '\n\n' + topic : ''}\n\n언제든 편하게 오세요. 늘 같은 마음으로 준비할게요.`,
- tags: ['#동네맛집', '#단골카페', '#일상', '#소소한행복'],
- },
- inspirational: {
- caption: `평범한 하루를 특별하게 만드는 작은 순간들${topic ? '\n\n' + topic : ''}\n\n조용히 머물다 가실 수 있는 공간이 되겠습니다.`,
- tags: ['#감성카페', '#무드', '#오늘의기분', '#힐링'],
- },
- energetic: {
- caption: `오늘 진짜 핫한 메뉴 공개합니다${topic ? '\n\n' + topic : ''}\n\n다 드시고 가시면 후회 안 할 거예요. 빨리 와서 직접 느껴보세요!`,
- tags: ['#신메뉴', '#오픈런', '#핫플레이스', '#오늘뭐먹지'],
- },
- professional: {
- caption: `매일 새벽 직접 준비한 신선한 재료로${topic ? ' ' + topic : ''} 정성을 담아 만들어 드립니다.\n\n작은 디테일까지 신경 쓴 한 잔/한 접시, 직접 느껴보세요.`,
- tags: ['#수제', '#국내산', '#정성', '#사장님맛집'],
- },
- }
- const m = moods[tone]
- setCaption(m.caption)
- setHashtags(m.tags)
- } finally {
- setGenerating(false)
- }
+ function generateCaption() {
+ alert('AI 캡션 연결이 준비되지 않았어요. 실제 매장 소식을 직접 작성해주세요.')
  }
 
  function addHashtag(tag: string) {
@@ -105,9 +77,7 @@ export default function InstagramFeedPage() {
  function saveDraft() {
  const draft: FeedDraft = { caption, hashtags, scheduledAt: scheduledAt || null, imageDataUrls: images }
  const next = [draft, ...drafts].slice(0, 10)
- setDrafts(next)
- try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)) } catch {}
- alert('초안 저장됨')
+ try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); setDrafts(next); alert('이 브라우저에 초안을 저장했어요.') } catch { alert('초안을 저장하지 못했어요. 내용을 복사해서 보관해주세요.') }
  }
 
  const charCount = caption.length + hashtags.join(' ').length
@@ -118,8 +88,8 @@ export default function InstagramFeedPage() {
  <div className="md:ml-[220px] flex flex-col min-h-screen">
  <PageHeader
  icon={<Instagram size={28} className="text-white" strokeWidth={2.5} />}
- title="인스타그램 피드 자동"
- subtitle="사진 업로드 → AI 캡션 + 해시태그 자동 생성 → 즉시 또는 예약 발행"
+ title="인스타그램 피드 작성"
+ subtitle="실제 매장 사진과 소식으로 초안을 작성하고 직접 게시하세요."
  variant="pink"
  />
 
@@ -129,10 +99,10 @@ export default function InstagramFeedPage() {
  <div className="rounded-[10px] border border-[#E9D5FF] bg-[var(--lu-accent)] p-3 md:p-4 flex items-start gap-2.5">
  <AlertCircle size={14} className="text-[#7C3AED] flex-shrink-0 mt-0.5" strokeWidth={2.5} />
  <div className="flex-1 min-w-0">
- <p className="text-xs md:text-sm font-bold text-[#7C3AED] mb-0.5">인스타그램 피드 자동 발행 베타</p>
+ <p className="text-xs md:text-sm font-bold text-[#7C3AED] mb-0.5">인스타그램 피드 작성 발행 베타</p>
  <p className="text-[11px] md:text-xs text-[#7C3AED]/90 leading-relaxed">
- 현재는 캡션 / 해시태그 자동 생성 + 초안 저장이 가능합니다.
- 메타 비즈니스 API 직접 발행 연동은 곧 추가됩니다.
+ 현재는 직접 작성한 캡션과 사진의 브라우저 초안 저장이 가능합니다. AI 생성과 자동 게시 연결은 준비 중입니다.
+ 자동 게시나 예약은 실행되지 않습니다.
  지금은 초안을 복사 → 인스타그램 앱에서 붙여넣기로 게시하세요.
  </p>
  </div>
@@ -311,8 +281,8 @@ export default function InstagramFeedPage() {
  <ul className="space-y-1.5 text-xs text-[var(--lu-muted)]">
  <li>· 첫 사진은 매장 분위기가 잘 드러나는 컷으로</li>
  <li>· 캡션 첫 1-2줄이 핵심 (그 이후는 더보기)</li>
- <li>· 해시태그는 7-15개 사이가 효과적</li>
- <li>· 평일 오후 12-2시 / 저녁 6-9시 발행 유리</li>
+ <li>· 사진과 매장 소식에 맞는 해시태그를 직접 선택하세요.</li>
+ <li>· 게시 후 실제 계정의 인사이트에서 반응을 확인하세요.</li>
  </ul>
  </div>
 

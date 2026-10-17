@@ -240,9 +240,9 @@ export default function NaverAdsPage() {
  const r = await fetch('/api/marketing/naver-ads?type=bid&keyword=' + encodeURIComponent(kw))
  const j = await r.json()
  if (!r.ok || j.error) throw new Error(j.message || j.error || '정보를 가져오지 못했어요. 다시 조회해보세요.')
- setBidRows(j.rows || [])
+ setBidRows(j.unavailable ? [] : (j.rows || []))
  setBidKeyword(j.keyword || kw)
- setBidNotice(j.unavailable === 'competition_missing' ? '입찰가 추정에 필요한 경쟁도 정보가 없어요. 다른 키워드로 조회해보세요.' : null)
+ setBidNotice(j.unavailable ? '순위별 실제 입찰가는 아직 집계하지 않아요. 경쟁도만으로 입찰 금액을 만들지 않으며, 네이버 검색광고 관리 화면에서 실제 입찰가를 확인해주세요.' : null)
  } catch (e) {
  setBidError(e instanceof Error ? e.message : '오류 발생')
  } finally {
@@ -301,7 +301,7 @@ export default function NaverAdsPage() {
  const TAB_LIST = [
  { key: 'volume' as Tab, label: '검색량 조회', icon: '', desc: '키워드별 PC·모바일 월간 검색량' },
  { key: 'suggest' as Tab, label: '키워드 확장', icon: '', desc: '주키워드에서 파생되는 추천 키워드' },
- { key: 'bid' as Tab, label: '파워링크 입찰가', icon: '', desc: '순위별 PC·모바일 예상 입찰 단가' },
+ { key: 'bid' as Tab, label: '파워링크 입찰가', icon: '', desc: '실제 입찰가 수집 상태 확인' },
  ]
 
  return (
@@ -614,12 +614,12 @@ export default function NaverAdsPage() {
  </div>
  ))}
  </div>
- <p className="text-[11px] text-[#B0B8C1] mt-2 px-1">* 현재 시점 기준 예상 최소 입찰가 · 실제 낙찰가는 경쟁에 따라 다를 수 있음</p>
+ <p className="text-[11px] text-[#B0B8C1] mt-2 px-1">* 공급자가 실제로 반환한 입찰 정보만 표시합니다.</p>
  </div>
  )}
 
  {!bidLoading && bidRows.length === 0 && !bidError && (
- <div className="text-center py-10 text-[#B0B8C1] text-sm">{bidNotice || (bidKeyword ? '조회는 끝났지만 입찰가를 계산할 키워드 정보가 없어요. 다른 키워드로 조회해보세요.' : '키워드를 입력하고 조회하세요')}</div>
+ <div className="text-center py-10 text-[#B0B8C1] text-sm">{bidNotice || (bidKeyword ? '실제 입찰가 조회 자료가 없어요. 네이버 검색광고 관리 화면에서 확인해주세요.' : '키워드를 입력하고 조회하세요')}</div>
  )}
  </div>
  )}

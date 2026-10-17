@@ -180,23 +180,7 @@ export async function POST(req: NextRequest) {
 
  const apiKey = process.env.ANTHROPIC_API_KEY
 
- if (!apiKey) {
- const kw = mainKeyword || storeType || storeName
- const item = receiptItems.length > 0 ? receiptItems.slice(0, 2).join(', ') : ''
- const good = rating >= 4
- const demos: Record<string, string> = {
- z: storeName + ' 다녀왔는데 ' + (good ? '진짜 레전드야ㅠㅠ ' : '나름 괜찮았어 ') + (comment || (item ? item + ' 먹었는데 맛있더라' : '분위기 음식 다 좋았어')) + (good ? ' 강추!!' : ' 한번 가봐.'),
- mom: storeName + '에 다녀왔어요~ ' + (comment || (item ? item + '가 정말 맛있더라고요' : '음식도 맛있고 서비스도 친절했어요')) + ' 재방문 의사 있어요!',
- honest: '[' + storeName + '] ' + (comment || (item ? '주문: ' + item : '전반 평가')) + ' | 맛: ' + (good ? '합격' : '보통') + ' | 재방문: ' + (good ? 'O' : '고려중'),
- gourmet: storeName + '을 방문했습니다. ' + (comment || (item ? item + '의 풍미가 인상적이었으며' : '전반적인 완성도가 높으며')) + ' 추천할 만한 곳입니다.',
- friend: '야 ' + storeName + ' 거기 진짜야. ' + (comment || (item ? item + ' 먹었는데 ㄹㅇ맛있어' : '한번 가봐 진짜')) + ' 강추ㅋㅋ',
- insta: ' ' + storeName + ' ' + (comment || (item ? item : '오늘의 발견')) + (good ? ' 완전 취향저격' : ' 나쁘지 않았어요') + ' ',
- }
- return NextResponse.json({
- review: demos[tone] || demos['z'],
- hashtags: ['#' + (mainKeyword || storeName), '#' + (storeType || '맛집'), good ? '#강추' : '#방문후기'],
- })
- }
+ if (!apiKey) return NextResponse.json({ error: 'AI 연결이 설정되지 않았어요. 실제 방문 경험은 직접 입력해주세요.', code: 'not_configured' }, { status: 503 })
 
  // Claude Vision 호출
  const toneGuide = TONE_PROMPTS[tone] || TONE_PROMPTS['z']

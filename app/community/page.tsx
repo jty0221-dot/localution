@@ -18,8 +18,7 @@ import {
  type CommunityRegion,
 } from '../lib/regions-community'
 import {
- awardPoints, getBalance, readMyEmailFromCookie,
- maybeAwardFeatured, POINT_RULES, FEATURED_THRESHOLD,
+ readMyEmailFromCookie, FEATURED_THRESHOLD,
 } from '../lib/points'
 import {
  INDUSTRY_CATALOG, INDUSTRY_LABELS, DEFAULT_INDUSTRY_GROUP_ID, findIndustryGroup,
@@ -38,76 +37,8 @@ const CATEGORIES: Category[] = [
  { id: 'free', label: '자유게시판',Icon: MessageCircle, color: '#8B5CF6' },
 ]
 
-// ─── 샘플 데이터 ──────────────────────────────────────────────────
-const INITIAL_POSTS: any[] = [
- {
- id: 1, category: 'success', region_id: 'nationwide', industry: '한식',
- author: '김사장님', avatar: '김', author_email: 'sample1@example.com',
- title: '네이버 플레이스 별점 4.2→4.8 만든 후기 공유해요',
- content: '안녕하세요! 3개월 동안 리뷰 관리를 열심히 했더니 별점이 크게 올랐어요. 핵심은 부정 리뷰에 빠르게 진심 어린 답변을 달고, 만족한 단골손님들께 자연스럽게 리뷰를 부탁드리는 거였어요. 로컬루션으로 리뷰 알림 받고 바로바로 대응한 게 정말 도움이 많이 됐습니다.',
- time: '2시간 전', likes: 47, comments: [
- { author: '이점주', text: '저도 비슷한 경험 있어요! 답변 속도가 진짜 중요하더라고요', time: '1시간 전' },
- { author: '박대표', text: '구체적인 멘트 예시도 공유해주실 수 있나요?', time: '45분 전' },
- ],
- liked: false, bookmarked: false,
- },
- {
- id: 2, category: 'tip', region_id: 'seoul-mapo', industry: '고기집',
- author: '마케팅고수', avatar: '마', author_email: 'sample2@example.com',
- title: '인스타 릴스로 매출 30% 올린 방법 (식당 운영자)',
- content: '식당 운영 5년차입니다. 올해 초부터 릴스를 시작했는데 효과가 어마어마해요. 핵심 팁: 1) 음식 만드는 과정 ASMR 2) 사장님 얼굴 노출(친근감) 3) 자막 필수 4) 첫 3초 후킹.',
- time: '5시간 전', likes: 89, comments: [],
- liked: true, bookmarked: false,
- },
- {
- id: 3, category: 'qna', region_id: 'seoul-gangnam', industry: '피부과',
- author: '초보사장', avatar: '초', author_email: 'sample3@example.com',
- title: '네이버 스마트플레이스 등록이 안 되는데 혹시 아시는 분?',
- content: '사업자등록증은 있는데 계속 반려가 되네요. 업종이 좀 특이해서 그런지... 혹시 비슷한 경험 있으신 분 도움 부탁드립니다ㅠ',
- time: '어제', likes: 12, comments: [],
- liked: false, bookmarked: true,
- },
- {
- id: 4, category: 'tip', region_id: 'busan-haeundae', industry: '카페',
- author: '카페원장', avatar: '카', author_email: 'sample4@example.com',
- title: '단골 만드는 CRM 활용법 - 실전 경험 정리',
- content: '카페 운영하면서 고객 데이터 관리가 얼마나 중요한지 뼈저리게 느꼈어요. 생일 쿠폰, 방문 주기 파악, 선호 메뉴 기록... 이걸 체계적으로 하니까 재방문율이 확 올랐습니다.',
- time: '2일 전', likes: 63, comments: [],
- liked: false, bookmarked: false,
- },
- {
- id: 5, category: 'free', region_id: 'gyeonggi-bundang', industry: '베이커리',
- author: '동네빵집', avatar: '동', author_email: 'sample5@example.com',
- title: '오늘 리뷰 답변하다가 감동받은 일',
- content: '별점 2점짜리 리뷰에 정성껏 답변했더니, 며칠 후 그 손님이 다시 오셔서 "사장님 답변 보고 마음 바뀌었어요"라고 하시더라구요.',
- time: '3일 전', likes: 134, comments: [],
- liked: true, bookmarked: false,
- },
- {
- id: 6, category: 'success', region_id: 'nationwide', industry: '헤어샵',
- author: '뷰티샵원장', avatar: '뷰', author_email: 'sample6@example.com',
- title: 'QR코드 하나로 예약 문의 80% 줄인 방법',
- content: '손님들한테 QR 찍어서 카카오 예약 연결하도록 했더니 전화 문의가 확 줄었어요. 직접 예약이 가능하니 손님도 편하고 저도 편하고!',
- time: '4일 전', likes: 56, comments: [],
- liked: false, bookmarked: false,
- },
- {
- id: 7, category: 'tip', region_id: 'seoul-songpa', industry: '네일샵',
- author: '네일아티', avatar: '네', author_email: 'sample7@example.com',
- title: '네일샵 첫달 예약 30건 만든 인스타 전략',
- content: '오픈 직후 인스타만 집중했어요. 1) 아트 영상 15초 2) 해시태그 지역 고정(#잠실네일 #송파네일) 3) 스토리 DM 할인쿠폰. 이 3개만 3주 돌렸더니 예약 꽉 찼습니다.',
- time: '6일 전', likes: 78, comments: [],
- liked: false, bookmarked: false,
- },
- {
- id: 8, category: 'qna', region_id: 'seoul-gangnam', industry: '치과',
- author: '치과원장', avatar: '치', author_email: 'sample8@example.com',
- title: '치과 블로그 최적화 어느 정도 돌리면 효과 보나요',
- content: '개원 6개월차고 블로그 주 3회 올리는데 검색 유입이 늘지 않네요. 플레이스 랭킹은 조금 오르는데 블로그는 답보입니다. 같은 진료과 원장님들 경험 공유 부탁드려요.',
- time: '어제', likes: 18, comments: [],
- liked: false, bookmarked: false,
- },
-]
+// 공개 게시판 서버가 연결되기 전에는 게시글을 생성해서 채우지 않는다.
+const INITIAL_POSTS: any[] = []
 
 // ─── 작은 UI 헬퍼 ─────────────────────────────────────────────────
 function CatBadge({ cat, size = 'sm' }: { cat: Category | undefined; size?: 'xs' | 'sm' | 'md' }) {
@@ -141,21 +72,6 @@ function IndustryPill({ industry }: { industry?: string }) {
  )
 }
 
-
-// 포인트 토스트(간이)
-function PointToast({ amount, label, onClose }: { amount: number; label: string; onClose: () => void }) {
- useEffect(() => {
- const t = setTimeout(onClose, 2600)
- return () => clearTimeout(t)
- }, [onClose])
- return (
- <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-[var(--lu-accent)] text-white px-5 py-3 rounded-[10px] shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom">
- <Coins size={18} strokeWidth={2.25} />
- <span className="font-bold text-sm">+{amount}P</span>
- <span className="text-xs opacity-90">{label}</span>
- </div>
- )
-}
 
 // ─── 글쓰기 모달 ──────────────────────────────────────────────────
 function WriteModal({ onClose, onSubmit, defaultRegion }: {
@@ -209,7 +125,7 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
  <div className="bg-white rounded-[10px] w-full max-w-2xl shadow-2xl max-h-[92vh] overflow-y-auto">
  <div className="flex items-center justify-between p-6 border-b border-[var(--lu-canvas)] sticky top-0 bg-white z-10">
- <h2 className="text-lg font-bold text-[var(--lu-ink)]">글쓰기 <span className="text-xs text-[var(--lu-muted)] font-medium">· 작성 시 +{POINT_RULES.POST_CREATE.delta}P 적립</span></h2>
+ <h2 className="text-lg font-bold text-[var(--lu-ink)]">글쓰기 <span className="text-xs text-[var(--lu-muted)] font-medium">· 공개 전송되지 않는 초안</span></h2>
  <button onClick={onClose} className="min-h-11 text-[var(--lu-muted)] hover:text-[var(--lu-ink)] transition-colors">
  <X size={22} strokeWidth={2} />
  </button>
@@ -383,7 +299,7 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
  </button>
  <button onClick={handleSubmit} disabled={!title.trim() || !content.trim()}
  className="min-h-11 flex-1 py-3 rounded-[6px] bg-[var(--lu-accent)] text-white font-semibold text-sm hover:bg-[var(--lu-accent-hover)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
- 게시하기 (+{POINT_RULES.POST_CREATE.delta}P)
+ 이 브라우저에 초안 저장
  </button>
  </div>
  </div>
@@ -462,7 +378,7 @@ function PostModal({ post, onClose, onLike, onBookmark, onComment }: any) {
  </button>
  {post.likes >= FEATURED_THRESHOLD - 5 && !post.featured && (
  <span className="ml-auto text-[11px] text-[#FB8500] font-medium">
- 좋아요 {FEATURED_THRESHOLD}개 달성 시 인기글 +{POINT_RULES.POST_FEATURED.delta}P
+ 이 브라우저에서만 확인하는 초안입니다.
  </span>
  )}
  </div>
@@ -470,7 +386,7 @@ function PostModal({ post, onClose, onLike, onBookmark, onComment }: any) {
  <div className="mt-4">
  <div className="text-sm font-semibold text-[var(--lu-ink)] mb-4">댓글 {post.comments.length}개</div>
  {post.comments.length === 0 && (
- <div className="text-center text-[var(--lu-muted)] text-sm py-6">첫 번째 댓글을 남겨보세요! (+{POINT_RULES.COMMENT_CREATE.delta}P)</div>
+ <div className="text-center text-[var(--lu-muted)] text-sm py-6">이 초안에 메모를 남길 수 있습니다.</div>
  )}
  <div className="space-y-4">
  {post.comments.map((c: any, i: number) => (
@@ -519,8 +435,6 @@ export default function Community() {
  const [showWrite, setShowWrite] = useState(false)
  const [searchQuery, setSearchQuery] = useState('')
  const [myEmail, setMyEmail] = useState<string>('')
- const [balance, setBalance] = useState<number>(0)
- const [toast, setToast] = useState<{ amount: number; label: string } | null>(null)
 
  // 위치기반 (당근식)
  const [geoStatus, setGeoStatus] = useState<'idle' | 'loading' | 'ok' | 'denied' | 'unavailable' | 'timeout' | 'unsupported'>('idle')
@@ -605,31 +519,16 @@ export default function Community() {
  useEffect(() => {
  const email = readMyEmailFromCookie() || 'guest@example.com'
  setMyEmail(email)
- setBalance(getBalance(email))
+
  }, [])
 
- // 37차-6: 실제 사용자 글이 있으면 샘플은 밀어내기 (없으면 샘플만 유지)
+ // 이 브라우저에 사용자가 작성한 초안만 복구한다. 공개 게시글이 아니다.
  useEffect(() => {
  try {
  const raw = window.localStorage.getItem('localution.community_posts')
  if (!raw) return
- const myPosts = JSON.parse(raw)
- if (Array.isArray(myPosts) && myPosts.length > 0) {
- const isSample = (p: any) =>
- typeof p?.author_email === 'string' && p.author_email.startsWith('sample')
- setPosts(prev => {
- const existingIds = new Set(prev.map((p: any) => p.id))
- const fresh = myPosts.filter((p: any) => !existingIds.has(p.id))
- // 실제 사용자 글이 이미 3개 이상이면 샘플 제거, 그 전에는 뒤로 밀기
- const realCount = fresh.length + prev.filter((p: any) => !isSample(p)).length
- if (realCount >= 3) {
- return [...fresh, ...prev.filter((p: any) => !isSample(p))]
- }
- const realPrev = prev.filter((p: any) => !isSample(p))
- const samplePrev = prev.filter((p: any) => isSample(p))
- return [...fresh, ...realPrev, ...samplePrev]
- })
- }
+ const saved = JSON.parse(raw)
+ if (Array.isArray(saved)) setPosts(saved.filter((post: any) => post?.author === '나' && typeof post.title === 'string' && typeof post.content === 'string').map((post: any) => ({ ...post, featured: false })))
  } catch (_) {}
  }, [])
 
@@ -648,27 +547,14 @@ export default function Community() {
  return matchCat && matchRegion && matchSearch && matchIndustry
  }), [posts, activeCategory, activeRegion, activeIndustryGroup, activeIndustry, searchQuery])
 
- const hotPosts = useMemo(() => [...posts].sort((a, b) => b.likes - a.likes).slice(0, 3), [posts])
+ const hotPosts = useMemo(() => posts.slice(0, 3), [posts])
 
- const pushToast = (amount: number, label: string) => setToast({ amount, label })
 
  const handleLike = (id: number) => {
  setPosts(prev => prev.map(p => {
  if (p.id !== id) return p
  const newLikes = p.liked ? p.likes - 1 : p.likes + 1
  const next = { ...p, liked: !p.liked, likes: newLikes }
- // 인기글 기준 넘기면 작성자에게 500P
- if (!p.featured && newLikes >= FEATURED_THRESHOLD && p.author_email) {
- const r = maybeAwardFeatured({ post_id: p.id, author_email: p.author_email, likes: newLikes })
- if (r.ok) {
- next.featured = true
- next.featured_at = new Date().toISOString()
- if (p.author_email === myEmail) {
- setBalance(getBalance(myEmail))
- pushToast(POINT_RULES.POST_FEATURED.delta, '인기글 선정!')
- }
- }
- }
  return next
  }))
  if (selectedPost?.id === id) {
@@ -700,12 +586,7 @@ export default function Community() {
  } catch (_) {}
  return next
  })
- // 포인트 적립
- const r = awardPoints({ user_email: myEmail, rule_key: 'POST_CREATE', ref_type: 'post', ref_id: newId })
- if (r.ok) {
- setBalance(getBalance(myEmail))
- pushToast(POINT_RULES.POST_CREATE.delta, POINT_RULES.POST_CREATE.label)
- }
+
  }
 
  const handleComment = (postId: number, text: string) => {
@@ -715,12 +596,7 @@ export default function Community() {
  setSelectedPost((prev: any) => prev && prev.id === postId
  ? { ...prev, comments: [...prev.comments, { author: '나', text, time: '방금' }] }
  : prev)
- const commentRefId = `${postId}-${Date.now()}`
- const r = awardPoints({ user_email: myEmail, rule_key: 'COMMENT_CREATE', ref_type: 'comment', ref_id: commentRefId })
- if (r.ok) {
- setBalance(getBalance(myEmail))
- pushToast(POINT_RULES.COMMENT_CREATE.delta, POINT_RULES.COMMENT_CREATE.label)
- }
+
  }
 
  const regionGroups = useMemo(() => groupedRegions(), [])
@@ -732,13 +608,13 @@ export default function Community() {
  <PageHeader
  icon=""
  title="커뮤니티"
- subtitle="소상공인 사장님들의 경험·노하우 + 우리 동네 게시판"
+ subtitle="공개 게시판 연결 준비 중입니다. 작성한 내용은 이 브라우저에 초안으로만 저장됩니다."
  variant="promo"
  right={
  <div className="hidden md:flex items-center gap-2">
  <div className="flex items-center gap-1.5 bg-white/20 backdrop-blur px-3 py-1.5 rounded-full text-sm font-bold">
  <Coins size={14} strokeWidth={2.5} />
- {balance.toLocaleString()}P
+ 브라우저 초안
  </div>
  <button onClick={() => setShowWrite(true)}
  className="min-h-11 inline-flex items-center gap-1.5 bg-white text-[#EA580C] font-bold px-4 py-2 rounded-full text-sm shadow hover:shadow-none transition-all">
@@ -754,7 +630,7 @@ export default function Community() {
  <div className="md:hidden flex items-center justify-between mb-4 gap-2">
  <div className="flex items-center gap-1.5 bg-[var(--lu-accent)] text-white px-3 py-1.5 rounded-full text-sm font-bold shadow">
  <Coins size={14} strokeWidth={2.5} />
- {balance.toLocaleString()}P
+ 브라우저 초안
  </div>
  <button onClick={() => setShowWrite(true)}
  className="min-h-11 inline-flex items-center gap-1.5 bg-[var(--lu-accent)] text-white font-bold px-4 py-2 rounded-full text-sm shadow">
@@ -766,21 +642,7 @@ export default function Community() {
  {/* 슬라이드 광고 배너 — 최상단 (포인트·이용안내 위) */}
  <SlideAdBanner className="mb-4" />
 
- {/* 포인트 이벤트 배너 */}
- <div className="bg-[var(--lu-accent)] border border-[#FED7AA] rounded-[10px] px-5 py-4 mb-4">
- <div className="flex items-start gap-3">
- <span className="w-10 h-10 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center text-white flex-shrink-0 shadow">
- <Coins size={18} strokeWidth={2.25} />
- </span>
- <div className="flex-1">
- <p className="text-sm font-bold text-[#9A3412] mb-1">커뮤니티 활동 포인트 이벤트</p>
- <p className="text-xs text-[#78350F] leading-relaxed">
- 글 작성 <b>+{POINT_RULES.POST_CREATE.delta}P</b> · 댓글 작성 <b>+{POINT_RULES.COMMENT_CREATE.delta}P</b> · 인기 게시글(좋아요 {FEATURED_THRESHOLD}개↑) <b>+{POINT_RULES.POST_FEATURED.delta}P</b>
- </p>
- <p className="text-[11px] text-[#9A3412] mt-1 opacity-80">포인트는 결제·광고·리포트 차감에 사용 가능 · 초기 운영 정책으로 한도·룰은 예고 없이 조정될 수 있어요</p>
- </div>
- </div>
- </div>
+ <div className="mb-4 rounded-[10px] border border-[var(--lu-line)] bg-white p-4 text-sm leading-6 text-[var(--lu-muted)]">공개 게시글 조회와 게시 기능은 아직 연결되지 않았습니다. 아래 목록은 이 브라우저에 직접 저장한 초안입니다. 다른 사용자에게 공유되거나 포인트가 적립되지 않습니다.</div>
 
  {/* 공지 배너 */}
  <div className="bg-[var(--lu-accent-soft)] border border-[#BFDBFE] rounded-[10px] px-5 py-3.5 mb-4 flex items-start gap-3">
@@ -789,7 +651,7 @@ export default function Community() {
  </span>
  <div>
  <p className="text-sm font-bold text-[var(--lu-accent)] mb-0.5">커뮤니티 이용 안내</p>
- <p className="text-xs text-[var(--lu-muted)] leading-relaxed">서로 존중하는 댓글 문화 · 광고성 게시글은 삭제될 수 있어요 · 좋은 정보는 저장·공유 환영</p>
+ <p className="text-xs text-[var(--lu-muted)] leading-relaxed">초안은 현재 브라우저에만 저장됩니다. 다른 기기나 다른 사용자에게 전송되지 않습니다.</p>
  </div>
  </div>
 
@@ -935,7 +797,7 @@ export default function Community() {
  <Search size={26} strokeWidth={1.75} className="text-[var(--lu-muted)]" />
  </div>
  <div className="font-semibold text-[var(--lu-ink)] mb-1">게시글이 없어요</div>
- <div className="text-sm text-[var(--lu-muted)]">우리 동네에 첫 글을 남겨보세요 (+{POINT_RULES.POST_CREATE.delta}P)</div>
+ <div className="text-sm text-[var(--lu-muted)]">이 브라우저에 저장한 초안이 없습니다.</div>
  </div>
  ) : (
  <div className="space-y-3">
@@ -1115,14 +977,14 @@ export default function Community() {
  </p>
  </div>
 
- {/* 내 포인트 */}
+ {/* 저장 범위 */}
  <div className="bg-[var(--lu-accent)] rounded-[10px] p-3.5 border border-[#FED7AA]">
  <div className="flex items-center gap-1.5 mb-1">
  <Coins size={13} strokeWidth={2.25} className="text-[#EA580C]" />
- <h3 className="font-bold text-[#EA580C] text-[11px]">내 포인트</h3>
+ <h3 className="font-bold text-[#EA580C] text-[11px]">저장 범위</h3>
  </div>
- <p className="text-xl font-semibold text-[#9A3412] leading-tight">{balance.toLocaleString()}<span className="text-xs ml-1">P</span></p>
- <p className="text-[10px] text-[#78350F] mt-1 leading-snug opacity-90">활동하면 쌓여요 · 결제·광고에 사용</p>
+ <p className="text-xl font-semibold text-[#9A3412] leading-tight">공개 연동 준비 중</p>
+ <p className="text-[10px] text-[#78350F] mt-1 leading-snug opacity-90">이 브라우저에 직접 저장한 내용만 표시합니다.</p>
  </div>
 
  {/* 내 근처 지역 (geo OK 일 때만) */}
@@ -1155,11 +1017,11 @@ export default function Community() {
  </div>
  )}
 
- {/* 인기 게시글 */}
+ {/* 최근 브라우저 초안 */}
  <div className="bg-white rounded-[10px] p-3.5 shadow-none">
  <h3 className="font-bold text-[var(--lu-ink)] mb-2.5 flex items-center gap-1.5 text-xs">
  <Flame size={12} strokeWidth={2.25} className="text-[#FF3B30]" />
- 인기 게시글
+ 최근 브라우저 초안
  </h3>
  <div className="space-y-2">
  {hotPosts.map((post, i) => (
@@ -1231,7 +1093,7 @@ export default function Community() {
  onComment={handleComment}
  />
  )}
- {toast && <PointToast amount={toast.amount} label={toast.label} onClose={() => setToast(null)} />}
+
  <HarangMarketingPopup />
  </div>
  )

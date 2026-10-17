@@ -7,6 +7,8 @@ import { Link2, ClipboardList, Store, Settings, MessageSquare, LogOut, BarChart3
 import { isAdminEmail } from '@/app/lib/admin-emails'
 
 const FLAT_NAV = [
+ { href: '/support', label: '지원사업', icon: '지원', colors: { bg: '#E7F1ED', text: '#16685D' } },
+ { href: '/partners', label: '광고·공공홍보', icon: '제휴', colors: { bg: '#E7F1ED', text: '#16685D' } },
  { href: '/dashboard', label: '대시보드', icon: 'DB', colors: { bg: '#E7F1ED', text: '#16685D' } },
  { href: '/qr-admin', label: 'QR 관리', icon: 'QR', colors: { bg: '#F5F3FF', text: '#8B5CF6' } },
  { href: '/customers', label: '고객 관리',icon: '고객', colors: { bg: '#ECFDF5', text: '#059669' } },

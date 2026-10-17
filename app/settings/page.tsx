@@ -1683,39 +1683,7 @@ function ConnectTab() {
  )
 }
 
-function ShowcaseCarousel({ items }: { items: Array<{ metric: string; label: string; feature: string; who: string; story: string; grad: string }> }) {
- const [idx, setIdx] = useState(0)
- const [visible] = useState(true)
- const s = items[idx]
-
- return (
- <div>
- <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(8px)', transition: 'opacity 0.38s ease, transform 0.38s ease' }}>
- <div className={`bg-[var(--lu-accent)] rounded-[6px] p-4 text-white mb-3`}>
- <p className="text-3xl font-semibold mb-0.5">{s.metric}</p>
- <p className="text-sm opacity-80">{s.label}</p>
- </div>
- <p className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] font-semibold inline-block mb-1">{s.feature}</p>
- <p className="text-xs font-semibold text-[var(--lu-ink)] mb-1">{s.who}</p>
- <p className="text-xs text-[var(--lu-muted)]">{s.story}</p>
- </div>
- <div className="flex justify-center gap-1.5 mt-4">
- {items.map((_, i) => (
- <button key={i} onClick={() => setIdx(i)} className="min-h-11 rounded-full transition-all duration-300" style={{ width: i === idx ? '16px' : '6px', height: '6px', background: i === idx ? '#16685D' : '#E5E8EB' }} />
- ))}
- </div>
- </div>
- )
-}
-
 function PlanTab() {
- const SHOWCASE = [
- { metric: '98%', label: '리뷰 답변률', feature: 'AI 리뷰 자동 답글', who: '강남구 네일샵', story: 'AI가 매일 쏟아지는 리뷰를 진심 답변으로 처리', grad: 'from-[var(--lu-accent)] to-[var(--lu-accent-hover)]' },
- { metric: '+47명', label: '월 신규 고객', feature: 'CRM 고객관리', who: '홍대 카페', story: '재방문 유도 메시지로 충성 고객 3배 확보', grad: 'from-[#7C3AED] to-[#5B21B6]' },
- { metric: '+34%', label: '재방문율 상승', feature: '마케팅 성과 리포트', who: '이태원 헤어샵', story: '데이터 분석으로 마케팅 전략 최적화', grad: 'from-[#059669] to-[#047857]' },
- { metric: '1,200회', label: 'QR 월 스캔', feature: 'QR 스탬프 적립', who: '신촌 레스토랑', story: 'QR 쿠폰 하나로 재방문율 2배 달성', grad: 'from-[#DC2626] to-[#B91C1C]' },
- { metric: '28%', label: '알림톡 전환율', feature: '알림톡 마케팅', who: '합정 베이커리', story: '타겟 알림톡 한 통에 당일 매출 폭발', grad: 'from-[#D97706] to-[#B45309]' },
- ]
  type CategoryFilter = '전체' | '사장님' | '마케터' | '공통'
  const [cart, setCart] = useState<string[]>([])
  const [filter, setFilter] = useState<CategoryFilter>('전체')
@@ -2032,8 +2000,9 @@ function PlanTab() {
  )}
  </div>
  <div className="bg-white rounded-[10px] p-5 shadow-none">
- <p className="text-xs font-bold text-[var(--lu-muted)] mb-3 uppercase tracking-wider">로컬루션 성과</p>
- <ShowcaseCarousel items={SHOWCASE} />
+ <h3 className="text-base font-semibold text-[var(--lu-ink)]">기능을 먼저 확인하세요</h3>
+ <p className="mt-2 text-sm leading-6 text-[var(--lu-muted)]">실제 이용 결과는 연결한 데이터와 사용 조건에 따라 달라집니다. 기능 안내를 확인하고 필요한 도구를 선택해주세요.</p>
+ <a href="/help/videos" className="mt-3 inline-flex min-h-11 items-center text-sm font-semibold text-[var(--lu-accent)]">기능 안내 영상 보기</a>
  </div>
  </div>
  {showCancelModal && (

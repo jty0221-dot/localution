@@ -119,28 +119,28 @@ export default function AdminUsersPage() {
   }, [data, search, filterRegion, filterCategory, filterPlatform])
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-[var(--lu-canvas)]">
       <div className="max-w-6xl mx-auto px-4 md:px-6 py-4 md:py-6">
         {/* 헤더 */}
         <div className="flex items-start justify-between gap-3 mb-4 md:mb-6 flex-wrap">
           <div className="min-w-0 flex-1">
-            <h1 className="text-xl md:text-2xl font-black text-[#191F28] flex items-center gap-2">
-              <Users size={22} className="text-[#3182F6] flex-shrink-0" strokeWidth={2.5} />
+            <h1 className="text-xl md:text-2xl font-semibold text-[var(--lu-ink)] flex items-center gap-2">
+              <Users size={22} className="text-[#16685D] flex-shrink-0" strokeWidth={2.5} />
               사용자 목록
             </h1>
-            <p className="text-xs md:text-sm text-[#4E5968] mt-1">
+            <p className="text-xs md:text-sm text-[var(--lu-muted)] mt-1">
               로컬루션 가입자 + 매장 정보 + 연동 플랫폼 통합
             </p>
           </div>
           <button onClick={load} disabled={loading}
-            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#3182F6] text-white text-xs md:text-sm font-bold hover:bg-[#1B64DA] disabled:opacity-50 flex-shrink-0">
+            className="inline-flex items-center gap-1.5 px-3 py-2 rounded-[6px] bg-[#16685D] text-white text-xs md:text-sm font-bold hover:bg-[#105448] disabled:opacity-50 flex-shrink-0">
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} strokeWidth={2.5} />
             새로고침
           </button>
         </div>
 
         {err && (
-          <div className="mb-4 p-3 md:p-4 rounded-2xl bg-red-50 border border-red-200 text-red-800 text-sm">{err}</div>
+          <div className="mb-4 p-3 md:p-4 rounded-[10px] bg-red-50 border border-red-200 text-red-800 text-sm">{err}</div>
         )}
 
         {data && (
@@ -186,17 +186,17 @@ export default function AdminUsersPage() {
             </section>
 
             {/* 검색 */}
-            <div className="mb-4 p-2 bg-white rounded-2xl shadow-sm">
+            <div className="mb-4 p-2 bg-white rounded-[10px] shadow-none">
               <div className="flex items-center gap-2 px-2">
-                <Search size={16} className="text-[#8B95A1] flex-shrink-0" strokeWidth={2.5} />
+                <Search size={16} className="text-[var(--lu-muted)] flex-shrink-0" strokeWidth={2.5} />
                 <input
                   value={search}
                   onChange={e => setSearch(e.target.value)}
                   placeholder="이메일·매장명·주소·전화번호·placeId 검색"
-                  className="flex-1 px-2 py-2 text-sm focus:outline-none text-[#191F28] bg-transparent"
+                  className="flex-1 px-2 py-2 text-sm focus:outline-none text-[var(--lu-ink)] bg-transparent"
                 />
                 {search && (
-                  <button onClick={() => setSearch('')} className="text-xs text-[#8B95A1] hover:text-[#191F28]">×</button>
+                  <button onClick={() => setSearch('')} className="text-xs text-[var(--lu-muted)] hover:text-[var(--lu-ink)]">×</button>
                 )}
               </div>
             </div>
@@ -209,10 +209,10 @@ export default function AdminUsersPage() {
               }
             </div>
 
-            <div className="hidden md:block bg-white rounded-2xl shadow-sm overflow-hidden">
+            <div className="hidden md:block bg-white rounded-[10px] shadow-none overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-xs">
-                  <thead className="bg-[#F2F4F6] text-[#191F28] font-bold">
+                  <thead className="bg-[var(--lu-canvas)] text-[var(--lu-ink)] font-bold">
                     <tr>
                       <th className="px-3 py-2 text-left">사용자</th>
                       <th className="px-3 py-2 text-left">매장</th>
@@ -227,57 +227,57 @@ export default function AdminUsersPage() {
                   <tbody>
                     {loading ? (
                       Array.from({ length: 5 }).map((_, i) => (
-                        <tr key={i} className="border-t border-[#F2F4F6] animate-pulse">
-                          <td className="px-3 py-3"><div className="h-3 bg-[#F2F4F6] rounded w-40" /></td>
-                          <td className="px-3 py-3"><div className="h-3 bg-[#F2F4F6] rounded w-32" /></td>
-                          <td className="px-3 py-3"><div className="h-3 bg-[#F2F4F6] rounded w-16" /></td>
-                          <td className="px-3 py-3"><div className="h-3 bg-[#F2F4F6] rounded w-12" /></td>
-                          <td className="px-3 py-3"><div className="h-3 bg-[#F2F4F6] rounded w-20" /></td>
-                          <td className="px-3 py-3"><div className="h-3 bg-[#F2F4F6] rounded w-8 ml-auto" /></td>
-                          <td className="px-3 py-3"><div className="h-3 bg-[#F2F4F6] rounded w-16" /></td>
+                        <tr key={i} className="border-t border-[var(--lu-canvas)] animate-pulse">
+                          <td className="px-3 py-3"><div className="h-3 bg-[var(--lu-canvas)] rounded w-40" /></td>
+                          <td className="px-3 py-3"><div className="h-3 bg-[var(--lu-canvas)] rounded w-32" /></td>
+                          <td className="px-3 py-3"><div className="h-3 bg-[var(--lu-canvas)] rounded w-16" /></td>
+                          <td className="px-3 py-3"><div className="h-3 bg-[var(--lu-canvas)] rounded w-12" /></td>
+                          <td className="px-3 py-3"><div className="h-3 bg-[var(--lu-canvas)] rounded w-20" /></td>
+                          <td className="px-3 py-3"><div className="h-3 bg-[var(--lu-canvas)] rounded w-8 ml-auto" /></td>
+                          <td className="px-3 py-3"><div className="h-3 bg-[var(--lu-canvas)] rounded w-16" /></td>
                           <td className="px-3 py-3"></td>
                         </tr>
                       ))
                     ) : filtered.length === 0 ? (
-                      <tr><td colSpan={8} className="text-center text-[#8B95A1] py-10 text-sm">사용자가 없습니다</td></tr>
+                      <tr><td colSpan={8} className="text-center text-[var(--lu-muted)] py-10 text-sm">사용자가 없습니다</td></tr>
                     ) : filtered.map(u => (
-                      <tr key={u.user_id} className="border-b border-[#F2F4F6] hover:bg-[#FAFBFF]">
+                      <tr key={u.user_id} className="border-b border-[var(--lu-canvas)] hover:bg-[#FAFBFF]">
                         <td className="px-3 py-2.5 max-w-[180px]">
-                          <div className="text-xs font-bold text-[#191F28] truncate" title={u.email || ''}>{u.email || '-'}</div>
-                          <div className="text-[10px] text-[#8B95A1] font-mono">{u.user_id.slice(0, 8)}{u.provider ? ' · ' + u.provider : ''}</div>
+                          <div className="text-xs font-bold text-[var(--lu-ink)] truncate" title={u.email || ''}>{u.email || '-'}</div>
+                          <div className="text-xs text-[var(--lu-muted)] font-mono">{u.user_id.slice(0, 8)}{u.provider ? ' · ' + u.provider : ''}</div>
                         </td>
                         <td className="px-3 py-2.5 max-w-[200px]">
                           {u.primary_store ? (
                             <>
-                              <div className="text-xs font-bold text-[#191F28] truncate" title={u.primary_store.name}>
+                              <div className="text-xs font-bold text-[var(--lu-ink)] truncate" title={u.primary_store.name}>
                                 {u.primary_store.name}
-                                {u.store_count > 1 && <span className="ml-1 text-[10px] text-[#7C3AED]">+{u.store_count - 1}</span>}
+                                {u.store_count > 1 && <span className="ml-1 text-xs text-[#7C3AED]">+{u.store_count - 1}</span>}
                               </div>
                               {u.primary_store.address && (
-                                <div className="text-[10px] text-[#8B95A1] truncate" title={u.primary_store.address}>
+                                <div className="text-xs text-[var(--lu-muted)] truncate" title={u.primary_store.address}>
                                   {u.primary_store.address}
                                 </div>
                               )}
                             </>
-                          ) : <span className="text-[10px] text-[#B0B8C1]">미등록</span>}
+                          ) : <span className="text-xs text-[#B0B8C1]">미등록</span>}
                         </td>
-                        <td className="px-3 py-2.5 text-[11px] text-[#7C3AED]">{u.category || '-'}</td>
-                        <td className="px-3 py-2.5 text-[11px] text-[#F59E0B] font-bold">{u.region || '-'}</td>
+                        <td className="px-3 py-2.5 text-xs text-[#7C3AED]">{u.category || '-'}</td>
+                        <td className="px-3 py-2.5 text-xs text-[#F59E0B] font-bold">{u.region || '-'}</td>
                         <td className="px-3 py-2.5">
                           <div className="flex flex-wrap gap-1">
                             {u.platforms.map(p => (
-                              <span key={p} className="text-[9px] font-black text-white px-1.5 py-0.5 rounded"
+                              <span key={p} className="text-xs font-semibold text-white px-1.5 py-0.5 rounded"
                                 style={{ background: PLATFORM_COLOR[p] || '#6B7280', color: p === 'kakao_map' ? '#191F28' : '#fff' }}>
                                 {PLATFORM_LABEL[p] || p}
                               </span>
                             ))}
-                            {u.platforms.length === 0 && <span className="text-[10px] text-[#B0B8C1]">없음</span>}
+                            {u.platforms.length === 0 && <span className="text-xs text-[#B0B8C1]">없음</span>}
                           </div>
                         </td>
                         <td className="px-3 py-2.5 text-right font-bold tabular-nums" style={{ color: u.review_count > 0 ? '#191F28' : '#B0B8C1' }}>
                           {u.review_count}
                         </td>
-                        <td className="px-3 py-2.5 text-[10px] text-[#4E5968]">{fmtDate(u.signed_up_at)}</td>
+                        <td className="px-3 py-2.5 text-xs text-[var(--lu-muted)]">{fmtDate(u.signed_up_at)}</td>
                         <td className="px-3 py-2.5 text-center whitespace-nowrap">
                           <button onClick={async () => {
                             if (!confirm(`${u.email || u.user_id.slice(0,8)} 로 임시 로그인?\n\n1시간동안 사장님 화면 그대로 사용 가능.`)) return
@@ -291,12 +291,12 @@ export default function AdminUsersPage() {
                             if (j.ok) { window.location.href = '/dashboard' }
                             else { alert(j.error || '실패') }
                           }}
-                            className="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-1 rounded bg-[#F04452] text-white hover:bg-[#DC2626] mr-1">
+                            className="inline-flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded bg-[#F04452] text-white hover:bg-[#DC2626] mr-1">
                             로그인
                           </button>
                           {u.platforms.includes('coupangeats') && (
                             <Link href={'/admin/coupang/' + u.user_id}
-                              className="inline-flex items-center gap-0.5 text-[10px] font-bold px-2 py-1 rounded bg-[#FF4B30] text-white hover:bg-[#DC2626]">
+                              className="inline-flex items-center gap-0.5 text-xs font-bold px-2 py-1 rounded bg-[#FF4B30] text-white hover:bg-[#DC2626]">
                               쿠팡 <ExternalLink size={9} strokeWidth={2.5} />
                             </Link>
                           )}
@@ -316,9 +316,9 @@ export default function AdminUsersPage() {
 
 function StatCard({ label, value, color }: { label: string; value: number; color: string }) {
   return (
-    <div className="p-3 md:p-4 rounded-2xl bg-white shadow-sm">
-      <div className="text-[11px] md:text-xs font-bold text-[#8B95A1]">{label}</div>
-      <div className="text-xl md:text-2xl font-black tabular-nums" style={{ color }}>{value}</div>
+    <div className="p-3 md:p-4 rounded-[10px] bg-white shadow-none">
+      <div className="text-xs md:text-xs font-bold text-[var(--lu-muted)]">{label}</div>
+      <div className="text-xl md:text-2xl font-semibold tabular-nums" style={{ color }}>{value}</div>
     </div>
   )
 }
@@ -335,20 +335,20 @@ function FilterChips({ label, Icon, color, value, onChange, options, labelMap }:
   const entries = Object.entries(options).sort((a, b) => b[1] - a[1])
   if (entries.length === 0) return null
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-2.5">
+    <div className="bg-white rounded-[10px] shadow-none p-2.5">
       <div className="flex items-center gap-2 mb-1.5">
         <Icon size={13} className="flex-shrink-0" style={{ color }} strokeWidth={2.5} />
-        <span className="text-[11px] md:text-xs font-bold text-[#191F28]">{label}</span>
+        <span className="text-xs md:text-xs font-bold text-[var(--lu-ink)]">{label}</span>
       </div>
       <div className="flex flex-wrap gap-1">
         <button onClick={() => onChange('all')}
-          className={'text-[10px] md:text-[11px] font-bold px-2 py-1 rounded ' +
-            (value === 'all' ? 'bg-[#191F28] text-white' : 'bg-[#F2F4F6] text-[#4E5968]')}>
+          className={'text-xs md:text-xs font-bold px-2 py-1 rounded ' +
+            (value === 'all' ? 'bg-[var(--lu-ink)] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]')}>
           전체
         </button>
         {entries.map(([k, v]) => (
           <button key={k} onClick={() => onChange(k)}
-            className={'text-[10px] md:text-[11px] font-bold px-2 py-1 rounded ' +
+            className={'text-xs md:text-xs font-bold px-2 py-1 rounded ' +
               (value === k ? 'text-white' : 'bg-[#FAFBFF] border')}
             style={value === k
               ? { background: color }
@@ -363,56 +363,56 @@ function FilterChips({ label, Icon, color, value, onChange, options, labelMap }:
 
 function UserCard({ u }: { u: UserRow }) {
   return (
-    <div className="bg-white rounded-2xl shadow-sm p-3.5">
+    <div className="bg-white rounded-[10px] shadow-none p-3.5">
       <div className="flex items-start justify-between gap-2 mb-2 flex-wrap">
         <div className="min-w-0 flex-1">
-          <div className="text-sm font-bold text-[#191F28] truncate" title={u.email || ''}>{u.email || '-'}</div>
-          <div className="text-[10px] text-[#8B95A1] font-mono">
+          <div className="text-sm font-bold text-[var(--lu-ink)] truncate" title={u.email || ''}>{u.email || '-'}</div>
+          <div className="text-xs text-[var(--lu-muted)] font-mono">
             {u.user_id.slice(0, 8)} {u.provider && '· ' + u.provider} · 가입 {fmtDate(u.signed_up_at)}
           </div>
         </div>
         {u.platforms.includes('coupangeats') && (
           <Link href={'/admin/coupang/' + u.user_id}
-            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#FF4B30] text-white text-[10px] font-bold flex-shrink-0">
+            className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-[#FF4B30] text-white text-xs font-bold flex-shrink-0">
             쿠팡 상세 <ExternalLink size={10} strokeWidth={2.5} />
           </Link>
         )}
       </div>
 
       {u.primary_store ? (
-        <div className="mb-2 p-2.5 rounded-xl bg-[#FAFBFF]">
-          <div className="flex items-center gap-1.5 text-sm font-bold text-[#191F28] mb-1">
-            <Store size={13} className="text-[#8B95A1]" strokeWidth={2.5} />
+        <div className="mb-2 p-2.5 rounded-[6px] bg-[#FAFBFF]">
+          <div className="flex items-center gap-1.5 text-sm font-bold text-[var(--lu-ink)] mb-1">
+            <Store size={13} className="text-[var(--lu-muted)]" strokeWidth={2.5} />
             <span className="truncate">{u.primary_store.name}</span>
-            {u.store_count > 1 && <span className="text-[10px] text-[#7C3AED]">+{u.store_count - 1}개</span>}
+            {u.store_count > 1 && <span className="text-xs text-[#7C3AED]">+{u.store_count - 1}개</span>}
           </div>
           {u.primary_store.address && (
-            <div className="text-[11px] text-[#4E5968] flex items-start gap-1">
+            <div className="text-xs text-[var(--lu-muted)] flex items-start gap-1">
               <MapPin size={11} className="text-[#F59E0B] flex-shrink-0 mt-0.5" strokeWidth={2.5} />
               <span className="break-words">{u.primary_store.address}</span>
             </div>
           )}
-          <div className="mt-1 flex items-center gap-2 text-[11px] flex-wrap">
+          <div className="mt-1 flex items-center gap-2 text-xs flex-wrap">
             {u.category && <span className="text-[#7C3AED] font-bold">{u.category}</span>}
             {u.region && <span className="text-[#F59E0B] font-bold">· {u.region}</span>}
-            {u.primary_store.phone && <span className="text-[#8B95A1] font-mono">{u.primary_store.phone}</span>}
+            {u.primary_store.phone && <span className="text-[var(--lu-muted)] font-mono">{u.primary_store.phone}</span>}
           </div>
         </div>
       ) : (
-        <div className="mb-2 p-2 rounded-xl bg-[#FFFBEB] text-[11px] text-[#92400E]">매장 미등록</div>
+        <div className="mb-2 p-2 rounded-[6px] bg-[#FFFBEB] text-xs text-[#92400E]">매장 미등록</div>
       )}
 
       <div className="flex items-center justify-between flex-wrap gap-2">
         <div className="flex flex-wrap gap-1">
           {u.platforms.map(p => (
-            <span key={p} className="text-[10px] font-black px-1.5 py-0.5 rounded"
+            <span key={p} className="text-xs font-semibold px-1.5 py-0.5 rounded"
               style={{ background: PLATFORM_COLOR[p] || '#6B7280', color: p === 'kakao_map' ? '#191F28' : '#fff' }}>
               {PLATFORM_LABEL[p] || p}
             </span>
           ))}
-          {u.platforms.length === 0 && <span className="text-[10px] text-[#B0B8C1]">연동 없음</span>}
+          {u.platforms.length === 0 && <span className="text-xs text-[#B0B8C1]">연동 없음</span>}
         </div>
-        <div className="flex items-center gap-1.5 text-[11px]">
+        <div className="flex items-center gap-1.5 text-xs">
           <Star size={11} className="text-[#F59E0B]" fill="currentColor" strokeWidth={0} />
           <span className="font-bold tabular-nums" style={{ color: u.review_count > 0 ? '#191F28' : '#B0B8C1' }}>
             {u.review_count} 리뷰
@@ -427,10 +427,10 @@ function SkeletonCards() {
   return (
     <>
       {Array.from({ length: 5 }).map((_, i) => (
-        <div key={i} className="bg-white rounded-2xl p-4 animate-pulse space-y-2">
-          <div className="h-4 bg-[#F2F4F6] rounded w-32" />
-          <div className="h-3 bg-[#F2F4F6] rounded w-48" />
-          <div className="h-3 bg-[#F2F4F6] rounded w-24" />
+        <div key={i} className="bg-white rounded-[10px] p-4 animate-pulse space-y-2">
+          <div className="h-4 bg-[var(--lu-canvas)] rounded w-32" />
+          <div className="h-3 bg-[var(--lu-canvas)] rounded w-48" />
+          <div className="h-3 bg-[var(--lu-canvas)] rounded w-24" />
         </div>
       ))}
     </>
@@ -439,7 +439,7 @@ function SkeletonCards() {
 
 function EmptyState() {
   return (
-    <div className="bg-white rounded-2xl p-8 text-center text-sm text-[#8B95A1]">
+    <div className="bg-white rounded-[10px] p-8 text-center text-sm text-[var(--lu-muted)]">
       조건에 맞는 사용자가 없습니다
     </div>
   )

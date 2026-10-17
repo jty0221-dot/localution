@@ -90,7 +90,7 @@ export default function FixStoreIdPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F8F9FA]">
+    <div className="min-h-screen bg-[var(--lu-canvas)]">
       <PageHeader
         title="매장 ID 수동 fix"
         subtitle="naver_place / kakao_map URL 붙여넣고 저장"
@@ -120,19 +120,19 @@ export default function FixStoreIdPage() {
               <button
                 key={i}
                 onClick={() => loadDetail(u)}
-                className={`text-left p-3 md:p-4 rounded-2xl border-2 transition ${
+                className={`text-left p-3 md:p-4 rounded-[10px] border-2 transition ${
                   isSelected
-                    ? 'border-emerald-500 bg-emerald-50 shadow-sm'
+                    ? 'border-emerald-500 bg-emerald-50 shadow-none'
                     : 'border-gray-200 bg-white hover:border-emerald-300'
                 }`}
               >
                 <div className="flex items-center gap-2 mb-1">
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-emerald-500 to-green-600 shadow-sm flex items-center justify-center flex-shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-[var(--lu-accent)] shadow-none flex items-center justify-center flex-shrink-0">
                     <Link2 size={13} className="text-white" strokeWidth={2.5} />
                   </div>
                   <span className="text-xs md:text-sm font-bold text-gray-900">{u.platform}</span>
                 </div>
-                <div className="font-mono text-[11px] md:text-xs text-gray-600 truncate">{u.user_id}</div>
+                <div className="font-mono text-xs md:text-xs text-gray-600 truncate">{u.user_id}</div>
               </button>
             )
           })}
@@ -145,16 +145,16 @@ export default function FixStoreIdPage() {
 
         {/* 선택된 사용자 상세 + 입력 폼 */}
         {selected && (
-          <div className="bg-white rounded-2xl border border-emerald-200 shadow-sm p-4 md:p-6 space-y-4">
+          <div className="bg-white rounded-[10px] border border-emerald-200 shadow-none p-4 md:p-6 space-y-4">
             <div className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-500 to-green-600 shadow-sm flex items-center justify-center">
+              <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center">
                 <Search size={16} className="text-white" strokeWidth={2.5} />
               </div>
               <div className="min-w-0 flex-1">
                 <div className="text-base md:text-lg font-bold text-gray-900">
                   {selected.platform} 매장 ID 입력
                 </div>
-                <div className="font-mono text-[11px] md:text-xs text-gray-500 truncate">
+                <div className="font-mono text-xs md:text-xs text-gray-500 truncate">
                   {selected.user_id}
                 </div>
               </div>
@@ -179,7 +179,7 @@ export default function FixStoreIdPage() {
                   </div>
                 )}
                 {detail.recent_reviews && detail.recent_reviews.length > 0 && (
-                  <div className="text-[11px] md:text-xs text-gray-500">
+                  <div className="text-xs md:text-xs text-gray-500">
                     최근 리뷰 {detail.recent_reviews.length}건 (다른 플랫폼)
                   </div>
                 )}
@@ -206,10 +206,10 @@ export default function FixStoreIdPage() {
                 </ul>
                 {pipeline.collected_7d_by_platform && Object.keys(pipeline.collected_7d_by_platform).length > 0 && (
                   <div className="pt-2 border-t border-purple-200">
-                    <div className="text-[11px] text-purple-700 mb-1">최근 7일 리뷰 수집</div>
+                    <div className="text-xs text-purple-700 mb-1">최근 7일 리뷰 수집</div>
                     <div className="flex flex-wrap gap-1.5">
                       {Object.entries(pipeline.collected_7d_by_platform).map(([p, c]: any) => (
-                        <span key={p} className="px-2 py-0.5 bg-white border border-purple-300 rounded-md text-[11px] font-medium text-purple-700">
+                        <span key={p} className="px-2 py-0.5 bg-white border border-purple-300 rounded-md text-xs font-medium text-purple-700">
                           {p}: {c}건
                         </span>
                       ))}
@@ -217,7 +217,7 @@ export default function FixStoreIdPage() {
                   </div>
                 )}
                 {pipeline.stuck_queued_count > 0 && (
-                  <div className="pt-2 border-t border-purple-200 text-[11px] text-purple-700">
+                  <div className="pt-2 border-t border-purple-200 text-xs text-purple-700">
                     Stuck queued {pipeline.stuck_queued_count}건 · queue-maintenance 자동 처리 대기
                   </div>
                 )}
@@ -240,7 +240,7 @@ export default function FixStoreIdPage() {
                   }
                   className="w-full px-3 py-2.5 text-sm rounded-lg border border-gray-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500"
                 />
-                <div className="text-[11px] text-gray-500 mt-1">
+                <div className="text-xs text-gray-500 mt-1">
                   URL 붙여넣으면 자동으로 ID 추출 + 매장명 검색
                 </div>
               </div>
@@ -280,7 +280,7 @@ export default function FixStoreIdPage() {
               <button
                 onClick={handleSave}
                 disabled={saving || (!placeUrl && !placeId)}
-                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-br from-emerald-500 to-green-600 text-white font-bold rounded-xl shadow-sm hover:shadow-md transition disabled:opacity-50"
+                className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-[var(--lu-accent)] text-white font-bold rounded-[6px] shadow-none hover:shadow-md transition disabled:opacity-50"
               >
                 {saving ? <RefreshCw size={16} className="animate-spin" /> : <Save size={16} />}
                 저장
@@ -303,13 +303,13 @@ export default function FixStoreIdPage() {
                           place_id <code className="bg-white px-1 rounded">{lastResult.place_id_set}</code>
                           {lastResult.place_name && <> · {lastResult.place_name}</>}
                         </div>
-                        <div className="text-[11px] mt-1">{lastResult.message}</div>
+                        <div className="text-xs mt-1">{lastResult.message}</div>
                       </>
                     ) : (
                       <>
                         <div className="font-bold">저장 실패</div>
                         <div className="mt-1">{lastResult.error}</div>
-                        {lastResult.hint && <div className="text-[11px] mt-1">{lastResult.hint}</div>}
+                        {lastResult.hint && <div className="text-xs mt-1">{lastResult.hint}</div>}
                       </>
                     )}
                   </div>
@@ -320,7 +320,7 @@ export default function FixStoreIdPage() {
         )}
 
         {/* 가이드 */}
-        <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl border border-blue-200 p-4 md:p-5">
+        <div className="bg-[var(--lu-accent)] rounded-[10px] border border-blue-200 p-4 md:p-5">
           <div className="text-sm md:text-base font-bold text-blue-900 mb-2">사용 방법</div>
           <ol className="text-xs md:text-sm text-blue-900 space-y-1.5 list-decimal list-inside">
             <li>위 사용자 카드 선택</li>
@@ -328,7 +328,7 @@ export default function FixStoreIdPage() {
             <li>URL 붙여넣기 → 저장 클릭</li>
             <li>다음 cron 사이클 (30분) 부터 리뷰 자동 수집 + 답글 발행 가능</li>
           </ol>
-          <div className="mt-3 text-[11px] text-blue-700">
+          <div className="mt-3 text-xs text-blue-700">
             URL 예: <code className="bg-white px-1 rounded">https://map.naver.com/p/entry/place/1463314293</code>
           </div>
         </div>
