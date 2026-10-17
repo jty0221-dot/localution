@@ -43,6 +43,7 @@ const LS_DISMISS_TIL = 'localution.updates.dismissTodayUntil'
 // 공개 랜딩/OAuth 구간에서는 팝업 금지
 const EXCLUDE_PREFIXES = [
  '/login', '/signup', '/auth', '/onboarding', '/locked',
+ '/help/videos', // 설명 영상과 단계를 가리지 않도록 제외
  '/updates', // 업데이트 내역 본인 페이지에선 이중 노출 금지
 ]
 const EXCLUDE_EXACT = new Set<string>(['/', '/privacy', '/terms'])

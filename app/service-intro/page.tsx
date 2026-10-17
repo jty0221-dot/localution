@@ -922,7 +922,7 @@ export default function ServiceIntro() {
  <div className="w-8 h-8 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Sparkles size={14} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
- <h2 className="text-base sm:text-lg font-semibold text-[var(--lu-ink)]">2026년 5월 신규 추가 기능</h2>
+ <h2 className="text-base sm:text-lg font-semibold text-[var(--lu-ink)]">2026년 5월 기능 업데이트 이력</h2>
  </div>
  <p className="text-xs text-[var(--lu-muted)] mb-4 ml-10 break-keep">사장님 피드백을 그대로 반영해서 매주 새 기능이 들어옵니다.</p>
 

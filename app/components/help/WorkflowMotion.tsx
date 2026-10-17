@@ -10,7 +10,7 @@ const scenes = [
   { title: '검토한 결과를 사용해요', detail: '공지와 홍보 링크, 계산 결과를 확인하고 필요한 파일로 보관해요.', label: '03 · 활용', Icon: Layers3 },
 ]
 
-export default function WorkflowMotion() {
+export default function WorkflowMotion({ href = '/help/videos' }: { href?: string } = {}) {
   const [active, setActive] = useState(0)
   const [playing, setPlaying] = useState(false)
   useEffect(() => {
@@ -27,7 +27,7 @@ export default function WorkflowMotion() {
   }, [playing])
   const scene = scenes[active]
   return <section className="lu-motion-section" aria-labelledby="workflow-motion-title">
-    <div className="lu-motion-copy"><p className="lu-label">먼저 흐름을 살펴보세요</p><h2 id="workflow-motion-title">어려운 기능 이름보다<br />하는 일을 보여드릴게요.</h2><p>준비할 정보부터 결과를 사용하는 방법까지. 짧은 영상과 단계별 안내를 보고 직접 시작해 보세요.</p><Link className="lu-primary inline-flex items-center gap-2" href="/help/videos">기능별 설명 영상 보기<ArrowRight size={17} aria-hidden="true" /></Link></div>
+    <div className="lu-motion-copy"><p className="lu-label">먼저 흐름을 살펴보세요</p><h2 id="workflow-motion-title">어려운 기능 이름보다<br />하는 일을 보여드릴게요.</h2><p>준비할 정보부터 결과를 사용하는 방법까지. 짧은 영상과 단계별 안내를 보고 직접 시작해 보세요.</p><Link className="lu-primary inline-flex items-center gap-2" href={href}>기능별 설명 영상 보기<ArrowRight size={17} aria-hidden="true" /></Link></div>
     <div className={`lu-motion-stage ${playing ? 'is-playing' : ''}`}>
       <div className="lu-motion-stack" aria-hidden="true"><div className="lu-motion-sheet lu-motion-sheet-back" /><div className="lu-motion-sheet lu-motion-sheet-mid" /><div className="lu-motion-sheet lu-motion-sheet-front"><scene.Icon size={36} strokeWidth={1.3} /><span>{scene.label}</span><strong>{scene.title}</strong><div className="lu-motion-bars"><i /><i /><i /></div></div></div>
       <div className="lu-motion-caption"><p className="font-semibold text-[var(--lu-ink)]">{scene.title}</p><p className="mt-1 text-sm text-[var(--lu-muted)]">{scene.detail}</p><p className="mt-2 text-xs text-[var(--lu-muted)]">기능 흐름을 설명하는 모션 그래픽입니다.</p></div>

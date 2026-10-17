@@ -197,8 +197,8 @@ function computeStats(extraOwners = 0, extraReplies = 0) {
  void extraReplies
  return [
  { num: '6곳', label: '연결 가능 플랫폼' },
- { num: '4종', label: 'AI 답글 말투' },
- { num: '24시간', label: '자동 수집 주기' },
+ { num: '선택형', label: 'AI 답글 말투' },
+ { num: '연결 후', label: '리뷰 수집 확인' },
  { num: '3분', label: '매장 연결 소요' },
  ]
 }
