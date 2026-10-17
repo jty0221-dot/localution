@@ -188,7 +188,7 @@ export default function MyPlatformsPage() {
  }
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
  <div className="md:ml-[220px] flex flex-col min-h-screen">
  <PageHeader
@@ -202,17 +202,17 @@ export default function MyPlatformsPage() {
 
  {/* 현재 로컬루션 로그인 계정 — 모바일에서 OAuth 로그인 변경 후 헷갈리는 문제 해결 */}
  {me && (
- <div className="mb-4 rounded-2xl border border-[#BBF7D0] bg-gradient-to-br from-[#F0FDF4] to-[#DCFCE7] p-3 md:p-4">
+ <div className="mb-4 rounded-[10px] border border-[var(--lu-line)] bg-[var(--lu-surface)] p-3 md:p-4">
  <div className="flex items-center justify-between gap-3 flex-wrap">
  <div className="flex items-center gap-3 min-w-0 flex-1">
- <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#10B981] to-[#059669] flex items-center justify-center shadow-sm flex-shrink-0">
- <span className="text-white font-black text-base">{(me.name || me.email || '?').charAt(0)}</span>
+ <div className="w-10 h-10 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center shadow-none flex-shrink-0">
+ <span className="text-white font-semibold text-base">{(me.name || me.email || '?').charAt(0)}</span>
  </div>
  <div className="min-w-0 flex-1">
  <p className="text-[10px] font-bold text-[#059669] uppercase tracking-wide">로컬루션 로그인 계정</p>
- <p className="text-sm font-bold text-[#191F28] truncate">
+ <p className="text-sm font-bold text-[var(--lu-ink)] truncate">
  {me.name || '이름 없음'}
- <span className="text-xs font-medium text-[#4E5968] ml-1.5">({me.email || '이메일 없음'})</span>
+ <span className="text-xs font-medium text-[var(--lu-muted)] ml-1.5">({me.email || '이메일 없음'})</span>
  </p>
  </div>
  </div>
@@ -225,7 +225,7 @@ export default function MyPlatformsPage() {
  )}
 
  {/* 안내 헤더 — 두 계정 구분 명시 */}
- <header className="mb-5 rounded-2xl bg-[#FFFBEB] border border-[#FDE68A] p-3 md:p-4">
+ <header className="mb-5 rounded-[10px] bg-[#FFFBEB] border border-[#FDE68A] p-3 md:p-4">
  <p className="text-xs md:text-sm font-bold text-[#92400E] mb-1">
  알아두세요 · 로그인 계정과 플랫폼 계정은 다릅니다
  </p>
@@ -239,25 +239,25 @@ export default function MyPlatformsPage() {
  </header>
 
  {/* 안내 배너 — 법적 문서 링크 */}
- <div className="mb-6 rounded-xl border border-[#E5E7EB] bg-white p-4 text-sm text-[#4E5968]">
+ <div className="mb-6 rounded-[6px] border border-[#E5E7EB] bg-white p-4 text-sm text-[var(--lu-muted)]">
  <div className="flex items-start gap-3">
- <div className="w-6 h-6 rounded-full bg-[#EFF6FF] flex items-center justify-center text-[#3182F6] font-bold text-xs flex-shrink-0">!</div>
+ <div className="w-6 h-6 rounded-full bg-[var(--lu-accent-soft)] flex items-center justify-center text-[var(--lu-accent)] font-bold text-xs flex-shrink-0">!</div>
  <div className="flex-1">
  연결 전 반드시{' '}
- <Link href="/legal/platform-consent" className="text-[#3182F6] font-medium hover:underline">대리권 위임동의서</Link>,{' '}
- <Link href="/terms" className="text-[#3182F6] font-medium hover:underline">이용약관(제5조)</Link>,{' '}
- <Link href="/privacy" className="text-[#3182F6] font-medium hover:underline">개인정보처리방침(제8조)</Link>
+ <Link href="/legal/platform-consent" className="text-[var(--lu-accent)] font-medium hover:underline">대리권 위임동의서</Link>,{' '}
+ <Link href="/terms" className="text-[var(--lu-accent)] font-medium hover:underline">이용약관(제5조)</Link>,{' '}
+ <Link href="/privacy" className="text-[var(--lu-accent)] font-medium hover:underline">개인정보처리방침(제8조)</Link>
  를 확인해주세요. 3개 필수 항목 동의 후 자격증명을 입력하실 수 있습니다.
  </div>
  </div>
  </div>
 
  {/* 바로가기 — 인증 후 다른 페이지로 이동 */}
- <div className="mb-6 rounded-xl bg-[#EFF6FF] border border-[#BFDBFE] p-4">
+ <div className="mb-6 rounded-[6px] bg-[var(--lu-accent-soft)] border border-[#BFDBFE] p-4">
  <div className="flex items-center justify-between flex-wrap gap-3">
  <div className="flex items-center gap-2 text-sm text-[#1E40AF]">
  <span className="font-semibold">인증 완료 후 이동</span>
- <span className="text-[#3182F6]">· 자주 쓰는 페이지로 바로 가세요</span>
+ <span className="text-[var(--lu-accent)]">· 자주 쓰는 페이지로 바로 가세요</span>
  </div>
  <div className="flex gap-2 flex-wrap">
  <Link href="/dashboard" className="px-3 py-1.5 rounded-lg bg-white border border-[#BFDBFE] text-xs font-medium text-[#1E40AF] hover:bg-[#DBEAFE]">
@@ -285,7 +285,7 @@ export default function MyPlatformsPage() {
 
  {/* 로딩 */}
  {loading ? (
- <div className="rounded-xl bg-white border border-[#E5E7EB] p-10 text-center text-[#6B7280]">
+ <div className="rounded-[6px] bg-white border border-[#E5E7EB] p-10 text-center text-[#6B7280]">
  불러오는 중…
  </div>
  ) : (
@@ -301,7 +301,7 @@ export default function MyPlatformsPage() {
  return (
  <div
  key={item.platform}
- className="rounded-xl bg-white border border-[#E5E7EB] p-5 hover:border-[#D1D5DB] transition-colors"
+ className="rounded-[6px] bg-white border border-[#E5E7EB] p-5 hover:border-[#D1D5DB] transition-colors"
  >
  {/* 상단: 로고 + 제목 (35차-4: 공통 PlatformLogo 로 교체) */}
  <div className="flex items-center gap-3 mb-4">
@@ -311,7 +311,7 @@ export default function MyPlatformsPage() {
  rounded={11}
  />
  <div className="flex-1 min-w-0">
- <div className="font-semibold text-[#191F28] truncate">{meta.label}</div>
+ <div className="font-semibold text-[var(--lu-ink)] truncate">{meta.label}</div>
  <div className="text-xs text-[#6B7280]">{meta.description}</div>
  </div>
  {/* 연결 상태 배지 */}
@@ -323,7 +323,7 @@ export default function MyPlatformsPage() {
  연결됨
  </span>
  ) : (
- <span className="text-xs font-medium px-2 py-1 rounded-full bg-[#F2F4F6] text-[#6B7280] flex-shrink-0">
+ <span className="text-xs font-medium px-2 py-1 rounded-full bg-[var(--lu-canvas)] text-[#6B7280] flex-shrink-0">
  미연결
  </span>
  )}
@@ -334,21 +334,21 @@ export default function MyPlatformsPage() {
  <div className="space-y-2 mb-4 rounded-lg bg-[#F9FAFB] p-3 text-xs">
  <div className="flex justify-between">
  <span className="text-[#6B7280]">계정</span>
- <span className="text-[#191F28] font-medium">{acc.account_id}</span>
+ <span className="text-[var(--lu-ink)] font-medium">{acc.account_id}</span>
  </div>
  {acc.platform_store_name && (
  <div className="flex justify-between">
  <span className="text-[#6B7280]">매장</span>
- <span className="text-[#191F28] font-medium truncate max-w-[160px]">{acc.platform_store_name}</span>
+ <span className="text-[var(--lu-ink)] font-medium truncate max-w-[160px]">{acc.platform_store_name}</span>
  </div>
  )}
  <div className="flex justify-between">
  <span className="text-[#6B7280]">연결일</span>
- <span className="text-[#191F28]">{formatDate(acc.connected_at)}</span>
+ <span className="text-[var(--lu-ink)]">{formatDate(acc.connected_at)}</span>
  </div>
  <div className="flex justify-between">
  <span className="text-[#6B7280]">최근 로그인</span>
- <span className="text-[#191F28]">
+ <span className="text-[var(--lu-ink)]">
  {acc.last_login_at ? formatDate(acc.last_login_at) : '미실행'}
  </span>
  </div>
@@ -374,14 +374,14 @@ export default function MyPlatformsPage() {
  <div className="flex gap-2">
  <Link
  href={`/my/platforms/${item.platform}/connect`}
- className="flex-1 text-center py-2 rounded-lg border border-[#E5E7EB] text-sm font-medium text-[#4E5968] hover:bg-[#F9FAFB]"
+ className="flex-1 text-center py-2 rounded-lg border border-[#E5E7EB] text-sm font-medium text-[var(--lu-muted)] hover:bg-[#F9FAFB]"
  >
  재연결
  </Link>
  <button
  onClick={() => unlink(item.platform)}
  disabled={unlinking === item.platform}
- className="flex-1 py-2 rounded-lg bg-[#FEF2F2] text-sm font-medium text-[#DC2626] hover:bg-[#FECACA] disabled:opacity-50"
+ className="min-h-11 flex-1 py-2 rounded-lg bg-[#FEF2F2] text-sm font-medium text-[#DC2626] hover:bg-[#FECACA] disabled:opacity-50"
  >
  {unlinking === item.platform ? '해제 중…' : '연결 해제'}
  </button>
@@ -402,8 +402,8 @@ export default function MyPlatformsPage() {
  )}
 
  {/* 하단 안내 */}
- <div className="mt-8 rounded-xl border border-[#E5E7EB] bg-white p-5 text-sm text-[#4E5968]">
- <div className="font-semibold text-[#191F28] mb-2">연결된 정보 보호</div>
+ <div className="mt-8 rounded-[6px] border border-[#E5E7EB] bg-white p-5 text-sm text-[var(--lu-muted)]">
+ <div className="font-semibold text-[var(--lu-ink)] mb-2">연결된 정보 보호</div>
  <ul className="space-y-1.5 list-disc pl-5">
  <li>비밀번호는 AES-256-GCM 으로 암호화되어 Supabase 에만 저장됩니다</li>
  <li>복호화 키(KEK)는 DB 와 완전 분리되어 있으며, 운영자도 평문 조회 불가</li>

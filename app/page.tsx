@@ -3,6 +3,7 @@
 // force-dynamic 제거 (2026-04-19) — 공개 랜딩이라 정적 shell 생성 허용 (LCP 개선)
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
+import WorkflowMotion from './components/help/WorkflowMotion'
 import Footer from './components/Footer'
 import TopNav from './components/TopNav'
 import HarangMarketingPopup from './components/HarangMarketingPopup'
@@ -309,30 +310,30 @@ function FaqSlider({ faqs }: { faqs: { q: string; a: string }[] }) {
  <section id="faq" aria-labelledby="faq-title" className="scroll-mt-24 py-20 px-4 bg-white">
  <div className="max-w-3xl mx-auto">
  <div className="text-center mb-10">
- <h2 id="faq-title" className="text-2xl md:text-3xl font-black text-[#191F28] mb-2">
+ <h2 id="faq-title" className="text-2xl md:text-3xl font-semibold text-[var(--lu-ink)] mb-2">
  사장님들이 많이 물어보시는 것
  </h2>
- <p className="text-[#8B95A1] text-sm text-left sm:text-center">가입 전 궁금증부터 풀고 가세요</p>
+ <p className="text-[var(--lu-muted)] text-sm text-left sm:text-center">가입 전 궁금증부터 풀고 가세요</p>
  </div>
 
  {/* 슬라이드 영역 */}
  <div className="relative">
  {/* 카드 */}
- <div className="overflow-hidden rounded-2xl">
+ <div className="overflow-hidden rounded-[10px]">
  <div
  className="flex motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-in-out"
  style={{ transform: `translateX(-${cur * 100}%)` }}
  >
  {faqs.map((item, i) => (
- <div key={i} id={`faq-panel-${i}`} aria-hidden={i !== cur} className="w-full min-w-0 shrink-0 bg-[#F8F9FA] border border-gray-100 rounded-2xl p-8 md:p-10">
- <div className="text-xs font-bold text-[#3182F6] mb-4 tracking-widest uppercase">
+ <div key={i} id={`faq-panel-${i}`} aria-hidden={i !== cur} className="w-full min-w-0 shrink-0 bg-[var(--lu-canvas)] border border-gray-100 rounded-[10px] p-8 md:p-10">
+ <div className="text-xs font-bold text-[var(--lu-accent)] mb-4 tracking-widest uppercase">
  Q&A {i + 1} / {faqs.length}
  </div>
- <p className="text-lg md:text-xl font-black text-[#191F28] mb-5 leading-snug">
+ <p className="text-lg md:text-xl font-semibold text-[var(--lu-ink)] mb-5 leading-snug">
  {item.q}
  </p>
- <div className="w-8 h-0.5 bg-[#3182F6] mb-5 rounded-full" />
- <p className="text-sm md:text-base text-[#4E5968] leading-relaxed">
+ <div className="w-8 h-0.5 bg-[var(--lu-accent)] mb-5 rounded-full" />
+ <p className="text-sm md:text-base text-[var(--lu-muted)] leading-relaxed">
  {item.a}
  </p>
  </div>
@@ -344,7 +345,7 @@ function FaqSlider({ faqs }: { faqs: { q: string; a: string }[] }) {
  <div className="mt-3 flex justify-between">
  <button
  onClick={prev}
- className="w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-[#3182F6] hover:text-[#3182F6] transition-all text-[#4E5968]"
+ className="w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-[var(--lu-accent)] hover:text-[var(--lu-accent)] transition-all text-[var(--lu-muted)]"
  type="button"
  aria-label="이전 질문"
  >
@@ -352,7 +353,7 @@ function FaqSlider({ faqs }: { faqs: { q: string; a: string }[] }) {
  </button>
  <button
  onClick={next}
- className="w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-[#3182F6] hover:text-[#3182F6] transition-all text-[#4E5968]"
+ className="w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-[var(--lu-accent)] hover:text-[var(--lu-accent)] transition-all text-[var(--lu-muted)]"
  type="button"
  aria-label="다음 질문"
  >
@@ -368,12 +369,12 @@ function FaqSlider({ faqs }: { faqs: { q: string; a: string }[] }) {
  key={i}
  onClick={() => setCur(i)}
  type="button"
- className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]"
+ className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lu-accent)]"
  aria-label={`${i + 1}번 질문`}
  aria-current={i === cur ? 'true' : undefined}
  aria-controls={`faq-panel-${i}`}
  >
- <span aria-hidden="true" className={`h-2 rounded-full ${i === cur ? 'w-6 bg-[#3182F6]' : 'w-2 bg-gray-200'}`} />
+ <span aria-hidden="true" className={`h-2 rounded-full ${i === cur ? 'w-6 bg-[var(--lu-accent)]' : 'w-2 bg-gray-200'}`} />
  </button>
  ))}
  </div>
@@ -459,7 +460,7 @@ export default function LandingPage() {
  <p className="lu-hero-description">리뷰를 확인하고, 공지를 만들고, 홍보 비용을 비교하세요. 흩어진 마케팅 업무를 한곳에 모아 필요한 일부터 차근차근 시작해 보세요.</p>
  <div className="lu-hero-actions">
  <Link href="/marketing" className="lu-primary inline-flex items-center gap-3">마케팅 도구 시작하기<ArrowRight size={18} aria-hidden="true" /></Link>
- <a href="#tools" className="inline-flex min-h-[44px] items-center gap-2 px-3 font-semibold text-[var(--lu-ink)]">전체 기능 살펴보기<ArrowRight size={16} aria-hidden="true" /></a>
+ <a href="/help/videos" className="inline-flex min-h-[44px] items-center gap-2 px-3 font-semibold text-[var(--lu-ink)]">기능별 영상 보기<ArrowRight size={16} aria-hidden="true" /></a>
  </div>
  <p className="lu-hero-footnote">계산·공지·홍보 링크 도구는 로그인 없이 사용할 수 있어요.<br />리뷰와 매장 검색은 로그인 및 서비스 연결이 필요해요.</p>
  <Link href="/help#find-tools" className="mt-5 inline-flex min-h-[44px] items-center gap-2 text-sm font-semibold text-[var(--lu-accent)]">내 업종에 맞는 작업 찾기<ArrowRight size={15} aria-hidden="true" /></Link>
@@ -476,12 +477,14 @@ export default function LandingPage() {
  </div>
  </section>
 
+ <WorkflowMotion />
+
  {/* ── 통계 ── */}
  <section className="py-12 px-4 bg-white border-b border-gray-100">
  <div className="max-w-4xl mx-auto">
  {!liveSections.stats && (
  <div className="text-center mb-6">
- <span className="inline-block text-[11px] font-semibold text-[#8B95A1] bg-[#F2F4F6] px-2.5 py-1 rounded-full">
+ <span className="inline-block text-[11px] font-semibold text-[var(--lu-muted)] bg-[var(--lu-canvas)] px-2.5 py-1 rounded-full">
  예시 · 실제 데이터 연동 예정
  </span>
  </div>
@@ -492,11 +495,11 @@ export default function LandingPage() {
  {/* SVG 배경 링 */}
  <div className="relative inline-flex items-center justify-center mb-3">
  <svg width="64" height="64" viewBox="0 0 64 64" className="absolute opacity-10 group-hover:opacity-20 transition-opacity" aria-hidden="true">
- <circle cx="32" cy="32" r="30" stroke="#3182F6" strokeWidth="3" fill="none" strokeDasharray="8 4" />
+ <circle cx="32" cy="32" r="30" stroke="var(--lu-accent)" strokeWidth="3" fill="none" strokeDasharray="8 4" />
  </svg>
- <div className="text-2xl md:text-3xl font-black text-[#3182F6]">{s.num}</div>
+ <div className="text-2xl md:text-3xl font-semibold text-[var(--lu-accent)]">{s.num}</div>
  </div>
- <div className="text-xs md:text-sm text-[#8B95A1] font-medium">{s.label}</div>
+ <div className="text-xs md:text-sm text-[var(--lu-muted)] font-medium">{s.label}</div>
  </div>
  ))}
  </div>
@@ -507,14 +510,14 @@ export default function LandingPage() {
  <section className="py-16 px-4 bg-white">
  <div className="max-w-4xl mx-auto">
  <div className="text-center mb-10">
- <h2 className="text-2xl md:text-3xl font-black text-[#191F28] mb-2">
+ <h2 className="text-2xl md:text-3xl font-semibold text-[var(--lu-ink)] mb-2">
  혼자 다 하려면 하루가 모자라요
  </h2>
- <p className="text-[#8B95A1] text-sm">로컬루션 하나로 마케팅·정산·고객관리 전부 해결</p>
+ <p className="text-[var(--lu-muted)] text-sm">반복되는 홍보와 고객 관리 업무를 차근차근 정리하세요</p>
  </div>
  {/* ── 바쁜 사장님 일과 애니메이션 ── */}
  <div className="flex justify-center mb-8">
- <div className="w-full max-w-sm bg-[#1C1C1E] rounded-[2rem] p-3 shadow-2xl shadow-gray-300">
+ <div className="w-full max-w-sm bg-[#1C1C1E] rounded-[2rem] p-3 shadow-sm">
  {/* 상단 상태바 */}
  <div className="flex justify-between items-center px-3 py-1 mb-2">
  <span className="text-white text-xs font-bold">{DAY_SCENES[dayStep].time}</span>
@@ -591,10 +594,10 @@ export default function LandingPage() {
 
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
  {/* Before */}
- <div className="bg-[#FFF5F5] border border-red-100 rounded-2xl p-6">
+ <div className="bg-[#FFF5F5] border border-red-100 rounded-[10px] p-6">
  <div className="flex items-center gap-2 mb-5">
  <div className="w-9 h-9 rounded-full bg-red-100 flex items-center justify-center text-red-500"><Frown size={18} strokeWidth={2.5} /></div>
- <span className="font-black text-[#191F28] text-base">로컬루션 전</span>
+ <span className="font-semibold text-[var(--lu-ink)] text-base">로컬루션 전</span>
  </div>
  <ul className="space-y-3.5">
  {([
@@ -610,18 +613,18 @@ export default function LandingPage() {
  <path d="M5 5l6 6M11 5l-6 6" stroke="#F87171" strokeWidth="1.8" strokeLinecap="round" />
  </svg>
  <div>
- <span className="text-sm font-bold text-[#191F28]">{title}</span>
- <span className="text-xs text-[#8B95A1] ml-1.5">{desc}</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">{title}</span>
+ <span className="text-xs text-[var(--lu-muted)] ml-1.5">{desc}</span>
  </div>
  </li>
  ))}
  </ul>
  </div>
  {/* After */}
- <div className="bg-[#EFF6FF] border border-blue-100 rounded-2xl p-6">
+ <div className="bg-[var(--lu-accent-soft)] border border-blue-100 rounded-[10px] p-6">
  <div className="flex items-center gap-2 mb-5">
  <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center text-blue-500"><Sparkles size={18} strokeWidth={2.5} /></div>
- <span className="font-black text-[#191F28] text-base">로컬루션 후</span>
+ <span className="font-semibold text-[var(--lu-ink)] text-base">로컬루션 후</span>
  </div>
  <ul className="space-y-3.5">
  {([
@@ -634,11 +637,11 @@ export default function LandingPage() {
  <li key={title} className="flex items-start gap-3">
  <svg width="16" height="16" viewBox="0 0 16 16" className="shrink-0 mt-0.5" aria-hidden="true">
  <circle cx="8" cy="8" r="7.5" fill="#DBEAFE" />
- <path d="M4.5 8.5l2.5 2.5 4.5-5" stroke="#3182F6" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+ <path d="M4.5 8.5l2.5 2.5 4.5-5" stroke="var(--lu-accent)" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none" />
  </svg>
  <div>
- <span className="text-sm font-bold text-[#191F28]">{title}</span>
- <span className="text-xs text-[#8B95A1] ml-1.5">{desc}</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">{title}</span>
+ <span className="text-xs text-[var(--lu-muted)] ml-1.5">{desc}</span>
  </div>
  </li>
  ))}
@@ -656,29 +659,29 @@ export default function LandingPage() {
  </div>
 
  {/* ── 주요 기능 ── */}
- <section id="tools" aria-labelledby="tools-title" className="scroll-mt-24 py-20 px-4 bg-[#F8F9FA]">
+ <section id="tools" aria-labelledby="tools-title" className="scroll-mt-24 py-20 px-4 bg-[var(--lu-canvas)]">
  <div className="max-w-6xl mx-auto">
  <div className="text-center mb-14">
- <h2 id="tools-title" className="text-2xl md:text-3xl font-semibold text-[#191F28] mb-4">
+ <h2 id="tools-title" className="text-2xl md:text-3xl font-semibold text-[var(--lu-ink)] mb-4">
  지금 필요한 작업을 선택하세요
  </h2>
- <p className="text-[#4E5968] text-sm md:text-base text-left sm:text-center">
+ <p className="text-[var(--lu-muted)] text-sm md:text-base text-left sm:text-center">
  커피 한 잔 값 월 6,900원 · 3개 묶으면 10% · 5개 15% · 8개 20% 추가 할인
  </p>
  </div>
- <p className="mb-5 text-center text-sm text-[#4E5968]">기능을 살펴본 뒤 필요한 도구로 이동하세요.</p>
+ <p className="mb-5 text-center text-sm text-[var(--lu-muted)]">기능을 살펴본 뒤 필요한 도구로 이동하세요.</p>
  <nav aria-label="기능 분류" className="mb-8 flex flex-wrap justify-center gap-2">
- {FEATURE_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="inline-flex min-h-[44px] items-center rounded-xl border border-[#E5E8EB] bg-white px-4 py-2 text-sm font-semibold text-[#4E5968] hover:border-[#3182F6] hover:text-[#3182F6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]">{group.title}</a>)}
+ {FEATURE_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="inline-flex min-h-[44px] items-center rounded-xl border border-[var(--lu-line)] bg-white px-4 py-2 text-sm font-semibold text-[var(--lu-muted)] hover:border-[var(--lu-accent)] hover:text-[var(--lu-accent)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lu-accent)]">{group.title}</a>)}
  </nav>
  <div className="space-y-10">
  {FEATURE_GROUPS.map(group => (
  <section key={group.id} id={group.id} aria-labelledby={`${group.id}-title`} className="scroll-mt-24">
- <h3 id={`${group.id}-title`} className="mb-4 text-lg font-semibold text-[#191F28]">{group.title}</h3>
+ <h3 id={`${group.id}-title`} className="mb-4 text-lg font-semibold text-[var(--lu-ink)]">{group.title}</h3>
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
  {FEATURES.filter(f => group.titles.includes(f.title)).map(f => (
- <Link key={f.title} href={f.href} className="relative bg-white rounded-2xl p-6 border border-gray-100 hover:border-blue-200 shadow-sm transition-all group flex h-full min-w-0 flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]">
+ <Link key={f.title} href={f.href} className="relative bg-white rounded-[10px] p-6 border border-gray-100 hover:border-blue-200 shadow-sm transition-all group flex h-full min-w-0 flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lu-accent)]">
  {f.badge && (
- <span className={`absolute top-4 right-4 text-[10px] font-black tracking-wider px-2 py-0.5 rounded-full ${
+ <span className={`absolute top-4 right-4 text-[10px] font-semibold tracking-wider px-2 py-0.5 rounded-full ${
  f.badge === 'HOT' ? 'bg-red-100 text-red-600'
  : f.badge === '체험가능' ? 'bg-emerald-100 text-emerald-700'
  : 'bg-blue-100 text-blue-600'
@@ -689,11 +692,11 @@ export default function LandingPage() {
  <div className="lu-soft-icon mb-4">
  <f.Icon size={20} strokeWidth={1.8} />
  </div>
- <h4 className="text-lg font-semibold text-[#191F28] mb-2 flex items-center gap-1.5">
+ <h4 className="text-lg font-semibold text-[var(--lu-ink)] mb-2 flex items-center gap-1.5">
  {f.title}
- <ArrowRight size={14} strokeWidth={2.5} className="text-[#8B95A1] group-hover:text-[#3182F6] group-hover:translate-x-0.5 transition-all" />
+ <ArrowRight size={14} strokeWidth={2.5} className="text-[var(--lu-muted)] group-hover:text-[var(--lu-accent)] group-hover:translate-x-0.5 transition-all" />
  </h4>
- <p className="text-sm text-[#4E5968] leading-relaxed mb-4">{f.desc}</p>
+ <p className="text-sm text-[var(--lu-muted)] leading-relaxed mb-4">{f.desc}</p>
  <div className="flex flex-wrap gap-2">
  {f.tags.map(tag => (
  <span key={tag} className={`text-xs font-medium px-2.5 py-1 rounded-lg ${f.bg} text-gray-600`}>
@@ -701,18 +704,18 @@ export default function LandingPage() {
  </span>
  ))}
  </div>
- <p className="mt-auto flex items-center gap-2 pt-5 text-sm font-semibold text-[#3182F6]">{FEATURE_ACTIONS[f.href]}<ArrowRight size={16} aria-hidden="true" /></p>
+ <p className="mt-auto flex items-center gap-2 pt-5 text-sm font-semibold text-[var(--lu-accent)]">{FEATURE_ACTIONS[f.href]}<ArrowRight size={16} aria-hidden="true" /></p>
  </Link>
  ))}
  </div>
  </section>
  ))}
  </div>
- <Link href="/marketing/notice" className="mt-8 flex min-h-[44px] flex-wrap items-center justify-between gap-3 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]">
- <span className="flex min-w-0 items-center gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 shadow-sm"><FileText size={16} className="text-white" strokeWidth={2.5} /></span><span className="min-w-0"><span className="block font-semibold text-[#191F28]">매장 공지 작성 도우미</span><span className="block text-sm text-[#4E5968]">휴무와 영업시간 변경 안내 문구를 준비해보세요.</span></span></span>
- <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#3182F6]">공지 준비하기<ArrowRight size={16} aria-hidden="true" /></span>
+ <Link href="/marketing/notice" className="mt-8 flex min-h-[44px] flex-wrap items-center justify-between gap-3 rounded-[10px] border border-blue-100 bg-white p-5 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lu-accent)]">
+ <span className="flex min-w-0 items-center gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[var(--lu-accent-soft)] shadow-none"><FileText size={16} className="text-[var(--lu-accent)]" strokeWidth={2.5} /></span><span className="min-w-0"><span className="block font-semibold text-[var(--lu-ink)]">매장 공지 작성 도우미</span><span className="block text-sm text-[var(--lu-muted)]">휴무와 영업시간 변경 안내 문구를 준비해보세요.</span></span></span>
+ <span className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--lu-accent)]">공지 준비하기<ArrowRight size={16} aria-hidden="true" /></span>
  </Link>
- <p className="text-center text-xs text-[#8B95A1] mt-6">
+ <p className="text-center text-xs text-[var(--lu-muted)] mt-6">
  AI 정산·세금계산서·급여 관리는 곧 추가됩니다
  </p>
  </div>
@@ -726,10 +729,10 @@ export default function LandingPage() {
  <Sparkles size={12} strokeWidth={2.5} />
  2026년 5월 업데이트
  </div>
- <h2 className="text-2xl md:text-3xl font-black text-[#191F28] mb-2">
+ <h2 className="text-2xl md:text-3xl font-semibold text-[var(--lu-ink)] mb-2">
  매주 새 기능이 추가돼요
  </h2>
- <p className="text-[#8B95A1] text-sm text-left sm:text-center">
+ <p className="text-[var(--lu-muted)] text-sm text-left sm:text-center">
  사장님 피드백 → 빠른 개발 → 자동 배포 사이클로 매주 업그레이드 중
  </p>
  </div>
@@ -742,25 +745,25 @@ export default function LandingPage() {
  { Icon: Youtube, title: '유튜브 커뮤니티 자동', desc: '댓글 고정까지 한 번에', color: 'from-red-500 to-rose-600', date: '5월 5일' },
  { Icon: BellRing, title: '실시간 리뷰 알림', desc: '15분 자동 수집 + 부정 리뷰 우선', color: 'from-orange-500 to-red-500', date: '5월 3일' },
  ].map((u) => (
- <div key={u.title} className="bg-[#FAFBFF] border border-gray-100 rounded-2xl p-4 hover:border-blue-200 hover:shadow-sm transition-all">
+ <div key={u.title} className="bg-[#FAFBFF] border border-gray-100 rounded-[10px] p-4 hover:border-blue-200 hover:shadow-sm transition-all">
  <div className="flex items-start gap-3">
  <div className="lu-soft-icon">
  <u.Icon size={18} strokeWidth={1.8} />
  </div>
  <div className="min-w-0 flex-1">
  <div className="flex items-center gap-1.5 mb-0.5">
- <p className="text-sm font-bold text-[#191F28] truncate">{u.title}</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)] truncate">{u.title}</p>
  <span className="text-[10px] font-bold text-violet-600 bg-violet-100 px-1.5 py-0.5 rounded-full flex-shrink-0">NEW</span>
  </div>
- <p className="text-xs text-[#4E5968] leading-relaxed">{u.desc}</p>
- <p className="text-[10px] text-[#8B95A1] mt-1.5 font-medium">{u.date}</p>
+ <p className="text-xs text-[var(--lu-muted)] leading-relaxed">{u.desc}</p>
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1.5 font-medium">{u.date}</p>
  </div>
  </div>
  </div>
  ))}
  </div>
  <div className="text-center mt-8">
- <Link href="/updates" className="inline-flex items-center gap-1.5 text-sm font-bold text-[#3182F6] hover:text-[#1B64DA] transition-colors">
+ <Link href="/updates" className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--lu-accent)] hover:text-[var(--lu-accent-hover)] transition-colors">
  전체 업데이트 내역 보기
  <ArrowRight size={14} strokeWidth={2.5} />
  </Link>
@@ -778,7 +781,7 @@ export default function LandingPage() {
  <Sparkles size={12} strokeWidth={2.5} />
  신기능
  </div>
- <h2 className="text-2xl md:text-3xl font-black mb-4">
+ <h2 className="text-2xl md:text-3xl font-semibold mb-4">
  QR 코드 하나로<br />네이버 리뷰가 쌓인다
  </h2>
  <p className="text-blue-100 text-sm leading-relaxed mb-6">
@@ -794,19 +797,19 @@ export default function LandingPage() {
  ))}
  </div>
  <Link href="/review/demo"
- className="inline-flex items-center gap-2 bg-white text-[#3182F6] font-bold text-sm px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors">
+ className="inline-flex items-center gap-2 bg-white text-[var(--lu-accent)] font-bold text-sm px-6 py-3 rounded-xl hover:bg-blue-50 transition-colors">
  QR 리뷰 지금 체험하기
  <ArrowRight size={16} strokeWidth={2.5} />
  </Link>
  </div>
- <div className="flex-shrink-0 bg-white/10 rounded-2xl p-6 text-center w-52">
- <div className="w-16 h-16 rounded-2xl bg-white/15 flex items-center justify-center mx-auto mb-3">
+ <div className="flex-shrink-0 bg-white/10 rounded-[10px] p-6 text-center w-52">
+ <div className="w-16 h-16 rounded-[10px] bg-white/15 flex items-center justify-center mx-auto mb-3">
  <QrCode size={36} strokeWidth={2} className="text-white" />
  </div>
- <div className="text-3xl font-black mb-1">{hero.reviewsPerMonth}</div>
+ <div className="text-3xl font-semibold mb-1">{hero.reviewsPerMonth}</div>
  <div className="text-blue-200 text-xs">{hero.reviewsPerMonthLabel}</div>
  <div className="mt-4 pt-4 border-t border-white/20">
- <div className="text-2xl font-black mb-1">{hero.avgRating}</div>
+ <div className="text-2xl font-semibold mb-1">{hero.avgRating}</div>
  <div className="text-blue-200 text-xs">{hero.avgRatingLabel}</div>
  </div>
  {!liveSections.hero && (
@@ -824,10 +827,10 @@ export default function LandingPage() {
  <section className="py-14 px-4 bg-white border-y border-gray-100">
  <div className="max-w-5xl mx-auto">
  <div className="text-center mb-8">
- <h2 className="text-2xl md:text-3xl font-black text-[#191F28] mb-2">
+ <h2 className="text-2xl md:text-3xl font-semibold text-[var(--lu-ink)] mb-2">
  이런 사장님들이 쓰고 있어요
  </h2>
- <p className="text-[#8B95A1] text-sm text-left sm:text-center">
+ <p className="text-[var(--lu-muted)] text-sm text-left sm:text-center">
  1인 운영부터 체인점까지 · 업종 상관없이 네이버·구글·배민이 핵심이라면 전부
  </p>
  </div>
@@ -843,15 +846,15 @@ export default function LandingPage() {
  { Icon: Wine, label: '술집·바' },
  ].map(({ Icon, label }) => (
  <div key={label} className="flex flex-col items-center gap-1.5 p-2 md:p-3 rounded-xl hover:bg-[#F8FAFC] transition-colors">
- <div className="w-10 h-10 md:w-12 md:h-12 rounded-2xl bg-[#EFF6FF] flex items-center justify-center">
- <Icon size={18} strokeWidth={2} className="text-[#3182F6] md:hidden" />
- <Icon size={22} strokeWidth={2} className="text-[#3182F6] hidden md:block" />
+ <div className="w-10 h-10 md:w-12 md:h-12 rounded-[10px] bg-[var(--lu-accent-soft)] flex items-center justify-center">
+ <Icon size={18} strokeWidth={2} className="text-[var(--lu-accent)] md:hidden" />
+ <Icon size={22} strokeWidth={2} className="text-[var(--lu-accent)] hidden md:block" />
  </div>
- <span className="text-[10px] md:text-xs font-semibold text-[#4E5968] text-center leading-tight">{label}</span>
+ <span className="text-[10px] md:text-xs font-semibold text-[var(--lu-muted)] text-center leading-tight">{label}</span>
  </div>
  ))}
  </div>
- <p className="text-left sm:text-center text-[11px] text-[#8B95A1] mt-6">
+ <p className="text-left sm:text-center text-[11px] text-[var(--lu-muted)] mt-6">
  이외에도 네이버 플레이스·블로그·리뷰 관리가 필요한 모든 자영업자 · 소상공인 · 마케터 · 프리랜서에게 맞춰져 있어요
  </p>
  </div>
@@ -868,10 +871,10 @@ export default function LandingPage() {
  <section className="py-20 px-4 bg-[#F8FAFC]">
  <div className="max-w-5xl mx-auto">
  <div className="text-center mb-12">
- <h2 className="text-3xl font-black text-[#191F28] mb-3">
+ <h2 className="text-3xl font-semibold text-[var(--lu-ink)] mb-3">
  {!liveSections.testimonials ? '사용 사례 예시' : '사장님들의 실제 후기'}
  </h2>
- <p className="text-[#8B95A1] text-sm text-left sm:text-center">
+ <p className="text-[var(--lu-muted)] text-sm text-left sm:text-center">
  {!liveSections.testimonials
  ? '실제 사용 후기 수집 중 · 아래는 예시 콘텐츠입니다'
  : '로컬루션을 사용 중인 매장 사장님들의 이야기'}
@@ -881,13 +884,13 @@ export default function LandingPage() {
  {testimonials.map((t, i) => {
  const TIcon = ICON_MAP[t.iconKey] ?? Coffee
  return (
- <div key={`${t.name}-${i}`} className="relative bg-white rounded-2xl p-6 border border-gray-100 shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all">
+ <div key={`${t.name}-${i}`} className="relative bg-white rounded-[10px] p-6 border border-gray-100 shadow-sm hover:shadow-sm hover:-translate-y-0.5 transition-all">
  {/* SVG 큰따옴표 장식 */}
  <svg className="absolute top-4 right-5 opacity-[0.07]" width="36" height="28" viewBox="0 0 36 28" aria-hidden="true">
- <path d="M0 28V17.5C0 7.833 4.5 2.5 13.5 0L15 3C10.5 4.667 8.167 7.833 8 12H14V28H0ZM22 28V17.5C22 7.833 26.5 2.5 35.5 0L37 3C32.5 4.667 30.167 7.833 30 12H36V28H22Z" fill="#3182F6" />
+ <path d="M0 28V17.5C0 7.833 4.5 2.5 13.5 0L15 3C10.5 4.667 8.167 7.833 8 12H14V28H0ZM22 28V17.5C22 7.833 26.5 2.5 35.5 0L37 3C32.5 4.667 30.167 7.833 30 12H36V28H22Z" fill="var(--lu-accent)" />
  </svg>
  {!liveSections.testimonials && (
- <span className="absolute top-4 left-4 text-[10px] font-semibold text-[#8B95A1] bg-[#F2F4F6] px-2 py-0.5 rounded-full">
+ <span className="absolute top-4 left-4 text-[10px] font-semibold text-[var(--lu-muted)] bg-[var(--lu-canvas)] px-2 py-0.5 rounded-full">
  예시
  </span>
  )}
@@ -896,15 +899,15 @@ export default function LandingPage() {
  <Star key={idx} size={14} strokeWidth={0} fill="currentColor" />
  ))}
  </div>
- <p className="text-sm text-[#191F28] leading-relaxed mb-4 break-keep">&quot;{t.text}&quot;</p>
+ <p className="text-sm text-[var(--lu-ink)] leading-relaxed mb-4 break-keep">&quot;{t.text}&quot;</p>
  <div className="flex items-center gap-3">
  <div className="w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0"
  style={{ backgroundColor: t.color + '15' }}>
  <TIcon size={18} strokeWidth={2} style={{ color: t.color }} />
  </div>
  <div>
- <div className="text-sm font-bold text-[#191F28]">{t.name}</div>
- <div className="text-xs text-[#8B95A1]">{t.store}</div>
+ <div className="text-sm font-bold text-[var(--lu-ink)]">{t.name}</div>
+ <div className="text-xs text-[var(--lu-muted)]">{t.store}</div>
  </div>
  </div>
  </div>
@@ -924,21 +927,21 @@ export default function LandingPage() {
  {/* ── 요금 CTA ── */}
  <section className="py-20 px-4 bg-[#F8FAFC]">
  <div className="max-w-3xl mx-auto text-center">
- <h2 className="text-3xl md:text-4xl font-black text-[#191F28] mb-4">
+ <h2 className="text-3xl md:text-4xl font-semibold text-[var(--lu-ink)] mb-4">
  필요한 기능만!<br />
- <span className="text-[#3182F6]">합리적인 요금으로</span>
+ <span className="text-[var(--lu-accent)]">합리적인 요금으로</span>
  </h2>
- <p className="text-[#4E5968] mb-8 text-left sm:text-center">
+ <p className="text-[var(--lu-muted)] mb-8 text-left sm:text-center">
  커피 한 잔 값 월 6,900원으로 모든 플랫폼 리뷰 답글 자동화.<br />
  부담 없이 체험하고 필요한 모듈만 추가하세요.
  </p>
  <div className="flex flex-col sm:flex-row gap-3 justify-center">
  <Link href="/pricing"
- className="inline-flex items-center justify-center gap-2 border-2 border-[#3182F6] text-[#3182F6] font-bold px-8 py-4 rounded-2xl hover:bg-blue-50 transition-colors">
+ className="inline-flex items-center justify-center gap-2 border-2 border-[var(--lu-accent)] text-[var(--lu-accent)] font-bold px-8 py-4 rounded-[10px] hover:bg-blue-50 transition-colors">
  요금 보기
  </Link>
  <Link href={isLoggedIn ? '/dashboard' : '/login'}
- className="inline-flex items-center justify-center gap-2 bg-[#3182F6] text-white font-bold px-8 py-4 rounded-2xl hover:bg-[#1B64DA] transition-colors shadow-lg shadow-blue-200">
+ className="inline-flex items-center justify-center gap-2 bg-[var(--lu-accent)] text-white font-bold px-8 py-4 rounded-[10px] hover:bg-[var(--lu-accent-hover)] transition-colors shadow-none">
  {isLoggedIn ? '내 대시보드로 이동' : '지금 무료로 시작하기'}
  <ArrowRight size={18} strokeWidth={2.5} />
  </Link>

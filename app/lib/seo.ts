@@ -91,6 +91,7 @@ export const PUBLIC_ROUTES: PublicRoute[] = [
   { path: 'marketing/youtube-community', title: '유튜브 커뮤니티 발행', summary: '유튜브 커뮤니티 게시글을 예약 · 자동 발행', priority: 0.5, freq: 'monthly' },
   { path: 'community', title: '사장님 커뮤니티', summary: '지역 사장님들이 정보를 나누는 게시판', priority: 0.6, freq: 'weekly' },
   { path: 'updates', title: '업데이트 소식', summary: '새로 나온 기능과 변경 사항', priority: 0.7, freq: 'weekly' },
+  { path: 'help/videos', title: '기능별 설명 영상', summary: '기능별 준비물과 사용 순서를 영상과 단계별 안내로 확인', priority: 0.7, freq: 'monthly' },
   { path: 'help', title: '도움말', summary: '연결 · 답글 · 결제에 관한 자주 묻는 질문', priority: 0.6, freq: 'monthly' },
   { path: 'inquiry', title: '문의하기', summary: '도입 · 제휴 · 이용 문의', priority: 0.5, freq: 'monthly' },
   { path: 'login', title: '로그인', summary: '구글 · 네이버 · 카카오 소셜 로그인', priority: 0.4, freq: 'yearly' },

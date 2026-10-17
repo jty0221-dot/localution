@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import FeatureGuideLink from '../help/FeatureGuideLink'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
 type ToolId = 'cost-calculator' | 'notice' | 'business-search' | 'campaign-url' | 'promotion-profit'
@@ -26,7 +27,7 @@ const related: Record<ToolId, ToolId[]> = {
 const linkClass = 'inline-flex min-h-[44px] items-center gap-2 rounded-[6px] px-3 py-2 text-sm font-semibold text-[var(--lu-accent)] hover:bg-[var(--lu-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lu-accent)]'
 
 export function ToolNavigation() {
-  return <div className="mb-5 space-y-2"><nav aria-label="도구 탐색" className="flex flex-wrap gap-2"><Link href="/marketing#marketing-tools" className={linkClass}><ArrowLeft size={16} aria-hidden="true" />마케팅 도구 목록</Link><Link href="/help#find-tools" className={linkClass}>업종별 작업 찾기<ArrowRight size={16} aria-hidden="true" /></Link></nav><p className="px-3 text-xs leading-5 text-[var(--lu-muted)]">다른 도구로 이동하면 이 화면의 입력이 유지되지 않을 수 있어요. 필요한 결과를 먼저 저장하거나 복사해 주세요.</p></div>
+  return <div className="mb-5 space-y-2"><nav aria-label="도구 탐색" className="flex flex-wrap gap-2"><Link href="/marketing#marketing-tools" className={linkClass}><ArrowLeft size={16} aria-hidden="true" />마케팅 도구 목록</Link><Link href="/help#find-tools" className={linkClass}>업종별 작업 찾기<ArrowRight size={16} aria-hidden="true" /></Link></nav><FeatureGuideLink /><p className="px-3 text-xs leading-5 text-[var(--lu-muted)]">다른 도구로 이동하면 이 화면의 입력이 유지되지 않을 수 있어요. 필요한 결과를 먼저 저장하거나 복사해 주세요.</p></div>
 }
 
 export function ToolNextSteps({ current }: { current: ToolId }) {

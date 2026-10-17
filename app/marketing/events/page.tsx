@@ -38,7 +38,7 @@ type StoreEvent = {
 const STORAGE_KEY = 'localution.events'
 
 const EVENT_TYPES: Record<EventType, { label: string; Icon: typeof Sparkles; color: string; bg: string }> = {
- open: { label: '오픈/리뉴얼', Icon: PartyPopper, color: '#3182F6', bg: '#EFF6FF' },
+ open: { label: '오픈/리뉴얼', Icon: PartyPopper, color: '#16685D', bg: '#EFF6FF' },
  season: { label: '시즌', Icon: Sparkles, color: '#7C3AED', bg: '#F3E8FF' },
  loyalty: { label: '단골', Icon: Gift, color: '#10B981', bg: '#D1FAE5' },
  flash: { label: '타임세일', Icon: TrendingUp, color: '#F59E0B', bg: '#FEF3C7' },
@@ -98,7 +98,7 @@ export default function EventsPage() {
  }
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
  <div className="md:ml-[220px] flex flex-col min-h-screen">
  <PageHeader
@@ -111,7 +111,7 @@ export default function EventsPage() {
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full space-y-4 md:space-y-6">
 
  {/* 안내 */}
- <div className="rounded-2xl border border-[#E9D5FF] bg-gradient-to-br from-[#FAF5FF] to-[#F3E8FF] p-3 md:p-4 flex items-start gap-2.5">
+ <div className="rounded-[10px] border border-[#E9D5FF] bg-[var(--lu-accent)] p-3 md:p-4 flex items-start gap-2.5">
  <Sparkles size={14} className="text-[#7C3AED] flex-shrink-0 mt-0.5" strokeWidth={2.5} />
  <div className="flex-1 min-w-0">
  <p className="text-xs md:text-sm font-bold text-[#7C3AED] mb-0.5">이벤트 매니저 베타</p>
@@ -124,10 +124,10 @@ export default function EventsPage() {
 
  {/* 4 카드 */}
  <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 md:gap-3">
- <StatCard color="from-[#3182F6] to-[#1B64DA]" label="전체 이벤트" value={stats.total + '건'} icon={<Tag size={14} className="text-white" strokeWidth={2.5} />} />
+ <StatCard color="from-[var(--lu-accent)] to-[var(--lu-accent-hover)]" label="전체 이벤트" value={stats.total + '건'} icon={<Tag size={14} className="text-white" strokeWidth={2.5} />} />
  <StatCard color="from-[#10B981] to-[#059669]" label="진행 중" value={stats.active + '건'} icon={<CheckCircle2 size={14} className="text-white" strokeWidth={2.5} />} />
  <StatCard color="from-[#F59E0B] to-[#D97706]" label="예정" value={stats.scheduled + '건'} icon={<Clock size={14} className="text-white" strokeWidth={2.5} />} />
- <StatCard color="from-[#8B95A1] to-[#6B7280]" label="종료" value={stats.ended + '건'} icon={<X size={14} className="text-white" strokeWidth={2.5} />} />
+ <StatCard color="from-[var(--lu-muted)] to-[#6B7280]" label="종료" value={stats.ended + '건'} icon={<X size={14} className="text-white" strokeWidth={2.5} />} />
  </div>
 
  {/* 필터 + 추가 버튼 */}
@@ -140,24 +140,24 @@ export default function EventsPage() {
  ] as const).map(f => (
  <button key={f.key}
  onClick={() => setFilter(f.key)}
- className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${filter === f.key ? 'bg-[#3182F6] text-white' : 'bg-white border border-[#E5E8EB] text-[#4E5968] hover:bg-[#F8F9FA]'}`}>
+ className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ${filter === f.key ? 'bg-[var(--lu-accent)] text-white' : 'bg-white border border-[var(--lu-line)] text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)]'}`}>
  {f.label}
  </button>
  ))}
  <button onClick={() => setEditOpen('new')}
- className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-br from-[#EC4899] to-[#BE185D] text-white rounded-lg text-xs font-bold hover:opacity-90 shadow-sm">
+ className="min-h-11 ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--lu-accent)] text-white rounded-lg text-xs font-bold hover:opacity-90 shadow-none">
  <Plus size={12} strokeWidth={2.5} /> 이벤트 추가
  </button>
  </div>
 
  {/* 이벤트 목록 */}
  {sorted.length === 0 ? (
- <div className="bg-white rounded-2xl shadow-sm p-8 text-center">
- <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#EC4899] to-[#BE185D] flex items-center justify-center mx-auto mb-3 shadow-md">
+ <div className="bg-white rounded-[10px] shadow-none p-8 text-center">
+ <div className="w-14 h-14 rounded-[10px] bg-[var(--lu-accent)] flex items-center justify-center mx-auto mb-3 shadow-md">
  <Megaphone size={22} className="text-white" strokeWidth={2.5} />
  </div>
- <h2 className="text-base md:text-lg font-black text-[#191F28] mb-1">아직 등록한 이벤트가 없어요</h2>
- <p className="text-xs md:text-sm text-[#8B95A1] mb-5 leading-relaxed">
+ <h2 className="text-base md:text-lg font-semibold text-[var(--lu-ink)] mb-1">아직 등록한 이벤트가 없어요</h2>
+ <p className="text-xs md:text-sm text-[var(--lu-muted)] mb-5 leading-relaxed">
  템플릿으로 빠르게 시작하거나 직접 만들어 보세요.
  </p>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-w-2xl mx-auto">
@@ -170,14 +170,14 @@ export default function EventsPage() {
  startDate: today, endDate: addDays(today, 14), reward: tp.reward,
  targetAudience: tp.target, publishChannels: [], createdAt: new Date().toISOString(),
  })}
- className="text-left p-3 rounded-xl border border-[#F2F4F6] hover:border-[#EC4899] hover:shadow-sm transition-all bg-white">
+ className="min-h-11 text-left p-3 rounded-[6px] border border-[var(--lu-canvas)] hover:border-[#EC4899] hover:shadow-none transition-all bg-white">
  <div className="flex items-center gap-2 mb-1">
  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: cfg.bg }}>
  <cfg.Icon size={12} style={{ color: cfg.color }} strokeWidth={2.5} />
  </div>
- <p className="text-xs font-bold text-[#191F28]">{tp.title}</p>
+ <p className="text-xs font-bold text-[var(--lu-ink)]">{tp.title}</p>
  </div>
- <p className="text-[10px] text-[#8B95A1] line-clamp-2">{tp.description}</p>
+ <p className="text-[10px] text-[var(--lu-muted)] line-clamp-2">{tp.description}</p>
  </button>
  )
  })}
@@ -191,39 +191,39 @@ export default function EventsPage() {
  : e.status === 'scheduled' ? { label: '예정', color: '#D97706', bg: '#FEF3C7' }
  : { label: '종료', color: '#6B7280', bg: '#E5E7EB' }
  return (
- <div key={e.id} className="bg-white rounded-2xl shadow-sm p-4 hover:shadow-md transition-shadow">
+ <div key={e.id} className="bg-white rounded-[10px] shadow-none p-4 hover:shadow-md transition-shadow">
  <div className="flex items-start justify-between gap-2 mb-2">
  <div className="flex items-center gap-2">
- <div className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: cfg.bg }}>
+ <div className="w-9 h-9 rounded-[6px] flex items-center justify-center flex-shrink-0" style={{ background: cfg.bg }}>
  <cfg.Icon size={16} style={{ color: cfg.color }} strokeWidth={2.5} />
  </div>
  <div className="min-w-0">
  <span className="text-[10px] font-bold uppercase" style={{ color: cfg.color }}>{cfg.label}</span>
- <p className="text-sm font-bold text-[#191F28] truncate">{e.title}</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)] truncate">{e.title}</p>
  </div>
  </div>
  <span className="flex-shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full" style={{ background: statusCfg.bg, color: statusCfg.color }}>
  {statusCfg.label}
  </span>
  </div>
- <p className="text-xs text-[#4E5968] line-clamp-2 mb-3 leading-relaxed">{e.description}</p>
+ <p className="text-xs text-[var(--lu-muted)] line-clamp-2 mb-3 leading-relaxed">{e.description}</p>
  <div className="space-y-1.5 mb-3 text-[11px]">
- <div className="flex items-center gap-1.5 text-[#4E5968]">
- <Calendar size={11} strokeWidth={2.5} className="text-[#8B95A1]" />
+ <div className="flex items-center gap-1.5 text-[var(--lu-muted)]">
+ <Calendar size={11} strokeWidth={2.5} className="text-[var(--lu-muted)]" />
  <span>{e.startDate} ~ {e.endDate}</span>
  </div>
- <div className="flex items-center gap-1.5 text-[#4E5968]">
- <Gift size={11} strokeWidth={2.5} className="text-[#8B95A1]" />
+ <div className="flex items-center gap-1.5 text-[var(--lu-muted)]">
+ <Gift size={11} strokeWidth={2.5} className="text-[var(--lu-muted)]" />
  <span className="truncate">{e.reward}</span>
  </div>
  </div>
- <div className="flex items-center gap-1 pt-2 border-t border-[#F2F4F6]">
+ <div className="flex items-center gap-1 pt-2 border-t border-[var(--lu-canvas)]">
  <button onClick={() => setEditOpen(e)}
- className="flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg border border-[#E5E8EB] text-[11px] font-bold text-[#4E5968] hover:bg-[#F8F9FA]">
+ className="min-h-11 flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg border border-[var(--lu-line)] text-[11px] font-bold text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)]">
  <Edit3 size={11} strokeWidth={2.5} /> 편집
  </button>
  <button onClick={() => deleteEvent(e.id)}
- className="px-2 py-1.5 rounded-lg border border-[#E5E8EB] text-[11px] font-bold text-[#DC2626] hover:bg-[#FEF2F2]">
+ className="min-h-11 px-2 py-1.5 rounded-lg border border-[var(--lu-line)] text-[11px] font-bold text-[#DC2626] hover:bg-[#FEF2F2]">
  <Trash2 size={11} strokeWidth={2.5} />
  </button>
  </div>
@@ -234,35 +234,35 @@ export default function EventsPage() {
  )}
 
  {/* 자동 발행 연동 안내 */}
- <div className="bg-white rounded-2xl shadow-sm p-4">
- <h2 className="text-sm md:text-base font-bold text-[#191F28] mb-3 flex items-center gap-2">
+ <div className="bg-white rounded-[10px] shadow-none p-4">
+ <h2 className="text-sm md:text-base font-bold text-[var(--lu-ink)] mb-3 flex items-center gap-2">
  <Sparkles size={14} className="text-[#7C3AED]" strokeWidth={2.5} />
  이벤트 자동 발행 연동 (곧 추가)
  </h2>
- <p className="text-xs text-[#4E5968] mb-3 leading-relaxed">
+ <p className="text-xs text-[var(--lu-muted)] mb-3 leading-relaxed">
  이벤트 등록 → 자동으로 카드뉴스 슬라이드 + 스레드 글 + 유튜브 커뮤니티 게시글이 만들어져요.
  </p>
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
- <Link href="/marketing/card-news" className="p-3 rounded-xl border border-[#F2F4F6] hover:border-[#EC4899] hover:bg-[#FCE7F3]/30 transition-all flex items-center gap-2">
- <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#EC4899] to-[#BE185D] flex items-center justify-center">
+ <Link href="/marketing/card-news" className="p-3 rounded-[6px] border border-[var(--lu-canvas)] hover:border-[#EC4899] hover:bg-[#FCE7F3]/30 transition-all flex items-center gap-2">
+ <div className="w-7 h-7 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center">
  <Star size={12} className="text-white" strokeWidth={2.5} />
  </div>
- <span className="text-xs font-bold text-[#191F28] truncate">카드뉴스</span>
- <ArrowRight size={11} className="text-[#8B95A1] ml-auto" strokeWidth={2.5} />
+ <span className="text-xs font-bold text-[var(--lu-ink)] truncate">카드뉴스</span>
+ <ArrowRight size={11} className="text-[var(--lu-muted)] ml-auto" strokeWidth={2.5} />
  </Link>
- <Link href="/marketing/threads" className="p-3 rounded-xl border border-[#F2F4F6] hover:border-[#3182F6] hover:bg-[#EFF6FF]/30 transition-all flex items-center gap-2">
- <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-slate-700 to-slate-900 flex items-center justify-center">
+ <Link href="/marketing/threads" className="p-3 rounded-[6px] border border-[var(--lu-canvas)] hover:border-[var(--lu-accent)] hover:bg-[var(--lu-accent-soft)]/30 transition-all flex items-center gap-2">
+ <div className="w-7 h-7 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center">
  <Star size={12} className="text-white" strokeWidth={2.5} />
  </div>
- <span className="text-xs font-bold text-[#191F28] truncate">스레드</span>
- <ArrowRight size={11} className="text-[#8B95A1] ml-auto" strokeWidth={2.5} />
+ <span className="text-xs font-bold text-[var(--lu-ink)] truncate">스레드</span>
+ <ArrowRight size={11} className="text-[var(--lu-muted)] ml-auto" strokeWidth={2.5} />
  </Link>
- <Link href="/marketing/youtube-community" className="p-3 rounded-xl border border-[#F2F4F6] hover:border-[#DC2626] hover:bg-[#FEF2F2]/30 transition-all flex items-center gap-2">
- <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#DC2626] to-[#991B1B] flex items-center justify-center">
+ <Link href="/marketing/youtube-community" className="p-3 rounded-[6px] border border-[var(--lu-canvas)] hover:border-[#DC2626] hover:bg-[#FEF2F2]/30 transition-all flex items-center gap-2">
+ <div className="w-7 h-7 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center">
  <Star size={12} className="text-white" strokeWidth={2.5} />
  </div>
- <span className="text-xs font-bold text-[#191F28] truncate">유튜브</span>
- <ArrowRight size={11} className="text-[#8B95A1] ml-auto" strokeWidth={2.5} />
+ <span className="text-xs font-bold text-[var(--lu-ink)] truncate">유튜브</span>
+ <ArrowRight size={11} className="text-[var(--lu-muted)] ml-auto" strokeWidth={2.5} />
  </Link>
  </div>
  </div>
@@ -284,14 +284,14 @@ export default function EventsPage() {
 
 function StatCard({ color, label, value, icon }: { color: string; label: string; value: string; icon: React.ReactNode }) {
  return (
- <div className="bg-white rounded-2xl shadow-sm p-3 md:p-4">
+ <div className="bg-white rounded-[10px] shadow-none p-3 md:p-4">
  <div className="flex items-center gap-1.5 mb-1.5">
- <div className={`w-7 h-7 rounded-xl bg-gradient-to-br ${color} flex items-center justify-center shadow-sm`}>
+ <div className={`w-7 h-7 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center shadow-none`}>
  {icon}
  </div>
- <span className="text-[10px] md:text-[11px] font-semibold text-[#8B95A1] truncate">{label}</span>
+ <span className="text-[10px] md:text-[11px] font-semibold text-[var(--lu-muted)] truncate">{label}</span>
  </div>
- <p className="text-base md:text-lg font-black text-[#191F28]">{value}</p>
+ <p className="text-base md:text-lg font-semibold text-[var(--lu-ink)]">{value}</p>
  </div>
  )
 }
@@ -332,63 +332,63 @@ function EditModal({ initial, onClose, onSave }: {
 
  return (
  <div className="fixed inset-0 z-50 bg-black/50 flex items-end md:items-center justify-center p-0 md:p-4" onClick={onClose}>
- <div className="bg-white w-full md:max-w-lg rounded-t-3xl md:rounded-2xl p-5 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
+ <div className="bg-white w-full md:max-w-lg rounded-t-3xl md:rounded-[10px] p-5 max-h-[90vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
  <div className="flex items-center justify-between mb-4">
- <h3 className="text-base font-black text-[#191F28]">{initial ? '이벤트 편집' : '새 이벤트'}</h3>
- <button onClick={onClose} className="p-1 text-[#8B95A1]">
+ <h3 className="text-base font-semibold text-[var(--lu-ink)]">{initial ? '이벤트 편집' : '새 이벤트'}</h3>
+ <button onClick={onClose} className="min-h-11 p-1 text-[var(--lu-muted)]">
  <X size={18} strokeWidth={2.5} />
  </button>
  </div>
  <div className="space-y-3">
  {/* 타입 선택 */}
  <div>
- <label className="text-[11px] font-bold text-[#4E5968] mb-1.5 block">유형</label>
+ <label className="text-[11px] font-bold text-[var(--lu-muted)] mb-1.5 block">유형</label>
  <div className="grid grid-cols-5 gap-1">
  {(Object.entries(EVENT_TYPES) as [EventType, typeof EVENT_TYPES['open']][]).map(([k, cfg]) => (
  <button key={k}
  onClick={() => setType(k)}
- className={`flex flex-col items-center gap-1 py-2 rounded-lg border transition-colors ${type === k ? 'border-[#EC4899] bg-[#FCE7F3]' : 'border-[#E5E8EB] hover:bg-[#F8F9FA]'}`}>
+ className={`flex flex-col items-center gap-1 py-2 rounded-lg border transition-colors ${type === k ? 'border-[#EC4899] bg-[#FCE7F3]' : 'border-[var(--lu-line)] hover:bg-[var(--lu-canvas)]'}`}>
  <cfg.Icon size={14} style={{ color: cfg.color }} strokeWidth={2.5} />
- <span className="text-[10px] font-bold text-[#191F28]">{cfg.label}</span>
+ <span className="text-[10px] font-bold text-[var(--lu-ink)]">{cfg.label}</span>
  </button>
  ))}
  </div>
  </div>
  <Field label="제목" required>
  <input type="text" value={title} onChange={e => setTitle(e.target.value)} placeholder="여름 시즌 신메뉴 출시"
- className="w-full px-2.5 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:border-[#3182F6]" />
+ className="min-h-11 w-full px-2.5 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:border-[var(--lu-accent)]" />
  </Field>
  <Field label="설명">
  <textarea value={description} onChange={e => setDescription(e.target.value)} placeholder="이벤트 내용을 손님께 안내하는 문구"
- className="w-full px-2.5 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:border-[#3182F6] resize-y min-h-[60px]" />
+ className="w-full px-2.5 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:border-[var(--lu-accent)] resize-y min-h-[60px]" />
  </Field>
  <div className="grid grid-cols-2 gap-2">
  <Field label="시작일">
  <input type="date" value={startDate} onChange={e => setStartDate(e.target.value)}
- className="w-full px-2.5 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:border-[#3182F6]" />
+ className="min-h-11 w-full px-2.5 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:border-[var(--lu-accent)]" />
  </Field>
  <Field label="종료일">
  <input type="date" value={endDate} onChange={e => setEndDate(e.target.value)}
- className="w-full px-2.5 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:border-[#3182F6]" />
+ className="min-h-11 w-full px-2.5 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:border-[var(--lu-accent)]" />
  </Field>
  </div>
  <Field label="혜택" required>
  <input type="text" value={reward} onChange={e => setReward(e.target.value)} placeholder="아메리카노 1잔 무료, 20% 할인 등"
- className="w-full px-2.5 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:border-[#3182F6]" />
+ className="min-h-11 w-full px-2.5 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:border-[var(--lu-accent)]" />
  </Field>
  <Field label="대상 고객">
  <input type="text" value={targetAudience} onChange={e => setTargetAudience(e.target.value)} placeholder="전체 / 신규 / 단골 / VIP"
- className="w-full px-2.5 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:border-[#3182F6]" />
+ className="min-h-11 w-full px-2.5 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:border-[var(--lu-accent)]" />
  </Field>
  </div>
  <div className="flex gap-2 mt-5">
  <button onClick={onClose}
- className="flex-1 px-3 py-2.5 rounded-xl border border-[#E5E8EB] text-sm font-bold text-[#4E5968] hover:bg-[#F8F9FA]">
+ className="min-h-11 flex-1 px-3 py-2.5 rounded-[6px] border border-[var(--lu-line)] text-sm font-bold text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)]">
  취소
  </button>
  <button disabled={!canSubmit}
  onClick={submit}
- className="flex-1 px-3 py-2.5 rounded-xl bg-gradient-to-br from-[#EC4899] to-[#BE185D] text-white text-sm font-bold hover:opacity-90 disabled:opacity-40">
+ className="min-h-11 flex-1 px-3 py-2.5 rounded-[6px] bg-[var(--lu-accent)] text-white text-sm font-bold hover:opacity-90 disabled:opacity-40">
  {initial ? '저장' : '추가'}
  </button>
  </div>
@@ -400,7 +400,7 @@ function EditModal({ initial, onClose, onSave }: {
 function Field({ label, required, children }: { label: string; required?: boolean; children: React.ReactNode }) {
  return (
  <div>
- <label className="text-[11px] font-bold text-[#4E5968] mb-1 block">
+ <label className="text-[11px] font-bold text-[var(--lu-muted)] mb-1 block">
  {label} {required && <span className="text-[#DC2626]">*</span>}
  </label>
  {children}

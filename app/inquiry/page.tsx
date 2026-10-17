@@ -32,7 +32,7 @@ const GLOBAL_STYLES = `
 `
 
 const CATEGORIES: { value: string; label: string; Icon: LucideIcon; color: string }[] = [
- { value: '서비스문의', label: '서비스 문의', Icon: MessageCircle, color: '#3182F6' },
+ { value: '서비스문의', label: '서비스 문의', Icon: MessageCircle, color: '#16685D' },
  { value: '기술문의', label: '기술 문의', Icon: Wrench, color: '#8B5CF6' },
  { value: '요금결제', label: '요금 · 결제', Icon: CreditCard, color: '#059669' },
  { value: '기능요청', label: '기능 요청', Icon: Sparkles, color: '#F59E0B' },
@@ -91,36 +91,36 @@ function FAQSection() {
  { q: '기존 데이터 이관이 가능한가요?', a: '기존 리뷰·고객 데이터 CSV 임포트를 지원합니다. 도입 담당자가 이관 과정을 직접 도와드려요.' },
  ]
  return (
- <aside className="bg-white rounded-2xl p-5 sm:p-6 border border-[#E5E8EB] shadow-sm lg:sticky lg:top-6">
+ <aside className="bg-white rounded-[10px] p-5 sm:p-6 border border-[var(--lu-line)] shadow-none lg:sticky lg:top-6">
  <div className="flex items-center gap-2.5 mb-4">
- <div className="w-8 h-8 rounded-xl bg-[#EFF6FF] flex items-center justify-center shrink-0">
- <MessageCircle size={15} strokeWidth={2} className="text-[#3182F6]" />
+ <div className="w-8 h-8 rounded-[6px] bg-[var(--lu-accent-soft)] flex items-center justify-center shrink-0">
+ <MessageCircle size={15} strokeWidth={2} className="text-[var(--lu-accent)]" />
  </div>
  <div>
- <h2 className="text-sm sm:text-base font-black text-[#191F28]">자주 묻는 질문</h2>
- <p className="text-[10px] text-[#8B95A1]">문의 전에 먼저 확인해 보세요</p>
+ <h2 className="text-sm sm:text-base font-semibold text-[var(--lu-ink)]">자주 묻는 질문</h2>
+ <p className="text-[10px] text-[var(--lu-muted)]">문의 전에 먼저 확인해 보세요</p>
  </div>
  </div>
  <div className="space-y-2">
  {faqs.map((f, i) => (
- <div key={i} className="border border-[#F2F4F6] rounded-xl overflow-hidden">
+ <div key={i} className="border border-[var(--lu-canvas)] rounded-[6px] overflow-hidden">
  <button onClick={() => setOpen(open === i ? null : i)}
- className="w-full flex items-center justify-between gap-3 px-3.5 py-3 text-left hover:bg-[#F8F9FA] transition-colors">
- <span className="font-bold text-[#191F28] text-xs sm:text-sm break-keep leading-snug">{f.q}</span>
+ className="min-h-11 w-full flex items-center justify-between gap-3 px-3.5 py-3 text-left hover:bg-[var(--lu-canvas)] transition-colors">
+ <span className="font-bold text-[var(--lu-ink)] text-xs sm:text-sm break-keep leading-snug">{f.q}</span>
  <Plus size={15} strokeWidth={2.25}
- className={'text-[#8B95A1] shrink-0 transition-transform ' + (open === i ? 'rotate-45' : '')} />
+ className={'text-[var(--lu-muted)] shrink-0 transition-transform ' + (open === i ? 'rotate-45' : '')} />
  </button>
  {open === i && (
- <div className="px-3.5 pb-3.5 text-xs sm:text-sm text-[#4E5968] leading-relaxed border-t border-[#F2F4F6] pt-3 break-keep">
+ <div className="px-3.5 pb-3.5 text-xs sm:text-sm text-[var(--lu-muted)] leading-relaxed border-t border-[var(--lu-canvas)] pt-3 break-keep">
  {f.a}
  </div>
  )}
  </div>
  ))}
  </div>
- <div className="mt-4 p-3.5 rounded-xl bg-[#EFF6FF] border border-[#DBEAFE]">
- <p className="text-[11px] font-black text-[#3182F6] mb-1">원하시는 답변을 못 찾으셨나요?</p>
- <p className="text-[11px] text-[#4E5968] leading-relaxed break-keep">왼쪽 양식으로 문의하시거나 카카오톡 채널로 빠르게 상담받아 보세요.</p>
+ <div className="mt-4 p-3.5 rounded-[6px] bg-[var(--lu-accent-soft)] border border-[#DBEAFE]">
+ <p className="text-[11px] font-semibold text-[var(--lu-accent)] mb-1">원하시는 답변을 못 찾으셨나요?</p>
+ <p className="text-[11px] text-[var(--lu-muted)] leading-relaxed break-keep">왼쪽 양식으로 문의하시거나 카카오톡 채널로 빠르게 상담받아 보세요.</p>
  </div>
  </aside>
  )
@@ -259,7 +259,7 @@ ${lines.join('\n')}
  const historyLabel = `내 문의 내역${myInquiries.length ? ` (${myInquiries.length})` : ''}`
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <style>{GLOBAL_STYLES}</style>
  <Sidebar />
  <div className="md:ml-[220px] flex flex-col min-h-screen">
@@ -274,16 +274,16 @@ ${lines.join('\n')}
  {/* 응답 보장 통계 3종 — 본문 상단 카드 */}
  <div className="grid grid-cols-3 gap-2.5 md:gap-3 mb-5">
  {[
- { icon: <Clock size={14} strokeWidth={2.5} className="text-[#3182F6]" />, value: '1~2일', label: '평균 답변 시간' },
+ { icon: <Clock size={14} strokeWidth={2.5} className="text-[var(--lu-accent)]" />, value: '1~2일', label: '평균 답변 시간' },
  { icon: <Zap size={14} strokeWidth={2.5} className="text-[#F59E0B]" />, value: '카카오', label: '실시간 채널 운영' },
  { icon: <CheckCircle2 size={14} strokeWidth={2.5} className="text-[#10B981]" />, value: '100%', label: '모든 문의 답변' },
  ].map(s => (
- <div key={s.label} className="bg-white rounded-2xl shadow-sm p-3 md:p-4">
+ <div key={s.label} className="bg-white rounded-[10px] shadow-none p-3 md:p-4">
  <div className="flex items-center gap-1.5 mb-1.5">
  {s.icon}
- <span className="text-[10px] md:text-[11px] text-[#8B95A1] font-medium">{s.label}</span>
+ <span className="text-[10px] md:text-[11px] text-[var(--lu-muted)] font-medium">{s.label}</span>
  </div>
- <p className="text-base md:text-xl font-black text-[#191F28]">{s.value}</p>
+ <p className="text-base md:text-xl font-semibold text-[var(--lu-ink)]">{s.value}</p>
  </div>
  ))}
  </div>
@@ -293,14 +293,14 @@ ${lines.join('\n')}
 
  {/* 견적 자동 채움 배너 */}
  {quoteBanner && (
- <div className="mb-5 flex items-start gap-3 p-4 bg-gradient-to-r from-[#EFF6FF] to-[#F5F3FF] border border-[#3182F6]/30 rounded-2xl"
+ <div className="mb-5 flex items-start gap-3 p-4 bg-[var(--lu-accent)] border border-[var(--lu-accent)]/30 rounded-[10px]"
  style={{ animation: 'slide-up 0.3s ease-out forwards' }}>
- <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shrink-0 shadow-sm">
- <ShoppingCart size={16} strokeWidth={2} className="text-[#3182F6]" />
+ <div className="w-9 h-9 rounded-[6px] bg-white flex items-center justify-center shrink-0 shadow-none">
+ <ShoppingCart size={16} strokeWidth={2} className="text-[var(--lu-accent)]" />
  </div>
  <div className="flex-1 min-w-0">
- <p className="text-sm font-bold text-[#191F28]">견적 내용이 자동 입력됐어요</p>
- <p className="text-xs text-[#4E5968] mt-0.5 break-keep">{quoteBanner}</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)]">견적 내용이 자동 입력됐어요</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5 break-keep">{quoteBanner}</p>
  </div>
  </div>
  )}
@@ -308,27 +308,27 @@ ${lines.join('\n')}
  {/* 빠른 연락 카드 */}
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
  <a href="https://open.kakao.com/o/gSC9jrqi" target="_blank" rel="noopener noreferrer"
- className="flex items-center gap-3 p-4 rounded-2xl border-2 border-[#FEE500] bg-[#FFFDE7] hover:bg-[#FEE500]/30 hover:shadow-md transition-all group active:scale-[0.98]">
- <div className="w-11 h-11 rounded-xl bg-[#FEE500] flex items-center justify-center shrink-0 shadow-sm">
- <span className="text-[#191F28] font-black text-lg leading-none">K</span>
+ className="flex items-center gap-3 p-4 rounded-[10px] border-2 border-[#FEE500] bg-[#FFFDE7] hover:bg-[#FEE500]/30 hover:shadow-md transition-all group active:scale-[0.98]">
+ <div className="w-11 h-11 rounded-[6px] bg-[#FEE500] flex items-center justify-center shrink-0 shadow-none">
+ <span className="text-[var(--lu-ink)] font-semibold text-lg leading-none">K</span>
  </div>
  <div className="flex-1 min-w-0">
- <p className="font-black text-[#191F28] text-sm">카카오톡 채널 상담</p>
+ <p className="font-semibold text-[var(--lu-ink)] text-sm">카카오톡 채널 상담</p>
  <p className="text-[11px] text-[#78350F] mt-0.5">가장 빠른 답변 · 실시간 채팅</p>
  </div>
  <ArrowRight size={15} strokeWidth={2.5} className="text-[#78350F] shrink-0 group-hover:translate-x-1 transition-transform" />
  </a>
 
  <button onClick={copyEmail}
- className="flex items-center gap-3 p-4 rounded-2xl border-2 border-[#E5E8EB] bg-white hover:border-[#3182F6] hover:shadow-md transition-all text-left w-full group active:scale-[0.98]">
- <div className="w-11 h-11 rounded-xl bg-[#EFF6FF] flex items-center justify-center shrink-0">
- <Mail size={18} strokeWidth={2} className="text-[#3182F6]" />
+ className="min-h-11 flex items-center gap-3 p-4 rounded-[10px] border-2 border-[var(--lu-line)] bg-white hover:border-[var(--lu-accent)] hover:shadow-md transition-all text-left w-full group active:scale-[0.98]">
+ <div className="w-11 h-11 rounded-[6px] bg-[var(--lu-accent-soft)] flex items-center justify-center shrink-0">
+ <Mail size={18} strokeWidth={2} className="text-[var(--lu-accent)]" />
  </div>
  <div className="flex-1 min-w-0">
- <p className="font-black text-[#191F28] text-sm">이메일 문의</p>
- <p className="text-[11px] text-[#8B95A1] mt-0.5 truncate">{COMPANY.EMAIL} · 클릭해서 복사</p>
+ <p className="font-semibold text-[var(--lu-ink)] text-sm">이메일 문의</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mt-0.5 truncate">{COMPANY.EMAIL} · 클릭해서 복사</p>
  </div>
- <ArrowRight size={15} strokeWidth={2.5} className="text-[#3182F6] shrink-0 group-hover:translate-x-1 transition-transform" />
+ <ArrowRight size={15} strokeWidth={2.5} className="text-[var(--lu-accent)] shrink-0 group-hover:translate-x-1 transition-transform" />
  </button>
  </div>
 
@@ -338,13 +338,13 @@ ${lines.join('\n')}
  {/* 좌: 폼 / 내역 */}
  <div>
  {/* 탭 */}
- <div className="flex gap-1.5 bg-white rounded-2xl p-1.5 shadow-sm mb-5 w-fit border border-[#E5E8EB]">
+ <div className="flex gap-1.5 bg-white rounded-[10px] p-1.5 shadow-none mb-5 w-fit border border-[var(--lu-line)]">
  {([['new', '문의하기'], ['history', historyLabel]] as const).map(([t, l]) => (
  <button key={t} onClick={() => setTab(t)}
- className={`relative px-4 sm:px-5 py-2 rounded-xl text-xs sm:text-sm font-bold transition-colors ${tab === t ? 'bg-[#3182F6] text-white shadow-sm' : 'text-[#4E5968] hover:bg-[#F2F4F6]'}`}>
+ className={`relative px-4 sm:px-5 py-2 rounded-[6px] text-xs sm:text-sm font-bold transition-colors ${tab === t ? 'bg-[var(--lu-accent)] text-white shadow-none' : 'text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)]'}`}>
  {l}
  {t === 'history' && unreadCount > 0 && tab !== 'history' && (
- <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#EF4444] text-white text-[9px] font-black flex items-center justify-center">
+ <span className="absolute -top-1 -right-1 min-w-[16px] h-4 px-1 rounded-full bg-[#EF4444] text-white text-[9px] font-semibold flex items-center justify-center">
  {unreadCount}
  </span>
  )}
@@ -354,25 +354,25 @@ ${lines.join('\n')}
 
  {/* 문의하기 폼 */}
  {tab === 'new' && (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] shadow-sm overflow-hidden">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] shadow-none overflow-hidden">
  {submitted ? (
  <div className="text-center py-12 px-6" style={{ animation: 'slide-up 0.3s ease-out' }}>
- <div className="w-16 h-16 rounded-2xl bg-[#D1FAE5] mx-auto mb-4 flex items-center justify-center"
+ <div className="w-16 h-16 rounded-[10px] bg-[#D1FAE5] mx-auto mb-4 flex items-center justify-center"
  style={{ animation: 'check-pop 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards' }}>
  <CheckCircle2 size={32} strokeWidth={2} className="text-[#10B981]" />
  </div>
- <h2 className="text-lg sm:text-xl font-black text-[#191F28] mb-2">문의가 접수되었습니다!</h2>
- <p className="text-[#4E5968] text-sm leading-relaxed mb-6 break-keep">
+ <h2 className="text-lg sm:text-xl font-semibold text-[var(--lu-ink)] mb-2">문의가 접수되었습니다!</h2>
+ <p className="text-[var(--lu-muted)] text-sm leading-relaxed mb-6 break-keep">
  영업일 기준 1~2일 내로 답변드립니다.<br/>
  답변이 달리면 내 문의 내역에 자동으로 표시돼요.
  </p>
  <div className="flex gap-2.5 justify-center flex-col sm:flex-row">
  <button onClick={() => setSubmitted(false)}
- className="px-5 py-2.5 bg-[#F2F4F6] text-[#4E5968] font-bold rounded-xl text-sm hover:bg-[#E5E8EB] transition-colors">
+ className="min-h-11 px-5 py-2.5 bg-[var(--lu-canvas)] text-[var(--lu-muted)] font-bold rounded-[6px] text-sm hover:bg-[var(--lu-line)] transition-colors">
  추가 문의하기
  </button>
  <button onClick={() => { setTab('history'); setSubmitted(false) }}
- className="px-5 py-2.5 bg-[#3182F6] text-white font-bold rounded-xl text-sm hover:bg-[#1B64DA] transition-colors">
+ className="min-h-11 px-5 py-2.5 bg-[var(--lu-accent)] text-white font-bold rounded-[6px] text-sm hover:bg-[var(--lu-accent-hover)] transition-colors">
  내 문의 내역 보기
  </button>
  </div>
@@ -381,14 +381,14 @@ ${lines.join('\n')}
  <div className="p-5 sm:p-6 space-y-5">
  {/* 분류 선택 */}
  <div>
- <label className="text-xs sm:text-sm font-black text-[#191F28] block mb-2.5">문의 분류</label>
+ <label className="text-xs sm:text-sm font-semibold text-[var(--lu-ink)] block mb-2.5">문의 분류</label>
  <div className="flex flex-wrap gap-2">
  {CATEGORIES.map(cat => {
  const active = form.category === cat.value
  return (
  <button key={cat.value} onClick={() => setForm(p => ({ ...p, category: cat.value }))}
  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs sm:text-sm font-bold transition-all border-2 ${
- active ? 'text-white border-transparent shadow-sm' : 'border-[#E5E8EB] text-[#4E5968] hover:border-[#3182F6] bg-white'
+ active ? 'text-white border-transparent shadow-none' : 'border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[var(--lu-accent)] bg-white'
  }`}
  style={active ? { background: cat.color, borderColor: cat.color } : {}}>
  <cat.Icon size={13} strokeWidth={2.25} />
@@ -402,54 +402,54 @@ ${lines.join('\n')}
  {/* 이름 + 연락처 */}
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
  <div>
- <label className="text-xs sm:text-sm font-black text-[#191F28] block mb-1.5">
+ <label className="text-xs sm:text-sm font-semibold text-[var(--lu-ink)] block mb-1.5">
  이름 <span className="text-red-500">*</span>
  </label>
  <input value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))}
  placeholder="홍길동"
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  </div>
  <div>
- <label className="text-xs sm:text-sm font-black text-[#191F28] block mb-1.5">연락처</label>
+ <label className="text-xs sm:text-sm font-semibold text-[var(--lu-ink)] block mb-1.5">연락처</label>
  <input value={form.contact} onChange={e => setForm(p => ({ ...p, contact: e.target.value }))}
  placeholder="010-0000-0000 또는 이메일"
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  </div>
  </div>
 
  {/* 문의 내용 */}
  <div>
- <label className="text-xs sm:text-sm font-black text-[#191F28] block mb-1.5">
+ <label className="text-xs sm:text-sm font-semibold text-[var(--lu-ink)] block mb-1.5">
  문의 내용 <span className="text-red-500">*</span>
  </label>
  <textarea value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))}
  rows={7} placeholder="문의하실 내용을 자세히 작성해 주세요. 자세할수록 더 정확한 답변을 드릴 수 있어요."
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm leading-relaxed focus:outline-none focus:border-[#3182F6] transition-colors resize-none" />
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base leading-relaxed focus:outline-none focus:border-[var(--lu-accent)] transition-colors resize-none" />
  <p className="text-[11px] text-[#B0B8C1] mt-1 text-right">{form.message.length}자</p>
  </div>
 
  {error && (
- <p className="text-red-500 text-xs sm:text-sm bg-red-50 border border-red-100 rounded-xl px-4 py-3 break-keep">
+ <p className="text-red-500 text-xs sm:text-sm bg-red-50 border border-red-100 rounded-[6px] px-4 py-3 break-keep">
  {error}
  </p>
  )}
 
  <button onClick={handleSubmit} disabled={submitting}
- className={`w-full py-3.5 rounded-xl font-black text-sm transition-all flex items-center justify-center gap-2 ${
+ className={`w-full py-3.5 rounded-[6px] font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
  submitting
  ? 'bg-[#93C5FD] cursor-not-allowed text-white'
- : 'bg-[#3182F6] text-white hover:bg-[#1B64DA] shadow-[0_4px_16px_rgba(49,130,246,0.28)] active:scale-[0.99]'
+ : 'bg-[var(--lu-accent)] text-white hover:bg-[var(--lu-accent-hover)] shadow-[0_4px_16px_rgba(49,130,246,0.28)] active:scale-[0.99]'
  }`}>
  {submitting
  ? <><RefreshCw size={15} className="animate-spin" /> 접수 중...</>
  : <><Send size={15} strokeWidth={2.5} /> 문의 접수하기</>}
  </button>
 
- <div className="pt-1 border-t border-[#F2F4F6] flex items-center justify-center gap-3 text-xs text-[#8B95A1]">
+ <div className="pt-1 border-t border-[var(--lu-canvas)] flex items-center justify-center gap-3 text-xs text-[var(--lu-muted)]">
  <span className="inline-flex items-center gap-1">
  <Mail size={11} strokeWidth={2.25} /> 이메일 직접 문의
  </span>
- <button onClick={copyEmail} className="font-bold text-[#3182F6] hover:underline">{COMPANY.EMAIL}</button>
+ <button onClick={copyEmail} className="min-h-11 font-bold text-[var(--lu-accent)] hover:underline">{COMPANY.EMAIL}</button>
  </div>
  </div>
  )}
@@ -458,16 +458,16 @@ ${lines.join('\n')}
 
  {/* 내 문의 내역 */}
  {tab === 'history' && (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] shadow-sm">
- <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[#F2F4F6]">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] shadow-none">
+ <div className="flex items-center justify-between px-5 sm:px-6 py-4 border-b border-[var(--lu-canvas)]">
  <div>
- <p className="text-sm font-black text-[#191F28]">내 문의 내역</p>
- <p className="text-[11px] text-[#8B95A1] mt-0.5 break-keep">
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">내 문의 내역</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mt-0.5 break-keep">
  이 기기에서 접수한 문의{syncedAt && <span> · 동기화 {formatDate(syncedAt)}</span>}
  </p>
  </div>
  <button onClick={() => syncFromServer()} disabled={syncing || myInquiries.length === 0}
- className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#F2F4F6] text-[#4E5968] text-xs font-bold hover:bg-[#E5E8EB] disabled:opacity-50 transition-colors">
+ className="min-h-11 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-[6px] bg-[var(--lu-canvas)] text-[var(--lu-muted)] text-xs font-bold hover:bg-[var(--lu-line)] disabled:opacity-50 transition-colors">
  <RefreshCw size={11} className={syncing ? 'animate-spin' : ''} />
  {syncing ? '동기화 중…' : '새로고침'}
  </button>
@@ -478,33 +478,33 @@ ${lines.join('\n')}
  {/* SVG 빈 상태 — 편지봉투 일러스트 */}
  <svg width="72" height="72" viewBox="0 0 72 72" fill="none" className="mb-4 opacity-70" aria-hidden="true">
  <rect x="6" y="18" width="60" height="40" rx="6" fill="#EFF6FF" stroke="#BFDBFE" strokeWidth="2" />
- <path d="M6 24l30 20 30-20" stroke="#3182F6" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
+ <path d="M6 24l30 20 30-20" stroke="#16685D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" fill="none" />
  <circle cx="54" cy="20" r="10" fill="#DBEAFE" />
- <path d="M49 20h10M54 15v10" stroke="#3182F6" strokeWidth="2" strokeLinecap="round" />
+ <path d="M49 20h10M54 15v10" stroke="#16685D" strokeWidth="2" strokeLinecap="round" />
  </svg>
- <p className="font-bold text-[#191F28] text-sm mb-1">문의 내역이 없습니다</p>
- <p className="text-xs text-[#8B95A1] mb-4 break-keep">궁금한 점이 있으시면 언제든 문의해 주세요.<br/>평균 1~2일 내 답변드립니다.</p>
+ <p className="font-bold text-[var(--lu-ink)] text-sm mb-1">문의 내역이 없습니다</p>
+ <p className="text-xs text-[var(--lu-muted)] mb-4 break-keep">궁금한 점이 있으시면 언제든 문의해 주세요.<br/>평균 1~2일 내 답변드립니다.</p>
  <button onClick={() => setTab('new')}
- className="px-5 py-2.5 bg-[#3182F6] text-white font-bold rounded-xl text-sm hover:bg-[#1B64DA] transition-colors">
+ className="min-h-11 px-5 py-2.5 bg-[var(--lu-accent)] text-white font-bold rounded-[6px] text-sm hover:bg-[var(--lu-accent-hover)] transition-colors">
  첫 문의 남기기
  </button>
  </div>
  ) : (
- <div className="divide-y divide-[#F2F4F6]">
+ <div className="divide-y divide-[var(--lu-canvas)]">
  {myInquiries.map(inq => (
  <button key={inq.id} onClick={() => setActive(inq)}
- className="w-full text-left px-5 sm:px-6 py-4 hover:bg-[#FAFBFF] transition-colors">
+ className="min-h-11 w-full text-left px-5 sm:px-6 py-4 hover:bg-[#FAFBFF] transition-colors">
  <div className="flex items-center gap-2 flex-wrap mb-1.5">
  <StatusBadge status={inq.status} />
- <span className="text-[10px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2 py-0.5 rounded-full">{inq.category}</span>
+ <span className="text-[10px] font-bold text-[var(--lu-muted)] bg-[var(--lu-canvas)] px-2 py-0.5 rounded-full">{inq.category}</span>
  <span className="text-[10px] text-[#B0B8C1] ml-auto shrink-0">{formatDate(inq.createdAt)}</span>
  </div>
- <p className="text-xs sm:text-sm text-[#191F28] line-clamp-2 whitespace-pre-wrap break-keep">{inq.message}</p>
+ <p className="text-xs sm:text-sm text-[var(--lu-ink)] line-clamp-2 whitespace-pre-wrap break-keep">{inq.message}</p>
  {inq.reply && (
- <div className="mt-2 flex items-start gap-2 bg-[#F0F7FF] rounded-xl px-3 py-2">
- <MessageSquare size={11} strokeWidth={2.25} className="text-[#3182F6] mt-0.5 shrink-0" />
+ <div className="mt-2 flex items-start gap-2 bg-[#F0F7FF] rounded-[6px] px-3 py-2">
+ <MessageSquare size={11} strokeWidth={2.25} className="text-[var(--lu-accent)] mt-0.5 shrink-0" />
  <div className="min-w-0">
- <div className="text-[10px] font-black text-[#3182F6] mb-0.5">관리자 답변</div>
+ <div className="text-[10px] font-semibold text-[var(--lu-accent)] mb-0.5">관리자 답변</div>
  <div className="text-[11px] text-[#1E3A8A] line-clamp-1 break-keep">{inq.reply}</div>
  </div>
  </div>
@@ -529,50 +529,50 @@ ${lines.join('\n')}
  <div className="bg-white rounded-t-3xl sm:rounded-3xl w-full sm:max-w-lg max-h-[92vh] overflow-y-auto shadow-2xl"
  onClick={e => e.stopPropagation()}>
  {/* 모달 헤더 */}
- <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-[#F2F4F6] flex items-start justify-between gap-3 sticky top-0 bg-white z-10 rounded-t-3xl">
+ <div className="px-5 sm:px-6 py-4 sm:py-5 border-b border-[var(--lu-canvas)] flex items-start justify-between gap-3 sticky top-0 bg-white z-10 rounded-t-3xl">
  <div className="flex-1">
  <div className="flex items-center gap-2 flex-wrap mb-1">
  <StatusBadge status={active.status} />
- <span className="text-[10px] font-bold text-[#4E5968] bg-[#F2F4F6] px-2 py-0.5 rounded-full">{active.category}</span>
+ <span className="text-[10px] font-bold text-[var(--lu-muted)] bg-[var(--lu-canvas)] px-2 py-0.5 rounded-full">{active.category}</span>
  </div>
- <p className="text-[11px] text-[#8B95A1]">
+ <p className="text-[11px] text-[var(--lu-muted)]">
  접수 {formatDate(active.createdAt)}
  {active.repliedAt && ` · 답변 ${formatDate(active.repliedAt)}`}
  {active.completedAt && ` · 완료 ${formatDate(active.completedAt)}`}
  </p>
  </div>
- <button onClick={() => setActive(null)} className="p-1.5 rounded-lg hover:bg-[#F2F4F6] text-[#8B95A1] transition-colors shrink-0">
+ <button onClick={() => setActive(null)} className="min-h-11 p-1.5 rounded-lg hover:bg-[var(--lu-canvas)] text-[var(--lu-muted)] transition-colors shrink-0">
  <X size={18} strokeWidth={2} />
  </button>
  </div>
 
  <div className="px-5 sm:px-6 py-5 space-y-4">
  <div>
- <p className="text-[11px] font-black text-[#8B95A1] mb-2">내 문의 내용</p>
- <div className="text-xs sm:text-sm text-[#191F28] leading-relaxed whitespace-pre-wrap bg-[#F8F9FA] rounded-xl p-4 break-keep">
+ <p className="text-[11px] font-semibold text-[var(--lu-muted)] mb-2">내 문의 내용</p>
+ <div className="text-xs sm:text-sm text-[var(--lu-ink)] leading-relaxed whitespace-pre-wrap bg-[var(--lu-canvas)] rounded-[6px] p-4 break-keep">
  {active.message}
  </div>
  </div>
  {active.reply ? (
  <div>
  <div className="flex items-center gap-1.5 mb-2">
- <div className="w-5 h-5 rounded-full bg-[#EFF6FF] flex items-center justify-center shrink-0">
- <Headphones size={11} strokeWidth={2.5} className="text-[#3182F6]" />
+ <div className="w-5 h-5 rounded-full bg-[var(--lu-accent-soft)] flex items-center justify-center shrink-0">
+ <Headphones size={11} strokeWidth={2.5} className="text-[var(--lu-accent)]" />
  </div>
- <span className="text-[11px] font-black text-[#3182F6]">관리자 답변</span>
+ <span className="text-[11px] font-semibold text-[var(--lu-accent)]">관리자 답변</span>
  </div>
- <div className="text-xs sm:text-sm text-[#1E3A8A] leading-relaxed whitespace-pre-wrap bg-[#EFF6FF] rounded-xl p-4 break-keep">
+ <div className="text-xs sm:text-sm text-[#1E3A8A] leading-relaxed whitespace-pre-wrap bg-[var(--lu-accent-soft)] rounded-[6px] p-4 break-keep">
  {active.reply}
  </div>
  {active.status === 'completed' && (
- <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-bold text-[#065F46] bg-[#D1FAE5] rounded-xl py-2.5">
+ <div className="mt-3 flex items-center justify-center gap-1.5 text-xs font-bold text-[#065F46] bg-[#D1FAE5] rounded-[6px] py-2.5">
  <CheckCircle2 size={12} strokeWidth={2.5} />
  이 문의는 처리 완료되었습니다
  </div>
  )}
  </div>
  ) : (
- <div className="text-sm text-[#8B95A1] bg-[#F8F9FA] rounded-xl p-4 text-center leading-relaxed break-keep">
+ <div className="text-sm text-[var(--lu-muted)] bg-[var(--lu-canvas)] rounded-[6px] p-4 text-center leading-relaxed break-keep">
  아직 답변이 작성되지 않았습니다.<br />
  영업일 기준 1~2일 내로 답변드릴게요.
  </div>
@@ -590,10 +590,10 @@ ${lines.join('\n')}
  {copied && (
  <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[9999] pointer-events-none"
  style={{ animation: 'slide-up 0.25s ease-out' }}>
- <div className="flex items-center gap-2.5 px-5 py-3 bg-[#191F28] text-white rounded-2xl shadow-2xl text-sm font-bold whitespace-nowrap">
+ <div className="flex items-center gap-2.5 px-5 py-3 bg-[var(--lu-ink)] text-white rounded-[10px] shadow-2xl text-sm font-bold whitespace-nowrap">
  <CheckCircle2 size={15} strokeWidth={2.25} className="text-[#10B981]" />
  이메일 주소가 복사되었습니다
- <span className="text-[#8B95A1] text-xs">{COMPANY.EMAIL}</span>
+ <span className="text-[var(--lu-muted)] text-xs">{COMPANY.EMAIL}</span>
  </div>
  </div>
  )}

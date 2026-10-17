@@ -33,7 +33,7 @@ const FEATURES: Array<{
  desc: string; category: '사장님' | '마케터' | '공통'; popular?: boolean;
 }> = [
  // ── 사장님: 운영 자동화 ──
- { id: 'ai-review', name: 'AI 리뷰 자동 답글', price: 0, short: 'AI', bg: '#EFF6FF', color: '#3182F6',
+ { id: 'ai-review', name: 'AI 리뷰 자동 답글', price: 0, short: 'AI', bg: '#EFF6FF', color: '#16685D',
  desc: '네이버·배민·쿠팡이츠·요기요·카카오 통합 · AI 분석·자동 답글 (말투 4종)', category: '사장님', popular: true },
  { id: 'review-alert', name: '부정 리뷰 알림', price: 0, short: '알림', bg: '#FFFBEB', color: '#F59E0B',
  desc: '15분 자동 수집 · 별점 1~2점 우선 알림 (웹푸시 + 카카오톡)', category: '사장님', popular: true },
@@ -71,7 +71,7 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
  return (
  <button
  onClick={() => onChange(!checked)}
- className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${checked ? 'bg-[#3182F6]' : 'bg-[#E5E8EB]'}`}
+ className={`w-11 h-6 rounded-full transition-colors relative flex-shrink-0 ${checked ? 'bg-[var(--lu-accent)]' : 'bg-[var(--lu-line)]'}`}
  >
  <span className={`absolute top-0.5 w-5 h-5 bg-white rounded-full shadow transition-all ${checked ? 'left-[22px]' : 'left-0.5'}`} />
  </button>
@@ -140,15 +140,15 @@ function KakaoMapBox({ address }: { address: string }) {
  <div className="relative w-full bg-[#F8FAFF]" style={{ height: 620 }}>
  <div ref={mapRef} className="absolute inset-0 w-full h-full" />
  {error && (
- <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#FFFBEB] via-[#FFFDF5] to-[#FFFBEB] text-center px-6">
- <div className="w-16 h-16 rounded-2xl bg-[#FEE500] flex items-center justify-center text-[#3B1E1E] font-black text-2xl mb-3 shadow-lg">K</div>
- <p className="text-base font-bold text-[#191F28] mb-1">카카오 지도</p>
- <p className="text-xs text-[#8B95A1] mb-4">{error}</p>
- <div className="bg-white rounded-xl px-4 py-3 shadow-sm max-w-[300px]">
- <p className="text-xs font-semibold text-[#4E5968] mb-1">주소</p>
- <p className="text-sm text-[#191F28] leading-relaxed">{address || '주소 미입력'}</p>
+ <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--lu-accent)] text-center px-6">
+ <div className="w-16 h-16 rounded-[10px] bg-[#FEE500] flex items-center justify-center text-[#3B1E1E] font-semibold text-2xl mb-3 shadow-none">K</div>
+ <p className="text-base font-bold text-[var(--lu-ink)] mb-1">카카오 지도</p>
+ <p className="text-xs text-[var(--lu-muted)] mb-4">{error}</p>
+ <div className="bg-white rounded-[6px] px-4 py-3 shadow-none max-w-[300px]">
+ <p className="text-xs font-semibold text-[var(--lu-muted)] mb-1">주소</p>
+ <p className="text-sm text-[var(--lu-ink)] leading-relaxed">{address || '주소 미입력'}</p>
  </div>
- <a href={'https://map.kakao.com/?q=' + encodeURIComponent(address || '')} target="_blank" rel="noopener noreferrer" className="mt-4 px-5 py-2.5 rounded-xl bg-[#FEE500] text-[#3B1E1E] text-xs font-bold hover:brightness-95 transition-all">
+ <a href={'https://map.kakao.com/?q=' + encodeURIComponent(address || '')} target="_blank" rel="noopener noreferrer" className="mt-4 px-5 py-2.5 rounded-[6px] bg-[#FEE500] text-[#3B1E1E] text-xs font-bold hover:brightness-95 transition-all">
  카카오맵에서 열기 →
  </a>
  </div>
@@ -213,15 +213,15 @@ function NaverMapBox({ address }: { address: string }) {
  <div className="relative w-full bg-[#F8FAFF]" style={{ height: 620 }}>
  <div ref={mapRef} className="absolute inset-0 w-full h-full" />
  {error && (
- <div className="absolute inset-0 flex flex-col items-center justify-center bg-gradient-to-br from-[#F0FDF4] via-[#F8FAFF] to-[#EFF6FF] text-center px-6">
- <div className="w-16 h-16 rounded-2xl bg-[#03C75A] flex items-center justify-center text-white font-black text-2xl mb-3 shadow-lg">N</div>
- <p className="text-base font-bold text-[#191F28] mb-1">네이버 지도</p>
- <p className="text-xs text-[#8B95A1] mb-4">{error}</p>
- <div className="bg-white rounded-xl px-4 py-3 shadow-sm max-w-[300px]">
- <p className="text-xs font-semibold text-[#4E5968] mb-1">주소</p>
- <p className="text-sm text-[#191F28] leading-relaxed">{address || '주소 미입력'}</p>
+ <div className="absolute inset-0 flex flex-col items-center justify-center bg-[var(--lu-accent)] text-center px-6">
+ <div className="w-16 h-16 rounded-[10px] bg-[#03C75A] flex items-center justify-center text-white font-semibold text-2xl mb-3 shadow-none">N</div>
+ <p className="text-base font-bold text-[var(--lu-ink)] mb-1">네이버 지도</p>
+ <p className="text-xs text-[var(--lu-muted)] mb-4">{error}</p>
+ <div className="bg-white rounded-[6px] px-4 py-3 shadow-none max-w-[300px]">
+ <p className="text-xs font-semibold text-[var(--lu-muted)] mb-1">주소</p>
+ <p className="text-sm text-[var(--lu-ink)] leading-relaxed">{address || '주소 미입력'}</p>
  </div>
- <a href={'https://map.naver.com/v5/search/' + encodeURIComponent(address || '')} target="_blank" rel="noopener noreferrer" className="mt-4 px-5 py-2.5 rounded-xl bg-[#03C75A] text-white text-xs font-bold hover:bg-[#02A84A] transition-colors">
+ <a href={'https://map.naver.com/v5/search/' + encodeURIComponent(address || '')} target="_blank" rel="noopener noreferrer" className="mt-4 px-5 py-2.5 rounded-[6px] bg-[#03C75A] text-white text-xs font-bold hover:bg-[#02A84A] transition-colors">
  네이버지도 앱에서 열기 →
  </a>
  </div>
@@ -442,24 +442,24 @@ function StoreTab() {
  return (
  <div className="flex gap-6 items-start">
  <div className="flex-1 min-w-0 space-y-4">
- <div className="bg-[#EFF6FF] rounded-2xl p-4 border border-[#BFDBFE]">
+ <div className="bg-[var(--lu-accent-soft)] rounded-[10px] p-4 border border-[#BFDBFE]">
  <div className="flex items-center gap-2 mb-3">
- <div className="w-6 h-6 rounded-md bg-[#03C75A] flex items-center justify-center text-white text-[10px] font-black">N</div>
- <span className="text-sm font-bold text-[#191F28]">네이버 플레이스 연동</span>
- <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#3182F6] text-white font-semibold">자동 입력</span>
+ <div className="w-6 h-6 rounded-md bg-[#03C75A] flex items-center justify-center text-white text-[10px] font-semibold">N</div>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">네이버 플레이스 연동</span>
+ <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--lu-accent)] text-white font-semibold">자동 입력</span>
  </div>
  <div className="flex flex-col sm:flex-row gap-2">
  <input
  value={form.naverUrl}
  onChange={e => { setForm(p => ({ ...p, naverUrl: e.target.value })); setSyncError(''); setShowResults(false) }}
  placeholder="https://m.place.naver.com/restaurant/1129864566/home"
- className="flex-1 border border-[#BFDBFE] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] bg-white transition-colors"
+ className="min-h-11 flex-1 border border-[#BFDBFE] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] bg-white transition-colors"
  onKeyDown={e => e.key === 'Enter' && handleNaverSync()}
  />
  <button
  onClick={handleNaverSync}
  disabled={syncing}
- className={`px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap transition-all ${synced && !isMock ? 'bg-green-500 text-white' : syncing ? 'bg-[#93C5FD] text-white cursor-not-allowed' : 'bg-[#3182F6] text-white hover:bg-[#1B64DA]'}`}
+ className={`px-4 py-2.5 rounded-[6px] text-sm font-bold whitespace-nowrap transition-all ${synced && !isMock ? 'bg-green-500 text-white' : syncing ? 'bg-[#93C5FD] text-white cursor-not-allowed' : 'bg-[var(--lu-accent)] text-white hover:bg-[var(--lu-accent-hover)]'}`}
  >
  {syncing ? '검색 중...' : synced && !isMock ? '연동 완료' : '연동하기'}
  </button>
@@ -473,67 +473,67 @@ function StoreTab() {
  <p className="text-xs text-green-600 font-semibold mt-2">네이버 플레이스에서 매장 정보를 가져왔습니다!</p>
  )}
  {showResults && searchResults.length > 0 && (
- <div className="mt-3 bg-white rounded-xl border border-[#BFDBFE] overflow-hidden shadow-md">
- <p className="text-xs font-bold text-[#8B95A1] px-4 py-2 border-b border-[#F2F4F6]">
+ <div className="mt-3 bg-white rounded-[6px] border border-[#BFDBFE] overflow-hidden shadow-md">
+ <p className="text-xs font-bold text-[var(--lu-muted)] px-4 py-2 border-b border-[var(--lu-canvas)]">
  검색 결과 {searchResults.length}개 · 해당하는 매장을 선택해주세요
  </p>
  {searchResults.map((place, i) => (
- <button key={i} onClick={() => applyPlace(place)} className="w-full text-left px-4 py-3 hover:bg-[#EFF6FF] transition-colors border-b border-[#F2F4F6] last:border-0">
- <p className="text-sm font-semibold text-[#191F28]">{place.title}</p>
- <p className="text-xs text-[#8B95A1] mt-0.5">{place.category} · {place.roadAddress || place.address}</p>
- {place.telephone && <p className="text-xs text-[#3182F6] mt-0.5">{place.telephone}</p>}
+ <button key={i} onClick={() => applyPlace(place)} className="min-h-11 w-full text-left px-4 py-3 hover:bg-[var(--lu-accent-soft)] transition-colors border-b border-[var(--lu-canvas)] last:border-0">
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">{place.title}</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">{place.category} · {place.roadAddress || place.address}</p>
+ {place.telephone && <p className="text-xs text-[var(--lu-accent)] mt-0.5">{place.telephone}</p>}
  </button>
  ))}
  </div>
  )}
- <p className="text-xs text-[#3182F6] mt-2 opacity-70">네이버 플레이스 URL 붙여넣기 → 매장명·업종·전화·주소·메인/서브 키워드·매장 소개 자동 입력 (API 키 불필요)</p>
+ <p className="text-xs text-[var(--lu-accent)] mt-2 opacity-70">네이버 플레이스 URL 붙여넣기 → 매장명·업종·전화·주소·메인/서브 키워드·매장 소개 자동 입력 (API 키 불필요)</p>
  </div>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  <div>
- <label htmlFor="form-name" className="block text-xs font-semibold text-[#4E5968] mb-1.5">매장명</label>
- <input id="form-name" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="우리 카페" className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
+ <label htmlFor="form-name" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">매장명</label>
+ <input id="form-name" value={form.name} onChange={e => setForm(p => ({ ...p, name: e.target.value }))} placeholder="우리 카페" className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  </div>
  <div>
- <label htmlFor="form-category" className="block text-xs font-semibold text-[#4E5968] mb-1.5">업종</label>
- <input id="form-category" value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} placeholder="카페·베이커리" className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
+ <label htmlFor="form-category" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">업종</label>
+ <input id="form-category" value={form.category} onChange={e => setForm(p => ({ ...p, category: e.target.value }))} placeholder="카페·베이커리" className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  </div>
  </div>
  <div>
- <label htmlFor="form-phone" className="block text-xs font-semibold text-[#4E5968] mb-1.5">전화번호</label>
- <input id="form-phone" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="02-1234-5678" className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
+ <label htmlFor="form-phone" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">전화번호</label>
+ <input id="form-phone" value={form.phone} onChange={e => setForm(p => ({ ...p, phone: e.target.value }))} placeholder="02-1234-5678" className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  </div>
  <div>
- <label htmlFor="form-address" className="block text-xs font-semibold text-[#4E5968] mb-1.5">주소</label>
- <input id="form-address" value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} placeholder="서울시 마포구 합정동 123-4" className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
+ <label htmlFor="form-address" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">주소</label>
+ <input id="form-address" value={form.address} onChange={e => setForm(p => ({ ...p, address: e.target.value }))} placeholder="서울시 마포구 합정동 123-4" className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  </div>
  <div>
- <label htmlFor="form-main-keyword" className="block text-xs font-semibold text-[#4E5968] mb-1.5">키워드</label>
+ <label htmlFor="form-main-keyword" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">키워드</label>
  <div className="flex gap-2">
  <div className="w-[38%]">
- <input id="form-main-keyword" value={form.mainKeyword} onChange={e => setForm(p => ({ ...p, mainKeyword: e.target.value }))} placeholder="메인 키워드" aria-label="메인 키워드" className="w-full border-2 border-[#3182F6] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1B64DA]/30 bg-[#F8FAFF] font-semibold" />
- <p className="text-[10px] text-[#3182F6] mt-1 font-semibold pl-0.5">메인 키워드 1개</p>
+ <input id="form-main-keyword" value={form.mainKeyword} onChange={e => setForm(p => ({ ...p, mainKeyword: e.target.value }))} placeholder="메인 키워드" aria-label="메인 키워드" className="min-h-11 w-full border-2 border-[var(--lu-accent)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-[var(--lu-accent-hover)]/30 bg-[#F8FAFF] font-semibold" />
+ <p className="text-[10px] text-[var(--lu-accent)] mt-1 font-semibold pl-0.5">메인 키워드 1개</p>
  </div>
  <div className="flex-1">
- <input value={form.subKeywords} onChange={e => setForm(p => ({ ...p, subKeywords: e.target.value }))} placeholder="서브 키워드 (쉼표로 구분)" aria-label="서브 키워드" className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] focus:ring-2 focus:ring-[#1B64DA]/20 transition-colors" />
- <p className="text-[10px] text-[#8B95A1] mt-1 pl-0.5">여러 개 입력 가능</p>
+ <input value={form.subKeywords} onChange={e => setForm(p => ({ ...p, subKeywords: e.target.value }))} placeholder="서브 키워드 (쉼표로 구분)" aria-label="서브 키워드" className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] focus:ring-2 focus:ring-[var(--lu-accent-hover)]/20 transition-colors" />
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1 pl-0.5">여러 개 입력 가능</p>
  </div>
  </div>
  {(form.mainKeyword || form.subKeywords) && (
  <div className="flex flex-wrap gap-1.5 mt-2.5">
  {form.mainKeyword && (
- <span className="text-[11px] px-2.5 py-1 bg-[#3182F6] text-white rounded-full font-bold">#{form.mainKeyword}</span>
+ <span className="text-[11px] px-2.5 py-1 bg-[var(--lu-accent)] text-white rounded-full font-bold">#{form.mainKeyword}</span>
  )}
  {form.subKeywords.split(',').filter(k => k.trim()).map(kw => (
- <span key={kw.trim()} className="text-[11px] px-2.5 py-1 bg-[#EFF6FF] text-[#3182F6] rounded-full font-medium">#{kw.trim()}</span>
+ <span key={kw.trim()} className="text-[11px] px-2.5 py-1 bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] rounded-full font-medium">#{kw.trim()}</span>
  ))}
  </div>
  )}
  </div>
  <div>
  <div className="flex items-center justify-between mb-1.5">
- <label htmlFor="form-desc" className="block text-xs font-semibold text-[#4E5968]">
+ <label htmlFor="form-desc" className="block text-xs font-semibold text-[var(--lu-muted)]">
  매장 소개
- <span className="ml-1.5 text-[10px] text-[#8B95A1] font-normal">AI 리뷰·블로그 작성 참고용 · 최대 2000자</span>
+ <span className="ml-1.5 text-[10px] text-[var(--lu-muted)] font-normal">AI 리뷰·블로그 작성 참고용 · 최대 2000자</span>
  </label>
  <button
  type="button"
@@ -542,8 +542,8 @@ function StoreTab() {
  title="네이버 플레이스 /information 페이지에서 매장 소개 가져오기"
  className={`text-[11px] px-2.5 py-1 rounded-lg font-bold transition-colors ${
  syncing || !form.naverUrl.trim()
- ? 'bg-[#F2F4F6] text-[#8B95A1] cursor-not-allowed'
- : 'bg-[#EFF6FF] text-[#3182F6] hover:bg-[#DBEAFE]'
+ ? 'bg-[var(--lu-canvas)] text-[var(--lu-muted)] cursor-not-allowed'
+ : 'bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] hover:bg-[#DBEAFE]'
  }`}
  >
  {syncing ? '불러오는 중...' : '네이버에서 가져오기'}
@@ -559,22 +559,22 @@ function StoreTab() {
  maxLength={2000}
  rows={10}
  placeholder="예: 포항 용흥동에서 10년째 운영 중인 스페셜티 카페입니다. 제주산 원두 직접 로스팅, 수제 디저트, 반려동물 동반 가능. 주차 20대, 와이파이 제공. 매주 수요일 원두 할인 이벤트.&#10;&#10;AI 가 리뷰 답글·블로그 포스팅을 쓸 때 이 소개를 참고합니다. 매장 특징·대표 메뉴·위치·이벤트 등을 자세히 적을수록 품질이 올라갑니다."
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors resize-y leading-relaxed"
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors resize-y leading-relaxed"
  style={{ minHeight: '240px' }}
  />
  <div className="flex items-center justify-between mt-1.5">
- <p className="text-[10px] text-[#8B95A1]">
+ <p className="text-[10px] text-[var(--lu-muted)]">
  네이버 플레이스 URL 이 위에 있으면 "네이버에서 가져오기" 한 번으로 자동 채움 (information 페이지 전문 수집)
  </p>
  <p className={`text-[11px] font-semibold tabular-nums ${
- form.desc.length > 1900 ? 'text-red-500' : form.desc.length > 1500 ? 'text-orange-500' : 'text-[#8B95A1]'
+ form.desc.length > 1900 ? 'text-red-500' : form.desc.length > 1500 ? 'text-orange-500' : 'text-[var(--lu-muted)]'
  }`}>
  {form.desc.length.toLocaleString()} / 2,000
  </p>
  </div>
  </div>
  {serverPlatforms.some(p => p.connected) && (
- <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-xl p-3">
+ <div className="bg-[#F0FDF4] border border-[#BBF7D0] rounded-[6px] p-3">
  <p className="text-xs font-bold text-[#166534] mb-2">연결된 플랫폼 ({serverPlatforms.filter(p => p.connected).length}개)</p>
  <div className="flex flex-wrap gap-1.5">
  {serverPlatforms.filter(p => p.connected).map(p => (
@@ -583,25 +583,25 @@ function StoreTab() {
  </span>
  ))}
  </div>
- <a href="/my/platforms" className="inline-block text-[11px] text-[#3182F6] hover:underline mt-2 font-semibold">플랫폼 연결 관리 →</a>
+ <a href="/my/platforms" className="inline-block text-[11px] text-[var(--lu-accent)] hover:underline mt-2 font-semibold">플랫폼 연결 관리 →</a>
  </div>
  )}
  {saveError && (
  <p className="text-xs text-red-500 font-medium">{saveError}</p>
  )}
- <button onClick={handleSave} disabled={saving} className={`w-full py-3 rounded-xl font-bold text-sm transition-colors ${saved ? 'bg-green-500 text-white' : saving ? 'bg-[#93C5FD] text-white cursor-not-allowed' : 'bg-[#191F28] text-white hover:bg-[#333D4B]'}`}>
+ <button onClick={handleSave} disabled={saving} className={`w-full py-3 rounded-[6px] font-bold text-sm transition-colors ${saved ? 'bg-green-500 text-white' : saving ? 'bg-[#93C5FD] text-white cursor-not-allowed' : 'bg-[var(--lu-ink)] text-white hover:bg-[#333D4B]'}`}>
  {saving ? '저장 중...' : saved ? '저장됨' : '저장하기'}
  </button>
  </div>
  <div className="flex-1 min-w-0 hidden lg:block space-y-4">
- <div className="bg-white rounded-2xl shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(17,24,39,0.06)] overflow-hidden sticky top-8">
- <div className="px-5 pt-5 pb-4 border-b border-[#F2F4F6] flex items-start justify-between gap-3">
+ <div className="bg-white rounded-[10px] shadow-[0_1px_3px_rgba(0,0,0,0.04),0_8px_24px_rgba(17,24,39,0.06)] overflow-hidden sticky top-8">
+ <div className="px-5 pt-5 pb-4 border-b border-[var(--lu-canvas)] flex items-start justify-between gap-3">
  <div className="min-w-0">
  <div className="flex items-center gap-2 mb-1">
- <div className="w-6 h-6 rounded-md bg-[#03C75A] flex items-center justify-center text-white text-[10px] font-black">N</div>
- <p className="font-bold text-[#191F28] text-base">우리 매장 위치</p>
+ <div className="w-6 h-6 rounded-md bg-[#03C75A] flex items-center justify-center text-white text-[10px] font-semibold">N</div>
+ <p className="font-bold text-[var(--lu-ink)] text-base">우리 매장 위치</p>
  </div>
- <p className="text-xs text-[#8B95A1] truncate">{form.address || '주소를 입력하면 지도가 표시됩니다'}</p>
+ <p className="text-xs text-[var(--lu-muted)] truncate">{form.address || '주소를 입력하면 지도가 표시됩니다'}</p>
  </div>
  {form.address && (
  <a href={`https://map.naver.com/v5/search/${encodeURIComponent(form.address)}`} target="_blank" rel="noopener noreferrer" className="flex-shrink-0 px-3 py-1.5 rounded-lg bg-[#03C75A] text-white text-[11px] font-bold hover:bg-[#02A84A] transition-colors whitespace-nowrap">
@@ -611,10 +611,10 @@ function StoreTab() {
  </div>
  <SmartMapBox address={mapAddress} />
  </div>
- <div className="bg-[#FFFBEB] rounded-2xl p-4 border border-[#FDE68A]">
+ <div className="bg-[#FFFBEB] rounded-[10px] p-4 border border-[#FDE68A]">
  <p className="text-xs font-bold text-[#92400E] mb-2">지도 API 키 설정 (Kakao 추천)</p>
  <p className="text-[11px] text-[#78350F] leading-relaxed mb-2">둘 중 하나만 설정해도 지도가 표시됩니다. Kakao 가 발급·사용이 더 간단합니다:</p>
- <div className="bg-white rounded-lg p-2 font-mono text-[10px] text-[#4E5968] space-y-1">
+ <div className="bg-white rounded-lg p-2 font-mono text-[10px] text-[var(--lu-muted)] space-y-1">
  <p className="text-[#FF6B00] font-bold"># 카카오 지도 (우선·추천)</p>
  <p>NEXT_PUBLIC_KAKAO_MAP_KEY=JavaScript_키</p>
  <p className="text-[#9CA3AF]"># Kakao Developers Web 플랫폼 도메인 등록 필요</p>
@@ -678,7 +678,7 @@ function NotifyTestButton() {
  }
 
  return (
- <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-2xl p-5">
+ <div className="bg-[var(--lu-accent-soft)] border border-[#BFDBFE] rounded-[10px] p-5">
  <div className="flex items-center justify-between gap-4 flex-wrap">
  <div className="min-w-0">
  <p className="text-sm font-bold text-[#1E40AF]"> 테스트 알림 받아보기</p>
@@ -688,10 +688,10 @@ function NotifyTestButton() {
  type="button"
  onClick={runTest}
  disabled={busy}
- className={`px-4 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-colors ${
+ className={`px-4 py-2 rounded-[6px] text-xs font-bold whitespace-nowrap transition-colors ${
  busy
  ? 'bg-[#94A3B8] text-white cursor-wait'
- : 'bg-[#3182F6] text-white hover:bg-[#1E40AF] active:scale-95'
+ : 'bg-[var(--lu-accent)] text-white hover:bg-[#1E40AF] active:scale-95'
  }`}
  >
  {busy ? '발송 중…' : '테스트 발송'}
@@ -876,33 +876,33 @@ function NotifyTab() {
  }
 
  if (loading) {
- return <div className="max-w-xl py-8 text-center text-sm text-[#8B95A1]">불러오는 중…</div>
+ return <div className="max-w-xl py-8 text-center text-sm text-[var(--lu-muted)]">불러오는 중…</div>
  }
 
  return (
  <div className="max-w-xl space-y-6">
  {/* 알림 받을 항목 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
- <h3 className="font-bold text-[#191F28] mb-4">알림 받을 항목</h3>
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
+ <h3 className="font-bold text-[var(--lu-ink)] mb-4">알림 받을 항목</h3>
  <div className="space-y-4">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium text-[#191F28]">새 리뷰 알림</p>
- <p className="text-xs text-[#8B95A1] mt-0.5">새 리뷰가 등록되면 15분 이내 알려드려요</p>
+ <p className="text-sm font-medium text-[var(--lu-ink)]">새 리뷰 알림</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">새 리뷰가 등록되면 15분 이내 알려드려요</p>
  </div>
  <Toggle checked={prefs.review_alerts_enabled} onChange={v => update('review_alerts_enabled', v)} />
  </div>
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium text-[#191F28]">신규 고객 알림</p>
- <p className="text-xs text-[#8B95A1] mt-0.5">새 고객이 등록되면 알려드려요</p>
+ <p className="text-sm font-medium text-[var(--lu-ink)]">신규 고객 알림</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">새 고객이 등록되면 알려드려요</p>
  </div>
  <Toggle checked={prefs.customer_alerts_enabled} onChange={v => update('customer_alerts_enabled', v)} />
  </div>
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium text-[#191F28]">주간 리포트 알림</p>
- <p className="text-xs text-[#8B95A1] mt-0.5">매주 월요일 성과 리포트를 발송해요</p>
+ <p className="text-sm font-medium text-[var(--lu-ink)]">주간 리포트 알림</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">매주 월요일 성과 리포트를 발송해요</p>
  </div>
  <Toggle checked={prefs.report_alerts_enabled} onChange={v => update('report_alerts_enabled', v)} />
  </div>
@@ -910,7 +910,7 @@ function NotifyTab() {
  </div>
 
  {/* 낮은 별점 강제 알림 */}
- <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-2xl p-5">
+ <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-[10px] p-5">
  <div className="flex items-center justify-between mb-3">
  <div>
  <p className="text-sm font-bold text-[#92400E]">낮은 별점 강제 알림</p>
@@ -957,25 +957,25 @@ function NotifyTab() {
  </div>
 
  {/* 알림 채널 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
- <h3 className="font-bold text-[#191F28] mb-1">알림 받을 방식</h3>
- <p className="text-xs text-[#8B95A1] mb-5">여러 개를 켜면 모든 채널로 발송돼요</p>
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
+ <h3 className="font-bold text-[var(--lu-ink)] mb-1">알림 받을 방식</h3>
+ <p className="text-xs text-[var(--lu-muted)] mb-5">여러 개를 켜면 모든 채널로 발송돼요</p>
 
  {/* Web Push */}
- <div className="border-2 border-[#E5E8EB] rounded-xl p-4 mb-3">
+ <div className="border-2 border-[var(--lu-line)] rounded-[6px] p-4 mb-3">
  <div className="flex items-center justify-between mb-2 gap-2">
  <div className="min-w-0">
- <p className="text-sm font-bold text-[#191F28]">로컬루션 브라우저 알림</p>
- <p className="text-xs text-[#8B95A1] mt-0.5">브라우저가 닫혀있어도 알림 받음 (PC/모바일 다)</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)]">로컬루션 브라우저 알림</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">브라우저가 닫혀있어도 알림 받음 (PC/모바일 다)</p>
  </div>
  {pushPermission === 'unsupported' ? (
- <span className="text-[11px] text-[#8B95A1]">미지원</span>
+ <span className="text-[11px] text-[var(--lu-muted)]">미지원</span>
  ) : prefs.has_web_push_sub && prefs.channel_web_push ? (
  <button
  type="button"
  onClick={disableWebPush}
  disabled={pushBusy}
- className="px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-[#3182F6] bg-[#EFF6FF] text-[#3182F6] active:scale-95"
+ className="min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-[var(--lu-accent)] bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] active:scale-95"
  >켜짐</button>
  ) : (
  <button
@@ -985,7 +985,7 @@ function NotifyTab() {
  className={`px-3 py-1.5 rounded-lg text-xs font-bold border-2 active:scale-95 ${
  pushBusy
  ? 'border-[#94A3B8] bg-[#F1F5F9] text-[#64748B] cursor-wait'
- : 'border-[#3182F6] bg-[#3182F6] text-white hover:bg-[#1E40AF]'
+ : 'border-[var(--lu-accent)] bg-[var(--lu-accent)] text-white hover:bg-[#1E40AF]'
  }`}
  >{pushBusy ? '설정 중…' : '켜기'}</button>
  )}
@@ -1001,31 +1001,31 @@ function NotifyTab() {
  </div>
 
  {/* 카카오톡 */}
- <div className="border-2 border-[#E5E8EB] rounded-xl p-4 mb-3">
+ <div className="border-2 border-[var(--lu-line)] rounded-[6px] p-4 mb-3">
  <div className="flex items-center justify-between mb-2">
  <div>
- <p className="text-sm font-bold text-[#191F28]">카카오톡 알림</p>
- <p className="text-xs text-[#8B95A1] mt-0.5">본인 카카오톡으로 메시지 발송 (무료)</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)]">카카오톡 알림</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">본인 카카오톡으로 메시지 발송 (무료)</p>
  </div>
  {kakaoConnected && prefs.channel_kakao_talk ? (
  <button
  onClick={() => update('channel_kakao_talk', false)}
- className="px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-[#FEE500] bg-[#FFFBEB] text-[#92400E]"
+ className="min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-[#FEE500] bg-[#FFFBEB] text-[#92400E]"
  >켜짐</button>
  ) : kakaoConnected ? (
  <button
  onClick={() => update('channel_kakao_talk', true)}
- className="px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-[#E5E8EB] text-[#8B95A1] hover:border-[#FEE500] hover:text-[#92400E]"
+ className="min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[#FEE500] hover:text-[#92400E]"
  >켜기</button>
  ) : (
  <button
  onClick={startKakaoConnect}
- className="px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-[#FEE500] bg-[#FEE500] text-[#3B1E1E] hover:brightness-95"
+ className="min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold border-2 border-[#FEE500] bg-[#FEE500] text-[#3B1E1E] hover:brightness-95"
  >카카오 연결</button>
  )}
  </div>
  {kakaoConnected === false && (
- <p className="text-[11px] text-[#8B95A1] mt-1">카카오 로그인 + 알림 동의 1회만 하면 됩니다 (무료)</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mt-1">카카오 로그인 + 알림 동의 1회만 하면 됩니다 (무료)</p>
  )}
  {kakaoConnected && (
  <p className="text-[11px] text-[#059669] mt-1 inline-flex items-center gap-1"><Check size={12} strokeWidth={3} />카카오 연결됨 · 알림 받을 준비 완료</p>
@@ -1033,11 +1033,11 @@ function NotifyTab() {
  </div>
 
  {/* 이메일 */}
- <div className="border-2 border-[#E5E8EB] rounded-xl p-4">
+ <div className="border-2 border-[var(--lu-line)] rounded-[6px] p-4">
  <div className="flex items-center justify-between">
  <div>
- <p className="text-sm font-bold text-[#191F28]"> 이메일 알림</p>
- <p className="text-xs text-[#8B95A1] mt-0.5">가입 이메일로 발송</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)]"> 이메일 알림</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">가입 이메일로 발송</p>
  </div>
  <Toggle checked={prefs.channel_email} onChange={v => update('channel_email', v)} />
  </div>
@@ -1047,7 +1047,7 @@ function NotifyTab() {
  {/* 테스트 발송 */}
  <NotifyTestButton />
 
- {saving && <p className="text-[11px] text-[#8B95A1] text-center">저장 중…</p>}
+ {saving && <p className="text-[11px] text-[var(--lu-muted)] text-center">저장 중…</p>}
  </div>
  )
 }
@@ -1135,25 +1135,25 @@ function AITab() {
  return (
  <div className="max-w-2xl space-y-5">
  {/* 업종 + 매장 소개 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
- <h3 className="font-bold text-[#191F28] mb-4">매장 기본 설정</h3>
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
+ <h3 className="font-bold text-[var(--lu-ink)] mb-4">매장 기본 설정</h3>
  <div className="mb-4">
  <div className="flex items-center justify-between mb-2">
- <label className="block text-xs font-semibold text-[#4E5968]">
+ <label className="block text-xs font-semibold text-[var(--lu-muted)]">
  업종 선택
  {bizType && (
- <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#3182F6] text-[11px] font-bold">
- <span className="inline-block w-1.5 h-1.5 rounded-full bg-[#3182F6] mr-1.5 align-middle" />{bizType}
+ <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] text-[11px] font-bold">
+ <span className="inline-block w-1.5 h-1.5 rounded-full bg-[var(--lu-accent)] mr-1.5 align-middle" />{bizType}
  <button
  type="button"
  onClick={() => setBizType('')}
- className="ml-1 hover:text-[#1B64DA]"
+ className="min-h-11 ml-1 hover:text-[var(--lu-accent-hover)]"
  aria-label="선택 해제"
  >×</button>
  </span>
  )}
  </label>
- <span className="text-[10px] text-[#8B95A1]">총 {INDUSTRY_LABELS.length}개 업종</span>
+ <span className="text-[10px] text-[var(--lu-muted)]">총 {INDUSTRY_LABELS.length}개 업종</span>
  </div>
 
  {/* 대분류 탭 */}
@@ -1164,7 +1164,7 @@ function AITab() {
  type="button"
  onClick={() => { setIndustryGroup(g.id); setIndustrySearch('') }}
  title={g.desc}
- className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${industryGroup === g.id ? 'border-[#3182F6] bg-[#3182F6] text-white' : 'border-[#E5E8EB] text-[#4E5968] hover:border-[#3182F6] hover:text-[#3182F6]'}`}
+ className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${industryGroup === g.id ? 'border-[var(--lu-accent)] bg-[var(--lu-accent)] text-white' : 'border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[var(--lu-accent)] hover:text-[var(--lu-accent)]'}`}
  >
  <span className="mr-1">{g.emoji}</span>{g.label}
  </button>
@@ -1179,7 +1179,7 @@ function AITab() {
  key={item}
  type="button"
  onClick={() => setBizType(item)}
- className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${bizType === item ? 'border-[#3182F6] bg-[#EFF6FF] text-[#3182F6]' : 'border-[#E5E8EB] text-[#4E5968] hover:border-[#BFDBFE]'}`}
+ className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${bizType === item ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)] text-[var(--lu-accent)]' : 'border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[#BFDBFE]'}`}
  >
  {item}
  </button>
@@ -1195,13 +1195,13 @@ function AITab() {
  value={industrySearch}
  onChange={e => setIndustrySearch(e.target.value)}
  placeholder="업종 직접 검색 (예: 치과, 필라테스, 인테리어)"
- className="w-full border border-[#E5E8EB] rounded-lg px-3 py-2 pr-8 text-xs focus:outline-none focus:border-[#3182F6] transition-colors"
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-lg px-3 py-2 pr-8 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors"
  />
  {industrySearch && (
  <button
  type="button"
  onClick={() => setIndustrySearch('')}
- className="absolute right-2 top-1/2 -translate-y-1/2 text-[#8B95A1] hover:text-[#4E5968]"
+ className="min-h-11 absolute right-2 top-1/2 -translate-y-1/2 text-[var(--lu-muted)] hover:text-[var(--lu-muted)]"
  aria-label="검색 초기화"
  >×</button>
  )}
@@ -1222,32 +1222,32 @@ function AITab() {
  if (grp) setIndustryGroup(grp.id)
  setIndustrySearch('')
  }}
- className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${bizType === l ? 'border-[#3182F6] bg-[#EFF6FF] text-[#3182F6]' : 'border-[#E5E8EB] text-[#4E5968] hover:border-[#BFDBFE]'}`}
+ className={`px-2.5 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${bizType === l ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)] text-[var(--lu-accent)]' : 'border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[#BFDBFE]'}`}
  >
  {grp?.emoji} {l}
  </button>
  )
  })}
  {INDUSTRY_LABELS.filter(l => l.toLowerCase().includes(industrySearch.toLowerCase())).length === 0 && (
- <span className="text-[11px] text-[#8B95A1] py-1">검색 결과 없음 · 아래 매장 소개에 자유롭게 입력하세요</span>
+ <span className="text-[11px] text-[var(--lu-muted)] py-1">검색 결과 없음 · 아래 매장 소개에 자유롭게 입력하세요</span>
  )}
  </div>
  )}
  </div>
  </div>
  <div>
- <label htmlFor="store-desc" className="block text-xs font-semibold text-[#4E5968] mb-1.5">매장 소개 (AI 참고용)</label>
+ <label htmlFor="store-desc" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">매장 소개 (AI 참고용)</label>
  <textarea id="store-desc" value={storeDesc} onChange={e => setStoreDesc(e.target.value)} rows={2}
  placeholder="예: 강남역 10번 출구 도보 2분, 제주 원두 사용 스페셜티 카페. 감성 인테리어와 직접 구운 크로아상이 인기."
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors resize-none" />
- <p className="text-[10px] text-[#8B95A1] mt-1">입력할수록 AI가 매장에 맞는 답변을 생성합니다</p>
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors resize-none" />
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1">입력할수록 AI가 매장에 맞는 답변을 생성합니다</p>
  </div>
  </div>
 
  {/* 톤 + 길이 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
  <div className="mb-5">
- <h3 className="font-bold text-[#191F28] mb-3">답변 톤</h3>
+ <h3 className="font-bold text-[var(--lu-ink)] mb-3">답변 톤</h3>
  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
  {[
  { v:'warm', label:'따뜻하게', desc:'다정하고 부드러운 어투' },
@@ -1258,15 +1258,15 @@ function AITab() {
  { v:'energetic', label:'활발하게', desc:'밝고 에너지 넘치는 어투' },
  ].map(opt => (
  <button key={opt.v} onClick={() => setTone(opt.v)}
- className={`p-3 rounded-xl border-2 text-center transition-colors ${tone === opt.v ? 'border-[#3182F6] bg-[#EFF6FF]' : 'border-[#E5E8EB] hover:border-[#BFDBFE]'}`}>
- <div className="text-sm font-bold text-[#191F28]">{opt.label}</div>
- <div className="text-[10px] text-[#8B95A1] mt-0.5">{opt.desc}</div>
+ className={`p-3 rounded-[6px] border-2 text-center transition-colors ${tone === opt.v ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)]' : 'border-[var(--lu-line)] hover:border-[#BFDBFE]'}`}>
+ <div className="text-sm font-bold text-[var(--lu-ink)]">{opt.label}</div>
+ <div className="text-[10px] text-[var(--lu-muted)] mt-0.5">{opt.desc}</div>
  </button>
  ))}
  </div>
  </div>
  <div>
- <h3 className="font-bold text-[#191F28] mb-3">답변 길이</h3>
+ <h3 className="font-bold text-[var(--lu-ink)] mb-3">답변 길이</h3>
  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
  {[
  { v:'short', label:'짧게', desc:'150자\u00B1' },
@@ -1274,19 +1274,19 @@ function AITab() {
  { v:'long', label:'길게', desc:'400자\u00B1' },
  ].map(opt => (
  <button key={opt.v} onClick={() => setLength(opt.v)}
- className={`p-3 rounded-xl border-2 text-center transition-colors ${length === opt.v ? 'border-[#3182F6] bg-[#EFF6FF]' : 'border-[#E5E8EB] hover:border-[#BFDBFE]'}`}>
- <div className="text-sm font-bold text-[#191F28]">{opt.label}</div>
- <div className="text-[10px] text-[#8B95A1] mt-0.5">{opt.desc}</div>
+ className={`p-3 rounded-[6px] border-2 text-center transition-colors ${length === opt.v ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)]' : 'border-[var(--lu-line)] hover:border-[#BFDBFE]'}`}>
+ <div className="text-sm font-bold text-[var(--lu-ink)]">{opt.label}</div>
+ <div className="text-[10px] text-[var(--lu-muted)] mt-0.5">{opt.desc}</div>
  </button>
  ))}
  </div>
  </div>
  </div>
  {/* 성별 · 나이 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
  <div className="mb-5">
- <h3 className="font-bold text-[#191F28] mb-3">화자 성별</h3>
- <p className="text-xs text-[#8B95A1] mb-3">답변의 말투 느낌을 설정합니다</p>
+ <h3 className="font-bold text-[var(--lu-ink)] mb-3">화자 성별</h3>
+ <p className="text-xs text-[var(--lu-muted)] mb-3">답변의 말투 느낌을 설정합니다</p>
  <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
  {[
  { v:'none', label:'미설정', desc:'기본' },
@@ -1295,16 +1295,16 @@ function AITab() {
  { v:'neutral', label:'중성', desc:'성별 무관' },
  ].map(opt => (
  <button key={opt.v} onClick={() => setGender(opt.v)}
- className={`p-3 rounded-xl border-2 text-center transition-colors ${gender === opt.v ? 'border-[#3182F6] bg-[#EFF6FF]' : 'border-[#E5E8EB] hover:border-[#BFDBFE]'}`}>
- <div className="text-sm font-bold text-[#191F28]">{opt.label}</div>
- <div className="text-[10px] text-[#8B95A1] mt-0.5">{opt.desc}</div>
+ className={`p-3 rounded-[6px] border-2 text-center transition-colors ${gender === opt.v ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)]' : 'border-[var(--lu-line)] hover:border-[#BFDBFE]'}`}>
+ <div className="text-sm font-bold text-[var(--lu-ink)]">{opt.label}</div>
+ <div className="text-[10px] text-[var(--lu-muted)] mt-0.5">{opt.desc}</div>
  </button>
  ))}
  </div>
  </div>
  <div>
- <h3 className="font-bold text-[#191F28] mb-3">화자 연령대</h3>
- <p className="text-xs text-[#8B95A1] mb-3">답변 어투의 연령대 느낌을 설정합니다</p>
+ <h3 className="font-bold text-[var(--lu-ink)] mb-3">화자 연령대</h3>
+ <p className="text-xs text-[var(--lu-muted)] mb-3">답변 어투의 연령대 느낌을 설정합니다</p>
  <div className="grid grid-cols-1 md:grid-cols-5 gap-3">
  {[
  { v:'none', label:'미설정', desc:'기본' },
@@ -1314,9 +1314,9 @@ function AITab() {
  { v:'50s', label:'50대+', desc:'노련한' },
  ].map(opt => (
  <button key={opt.v} onClick={() => setAge(opt.v)}
- className={`p-3 rounded-xl border-2 text-center transition-colors ${age === opt.v ? 'border-[#3182F6] bg-[#EFF6FF]' : 'border-[#E5E8EB] hover:border-[#BFDBFE]'}`}>
- <div className="text-sm font-bold text-[#191F28]">{opt.label}</div>
- <div className="text-[10px] text-[#8B95A1] mt-0.5">{opt.desc}</div>
+ className={`p-3 rounded-[6px] border-2 text-center transition-colors ${age === opt.v ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)]' : 'border-[var(--lu-line)] hover:border-[#BFDBFE]'}`}>
+ <div className="text-sm font-bold text-[var(--lu-ink)]">{opt.label}</div>
+ <div className="text-[10px] text-[var(--lu-muted)] mt-0.5">{opt.desc}</div>
  </button>
  ))}
  </div>
@@ -1324,8 +1324,8 @@ function AITab() {
  </div>
 
  {/* 포함 요소 체크리스트 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
- <h3 className="font-bold text-[#191F28] mb-4">답변에 포함할 요소</h3>
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
+ <h3 className="font-bold text-[var(--lu-ink)] mb-4">답변에 포함할 요소</h3>
  <div className="space-y-3">
  {([
  { k:'thanks', label:'방문 감사 인사', desc:'항상 감사 인사로 시작' },
@@ -1337,8 +1337,8 @@ function AITab() {
  ] as { k: keyof typeof includes; label: string; desc: string }[]).map(item => (
  <div key={item.k} className="flex items-center justify-between">
  <div>
- <p className="text-sm font-medium text-[#191F28]">{item.label}</p>
- <p className="text-xs text-[#8B95A1]">{item.desc}</p>
+ <p className="text-sm font-medium text-[var(--lu-ink)]">{item.label}</p>
+ <p className="text-xs text-[var(--lu-muted)]">{item.desc}</p>
  </div>
  <Toggle checked={includes[item.k]} onChange={v => setIncludes(p => ({ ...p, [item.k]: v }))} />
  </div>
@@ -1347,68 +1347,68 @@ function AITab() {
  </div>
 
  {/* 고정 문구 + 제외 표현 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm space-y-4">
+ <div className="bg-white rounded-[10px] p-6 shadow-none space-y-4">
  <div>
- <label htmlFor="closing" className="block text-xs font-semibold text-[#4E5968] mb-1.5">고정 마무리 문구</label>
+ <label htmlFor="closing" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">고정 마무리 문구</label>
  <input id="closing" value={closing} onChange={e => setClosing(e.target.value)}
  placeholder="예: 오늘도 행복한 하루 되세요 "
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
- <p className="text-[10px] text-[#8B95A1] mt-1">모든 답변 마지막에 고정으로 들어갈 문구</p>
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1">모든 답변 마지막에 고정으로 들어갈 문구</p>
  </div>
  <div>
- <label htmlFor="excludes" className="block text-xs font-semibold text-[#4E5968] mb-1.5">사용 금지 표현</label>
+ <label htmlFor="excludes" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">사용 금지 표현</label>
  <input id="excludes" value={excludes} onChange={e => setExcludes(e.target.value)}
  placeholder="예: 죄송, 유감, 어떠셨나요"
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
- <p className="text-[10px] text-[#8B95A1] mt-1">쉼표로 구분 · AI가 절대 사용하지 않을 표현</p>
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1">쉼표로 구분 · AI가 절대 사용하지 않을 표현</p>
  </div>
  </div>
 
  {/* 자동 답변 ON/OFF */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
  <div className="flex items-center justify-between">
  <div>
- <p className="font-bold text-[#191F28]">자동 답변 활성화</p>
- <p className="text-xs text-[#8B95A1] mt-0.5">새 리뷰가 등록되면 AI가 즉시 자동 답변</p>
+ <p className="font-bold text-[var(--lu-ink)]">자동 답변 활성화</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">새 리뷰가 등록되면 AI가 즉시 자동 답변</p>
  </div>
  <Toggle checked={autoReply} onChange={setAutoReply} />
  </div>
  {autoReply && (
- <div className="mt-4 p-3 bg-blue-50 rounded-xl text-xs text-[#3182F6] font-medium">
+ <div className="mt-4 p-3 bg-blue-50 rounded-[6px] text-xs text-[var(--lu-accent)] font-medium">
  자동 답변 ON · 연동된 플랫폼에 리뷰가 등록되면 즉시 답변이 달립니다
  </div>
  )}
  </div>
 
  {/* AI 프롬프트 미리보기 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
  <button onClick={() => setShowPrompt(v => !v)}
- className="w-full flex items-center justify-between text-sm font-bold text-[#191F28]">
+ className="min-h-11 w-full flex items-center justify-between text-sm font-bold text-[var(--lu-ink)]">
  <span> AI 시스템 프롬프트 미리보기</span>
- <span className="text-[#8B95A1] font-normal text-xs">{showPrompt ? '접기' : '펼치기'}</span>
+ <span className="text-[var(--lu-muted)] font-normal text-xs">{showPrompt ? '접기' : '펼치기'}</span>
  </button>
  {showPrompt && (
- <pre className="mt-4 p-4 bg-[#F8F9FA] rounded-xl text-[11px] text-[#4E5968] whitespace-pre-wrap leading-relaxed font-mono overflow-x-auto">
+ <pre className="mt-4 p-4 bg-[var(--lu-canvas)] rounded-[6px] text-[11px] text-[var(--lu-muted)] whitespace-pre-wrap leading-relaxed font-mono overflow-x-auto">
  {prompt}
  </pre>
  )}
  </div>
 
  {/* 테스트 답변 생성 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
- <h3 className="font-bold text-[#191F28] mb-1">테스트 답변 생성</h3>
- <p className="text-xs text-[#8B95A1] mb-4">실제 리뷰를 입력하면 AI 답변을 미리 확인할 수 있어요</p>
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
+ <h3 className="font-bold text-[var(--lu-ink)] mb-1">테스트 답변 생성</h3>
+ <p className="text-xs text-[var(--lu-muted)] mb-4">실제 리뷰를 입력하면 AI 답변을 미리 확인할 수 있어요</p>
  <textarea value={testReview} onChange={e => setTestReview(e.target.value)} rows={3}
  placeholder="예: 커피가 정말 맛있었어요! 인테리어도 너무 예쁘고 직원분들도 친절하셨어요. 다음에 또 올게요~"
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors resize-none mb-3" />
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors resize-none mb-3" />
  <button onClick={handleTest} disabled={testing || !testReview.trim()}
- className={`w-full py-2.5 rounded-xl text-sm font-bold transition-colors ${testing || !testReview.trim() ? 'bg-[#F2F4F6] text-[#8B95A1] cursor-not-allowed' : 'bg-[#3182F6] text-white hover:bg-[#1B64DA]'}`}>
+ className={`w-full py-2.5 rounded-[6px] text-sm font-bold transition-colors ${testing || !testReview.trim() ? 'bg-[var(--lu-canvas)] text-[var(--lu-muted)] cursor-not-allowed' : 'bg-[var(--lu-accent)] text-white hover:bg-[var(--lu-accent-hover)]'}`}>
  {testing ? '생성 중...' : '답변 생성하기'}
  </button>
  {testResult && (
- <div className="mt-4 p-4 bg-[#EFF6FF] rounded-xl border border-[#BFDBFE]">
- <p className="text-[10px] font-bold text-[#3182F6] mb-2">AI 생성 답변</p>
- <p className="text-sm text-[#191F28] leading-relaxed whitespace-pre-wrap">{testResult}</p>
+ <div className="mt-4 p-4 bg-[var(--lu-accent-soft)] rounded-[6px] border border-[#BFDBFE]">
+ <p className="text-[10px] font-bold text-[var(--lu-accent)] mb-2">AI 생성 답변</p>
+ <p className="text-sm text-[var(--lu-ink)] leading-relaxed whitespace-pre-wrap">{testResult}</p>
  </div>
  )}
  </div>
@@ -1431,12 +1431,12 @@ function PlatformAutoReplyPanel() {
  const current = platforms.find(p => p.key === selected)!
 
  return (
- <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB] space-y-4">
+ <div className="bg-white rounded-[10px] p-4 md:p-5 border border-[var(--lu-line)] space-y-4">
  <div className="flex items-center gap-2">
- <h2 className="font-bold text-[#191F28] text-base md:text-lg">플랫폼별 AI 자동답글</h2>
- <span className="text-[10px] px-1.5 py-0.5 bg-[#EFF6FF] text-[#3182F6] font-bold rounded-full">NEW</span>
+ <h2 className="font-bold text-[var(--lu-ink)] text-base md:text-lg">플랫폼별 AI 자동답글</h2>
+ <span className="text-[10px] px-1.5 py-0.5 bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] font-bold rounded-full">NEW</span>
  </div>
- <p className="text-xs text-[#8B95A1] -mt-2">
+ <p className="text-xs text-[var(--lu-muted)] -mt-2">
  4시간마다 미답변 리뷰에 AI 초안 자동 생성. auto_approve 켜면 즉시 발행.
  </p>
 
@@ -1447,8 +1447,8 @@ function PlatformAutoReplyPanel() {
  onClick={() => setSelected(p.key)}
  className={`px-3 py-1.5 rounded-lg text-xs md:text-sm font-medium whitespace-nowrap transition flex-shrink-0 ${
  selected === p.key
- ? 'bg-[#3182F6] text-white'
- : 'bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'
+ ? 'bg-[var(--lu-accent)] text-white'
+ : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)] hover:bg-[var(--lu-line)]'
  }`}
  >
  {p.label}
@@ -1606,14 +1606,14 @@ function ConnectTab() {
  return (
  <div className="space-y-5">
  {/* 헤더 + 카운터 */}
- <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB]">
+ <div className="bg-white rounded-[10px] p-4 md:p-5 border border-[var(--lu-line)]">
  <div className="flex items-center justify-between gap-3 mb-1">
- <h2 className="font-bold text-[#191F28]">플랫폼 연동 관리</h2>
- <span className="text-xs font-bold text-[#3182F6] bg-[#EFF6FF] px-2.5 py-1 rounded-full whitespace-nowrap">
+ <h2 className="font-bold text-[var(--lu-ink)]">플랫폼 연동 관리</h2>
+ <span className="text-xs font-bold text-[var(--lu-accent)] bg-[var(--lu-accent-soft)] px-2.5 py-1 rounded-full whitespace-nowrap">
  {effectiveCount} / {PLATFORMS_8.length} 연결됨
  </span>
  </div>
- <p className="text-xs text-[#8B95A1]">리뷰·주문·매출 데이터를 한 곳에서 관리해요. 네이버/카카오맵/배민/요기요/쿠팡이츠는 <a href="/my/platforms" className="text-[#3182F6] font-bold hover:underline">플랫폼 연결 관리</a>에서 아이디·비번 저장. 연동 상태는 /dashboard · /review-admin · /qr-admin 과 자동 동기화됩니다.</p>
+ <p className="text-xs text-[var(--lu-muted)]">리뷰·주문·매출 데이터를 한 곳에서 관리해요. 네이버/카카오맵/배민/요기요/쿠팡이츠는 <a href="/my/platforms" className="text-[var(--lu-accent)] font-bold hover:underline">플랫폼 연결 관리</a>에서 아이디·비번 저장. 연동 상태는 /dashboard · /review-admin · /qr-admin 과 자동 동기화됩니다.</p>
  </div>
 
  {/* 카드 그리드 — review-admin 과 동일한 스타일 */}
@@ -1623,15 +1623,15 @@ function ConnectTab() {
  const sv = serverConnected[p.key]
  const connected = effectiveConnected(p.key)
  return (
- <div key={p.key} className="bg-white rounded-2xl border border-[#E5E8EB] p-4 md:p-5 flex flex-col">
+ <div key={p.key} className="bg-white rounded-[10px] border border-[var(--lu-line)] p-4 md:p-5 flex flex-col">
  <div className="flex items-center gap-2.5 mb-3">
  <div className="flex-shrink-0">{p.logo}</div>
  <div className="min-w-0 flex-1">
- <p className="text-sm font-bold text-[#191F28] truncate">{p.label}</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)] truncate">{p.label}</p>
  {connected ? (
  <p className="text-[10px] text-[#10B981] font-semibold">● 연결됨</p>
  ) : (
- <p className="text-[10px] text-[#8B95A1] font-medium">미연결</p>
+ <p className="text-[10px] text-[var(--lu-muted)] font-medium">미연결</p>
  )}
  </div>
  </div>
@@ -1639,28 +1639,28 @@ function ConnectTab() {
  {connected ? (
  <>
  <div className="bg-[#F9FAFB] rounded-lg px-2.5 py-2 mb-2.5 min-h-[44px]">
- <p className="text-[11px] text-[#8B95A1] mb-0.5">{sv?.connected ? '서버 저장' : '연결된 계정'}</p>
- <p className="text-xs font-semibold text-[#191F28] truncate">{sv?.storeName || c?.externalName || '-'}</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mb-0.5">{sv?.connected ? '서버 저장' : '연결된 계정'}</p>
+ <p className="text-xs font-semibold text-[var(--lu-ink)] truncate">{sv?.storeName || c?.externalName || '-'}</p>
  {sv?.accountMasked && (
- <p className="text-[10px] text-[#8B95A1] truncate mt-0.5">ID: {sv.accountMasked}</p>
+ <p className="text-[10px] text-[var(--lu-muted)] truncate mt-0.5">ID: {sv.accountMasked}</p>
  )}
  </div>
  <button
  onClick={() => handleConnect(p.key, p.label)}
- className="w-full bg-[#F2F4F6] hover:bg-[#E5E8EB] text-[#4E5968] text-xs font-bold py-2 rounded-lg transition"
+ className="min-h-11 w-full bg-[var(--lu-canvas)] hover:bg-[var(--lu-line)] text-[var(--lu-muted)] text-xs font-bold py-2 rounded-lg transition"
  >
  연동 해제
  </button>
  </>
  ) : (
  <>
- <p className="text-[11px] text-[#8B95A1] mb-2.5 min-h-[44px]">
- <span className="inline-block text-[10px] px-1.5 py-0.5 rounded-full bg-[#F2F4F6] text-[#8B95A1] font-medium mr-1">{p.cat}</span>
+ <p className="text-[11px] text-[var(--lu-muted)] mb-2.5 min-h-[44px]">
+ <span className="inline-block text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--lu-canvas)] text-[var(--lu-muted)] font-medium mr-1">{p.cat}</span>
  {p.desc}
  </p>
  <button
  onClick={() => handleConnect(p.key, p.label)}
- className="w-full text-xs font-bold py-2 rounded-lg text-white transition"
+ className="min-h-11 w-full text-xs font-bold py-2 rounded-lg text-white transition"
  style={{ background: p.color }}
  >
  + 연결하기
@@ -1672,8 +1672,8 @@ function ConnectTab() {
  })}
  </div>
 
- <div className="text-[11px] text-[#8B95A1] px-1 space-y-1">
- <p>* 네이버/배민/요기요/쿠팡이츠는 <a href="/my/platforms" className="text-[#3182F6] hover:underline font-semibold">플랫폼 연결 관리</a>에서 아이디·비번이 AES-256 암호화되어 서버에 저장됩니다.</p>
+ <div className="text-[11px] text-[var(--lu-muted)] px-1 space-y-1">
+ <p>* 네이버/배민/요기요/쿠팡이츠는 <a href="/my/platforms" className="text-[var(--lu-accent)] hover:underline font-semibold">플랫폼 연결 관리</a>에서 아이디·비번이 AES-256 암호화되어 서버에 저장됩니다.</p>
  <p>* 구글/카카오는 이 기기의 브라우저에만 저장되며, /dashboard · /review-admin 에서 즉시 반영됩니다.</p>
  </div>
 
@@ -1691,17 +1691,17 @@ function ShowcaseCarousel({ items }: { items: Array<{ metric: string; label: str
  return (
  <div>
  <div style={{ opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(8px)', transition: 'opacity 0.38s ease, transform 0.38s ease' }}>
- <div className={`bg-gradient-to-br ${s.grad} rounded-xl p-4 text-white mb-3`}>
- <p className="text-3xl font-black mb-0.5">{s.metric}</p>
+ <div className={`bg-[var(--lu-accent)] rounded-[6px] p-4 text-white mb-3`}>
+ <p className="text-3xl font-semibold mb-0.5">{s.metric}</p>
  <p className="text-sm opacity-80">{s.label}</p>
  </div>
- <p className="text-[10px] px-2 py-0.5 rounded-full bg-[#EFF6FF] text-[#3182F6] font-semibold inline-block mb-1">{s.feature}</p>
- <p className="text-xs font-semibold text-[#191F28] mb-1">{s.who}</p>
- <p className="text-xs text-[#8B95A1]">{s.story}</p>
+ <p className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] font-semibold inline-block mb-1">{s.feature}</p>
+ <p className="text-xs font-semibold text-[var(--lu-ink)] mb-1">{s.who}</p>
+ <p className="text-xs text-[var(--lu-muted)]">{s.story}</p>
  </div>
  <div className="flex justify-center gap-1.5 mt-4">
  {items.map((_, i) => (
- <button key={i} onClick={() => setIdx(i)} className="rounded-full transition-all duration-300" style={{ width: i === idx ? '16px' : '6px', height: '6px', background: i === idx ? '#3182F6' : '#E5E8EB' }} />
+ <button key={i} onClick={() => setIdx(i)} className="min-h-11 rounded-full transition-all duration-300" style={{ width: i === idx ? '16px' : '6px', height: '6px', background: i === idx ? '#16685D' : '#E5E8EB' }} />
  ))}
  </div>
  </div>
@@ -1710,7 +1710,7 @@ function ShowcaseCarousel({ items }: { items: Array<{ metric: string; label: str
 
 function PlanTab() {
  const SHOWCASE = [
- { metric: '98%', label: '리뷰 답변률', feature: 'AI 리뷰 자동 답글', who: '강남구 네일샵', story: 'AI가 매일 쏟아지는 리뷰를 진심 답변으로 처리', grad: 'from-[#3182F6] to-[#1B64DA]' },
+ { metric: '98%', label: '리뷰 답변률', feature: 'AI 리뷰 자동 답글', who: '강남구 네일샵', story: 'AI가 매일 쏟아지는 리뷰를 진심 답변으로 처리', grad: 'from-[var(--lu-accent)] to-[var(--lu-accent-hover)]' },
  { metric: '+47명', label: '월 신규 고객', feature: 'CRM 고객관리', who: '홍대 카페', story: '재방문 유도 메시지로 충성 고객 3배 확보', grad: 'from-[#7C3AED] to-[#5B21B6]' },
  { metric: '+34%', label: '재방문율 상승', feature: '마케팅 성과 리포트', who: '이태원 헤어샵', story: '데이터 분석으로 마케팅 전략 최적화', grad: 'from-[#059669] to-[#047857]' },
  { metric: '1,200회', label: 'QR 월 스캔', feature: 'QR 스탬프 적립', who: '신촌 레스토랑', story: 'QR 쿠폰 하나로 재방문율 2배 달성', grad: 'from-[#DC2626] to-[#B91C1C]' },
@@ -1832,56 +1832,56 @@ function PlanTab() {
  return (
  <div className="flex gap-6 items-start">
  <div className="flex-1 min-w-0 space-y-6">
- <div className="bg-white rounded-2xl p-6 shadow-sm">
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
  <div className="flex items-start justify-between mb-4">
  <div>
  <div className="flex items-center gap-2 flex-wrap">
- <span className="text-lg font-bold text-[#191F28]">베타 무료 플랜</span>
- <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-[#3182F6] font-semibold">임시 요금제</span>
+ <span className="text-lg font-bold text-[var(--lu-ink)]">베타 무료 플랜</span>
+ <span className="text-xs px-2 py-0.5 rounded-full bg-blue-100 text-[var(--lu-accent)] font-semibold">임시 요금제</span>
  {cancelled
  ? <span className="text-xs px-2 py-0.5 rounded-full bg-red-100 text-red-600 font-semibold">해지 예약됨</span>
  : <span className="text-xs px-2 py-0.5 rounded-full bg-green-100 text-green-700 font-semibold">이용 중</span>
  }
  </div>
- <p className="text-[#8B95A1] text-sm mt-1">
- <span className="text-[#191F28] font-bold">월 0원 · 전 기능 무료</span>
+ <p className="text-[var(--lu-muted)] text-sm mt-1">
+ <span className="text-[var(--lu-ink)] font-bold">월 0원 · 전 기능 무료</span>
  <span className="ml-1">(정식 요금제 준비 중)</span>
  </p>
  </div>
  <div className="text-right">
- <p className="text-xs text-[#8B95A1]">다음 결제일</p>
- <p className="text-sm font-semibold text-[#191F28] mt-0.5">-</p>
+ <p className="text-xs text-[var(--lu-muted)]">다음 결제일</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)] mt-0.5">-</p>
  <p className="text-[10px] text-[#B0B8C1] mt-0.5">베타 기간 무료</p>
  </div>
  </div>
  {cancelled && (
- <div className="bg-red-50 rounded-xl p-4 mb-4 text-sm">
+ <div className="bg-red-50 rounded-[6px] p-4 mb-4 text-sm">
  <p className="font-semibold text-red-700 mb-1">해지가 예약되었습니다</p>
  <p className="text-red-600 text-xs">베타 기간 종료 후 자동 종료 · 해지 후 7일 재가입 제한</p>
  </div>
  )}
- <div className="bg-blue-50 rounded-xl p-3 mb-4 text-xs text-[#3182F6] leading-relaxed">
+ <div className="bg-blue-50 rounded-[6px] p-3 mb-4 text-xs text-[var(--lu-accent)] leading-relaxed">
  <p className="font-semibold mb-0.5">베타 오픈 기념 · 전 기능 무료 이용 중</p>
- <p className="text-[#4E5968]">정식 요금제 안내는 <Link href="/pricing" className="underline font-semibold text-[#3182F6]">요금제 페이지</Link>에서 미리 확인하실 수 있어요. 금액은 임시이며, 베타 종료 전 사전 공지드립니다.</p>
+ <p className="text-[var(--lu-muted)]">정식 요금제 안내는 <Link href="/pricing" className="underline font-semibold text-[var(--lu-accent)]">요금제 페이지</Link>에서 미리 확인하실 수 있어요. 금액은 임시이며, 베타 종료 전 사전 공지드립니다.</p>
  </div>
- <div className="flex items-center justify-between border-t border-[#F2F4F6] pt-4">
- <p className="text-xs text-[#8B95A1]">포함: 리뷰·CRM·QR·키워드·블로그·숏폼·Threads 등 {FEATURES.length}개 전체</p>
- {!cancelled && <button onClick={() => setShowCancelModal(true)} className="text-xs text-red-400 hover:text-red-600 underline">해지하기</button>}
+ <div className="flex items-center justify-between border-t border-[var(--lu-canvas)] pt-4">
+ <p className="text-xs text-[var(--lu-muted)]">포함: 리뷰·CRM·QR·키워드·블로그·숏폼·Threads 등 {FEATURES.length}개 전체</p>
+ {!cancelled && <button onClick={() => setShowCancelModal(true)} className="min-h-11 text-xs text-red-400 hover:text-red-600 underline">해지하기</button>}
  </div>
  </div>
  {/* 1) 기능 선택 — 결제 수단보다 위에 배치 */}
  <div>
  <div className="flex items-center justify-between mb-3">
- <h3 className="font-bold text-[#191F28]">기능 선택 · {FEATURES.length}개</h3>
- <span className="text-xs text-[#8B95A1]">베타 기간 전체 무료</span>
+ <h3 className="font-bold text-[var(--lu-ink)]">기능 선택 · {FEATURES.length}개</h3>
+ <span className="text-xs text-[var(--lu-muted)]">베타 기간 전체 무료</span>
  </div>
  <div className="flex gap-2 mb-3 flex-wrap">
  {(['전체', '사장님', '마케터', '공통'] as const).map(f => {
  const active = filter === f
  return (
  <button key={f} onClick={() => setFilter(f)}
- className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-colors ${
- active ? 'bg-[#3182F6] text-white' : 'bg-white text-[#4E5968] border border-[#E5E8EB] hover:bg-gray-50'
+ className={`px-3 py-1.5 rounded-[6px] text-xs font-semibold transition-colors ${
+ active ? 'bg-[var(--lu-accent)] text-white' : 'bg-white text-[var(--lu-muted)] border border-[var(--lu-line)] hover:bg-gray-50'
  }`}>
  {f === '전체' ? '전체' : `${f}용`}
  </button>
@@ -1892,21 +1892,21 @@ function PlanTab() {
  {filteredFeatures.map(f => {
  const inCart = cart.includes(f.id)
  return (
- <div key={f.id} className="bg-white rounded-2xl p-5 shadow-sm flex items-center justify-between">
+ <div key={f.id} className="bg-white rounded-[10px] p-5 shadow-none flex items-center justify-between">
  <div className="flex items-center gap-3 min-w-0 flex-1">
- <div className="w-10 h-10 rounded-xl flex items-center justify-center text-[11px] font-black flex-shrink-0" style={{ background: f.bg, color: f.color }}>{f.short}</div>
+ <div className="w-10 h-10 rounded-[6px] flex items-center justify-center text-[11px] font-semibold flex-shrink-0" style={{ background: f.bg, color: f.color }}>{f.short}</div>
  <div className="min-w-0">
  <div className="flex items-center gap-1.5 flex-wrap">
- <p className="font-semibold text-[#191F28] text-sm">{f.name}</p>
+ <p className="font-semibold text-[var(--lu-ink)] text-sm">{f.name}</p>
  <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${CATEGORY_COLOR[f.category]}`}>{f.category}용</span>
  {f.popular && <span className="text-[10px] px-1.5 py-0.5 rounded-full font-bold bg-orange-100 text-orange-600">인기</span>}
  </div>
- <p className="text-xs text-[#8B95A1] mt-0.5">{f.desc}</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">{f.desc}</p>
  </div>
  </div>
  <div className="flex items-center gap-3 flex-shrink-0">
  <span className="text-sm font-semibold text-[#00C471]">무료</span>
- <button onClick={() => inCart ? removeFromCart(f.id) : addToCart(f.id)} className={`px-4 py-2 rounded-xl text-sm font-semibold transition-colors ${inCart ? 'bg-[#F2F4F6] text-[#4E5968]' : 'bg-[#3182F6] text-white hover:bg-[#1B64DA]'}`}>
+ <button onClick={() => inCart ? removeFromCart(f.id) : addToCart(f.id)} className={`px-4 py-2 rounded-[6px] text-sm font-semibold transition-colors ${inCart ? 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]' : 'bg-[var(--lu-accent)] text-white hover:bg-[var(--lu-accent-hover)]'}`}>
  {inCart ? '담김' : '담기'}
  </button>
  </div>
@@ -1917,63 +1917,63 @@ function PlanTab() {
  </div>
 
  {/* 2) 결제 수단 — 토스페이먼츠 빌링 인증 실제 호출 */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
+ <div className="bg-white rounded-[10px] p-6 shadow-none">
  <div className="flex items-center justify-between mb-4">
- <h3 className="font-bold text-[#191F28]">결제 수단</h3>
- <span className="inline-flex items-center gap-1.5 text-xs text-[#3182F6] font-semibold">
- <span className="w-1.5 h-1.5 rounded-full bg-[#3182F6] animate-pulse"></span>
+ <h3 className="font-bold text-[var(--lu-ink)]">결제 수단</h3>
+ <span className="inline-flex items-center gap-1.5 text-xs text-[var(--lu-accent)] font-semibold">
+ <span className="w-1.5 h-1.5 rounded-full bg-[var(--lu-accent)] animate-pulse"></span>
  토스페이먼츠 보안 결제
  </span>
  </div>
  {paymentMethod ? (
  <div className="flex items-center justify-between">
  <div className="flex items-center gap-3">
- <div className="w-12 h-8 rounded-lg bg-gradient-to-r from-[#3182F6] to-[#1B64DA] flex items-center justify-center">
+ <div className="w-12 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center">
  <span className="text-white text-xs font-bold">CARD</span>
  </div>
  <div>
- <p className="font-semibold text-[#191F28] text-sm">{paymentMethod.cardName}</p>
- <p className="text-xs text-[#8B95A1]">**** **** **** {paymentMethod.last4}</p>
+ <p className="font-semibold text-[var(--lu-ink)] text-sm">{paymentMethod.cardName}</p>
+ <p className="text-xs text-[var(--lu-muted)]">**** **** **** {paymentMethod.last4}</p>
  </div>
  </div>
  <div className="flex gap-2">
- <button onClick={openTossBillingAuth} className="px-3 py-1.5 rounded-xl text-xs font-medium bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]">변경</button>
- <button onClick={removePaymentMethod} className="px-3 py-1.5 rounded-xl text-xs font-medium text-red-500 hover:bg-red-50">제거</button>
+ <button onClick={openTossBillingAuth} className="min-h-11 px-3 py-1.5 rounded-[6px] text-xs font-medium bg-[var(--lu-canvas)] text-[var(--lu-muted)] hover:bg-[var(--lu-line)]">변경</button>
+ <button onClick={removePaymentMethod} className="min-h-11 px-3 py-1.5 rounded-[6px] text-xs font-medium text-red-500 hover:bg-red-50">제거</button>
  </div>
  </div>
  ) : (
  <>
- <button onClick={openTossBillingAuth} className="w-full py-4 rounded-xl border-2 border-dashed border-[#E5E8EB] text-sm font-medium text-[#3182F6] hover:border-[#3182F6] hover:bg-[#EFF6FF] transition-colors">
+ <button onClick={openTossBillingAuth} className="min-h-11 w-full py-4 rounded-[6px] border-2 border-dashed border-[var(--lu-line)] text-sm font-medium text-[var(--lu-accent)] hover:border-[var(--lu-accent)] hover:bg-[var(--lu-accent-soft)] transition-colors">
  + 카드 등록하기 (토스페이먼츠 보안 결제창)
  </button>
  <p className="text-[11px] text-[#B0B8C1] mt-2 text-center">실제 결제 없음 · 베타 기간은 결제 수단 등록만 진행</p>
  </>
  )}
  {tossError && (
- <div className="mt-3 bg-red-50 border border-red-200 rounded-xl p-3 text-xs text-red-700">{tossError}</div>
+ <div className="mt-3 bg-red-50 border border-red-200 rounded-[6px] p-3 text-xs text-red-700">{tossError}</div>
  )}
  </div>
 
  {/* 3) 토스페이먼츠 연동 상태 — 운영자 전용 안내 (키 입력 UI 제거: 보안 강화) */}
- <div className="bg-white rounded-2xl p-6 shadow-sm border-2 border-[#E5E8EB]">
+ <div className="bg-white rounded-[10px] p-6 shadow-none border-2 border-[var(--lu-line)]">
  <div className="flex items-center gap-3 mb-5">
- <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3182F6] to-[#1B64DA] flex items-center justify-center text-xs font-black text-white">Toss</div>
+ <div className="w-10 h-10 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center text-xs font-semibold text-white">Toss</div>
  <div>
- <p className="font-bold text-[#191F28]">토스페이먼츠 연동 상태</p>
- <p className="text-xs text-[#8B95A1]">시크릿 키는 Vercel 환경변수로만 관리 (보안 강화)</p>
+ <p className="font-bold text-[var(--lu-ink)]">토스페이먼츠 연동 상태</p>
+ <p className="text-xs text-[var(--lu-muted)]">시크릿 키는 Vercel 환경변수로만 관리 (보안 강화)</p>
  </div>
- <span className={`ml-auto text-xs px-2 py-0.5 rounded-full font-medium ${tossReady ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-[#3182F6]'}`}>
+ <span className={`ml-auto text-xs px-2 py-0.5 rounded-full font-medium ${tossReady ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-[var(--lu-accent)]'}`}>
  {tossReady ? 'SDK 로드 완료' : 'SDK 로딩 중'}
  </span>
  </div>
- <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-xl text-xs text-green-800 space-y-1">
+ <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-[6px] text-xs text-green-800 space-y-1">
  <p className="font-semibold flex items-center gap-1">결제 키 보안 토큰화 적용됨</p>
  <p>· 시크릿 키 (TOSS_SECRET_KEY) · Vercel 환경변수에서만 사용</p>
  <p>· 빌링 키 (billing_key) · DB(billing_methods) 서버 측 보관, 클라이언트 미노출</p>
  <p>· 카드 정보 · 마스킹 표시(****) 만 클라이언트 노출</p>
  <p>· customer_key · 사용자 ID 기반 deterministic 자동 생성</p>
  </div>
- <div className="p-3 bg-blue-50 rounded-xl text-xs text-[#3182F6] space-y-1">
+ <div className="p-3 bg-blue-50 rounded-[6px] text-xs text-[var(--lu-accent)] space-y-1">
  <p className="font-semibold">Vercel 환경변수 체크리스트</p>
  <p>1. <span className="font-mono">NEXT_PUBLIC_TOSS_CLIENT_KEY</span> (클라이언트 키 · 공개 가능)</p>
  <p>2. <span className="font-mono">TOSS_SECRET_KEY</span> (시크릿 키 · 서버 전용)</p>
@@ -1983,72 +1983,72 @@ function PlanTab() {
  </div>
  </div>
  <div className="w-[360px] flex-shrink-0 hidden lg:block space-y-4">
- <div className="bg-white rounded-2xl p-5 shadow-sm">
- <h3 className="font-bold text-[#191F28] mb-4 flex items-center gap-2">
+ <div className="bg-white rounded-[10px] p-5 shadow-none">
+ <h3 className="font-bold text-[var(--lu-ink)] mb-4 flex items-center gap-2">
  선택 기능
  {cart.length > 0 && (
- <span className="text-[10px] bg-[#3182F6] text-white rounded-full w-5 h-5 flex items-center justify-center">{cart.length}</span>
+ <span className="text-[10px] bg-[var(--lu-accent)] text-white rounded-full w-5 h-5 flex items-center justify-center">{cart.length}</span>
  )}
  </h3>
  {cart.length === 0 ? (
- <p className="text-sm text-[#8B95A1] text-center py-4">기능을 선택하면 여기 표시됩니다</p>
+ <p className="text-sm text-[var(--lu-muted)] text-center py-4">기능을 선택하면 여기 표시됩니다</p>
  ) : (
  <>
  <div className="space-y-2.5 mb-4 max-h-60 overflow-y-auto">
  {cartFeatures.map(f => (
  <div key={f.id} className="flex items-center justify-between text-sm">
  <div className="flex items-center gap-1.5 min-w-0">
- <span className="w-5 h-5 rounded flex items-center justify-center text-[9px] font-black flex-shrink-0" style={{ background: f.bg, color: f.color }}>{f.short}</span>
- <span className="text-xs font-medium text-[#191F28] truncate">{f.name}</span>
+ <span className="w-5 h-5 rounded flex items-center justify-center text-[9px] font-semibold flex-shrink-0" style={{ background: f.bg, color: f.color }}>{f.short}</span>
+ <span className="text-xs font-medium text-[var(--lu-ink)] truncate">{f.name}</span>
  </div>
  <div className="flex items-center gap-1.5 flex-shrink-0">
  <span className="text-xs text-[#00C471] font-semibold">무료</span>
- <button onClick={() => removeFromCart(f.id)} className="text-[#B0B8C1] hover:text-red-400"><X size={14} strokeWidth={2.5} /></button>
+ <button onClick={() => removeFromCart(f.id)} className="min-h-11 text-[#B0B8C1] hover:text-red-400"><X size={14} strokeWidth={2.5} /></button>
  </div>
  </div>
  ))}
  </div>
- <div className="border-t border-[#F2F4F6] pt-3 mb-3 space-y-1.5">
- <div className="flex justify-between text-xs text-[#8B95A1]">
+ <div className="border-t border-[var(--lu-canvas)] pt-3 mb-3 space-y-1.5">
+ <div className="flex justify-between text-xs text-[var(--lu-muted)]">
  <span>정식 요금 예상(임시)</span>
  <span className="line-through">-</span>
  </div>
- <div className="flex justify-between font-bold text-[#191F28] pt-1 border-t border-[#F2F4F6]">
+ <div className="flex justify-between font-bold text-[var(--lu-ink)] pt-1 border-t border-[var(--lu-canvas)]">
  <span>월 합계</span>
  <span className="text-[#00C471]">0원 (무료)</span>
  </div>
  <p className="text-[10px] text-[#B0B8C1] text-right">베타 기간 · 정식 요금제 준비 중</p>
  </div>
  {nextTier ? (
- <p className="text-xs text-[#3182F6] bg-blue-50 rounded-lg px-3 py-2 mb-3 text-center font-semibold">
+ <p className="text-xs text-[var(--lu-accent)] bg-blue-50 rounded-lg px-3 py-2 mb-3 text-center font-semibold">
  정식 요금 시 <b>{nextTier.need}개</b> 더 담으면 <b>{nextTier.rate}%</b> 할인 예정
  </p>
  ) : (
  <p className="text-xs text-green-600 bg-green-50 rounded-lg px-3 py-2 mb-3 text-center font-semibold">최대 할인 티어(20%) 달성!</p>
  )}
- <button className="w-full bg-[#3182F6] text-white font-bold py-3 rounded-xl text-sm hover:bg-[#1B64DA] transition-colors">선택 기능 저장</button>
+ <button className="min-h-11 w-full bg-[var(--lu-accent)] text-white font-bold py-3 rounded-[6px] text-sm hover:bg-[var(--lu-accent-hover)] transition-colors">선택 기능 저장</button>
  <p className="text-[11px] text-[#B0B8C1] text-center mt-2">베타 기간 내 언제든 추가/해제 가능</p>
  </>
  )}
  </div>
- <div className="bg-white rounded-2xl p-5 shadow-sm">
- <p className="text-xs font-bold text-[#8B95A1] mb-3 uppercase tracking-wider">로컬루션 성과</p>
+ <div className="bg-white rounded-[10px] p-5 shadow-none">
+ <p className="text-xs font-bold text-[var(--lu-muted)] mb-3 uppercase tracking-wider">로컬루션 성과</p>
  <ShowcaseCarousel items={SHOWCASE} />
  </div>
  </div>
  {showCancelModal && (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
- <div className="bg-white rounded-2xl p-6 max-w-sm w-full">
- <h3 className="font-bold text-[#191F28] text-lg mb-4">정말 해지하시겠어요?</h3>
- <div className="bg-red-50 rounded-xl p-4 mb-5 space-y-2 text-sm text-[#4E5968]">
+ <div className="bg-white rounded-[10px] p-6 max-w-sm w-full">
+ <h3 className="font-bold text-[var(--lu-ink)] text-lg mb-4">정말 해지하시겠어요?</h3>
+ <div className="bg-red-50 rounded-[6px] p-4 mb-5 space-y-2 text-sm text-[var(--lu-muted)]">
  <p><strong>베타 기간 종료일</strong>까지 서비스 이용 가능</p>
  <p>해지 후 <strong>7일간</strong> 재가입 불가</p>
  <p>정식 요금제 전환 시 결제 없이 종료</p>
  <p>데이터 30일간 보관 후 삭제</p>
  </div>
  <div className="flex gap-3">
- <button onClick={() => setShowCancelModal(false)} className="flex-1 py-3 rounded-xl border border-[#E5E8EB] text-sm font-semibold text-[#4E5968]">취소</button>
- <button onClick={() => { setCancelled(true); setShowCancelModal(false) }} className="flex-1 py-3 rounded-xl bg-red-500 text-white text-sm font-semibold">해지 확인</button>
+ <button onClick={() => setShowCancelModal(false)} className="min-h-11 flex-1 py-3 rounded-[6px] border border-[var(--lu-line)] text-sm font-semibold text-[var(--lu-muted)]">취소</button>
+ <button onClick={() => { setCancelled(true); setShowCancelModal(false) }} className="min-h-11 flex-1 py-3 rounded-[6px] bg-red-500 text-white text-sm font-semibold">해지 확인</button>
  </div>
  </div>
  </div>
@@ -2070,21 +2070,21 @@ function SettingsInner() {
  <>
  {/* 토스페이먼츠 SDK — 플랜 관리 탭에서 결제 수단 등록 시 사용 */}
  <Script src="https://js.tosspayments.com/v1/payment" strategy="afterInteractive" />
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <div className="flex flex-1">
  <Sidebar />
  <main className="flex-1 min-w-0 max-w-full md:ml-[220px] pt-4 md:pt-0">
  {/* LOCALUTION_HERO_BANNER */}
- <section className={`bg-gradient-to-br ${hero.grad} text-white`}>
+ <section className={`bg-[var(--lu-accent)] text-white`}>
  <div className="max-w-5xl mx-auto px-4 md:px-8 py-6 md:py-10 flex items-center gap-3 md:gap-4">
- <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
+ <div className="w-12 h-12 md:w-14 md:h-14 rounded-[10px] bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
  {(() => {
  const Icon = TAB_HERO_ICONS[hero.icon]
  return <Icon size={26} className="text-white" strokeWidth={2.25} />
  })()}
  </div>
  <div className="flex-1 min-w-0">
- <h1 className="text-xl md:text-2xl font-black tracking-tight truncate">설정 · {activeTab === '플랜 관리 (결제내역)' ? '플랜·결제' : activeTab}</h1>
+ <h1 className="text-xl md:text-2xl font-semibold tracking-tight truncate">설정 · {activeTab === '플랜 관리 (결제내역)' ? '플랜·결제' : activeTab}</h1>
  <p className="text-white/85 text-xs md:text-sm mt-1 leading-relaxed">{hero.sub}</p>
  </div>
  <div className="hidden md:flex items-center gap-1.5 text-[11px] font-bold text-white/90 bg-white/15 backdrop-blur px-3 py-1.5 rounded-full border border-white/20 flex-shrink-0">
@@ -2094,12 +2094,12 @@ function SettingsInner() {
  </section>
 
  <div className="max-w-5xl mx-auto p-4 md:p-8">
- <div className="flex gap-1 mb-6 bg-white rounded-2xl p-1.5 shadow-sm overflow-x-auto scrollbar-hide -mx-1 px-1">
+ <div className="flex gap-1 mb-6 bg-white rounded-[10px] p-1.5 shadow-none overflow-x-auto scrollbar-hide -mx-1 px-1">
  {TABS.map(tab => (
  <button
  key={tab}
  onClick={() => setActiveTab(tab)}
- className={`flex-shrink-0 md:flex-1 min-w-fit py-2 px-3 rounded-xl text-sm font-semibold transition-colors whitespace-nowrap ${activeTab === tab ? 'bg-[#3182F6] text-white' : 'text-[#4E5968] hover:bg-[#F2F4F6]'}`}
+ className={`flex-shrink-0 md:flex-1 min-w-fit py-2 px-3 rounded-[6px] text-sm font-semibold transition-colors whitespace-nowrap ${activeTab === tab ? 'bg-[var(--lu-accent)] text-white' : 'text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)]'}`}
  >
  {tab === '플랜 관리 (결제내역)' ? '플랜·결제' : tab}
  </button>
@@ -2124,7 +2124,7 @@ function SettingsInner() {
 
 export default function Settings() {
  return (
- <Suspense fallback={<div className="min-h-screen bg-[#F8F9FA] flex items-center justify-center"><p className="text-[#8B95A1]">\uB85C\uB529 \uC911...</p></div>}>
+ <Suspense fallback={<div className="min-h-screen bg-[var(--lu-canvas)] flex items-center justify-center"><p className="text-[var(--lu-muted)]">\uB85C\uB529 \uC911...</p></div>}>
  <SettingsInner />
  </Suspense>
  )

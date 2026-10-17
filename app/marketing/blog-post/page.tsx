@@ -27,7 +27,7 @@ type Track = 'A' | 'B' | 'C' | 'D' | 'E' | 'F'
 type TrackGroup = 'owner' | 'blogger'
 const TRACKS: { id: Track; group: TrackGroup; label: string; desc: string; lengthHint: string; icon: any; color: string }[] = [
  // 사장님용
- { id: 'A', group: 'owner', label: '순위용', desc: '플레이스 연동·키워드 상위 노출 (정보·리스트형)', lengthHint: '800~1,500자', icon: TrendingUp, color: '#3182F6' },
+ { id: 'A', group: 'owner', label: '순위용', desc: '플레이스 연동·키워드 상위 노출 (정보·리스트형)', lengthHint: '800~1,500자', icon: TrendingUp, color: '#16685D' },
  { id: 'B', group: 'owner', label: '신뢰용', desc: '문의·예약·방문 유도 (사례·스토리형)', lengthHint: '1,500~2,500자', icon: Award, color: '#7C3AED' },
  { id: 'C', group: 'owner', label: '관심사형', desc: '특정 타겟 공감·재방문·팬 확보 (공감·생활형)', lengthHint: '1,000~2,000자', icon: Heart, color: '#EC4899' },
  // 블로거/마케팅용
@@ -277,7 +277,7 @@ export default function BlogPostGeneratorPage() {
  }
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
  <main className="flex-1 ml-0 md:ml-[220px] flex flex-col min-h-screen pt-4 md:pt-0">
  <PageHeader
@@ -290,33 +290,33 @@ export default function BlogPostGeneratorPage() {
  <div className="flex-1 p-4 md:p-6 max-w-4xl mx-auto w-full space-y-4">
 
  {/* 1. 글 트랙 */}
- <section className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-4 md:p-5">
+ <section className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-4 md:p-5">
  <div className="flex items-start gap-2 mb-3">
- <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3182F6] to-[#7C3AED] flex items-center justify-center shadow-sm">
+ <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Target size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-black text-[#191F28]">1. 글 유형 (목적)</p>
- <p className="text-[11px] text-[#8B95A1]">목적에 따라 글 구조가 완전히 달라집니다</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">1. 글 유형 (목적)</p>
+ <p className="text-[11px] text-[var(--lu-muted)]">목적에 따라 글 구조가 완전히 달라집니다</p>
  </div>
  </div>
 
  {/* 사장님용 4종 (순위/신뢰/관심사/이벤트) */}
- <p className="text-[10px] font-bold text-[#8B95A1] tracking-wider uppercase mb-2 px-1">SHOP OWNER · 사장님용</p>
+ <p className="text-[10px] font-bold text-[var(--lu-muted)] tracking-wider uppercase mb-2 px-1">SHOP OWNER · 사장님용</p>
  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-2.5 mb-4">
  {TRACKS.filter(t => t.group === 'owner').map(t => {
  const Icon = t.icon
  const active = track === t.id
  return (
  <button key={t.id} onClick={() => setTrack(t.id)}
- className={`text-left p-3 rounded-xl border-2 transition-all ${active ? 'border-[#3182F6] bg-[#EFF6FF] shadow-sm' : 'border-[#E5E8EB] bg-white hover:border-[#BFDBFE]'}`}>
+ className={`text-left p-3 rounded-[6px] border-2 transition-all ${active ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)] shadow-none' : 'border-[var(--lu-line)] bg-white hover:border-[#BFDBFE]'}`}>
  <div className="flex items-center gap-2 mb-1.5">
  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: t.color + '15', color: t.color }}>
  <Icon size={14} strokeWidth={2.5} />
  </div>
- <span className="text-sm font-black text-[#191F28]">{t.id}. {t.label}</span>
+ <span className="text-sm font-semibold text-[var(--lu-ink)]">{t.id}. {t.label}</span>
  </div>
- <p className="text-[11px] text-[#4E5968] leading-tight">{t.desc}</p>
+ <p className="text-[11px] text-[var(--lu-muted)] leading-tight">{t.desc}</p>
  <p className="text-[10px] mt-1.5 font-bold" style={{ color: t.color }}>권장 {t.lengthHint}</p>
  </button>
  )
@@ -324,21 +324,21 @@ export default function BlogPostGeneratorPage() {
  </div>
 
  {/* 블로거/마케팅용 2종 (맛집후기/체험단) */}
- <p className="text-[10px] font-bold text-[#8B95A1] tracking-wider uppercase mb-2 px-1">BLOGGER · 블로거/마케팅용</p>
+ <p className="text-[10px] font-bold text-[var(--lu-muted)] tracking-wider uppercase mb-2 px-1">BLOGGER · 블로거/마케팅용</p>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
  {TRACKS.filter(t => t.group === 'blogger').map(t => {
  const Icon = t.icon
  const active = track === t.id
  return (
  <button key={t.id} onClick={() => setTrack(t.id)}
- className={`text-left p-3 rounded-xl border-2 transition-all ${active ? 'border-[#3182F6] bg-[#EFF6FF] shadow-sm' : 'border-[#E5E8EB] bg-white hover:border-[#BFDBFE]'}`}>
+ className={`text-left p-3 rounded-[6px] border-2 transition-all ${active ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)] shadow-none' : 'border-[var(--lu-line)] bg-white hover:border-[#BFDBFE]'}`}>
  <div className="flex items-center gap-2 mb-1.5">
  <div className="w-7 h-7 rounded-lg flex items-center justify-center" style={{ background: t.color + '15', color: t.color }}>
  <Icon size={14} strokeWidth={2.5} />
  </div>
- <span className="text-sm font-black text-[#191F28]">{t.id}. {t.label}</span>
+ <span className="text-sm font-semibold text-[var(--lu-ink)]">{t.id}. {t.label}</span>
  </div>
- <p className="text-[11px] text-[#4E5968] leading-tight">{t.desc}</p>
+ <p className="text-[11px] text-[var(--lu-muted)] leading-tight">{t.desc}</p>
  <p className="text-[10px] mt-1.5 font-bold" style={{ color: t.color }}>권장 {t.lengthHint}</p>
  </button>
  )
@@ -347,23 +347,23 @@ export default function BlogPostGeneratorPage() {
  </section>
 
  {/* 2. 업종/주제 */}
- <section className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-4 md:p-5">
+ <section className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-4 md:p-5">
  <div className="flex items-start gap-2 mb-3">
- <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#059669] to-[#16A34A] flex items-center justify-center shadow-sm">
+ <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Tag size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-black text-[#191F28]">2. 업종 / 주제</p>
- <p className="text-[11px] text-[#8B95A1]">프리셋 클릭 = 업종만 빠르게 채워짐 (키워드는 직접 입력)</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">2. 업종 / 주제</p>
+ <p className="text-[11px] text-[var(--lu-muted)]">프리셋 클릭 = 업종만 빠르게 채워짐 (키워드는 직접 입력)</p>
  </div>
  </div>
  <input value={industry} onChange={e => setIndustry(e.target.value)}
  placeholder="예: 강남 피부과, 홍대 브런치 카페, 부산 필라테스 센터"
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] mb-2.5" />
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] mb-2.5" />
  <div className="flex flex-wrap gap-1.5">
  {INDUSTRY_PRESETS.map(p => (
  <button key={p.id} onClick={() => applyPreset(p.label)}
- className={`px-2.5 py-1 rounded-full text-[11px] font-bold border transition-colors ${industry === p.label ? 'bg-[#059669] text-white border-[#059669]' : 'bg-white text-[#4E5968] border-[#E5E8EB] hover:border-[#059669] hover:text-[#059669]'}`}>
+ className={`px-2.5 py-1 rounded-full text-[11px] font-bold border transition-colors ${industry === p.label ? 'bg-[#059669] text-white border-[#059669]' : 'bg-white text-[var(--lu-muted)] border-[var(--lu-line)] hover:border-[#059669] hover:text-[#059669]'}`}>
  {p.label}
  </button>
  ))}
@@ -371,30 +371,30 @@ export default function BlogPostGeneratorPage() {
  </section>
 
  {/* 3. 페르소나 */}
- <section className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-4 md:p-5">
+ <section className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-4 md:p-5">
  <div className="flex items-start gap-2 mb-3">
- <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#EC4899] flex items-center justify-center shadow-sm">
+ <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <User size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-black text-[#191F28]">3. 페르소나 · 글 발행 주체</p>
- <p className="text-[11px] text-[#8B95A1]">담당자 정보로 글의 톤·관점 결정</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">3. 페르소나 · 글 발행 주체</p>
+ <p className="text-[11px] text-[var(--lu-muted)]">담당자 정보로 글의 톤·관점 결정</p>
  </div>
  </div>
 
  <div className="mb-3">
- <label className="text-[11px] font-bold text-[#4E5968] mb-1 block">이름 또는 닉네임</label>
+ <label className="text-[11px] font-bold text-[var(--lu-muted)] mb-1 block">이름 또는 닉네임</label>
  <input value={personaName} onChange={e => setPersonaName(e.target.value)}
  placeholder="예: 박원장, 김실장, 강선생, 카페지기"
- className="w-full border border-[#E5E8EB] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#3182F6]" />
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-3 py-2 text-base focus:outline-none focus:border-[var(--lu-accent)]" />
  </div>
 
  <div className="mb-3">
- <label className="text-[11px] font-bold text-[#4E5968] mb-1.5 block">연령대</label>
+ <label className="text-[11px] font-bold text-[var(--lu-muted)] mb-1.5 block">연령대</label>
  <div className="grid grid-cols-3 md:grid-cols-6 gap-1.5">
  {AGE_RANGES.map(a => (
  <button key={a.id} onClick={() => setPersonaAge(a.id)}
- className={`py-2 rounded-lg text-xs font-bold border ${personaAge === a.id ? 'border-[#3182F6] bg-[#EFF6FF] text-[#3182F6]' : 'border-[#E5E8EB] bg-white text-[#4E5968]'}`}>
+ className={`py-2 rounded-lg text-xs font-bold border ${personaAge === a.id ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)] text-[var(--lu-accent)]' : 'border-[var(--lu-line)] bg-white text-[var(--lu-muted)]'}`}>
  {a.label}
  </button>
  ))}
@@ -402,11 +402,11 @@ export default function BlogPostGeneratorPage() {
  </div>
 
  <div className="mb-3">
- <label className="text-[11px] font-bold text-[#4E5968] mb-1.5 block">성별</label>
+ <label className="text-[11px] font-bold text-[var(--lu-muted)] mb-1.5 block">성별</label>
  <div className="flex gap-1.5">
  {GENDERS.map(g => (
  <button key={g.id} onClick={() => setPersonaGender(g.id)}
- className={`flex-1 py-2 rounded-lg text-xs font-bold border ${personaGender === g.id ? 'border-[#3182F6] bg-[#EFF6FF] text-[#3182F6]' : 'border-[#E5E8EB] bg-white text-[#4E5968]'}`}>
+ className={`flex-1 py-2 rounded-lg text-xs font-bold border ${personaGender === g.id ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)] text-[var(--lu-accent)]' : 'border-[var(--lu-line)] bg-white text-[var(--lu-muted)]'}`}>
  {g.label}
  </button>
  ))}
@@ -414,15 +414,15 @@ export default function BlogPostGeneratorPage() {
  </div>
 
  <div>
- <label className="text-[11px] font-bold text-[#4E5968] mb-1.5 block">말투 타입 · 글 전체 톤이 완전히 달라집니다</label>
+ <label className="text-[11px] font-bold text-[var(--lu-muted)] mb-1.5 block">말투 타입 · 글 전체 톤이 완전히 달라집니다</label>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
  {TONES.map(t => {
  const active = personaTone === t.id
  return (
  <button key={t.id} onClick={() => setPersonaTone(t.id)}
- className={`text-left p-2.5 rounded-xl border-2 transition-all ${active ? 'border-[#7C3AED] bg-[#F5F3FF]' : 'border-[#E5E8EB] bg-white hover:border-[#BFDBFE]'}`}>
- <p className="text-xs font-black text-[#191F28] mb-0.5">{t.label}</p>
- <p className="text-[10px] text-[#8B95A1] leading-tight">{t.desc}</p>
+ className={`text-left p-2.5 rounded-[6px] border-2 transition-all ${active ? 'border-[#7C3AED] bg-[#F5F3FF]' : 'border-[var(--lu-line)] bg-white hover:border-[#BFDBFE]'}`}>
+ <p className="text-xs font-semibold text-[var(--lu-ink)] mb-0.5">{t.label}</p>
+ <p className="text-[10px] text-[var(--lu-muted)] leading-tight">{t.desc}</p>
  </button>
  )
  })}
@@ -431,74 +431,74 @@ export default function BlogPostGeneratorPage() {
  </section>
 
  {/* 4. 핵심 타겟 */}
- <section className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-4 md:p-5">
+ <section className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-4 md:p-5">
  <div className="flex items-start gap-2 mb-3">
- <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#F59E0B] to-[#DC2626] flex items-center justify-center shadow-sm">
+ <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Target size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-black text-[#191F28]">4. 핵심 타겟 (뾰족하게)</p>
- <p className="text-[11px] text-[#8B95A1]">[상태] + [고민/욕구] + [라이프스타일] 형태로</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">4. 핵심 타겟 (뾰족하게)</p>
+ <p className="text-[11px] text-[var(--lu-muted)]">[상태] + [고민/욕구] + [라이프스타일] 형태로</p>
  </div>
  </div>
  <textarea value={coreTarget} onChange={e => setCoreTarget(e.target.value)}
  rows={2}
  placeholder={'예시:\n· 퇴근 후 어깨 통증으로 고민하는 직장인 여성\n· 개원 3년차인데 경쟁 병원에 밀리는 피부과 원장님\n· 전단지 효과가 없어진 골목 카페 사장님'}
- className="w-full border border-[#E5E8EB] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#F59E0B] resize-none" />
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-3 py-2.5 text-base focus:outline-none focus:border-[#F59E0B] resize-none" />
  </section>
 
  {/* 5. 검색 의도 키워드 */}
- <section className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-4 md:p-5">
+ <section className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-4 md:p-5">
  <div className="flex items-start gap-2 mb-3">
- <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3182F6] to-[#1D4ED8] flex items-center justify-center shadow-sm">
+ <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Tag size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-black text-[#191F28]">5. 검색 의도 키워드</p>
- <p className="text-[11px] text-[#8B95A1]">고객이 실제 검색할 때 쓰는 말 (업계 용어 X, 고객 언어 O)</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">5. 검색 의도 키워드</p>
+ <p className="text-[11px] text-[var(--lu-muted)]">고객이 실제 검색할 때 쓰는 말 (업계 용어 X, 고객 언어 O)</p>
  </div>
  </div>
  <div className="flex gap-2 mb-2">
  <input value={keywordInput} onChange={e => setKeywordInput(e.target.value)}
  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addKeyword())}
  placeholder="예: 강남 피부과 추천, 홍대 브런치 카페, 부산 필라테스 가격"
- className="flex-1 border border-[#E5E8EB] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#3182F6]" />
+ className="min-h-11 flex-1 border border-[var(--lu-line)] rounded-[6px] px-3 py-2 text-base focus:outline-none focus:border-[var(--lu-accent)]" />
  <button onClick={() => addKeyword()} disabled={!keywordInput.trim()}
- className="px-4 py-2 bg-[#3182F6] text-white rounded-xl text-sm font-bold disabled:opacity-40 hover:bg-[#1B64DA]">
+ className="min-h-11 px-4 py-2 bg-[var(--lu-accent)] text-white rounded-[6px] text-sm font-bold disabled:opacity-40 hover:bg-[var(--lu-accent-hover)]">
  <Plus size={14} strokeWidth={2.5} />
  </button>
  </div>
  <div className="flex flex-wrap gap-1.5">
  {keywords.map(k => (
- <span key={k} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#EFF6FF] text-[#3182F6] text-xs font-bold border border-[#BFDBFE]">
+ <span key={k} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] text-xs font-bold border border-[#BFDBFE]">
  {k}
- <button onClick={() => removeKeyword(k)} className="text-[#3182F6]/60 hover:text-[#DC2626]">
+ <button onClick={() => removeKeyword(k)} className="min-h-11 text-[var(--lu-accent)]/60 hover:text-[#DC2626]">
  <X size={11} strokeWidth={3} />
  </button>
  </span>
  ))}
- {keywords.length === 0 && <p className="text-[11px] text-[#8B95A1]">최소 1개 이상 입력 (없으면 업종으로 자동 작성)</p>}
+ {keywords.length === 0 && <p className="text-[11px] text-[var(--lu-muted)]">최소 1개 이상 입력 (없으면 업종으로 자동 작성)</p>}
  </div>
  </section>
 
  {/* 6. 세부 키워드 (롱테일·연관) */}
- <section className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-4 md:p-5">
+ <section className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-4 md:p-5">
  <div className="flex items-start gap-2 mb-3">
- <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#EC4899] to-[#DB2777] flex items-center justify-center shadow-sm">
+ <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Tag size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-black text-[#191F28]">6. 세부 키워드 (롱테일·연관)</p>
- <p className="text-[11px] text-[#8B95A1]">메인 키워드를 보조하는 세부 검색어 · 검색 다양성 확보 + 노출 폭 확대</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">6. 세부 키워드 (롱테일·연관)</p>
+ <p className="text-[11px] text-[var(--lu-muted)]">메인 키워드를 보조하는 세부 검색어 · 검색 다양성 확보 + 노출 폭 확대</p>
  </div>
  </div>
  <div className="flex gap-2 mb-2">
  <input value={detailKwInput} onChange={e => setDetailKwInput(e.target.value)}
  onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addDetailKw())}
  placeholder="예: 강남역 도보 5분, 주차 가능, 평일 야간 운영, 첫 방문 혜택"
- className="flex-1 border border-[#E5E8EB] rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-[#EC4899]" />
+ className="min-h-11 flex-1 border border-[var(--lu-line)] rounded-[6px] px-3 py-2 text-base focus:outline-none focus:border-[#EC4899]" />
  <button onClick={() => addDetailKw()} disabled={!detailKwInput.trim()}
- className="px-4 py-2 bg-[#EC4899] text-white rounded-xl text-sm font-bold disabled:opacity-40 hover:bg-[#DB2777]">
+ className="min-h-11 px-4 py-2 bg-[#EC4899] text-white rounded-[6px] text-sm font-bold disabled:opacity-40 hover:bg-[#DB2777]">
  <Plus size={14} strokeWidth={2.5} />
  </button>
  </div>
@@ -506,7 +506,7 @@ export default function BlogPostGeneratorPage() {
  {detailKeywords.map(k => (
  <span key={k} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-[#FDF2F8] text-[#EC4899] text-xs font-bold border border-[#FBCFE8]">
  {k}
- <button onClick={() => removeDetailKw(k)} className="text-[#EC4899]/60 hover:text-[#DC2626]">
+ <button onClick={() => removeDetailKw(k)} className="min-h-11 text-[#EC4899]/60 hover:text-[#DC2626]">
  <X size={11} strokeWidth={3} />
  </button>
  </span>
@@ -515,20 +515,20 @@ export default function BlogPostGeneratorPage() {
  </section>
 
  {/* AI 자동 초안 — 4·5·6번 정보로 7·8번 미리 채워주기 */}
- <div className="rounded-2xl p-4 md:p-5 bg-gradient-to-br from-[#EFF6FF] via-[#F5F3FF] to-[#FDF2F8] border-2 border-dashed border-[#7C3AED]">
+ <div className="rounded-[10px] p-4 md:p-5 bg-[var(--lu-accent)] border-2 border-dashed border-[#7C3AED]">
  <div className="flex items-start gap-2.5 mb-3">
- <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#3182F6] to-[#7C3AED] flex items-center justify-center shadow-sm flex-shrink-0">
+ <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center shadow-none flex-shrink-0">
  <Sparkles size={16} className="text-white" strokeWidth={2.5} />
  </div>
  <div className="flex-1">
- <p className="text-sm font-black text-[#191F28]">4·5·6번 정보로 초안 자동 작성</p>
- <p className="text-[11px] text-[#4E5968] leading-relaxed">
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">4·5·6번 정보로 초안 자동 작성</p>
+ <p className="text-[11px] text-[var(--lu-muted)] leading-relaxed">
  핵심 타겟·키워드·세부키워드만 입력해도 7번(초안)·8번(마무리)에 들어갈 메모를 AI가 가볍게 만들어드려요. 그대로 사용하거나 자유롭게 수정 가능.
  </p>
  </div>
  </div>
  <button onClick={handleSuggest} disabled={suggestLoading}
- className="w-full py-2.5 rounded-xl bg-gradient-to-r from-[#3182F6] to-[#7C3AED] text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 hover:shadow-md transition-shadow">
+ className="min-h-11 w-full py-2.5 rounded-[6px] bg-[var(--lu-accent)] text-white text-sm font-bold flex items-center justify-center gap-2 disabled:opacity-50 hover:shadow-md transition-shadow">
  {suggestLoading ? (
  <><Loader2 size={14} className="animate-spin" strokeWidth={2.5} /> AI가 초안 작성 중...</>
  ) : (
@@ -541,17 +541,17 @@ export default function BlogPostGeneratorPage() {
  </div>
 
  {/* 7. 초안·메모 */}
- <section className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-4 md:p-5">
+ <section className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-4 md:p-5">
  <div className="flex items-start gap-2 mb-3">
- <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#0EA5E9] to-[#0369A1] flex items-center justify-center shadow-sm">
+ <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <FileText size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div className="flex-1">
- <p className="text-sm font-black text-[#191F28]">7. 초안·메모·방향성 (선택)</p>
- <p className="text-[11px] text-[#8B95A1]">위 AI 초안 사용 또는 직접 작성 · 강조 포인트·사례·차별점·가격·위치 등</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">7. 초안·메모·방향성 (선택)</p>
+ <p className="text-[11px] text-[var(--lu-muted)]">위 AI 초안 사용 또는 직접 작성 · 강조 포인트·사례·차별점·가격·위치 등</p>
  </div>
  {draft && (
- <button onClick={() => setDraft('')} className="text-[10px] text-[#8B95A1] hover:text-[#DC2626] flex-shrink-0">
+ <button onClick={() => setDraft('')} className="min-h-11 text-[10px] text-[var(--lu-muted)] hover:text-[#DC2626] flex-shrink-0">
  초기화
  </button>
  )}
@@ -559,21 +559,21 @@ export default function BlogPostGeneratorPage() {
  <textarea value={draft} onChange={e => setDraft(e.target.value)}
  rows={6}
  placeholder={'담을 내용 자유롭게 작성:\n· 강조하고 싶은 차별점 (예: 24시간 운영, 자체 제조법, 10년 경력)\n· 실제 사례 (예: 30일 만에 4kg 감량한 회원님)\n· 위치·영업시간·가격 등 정보\n· 절대 빠지면 안 되는 메시지\n\n또는 위 [AI 초안 자동 작성] 버튼 활용'}
- className="w-full border border-[#E5E8EB] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#0EA5E9] resize-none" />
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-3 py-2.5 text-base focus:outline-none focus:border-[#0EA5E9] resize-none" />
  </section>
 
  {/* 8. 마무리 메시지 (행동 유도 글) */}
- <section className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-4 md:p-5">
+ <section className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-4 md:p-5">
  <div className="flex items-start gap-2 mb-3">
- <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#16A34A] to-[#15803D] flex items-center justify-center shadow-sm">
+ <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <LinkIcon size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div className="flex-1">
- <p className="text-sm font-black text-[#191F28]">8. 마무리 메시지 (행동 유도)</p>
- <p className="text-[11px] text-[#8B95A1]">글을 읽은 후 자연스럽게 다음 행동으로 연결되는 글로 표현 · 빈칸 가능 · AI 자동 초안 사용 가능</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">8. 마무리 메시지 (행동 유도)</p>
+ <p className="text-[11px] text-[var(--lu-muted)]">글을 읽은 후 자연스럽게 다음 행동으로 연결되는 글로 표현 · 빈칸 가능 · AI 자동 초안 사용 가능</p>
  </div>
  {closingMessage && (
- <button onClick={() => setClosingMessage('')} className="text-[10px] text-[#8B95A1] hover:text-[#DC2626] flex-shrink-0">
+ <button onClick={() => setClosingMessage('')} className="min-h-11 text-[10px] text-[var(--lu-muted)] hover:text-[#DC2626] flex-shrink-0">
  초기화
  </button>
  )}
@@ -581,37 +581,37 @@ export default function BlogPostGeneratorPage() {
  <textarea value={closingMessage} onChange={e => setClosingMessage(e.target.value)}
  rows={4}
  placeholder={'예시 (자유롭게 작성):\n· 망설이지 마시고 가벼운 마음으로 한 번 들러주세요\n· 처음 오시는 분들을 위해 첫 방문 안내 도와드리고 있어요\n· 평일 오후 시간대가 한가하니 천천히 둘러보기 좋습니다\n· 궁금하신 점은 언제든 편하게 물어봐 주시면 자세히 알려드릴게요\n\n빈칸으로 두면 글 트랙·타겟에 맞춰 자동 작성됩니다'}
- className="w-full border border-[#E5E8EB] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-[#16A34A] resize-none" />
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-3 py-2.5 text-base focus:outline-none focus:border-[#16A34A] resize-none" />
  </section>
 
  {/* 9. 길이 + 사진 */}
- <section className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-4 md:p-5">
+ <section className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-4 md:p-5">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
  <div>
- <p className="text-xs font-bold text-[#4E5968] mb-2">9. 글 길이</p>
+ <p className="text-xs font-bold text-[var(--lu-muted)] mb-2">9. 글 길이</p>
  <div className="grid grid-cols-4 gap-1.5">
  {([1500, 2000, 2500, 3000] as const).map(n => (
  <button key={n} onClick={() => setLength(n)}
- className={`py-2 rounded-lg text-xs font-bold border ${length === n ? 'border-[#3182F6] bg-[#EFF6FF] text-[#3182F6]' : 'border-[#E5E8EB] bg-white text-[#4E5968]'}`}>
+ className={`py-2 rounded-lg text-xs font-bold border ${length === n ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)] text-[var(--lu-accent)]' : 'border-[var(--lu-line)] bg-white text-[var(--lu-muted)]'}`}>
  {n.toLocaleString()}자
  </button>
  ))}
  </div>
  </div>
  <div>
- <p className="text-xs font-bold text-[#4E5968] mb-2">10. 사진 파일명 (자동 분산 배치)</p>
+ <p className="text-xs font-bold text-[var(--lu-muted)] mb-2">10. 사진 파일명 (자동 분산 배치)</p>
  <div className="flex gap-2">
- <input ref={fileRef} type="file" multiple accept="image/*" onChange={handleFilesPicked} className="hidden" id="photo-input" />
- <label htmlFor="photo-input" className="flex-1 cursor-pointer border border-dashed border-[#3182F6] rounded-xl px-3 py-2 text-xs font-bold text-[#3182F6] flex items-center justify-center gap-1.5 hover:bg-[#EFF6FF]">
+ <input ref={fileRef} type="file" multiple accept="image/*" onChange={handleFilesPicked} className="min-h-11 hidden" id="photo-input" />
+ <label htmlFor="photo-input" className="flex-1 cursor-pointer border border-dashed border-[var(--lu-accent)] rounded-[6px] px-3 py-2 text-xs font-bold text-[var(--lu-accent)] flex items-center justify-center gap-1.5 hover:bg-[var(--lu-accent-soft)]">
  <ImageIcon size={13} strokeWidth={2.5} /> 사진 선택
  </label>
  </div>
  {photoNames.length > 0 && (
  <div className="mt-2 flex flex-wrap gap-1">
  {photoNames.map(n => (
- <span key={n} className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[#F2F4F6] text-[10px] text-[#4E5968] font-mono">
+ <span key={n} className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-[var(--lu-canvas)] text-[10px] text-[var(--lu-muted)] font-mono">
  {n}
- <button onClick={() => removePhoto(n)} className="text-[#8B95A1] hover:text-[#DC2626]">
+ <button onClick={() => removePhoto(n)} className="min-h-11 text-[var(--lu-muted)] hover:text-[#DC2626]">
  <X size={9} strokeWidth={3} />
  </button>
  </span>
@@ -624,12 +624,12 @@ export default function BlogPostGeneratorPage() {
 
  {/* 생성 버튼 */}
  <button onClick={handleGenerate} disabled={loading}
- className="w-full py-4 rounded-2xl bg-gradient-to-r from-[#3182F6] to-[#7C3AED] text-white font-black text-base flex items-center justify-center gap-2 disabled:opacity-50 hover:shadow-lg transition-shadow">
+ className="min-h-11 w-full py-4 rounded-[10px] bg-[var(--lu-accent)] text-white font-semibold text-base flex items-center justify-center gap-2 disabled:opacity-50 hover:shadow-none transition-shadow">
  {loading ? (<><Loader2 size={18} className="animate-spin" strokeWidth={2.5} /> AI 작성 중... (1~2분, 길수록 더 걸려요)</>) : (<><Sparkles size={18} strokeWidth={2.5} /> 블로그 글 생성하기</>)}
  </button>
 
  {error && (
- <div className="bg-[#FEF2F2] border border-[#FCA5A5] rounded-xl p-3 flex items-start gap-2">
+ <div className="bg-[#FEF2F2] border border-[#FCA5A5] rounded-[6px] p-3 flex items-start gap-2">
  <AlertCircle size={14} className="text-[#DC2626] flex-shrink-0 mt-0.5" strokeWidth={2.5} />
  <p className="text-xs text-[#991B1B]">{error}</p>
  </div>
@@ -637,36 +637,36 @@ export default function BlogPostGeneratorPage() {
 
  {/* 결과 */}
  {post && (
- <div ref={outputRef} className="bg-white rounded-2xl shadow-sm border-2 border-[#3182F6] p-4 md:p-5">
+ <div ref={outputRef} className="bg-white rounded-[10px] shadow-none border-2 border-[var(--lu-accent)] p-4 md:p-5">
  <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
  <div className="flex items-center gap-2">
- <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#3182F6] to-[#7C3AED] flex items-center justify-center shadow-sm">
+ <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Sparkles size={15} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-black text-[#191F28]">생성된 블로그 글</p>
- <p className="text-[10px] text-[#8B95A1]">트랙 {track} · 목표 {length.toLocaleString()}자 · 실제 {post.length.toLocaleString()}자</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)]">생성된 블로그 글</p>
+ <p className="text-[10px] text-[var(--lu-muted)]">트랙 {track} · 목표 {length.toLocaleString()}자 · 실제 {post.length.toLocaleString()}자</p>
  </div>
  </div>
  <div className="flex gap-2 flex-wrap">
- <div className="inline-flex rounded-xl bg-[#F2F4F6] p-0.5">
+ <div className="inline-flex rounded-[6px] bg-[var(--lu-canvas)] p-0.5">
  <button onClick={() => setViewMode('preview')}
  className={'px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ' +
- (viewMode === 'preview' ? 'bg-white text-[#191F28] shadow-sm' : 'text-[#8B95A1]')}>
+ (viewMode === 'preview' ? 'bg-white text-[var(--lu-ink)] shadow-none' : 'text-[var(--lu-muted)]')}>
  미리보기
  </button>
  <button onClick={() => setViewMode('markdown')}
  className={'px-3 py-1.5 rounded-lg text-xs font-bold transition-colors ' +
- (viewMode === 'markdown' ? 'bg-white text-[#191F28] shadow-sm' : 'text-[#8B95A1]')}>
+ (viewMode === 'markdown' ? 'bg-white text-[var(--lu-ink)] shadow-none' : 'text-[var(--lu-muted)]')}>
  마크다운
  </button>
  </div>
  <button onClick={handleCopy}
- className={`px-3 py-2 rounded-xl text-xs font-bold flex items-center gap-1.5 ${copied ? 'bg-green-500 text-white' : 'bg-[#191F28] text-white hover:bg-[#333D4B]'}`}>
+ className={`px-3 py-2 rounded-[6px] text-xs font-bold flex items-center gap-1.5 ${copied ? 'bg-green-500 text-white' : 'bg-[var(--lu-ink)] text-white hover:bg-[#333D4B]'}`}>
  {copied ? <><Check size={12} strokeWidth={3} /> 복사됨</> : <><Copy size={12} strokeWidth={2.5} /> 마크다운 복사</>}
  </button>
  <button onClick={handleGenerate}
- className="px-3 py-2 rounded-xl bg-[#F2F4F6] text-[#4E5968] text-xs font-bold flex items-center gap-1.5 hover:bg-[#E5E8EB]">
+ className="min-h-11 px-3 py-2 rounded-[6px] bg-[var(--lu-canvas)] text-[var(--lu-muted)] text-xs font-bold flex items-center gap-1.5 hover:bg-[var(--lu-line)]">
  <RefreshCw size={12} strokeWidth={2.5} /> 다시 생성
  </button>
  </div>
@@ -674,7 +674,7 @@ export default function BlogPostGeneratorPage() {
  {viewMode === 'preview' ? (
  <BlogPreview markdown={post} />
  ) : (
- <pre className="whitespace-pre-wrap text-sm leading-relaxed text-[#191F28] bg-[#F8FAFB] rounded-xl p-4 border border-[#E5E8EB] font-sans">
+ <pre className="whitespace-pre-wrap text-sm leading-relaxed text-[var(--lu-ink)] bg-[#F8FAFB] rounded-[6px] p-4 border border-[var(--lu-line)] font-sans">
  {post}
  </pre>
  )}
@@ -695,7 +695,7 @@ function BlogPreview({ markdown }: { markdown: string }) {
  const html = renderMarkdownToHtml(markdown)
  return (
  <article
- className="bg-white rounded-xl border border-[#E5E8EB] p-5 md:p-7 prose-blog text-[15px] leading-[1.8] text-[#191F28]"
+ className="bg-white rounded-[6px] border border-[var(--lu-line)] p-5 md:p-7 prose-blog text-[15px] leading-[1.8] text-[var(--lu-ink)]"
  dangerouslySetInnerHTML={{ __html: html }}
  />
  )
@@ -714,9 +714,9 @@ function renderInline(s: string): string {
  // 이미 escape 된 문자열 가정
  // 1) 이미지 ![alt](url)
  s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, (_, alt, url) =>
- `<img src="${url}" alt="${alt}" class="my-3 rounded-xl border border-[#F2F4F6] max-w-full" />`)
+ `<img src="${url}" alt="${alt}" class="my-3 rounded-[6px] border border-[var(--lu-canvas)] max-w-full" />`)
  // 2) 링크 [text](url)
- s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="text-[#3182F6] underline">$1</a>')
+ s = s.replace(/\[([^\]]+)\]\(([^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener" class="text-[var(--lu-accent)] underline">$1</a>')
  // 3) bold + italic 동시 ***
  s = s.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>')
  // 4) bold **text**
@@ -724,7 +724,7 @@ function renderInline(s: string): string {
  // 5) italic *text* (단어 경계 안전)
  s = s.replace(/(^|[^*])\*([^*\n]+)\*(?!\*)/g, '$1<em>$2</em>')
  // 6) inline code `code`
- s = s.replace(/`([^`]+)`/g, '<code class="bg-[#F2F4F6] px-1.5 py-0.5 rounded text-[13px] font-mono">$1</code>')
+ s = s.replace(/`([^`]+)`/g, '<code class="bg-[var(--lu-canvas)] px-1.5 py-0.5 rounded text-[13px] font-mono">$1</code>')
  return s
 }
 
@@ -753,8 +753,8 @@ function renderMarkdownToHtml(md: string): string {
  flushPara(para)
  const lvl = h[1].length
  const txt = renderInline(escapeHtml(h[2]))
- const cls = lvl === 1 ? 'text-[28px] font-black mt-6 mb-3 leading-tight'
- : lvl === 2 ? 'text-[22px] font-black mt-5 mb-3 leading-tight'
+ const cls = lvl === 1 ? 'text-[28px] font-semibold mt-6 mb-3 leading-tight'
+ : lvl === 2 ? 'text-[22px] font-semibold mt-5 mb-3 leading-tight'
  : 'text-[18px] font-bold mt-4 mb-2'
  out.push(`<h${lvl} class="${cls}">${txt}</h${lvl}>`)
  i++; continue
@@ -763,7 +763,7 @@ function renderMarkdownToHtml(md: string): string {
  // 가로선
  if (/^\s*---+\s*$/.test(line)) {
  flushPara(para)
- out.push('<hr class="my-5 border-[#E5E8EB]" />')
+ out.push('<hr class="my-5 border-[var(--lu-line)]" />')
  i++; continue
  }
 
@@ -776,7 +776,7 @@ function renderMarkdownToHtml(md: string): string {
  i++
  }
  const inner = renderInline(quotes.map(escapeHtml).join('<br />'))
- out.push(`<blockquote class="border-l-4 border-[#3182F6] bg-[#F8FAFB] pl-4 py-2 my-4 italic text-[#4E5968]">${inner}</blockquote>`)
+ out.push(`<blockquote class="border-l-4 border-[var(--lu-accent)] bg-[#F8FAFB] pl-4 py-2 my-4 italic text-[var(--lu-muted)]">${inner}</blockquote>`)
  continue
  }
 

@@ -6,6 +6,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 
 const NAV_LINKS = [
+ { href: '/help/videos', label: '기능 영상' },
  { href: '/about', label: '회사 소개' }, // 신규 2026-04-19 · 대표의 편지 & 브랜드 스토리
  { href: '/service-intro', label: '서비스 소개' },
  { href: '/pricing', label: '요금' },

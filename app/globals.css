@@ -248,3 +248,20 @@ button, a, input, textarea, select { -webkit-tap-highlight-color: transparent; }
 .rounded-xl { border-radius: var(--lu-radius-control); }
 .shadow-sm { box-shadow:none; }
 button.rounded-2xl, a.rounded-2xl[role="button"] { border-radius:var(--lu-radius-control); }
+
+/* Feature education: dimensional CSS surfaces, no WebGL or external runtime. */
+.lu-motion-section{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);gap:48px;align-items:center;max-width:1152px;margin:0 auto;padding:64px 24px}
+.lu-motion-copy h2{margin:14px 0 20px;font-size:clamp(26px,3vw,38px);line-height:1.3;font-weight:600}
+.lu-motion-copy>p:not(.lu-label){max-width:40ch;color:var(--lu-muted);line-height:1.9;margin-bottom:24px}
+.lu-motion-stage{min-width:0;border:1px solid var(--lu-line);border-radius:14px;background:linear-gradient(145deg,#edf3f0,#f9fbfa);padding:24px;overflow:hidden}
+.lu-motion-stack{height:260px;position:relative;perspective:1000px;display:grid;place-items:center}
+.lu-motion-sheet{position:absolute;width:230px;height:190px;border:1px solid #bdd0c7;border-radius:12px;transform:rotateX(22deg) rotateY(-25deg) rotateZ(5deg);transform-style:preserve-3d;box-shadow:14px 20px 30px rgb(23 43 47/.08)}
+.lu-motion-sheet-back{background:#d2e3d9;translate:36px -24px}
+.lu-motion-sheet-mid{background:#e3eee8;translate:18px -12px}
+.lu-motion-sheet-front{background:#fff;padding:24px;display:flex;flex-direction:column;align-items:flex-start;gap:12px;color:var(--lu-accent)}
+.lu-motion-sheet-front span{font-size:11px;letter-spacing:.08em}.lu-motion-sheet-front strong{font-size:17px;color:var(--lu-ink)}
+.lu-motion-bars{display:flex;gap:5px;width:100%;align-items:flex-end;height:30px}.lu-motion-bars i{background:#b5d3c4;width:23%;border-radius:3px;height:50%}.lu-motion-bars i:nth-child(2){height:75%}.lu-motion-bars i:nth-child(3){height:100%;background:var(--lu-accent)}
+.is-playing .lu-motion-stack{animation:lu-layer-float 6s ease-in-out infinite}.lu-motion-caption{min-height:100px;text-align:center;max-width:340px;margin:auto}
+@keyframes lu-layer-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-12px)}}
+@media(max-width:767px){.lu-motion-section{grid-template-columns:minmax(0,1fr);gap:24px;padding:40px 16px}.lu-motion-stage{padding:16px}.lu-motion-stack{height:240px}.lu-motion-sheet{width:210px;height:180px}}
+@media(prefers-reduced-motion:reduce){.is-playing .lu-motion-stack{animation:none}.lu-motion-sheet{transform:none;translate:none}.lu-motion-sheet-back,.lu-motion-sheet-mid{display:none}}

@@ -52,10 +52,10 @@ export default function OnboardingBanner() {
  if (needsOnboarding !== true) return null
 
  return (
- <div className="fixed left-0 right-0 z-[40] top-0 px-4 py-2 bg-gradient-to-r from-[#3182F6] to-[#7C3AED] text-white shadow-lg">
+ <div className="fixed left-0 right-0 z-[40] top-0 px-4 py-2 bg-[var(--lu-accent)] text-white shadow-none">
  <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
  <div className="flex items-center gap-3 min-w-0 flex-1">
- <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center flex-shrink-0">
+ <div className="w-9 h-9 rounded-[6px] bg-white/20 flex items-center justify-center flex-shrink-0">
  <Rocket size={18} className="text-white" strokeWidth={2.5} />
  </div>
  <div className="min-w-0">
@@ -68,7 +68,7 @@ export default function OnboardingBanner() {
  <div className="flex items-center gap-2 flex-shrink-0">
  <Link
  href="/my/platforms/naver_place/connect"
- className="px-3 py-1.5 rounded-lg bg-white text-[#3182F6] text-xs font-bold hover:bg-[#F0F9FF] active:scale-95 transition-all whitespace-nowrap"
+ className="px-3 py-1.5 rounded-lg bg-white text-[#16685D] text-xs font-bold hover:bg-[#F0F9FF] active:scale-95 transition-all whitespace-nowrap"
  >
  매장 연결하기 →
  </Link>
@@ -79,7 +79,7 @@ export default function OnboardingBanner() {
  try { sessionStorage.setItem('localution.onboarding_dismissed', '1') } catch {}
  }}
  aria-label="닫기"
- className="w-7 h-7 flex items-center justify-center text-white/70 hover:text-white text-lg leading-none"
+ className="min-h-11 w-7 h-7 flex items-center justify-center text-white/70 hover:text-white text-lg leading-none"
  >×</button>
  </div>
  </div>

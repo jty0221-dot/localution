@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react'
+import FeatureGuideLink from './help/FeatureGuideLink'
 import { LayoutDashboard } from 'lucide-react'
 import type { BrandGradientKey } from '../lib/brand-colors'
 
@@ -29,6 +30,7 @@ export default function PageHeader({ icon, title, subtitle, right, badge = 'ë¡œì
  <div className="min-w-0 flex-1 basis-40">
  <h1 className="break-keep text-2xl font-bold leading-8 tracking-tight md:text-[28px] md:leading-9">{title}</h1>
  {subtitle && <p className="mt-2 max-w-[68ch] break-keep text-sm leading-6 text-[var(--lu-muted)]">{subtitle}</p>}
+ <FeatureGuideLink />
  </div>
  {right ? <div className="flex w-full flex-wrap items-center gap-2 pt-1 md:ml-auto md:w-auto">{right}</div>
  : badge ? <span className="hidden border-l border-[var(--lu-line)] pl-4 text-xs font-medium leading-8 text-[var(--lu-muted)] md:block">{badge}</span> : null}

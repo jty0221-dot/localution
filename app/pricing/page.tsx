@@ -64,7 +64,7 @@ const ICON_MAP: Record<string, LucideIcon> = {
 }
 
 const CATEGORY_COLOR: Record<string, string> = {
- '사장님': '#3182F6',
+ '사장님': '#16685D',
  '마케터': '#8B5CF6',
  '공통': '#059669',
 }
@@ -126,7 +126,7 @@ const PERSONAS = [
  title: '소상공인',
  desc: '동네 검색 노출 + 리뷰 관리 + 월 성과 확인',
  Icon: Store,
- color: '#3182F6',
+ color: '#16685D',
  features: ['ai-review', 'qr-stamp', 'keyword', 'crm', 'report'] as ModuleId[],
  },
  {
@@ -149,7 +149,7 @@ const PERSONAS = [
 
 // ── 무료 제공 기능 ─────────────────────────────────────────
 const FREE_FEATURES = [
- { Icon: MessageSquare, color: '#3182F6', label: '사장님 커뮤니티', desc: '지역·업종별 사장님들과 정보 공유 · 공동구매' },
+ { Icon: MessageSquare, color: '#16685D', label: '사장님 커뮤니티', desc: '지역·업종별 사장님들과 정보 공유 · 공동구매' },
  { Icon: Gift, color: '#F59E0B', label: '파트너 포인트', desc: '지인 추천 시 포인트 적립 · 구독료 할인 전환' },
  { Icon: BarChart3, color: '#7C3AED', label: '기본 대시보드', desc: '리뷰 현황·방문 추이 · 실시간 알림 기본 제공' },
  { Icon: Link2, color: '#059669', label: '매장 프로필 관리', desc: '매장 정보·플랫폼 연동 설정 · 무제한 무료' },
@@ -188,8 +188,8 @@ function AnimatedCheckSmall({ active }: { active: boolean }) {
  return (
  <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
  <circle cx="8" cy="8" r="7.5"
- fill={active ? '#3182F6' : 'none'}
- stroke={active ? '#3182F6' : '#D1D5DB'}
+ fill={active ? '#16685D' : 'none'}
+ stroke={active ? '#16685D' : '#D1D5DB'}
  strokeWidth="1.5" />
  {active && (
  <polyline points="4.5,8.5 7,11 11.5,5.5"
@@ -242,7 +242,7 @@ export default function PricingPage() {
  ]
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <style>{GLOBAL_STYLES}</style>
  <main className="px-4 sm:px-6 md:px-8 py-6 sm:py-8">
  {/* cart 가 있을 때 모바일 sticky 바 (높이 ~80px) 만큼 본문 하단 여백 추가 — 콘텐츠 가림 방지 */}
@@ -250,11 +250,11 @@ export default function PricingPage() {
 
  {/* ── 신뢰 배너 ─────────────────────────────── */}
  <div className="flex justify-center mb-5 sm:mb-6">
- <div className="inline-flex items-center gap-2 bg-white border border-[#10B981]/30 rounded-full px-4 py-2 shadow-sm">
+ <div className="inline-flex items-center gap-2 bg-white border border-[#10B981]/30 rounded-full px-4 py-2 shadow-none">
  <span className="w-2 h-2 bg-green-500 rounded-full"
  style={{ animation: 'pulse-dot 1.8s ease-in-out infinite' }} />
  <span className="text-xs font-bold text-[#059669]">베타 테스트 진행 중</span>
- <span className="text-xs text-[#8B95A1] hidden sm:inline">· 전 기능 무료 사용 가능</span>
+ <span className="text-xs text-[var(--lu-muted)] hidden sm:inline">· 전 기능 무료 사용 가능</span>
  </div>
  </div>
 
@@ -264,10 +264,10 @@ export default function PricingPage() {
  <Gift size={12} strokeWidth={2.5} />
  베타 테스트 기간 · 전 기능 100% 무료
  </div>
- <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-[#191F28] mb-3 break-keep leading-tight">
+ <h1 className="text-2xl sm:text-3xl md:text-4xl font-semibold text-[var(--lu-ink)] mb-3 break-keep leading-tight">
  지금은 모든 기능,<br className="sm:hidden" /> 테스트 기간 무료
  </h1>
- <p className="text-[#4E5968] text-sm sm:text-base max-w-lg mx-auto break-keep leading-relaxed">
+ <p className="text-[var(--lu-muted)] text-sm sm:text-base max-w-lg mx-auto break-keep leading-relaxed">
  신용카드 등록 없음 · 자동결제 없음 · 언제든 원클릭 해지
  <br/>
  <span className="font-bold text-[#059669]">필요한 기능을 담고 지금 바로 써보세요.</span>
@@ -289,27 +289,27 @@ export default function PricingPage() {
  {/* ── 역할별 추천 번들 ──────────────────────── */}
  <div className="mb-8 sm:mb-10">
  <div className="text-center mb-4">
- <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#3182F6] mb-1">
+ <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[var(--lu-accent)] mb-1">
  <Target size={12} strokeWidth={2.5} />
  어떤 분이세요?
  </div>
- <p className="text-sm text-[#8B95A1] break-keep">역할에 맞는 기능을 한 번에 담아드려요. 언제든 수정 가능합니다.</p>
+ <p className="text-sm text-[var(--lu-muted)] break-keep">역할에 맞는 기능을 한 번에 담아드려요. 언제든 수정 가능합니다.</p>
  </div>
  <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3">
  {PERSONAS.map(p => (
  <button key={p.key} onClick={() => applyPersona(p.features)}
- className="relative bg-white rounded-2xl p-3.5 sm:p-4 border border-[#E5E8EB] hover:border-[#3182F6] hover:shadow-md transition-all text-left group active:scale-95 overflow-hidden">
+ className="min-h-11 relative bg-white rounded-[10px] p-3.5 sm:p-4 border border-[var(--lu-line)] hover:border-[var(--lu-accent)] hover:shadow-md transition-all text-left group active:scale-95 overflow-hidden">
  {/* SVG 배경 — 오른쪽 하단 원형 장식 */}
  <svg className="absolute -bottom-4 -right-4 opacity-[0.06] pointer-events-none" width="80" height="80" aria-hidden="true">
  <circle cx="40" cy="40" r="40" fill={p.color} />
  </svg>
- <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center mb-2.5"
+ <div className="relative w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] flex items-center justify-center mb-2.5"
  style={{ background: p.color + '18' }}>
  <p.Icon size={18} strokeWidth={2} style={{ color: p.color }} />
  </div>
- <div className="font-black text-[#191F28] text-xs sm:text-sm mb-1 break-keep group-hover:text-[#3182F6] transition-colors leading-snug">{p.title}</div>
- <div className="text-[10px] sm:text-[11px] text-[#8B95A1] leading-relaxed mb-2.5 break-keep hidden sm:block">{p.desc}</div>
- <div className="inline-flex items-center gap-1 text-[10px] font-bold text-[#3182F6]">
+ <div className="font-semibold text-[var(--lu-ink)] text-xs sm:text-sm mb-1 break-keep group-hover:text-[var(--lu-accent)] transition-colors leading-snug">{p.title}</div>
+ <div className="text-[10px] sm:text-[11px] text-[var(--lu-muted)] leading-relaxed mb-2.5 break-keep hidden sm:block">{p.desc}</div>
+ <div className="inline-flex items-center gap-1 text-[10px] font-bold text-[var(--lu-accent)]">
  {p.features.length}개 기능 한 번에 담기
  <ArrowRight size={10} strokeWidth={2.5} />
  </div>
@@ -319,17 +319,17 @@ export default function PricingPage() {
  </div>
 
  {/* ── 베타 안내 박스 ─────────────────────────── */}
- <div className="mb-8 sm:mb-10 bg-gradient-to-br from-[#ECFDF5] to-[#F0FDF4] rounded-2xl p-4 sm:p-5 border border-[#A7F3D0] relative overflow-hidden">
+ <div className="mb-8 sm:mb-10 bg-[var(--lu-accent)] rounded-[10px] p-4 sm:p-5 border border-[#A7F3D0] relative overflow-hidden">
  {/* SVG 배경 장식 */}
  <svg className="absolute -top-8 -right-8 opacity-10 pointer-events-none" width="120" height="120" aria-hidden="true">
  <circle cx="60" cy="60" r="60" fill="#10B981" />
  </svg>
  <div className="flex flex-col sm:flex-row sm:items-center gap-3 relative">
- <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-2xl bg-[#10B981] flex items-center justify-center shrink-0">
+ <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-[10px] bg-[#10B981] flex items-center justify-center shrink-0">
  <Gift size={20} strokeWidth={2.25} className="text-white" />
  </div>
  <div className="flex-1">
- <p className="text-sm font-black text-[#065F46] mb-1">베타 테스트 기간 · 모든 기능 무료로 써보세요</p>
+ <p className="text-sm font-semibold text-[#065F46] mb-1">베타 테스트 기간 · 모든 기능 무료로 써보세요</p>
  <p className="text-xs text-[#065F46]/80 leading-relaxed break-keep">
  신용카드 등록 안 받습니다. 자동결제 불가능합니다. 정식 출시는 <b>최소 30일 전</b> 카카오톡·이메일로 미리 안내드리고, 원치 않으면 해지만 하면 끝입니다.
  </p>
@@ -346,10 +346,10 @@ export default function PricingPage() {
  <div className="flex gap-1.5 sm:gap-2 mb-5 flex-wrap">
  {FILTER_TABS.map(({ key, label, Icon: FIcon }) => (
  <button key={key} onClick={() => setFilter(key)}
- className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all ${
+ className={`inline-flex items-center gap-1.5 px-3 sm:px-4 py-2 rounded-[6px] text-xs sm:text-sm font-semibold transition-all ${
  filter === key
- ? 'bg-[#3182F6] text-white shadow-sm'
- : 'bg-white text-[#4E5968] hover:bg-gray-50 border border-[#E5E8EB]'
+ ? 'bg-[var(--lu-accent)] text-white shadow-none'
+ : 'bg-white text-[var(--lu-muted)] hover:bg-gray-50 border border-[var(--lu-line)]'
  }`}>
  <FIcon size={13} strokeWidth={2.25} />
  {label}
@@ -367,28 +367,28 @@ export default function PricingPage() {
  onKeyDown={e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(feature.id) } }}
  role="button" tabIndex={0}
  aria-pressed={inCart}
- className={`relative bg-white rounded-2xl p-4 sm:p-5 cursor-pointer transition-all border-2 focus:outline-none focus:ring-2 focus:ring-[#3182F6]/40 select-none ${
- inCart ? 'border-[#3182F6] shadow-sm shadow-blue-100' : 'border-transparent hover:border-[#E5E8EB]'
+ className={`relative bg-white rounded-[10px] p-4 sm:p-5 cursor-pointer transition-all border-2 focus:outline-none focus:ring-2 focus:ring-[var(--lu-accent)]/40 select-none ${
+ inCart ? 'border-[var(--lu-accent)] shadow-none shadow-blue-100' : 'border-transparent hover:border-[var(--lu-line)]'
  }`}>
  {feature.popular && (
- <div className="absolute -top-2.5 left-4 bg-[#3182F6] text-white text-[9px] font-black px-2 py-0.5 rounded-full"
+ <div className="absolute -top-2.5 left-4 bg-[var(--lu-accent)] text-white text-[9px] font-semibold px-2 py-0.5 rounded-full"
  style={{ animation: 'badge-pop 0.4s cubic-bezier(0.34,1.56,0.64,1) forwards' }}>
  인기
  </div>
  )}
  {feature.badge && !feature.popular && (
- <div className="absolute -top-2.5 left-4 bg-[#8B5CF6] text-white text-[9px] font-black px-2 py-0.5 rounded-full">
+ <div className="absolute -top-2.5 left-4 bg-[#8B5CF6] text-white text-[9px] font-semibold px-2 py-0.5 rounded-full">
  {feature.badge}
  </div>
  )}
  <div className="flex items-start justify-between mb-3">
  <div className="flex items-center gap-2.5">
- <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl flex items-center justify-center shrink-0"
+ <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-[6px] flex items-center justify-center shrink-0"
  style={{ backgroundColor: feature.iconColor + '15' }}>
  <feature.Icon size={18} strokeWidth={2} style={{ color: feature.iconColor }} />
  </div>
  <div>
- <div className="font-bold text-[#191F28] text-xs sm:text-sm leading-snug">{feature.name}</div>
+ <div className="font-bold text-[var(--lu-ink)] text-xs sm:text-sm leading-snug">{feature.name}</div>
  <span className={`text-[9px] px-1.5 py-0.5 rounded-full font-bold mt-0.5 inline-block ${categoryColor[feature.category]}`}>
  {feature.category}용
  </span>
@@ -396,14 +396,14 @@ export default function PricingPage() {
  </div>
  <AnimatedCheckSmall active={inCart} />
  </div>
- <p className="text-[11px] sm:text-xs text-[#8B95A1] leading-relaxed mb-3 break-keep">{feature.desc}</p>
+ <p className="text-[11px] sm:text-xs text-[var(--lu-muted)] leading-relaxed mb-3 break-keep">{feature.desc}</p>
  <div className="flex items-center justify-between">
  <span className="inline-flex items-baseline gap-1">
- <span className="text-xs sm:text-sm font-black text-[#10B981]">베타 무료</span>
+ <span className="text-xs sm:text-sm font-semibold text-[#10B981]">베타 무료</span>
  <span className="text-[10px] text-[#B0B8C1] line-through ml-1">{feature.price.toLocaleString()}원/월</span>
  </span>
  <span className={`inline-flex items-center gap-1 text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-lg transition-all ${
- inCart ? 'bg-[#3182F6] text-white' : 'bg-[#F2F4F6] text-[#4E5968]'
+ inCart ? 'bg-[var(--lu-accent)] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]'
  }`}>
  {inCart ? <><Check size={11} strokeWidth={3} /> 담김</> : <><Plus size={11} strokeWidth={3} /> 담기</>}
  </span>
@@ -414,21 +414,21 @@ export default function PricingPage() {
  </div>
 
  {/* ── 무료 제공 기능 ─────────────────────── */}
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-4 sm:p-6 mb-2">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-4 sm:p-6 mb-2">
  <div className="flex items-center gap-2 mb-4">
- <span className="inline-flex items-center gap-1.5 bg-[#ECFDF5] text-[#059669] text-[10px] font-black px-2.5 py-1 rounded-full">
+ <span className="inline-flex items-center gap-1.5 bg-[#ECFDF5] text-[#059669] text-[10px] font-semibold px-2.5 py-1 rounded-full">
  <Gift size={10} strokeWidth={2.5} /> 가입만 해도 무료 제공
  </span>
  </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
  {FREE_FEATURES.map(f => (
- <div key={f.label} className="flex items-start gap-2.5 p-3 rounded-xl bg-[#F8F9FA]">
+ <div key={f.label} className="flex items-start gap-2.5 p-3 rounded-[6px] bg-[var(--lu-canvas)]">
  <div className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: f.color + '15' }}>
  <f.Icon size={14} style={{ color: f.color }} strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-xs font-black text-[#191F28] mb-0.5">{f.label}</p>
- <p className="text-[11px] text-[#8B95A1] leading-relaxed break-keep">{f.desc}</p>
+ <p className="text-xs font-semibold text-[var(--lu-ink)] mb-0.5">{f.label}</p>
+ <p className="text-[11px] text-[var(--lu-muted)] leading-relaxed break-keep">{f.desc}</p>
  </div>
  </div>
  ))}
@@ -439,57 +439,57 @@ export default function PricingPage() {
 
  {/* ── 장바구니 (데스크탑 고정) ──────────────── */}
  <div className="hidden md:block w-[270px] lg:w-72 sticky top-24 shrink-0">
- <div className="bg-white rounded-2xl shadow-sm p-4 sm:p-5 border border-[#E5E8EB]">
+ <div className="bg-white rounded-[10px] shadow-none p-4 sm:p-5 border border-[var(--lu-line)]">
  <div className="flex items-center justify-between mb-4">
- <h3 className="inline-flex items-center gap-1.5 font-bold text-[#191F28] text-sm">
+ <h3 className="inline-flex items-center gap-1.5 font-bold text-[var(--lu-ink)] text-sm">
  내 플랜
- <ShoppingCart size={15} strokeWidth={2.25} className="text-[#3182F6]" />
+ <ShoppingCart size={15} strokeWidth={2.25} className="text-[var(--lu-accent)]" />
  </h3>
- <span className="text-xs bg-blue-100 text-[#3182F6] px-2 py-0.5 rounded-full font-bold">{cart.length}개</span>
+ <span className="text-xs bg-blue-100 text-[var(--lu-accent)] px-2 py-0.5 rounded-full font-bold">{cart.length}개</span>
  </div>
 
  {cart.length === 0 ? (
  <div className="text-center py-8">
- <div className="w-12 h-12 rounded-2xl bg-[#F2F4F6] mx-auto mb-3 flex items-center justify-center">
+ <div className="w-12 h-12 rounded-[10px] bg-[var(--lu-canvas)] mx-auto mb-3 flex items-center justify-center">
  <ShoppingBasket size={22} strokeWidth={1.75} className="text-[#B0B8C1]" />
  </div>
- <p className="text-xs text-[#8B95A1] break-keep leading-relaxed">위에서 역할을 선택하거나<br/>기능을 직접 담아보세요</p>
+ <p className="text-xs text-[var(--lu-muted)] break-keep leading-relaxed">위에서 역할을 선택하거나<br/>기능을 직접 담아보세요</p>
  </div>
  ) : (
  <>
  {/* 번들 할인 진행 바 */}
  {nextTier && (
- <div className="mb-4 bg-[#F8F9FA] rounded-xl p-3">
+ <div className="mb-4 bg-[var(--lu-canvas)] rounded-[6px] p-3">
  <div className="flex justify-between items-center mb-1.5">
- <span className="text-[10px] text-[#4E5968] font-bold">할인까지</span>
- <span className="text-[10px] font-black text-[#3182F6]">{nextTier.need}개 더 담으면 {nextTier.rate}% ↓</span>
+ <span className="text-[10px] text-[var(--lu-muted)] font-bold">할인까지</span>
+ <span className="text-[10px] font-semibold text-[var(--lu-accent)]">{nextTier.need}개 더 담으면 {nextTier.rate}% ↓</span>
  </div>
- <div className="h-1.5 bg-[#E5E8EB] rounded-full overflow-hidden">
- <div className="h-full bg-[#3182F6] rounded-full transition-all"
+ <div className="h-1.5 bg-[var(--lu-line)] rounded-full overflow-hidden">
+ <div className="h-full bg-[var(--lu-accent)] rounded-full transition-all"
  style={{ width: `${Math.min((cart.length / (cart.length + nextTier.need)) * 100, 100)}%` }} />
  </div>
  </div>
  )}
  {discountRate > 0 && (
- <div className="mb-3 inline-flex items-center gap-1.5 bg-[#EFF6FF] text-[#3182F6] text-[10px] font-black px-2.5 py-1 rounded-full">
+ <div className="mb-3 inline-flex items-center gap-1.5 bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] text-[10px] font-semibold px-2.5 py-1 rounded-full">
  번들 {Math.round(discountRate * 100)}% 할인 적용 중
  </div>
  )}
 
  <div className="space-y-1.5 mb-4 max-h-52 overflow-y-auto pr-0.5">
  {cartItems.map(item => (
- <div key={item.id} className="flex items-center justify-between py-1.5 border-b border-[#F2F4F6]">
+ <div key={item.id} className="flex items-center justify-between py-1.5 border-b border-[var(--lu-canvas)]">
  <div className="flex items-center gap-2 min-w-0">
  <span className="w-5 h-5 rounded-md flex items-center justify-center shrink-0"
  style={{ backgroundColor: item.iconColor + '15' }}>
  <item.Icon size={11} strokeWidth={2.25} style={{ color: item.iconColor }} />
  </span>
- <span className="text-[11px] text-[#4E5968] font-medium truncate">{item.name}</span>
+ <span className="text-[11px] text-[var(--lu-muted)] font-medium truncate">{item.name}</span>
  </div>
  <div className="flex items-center gap-1.5 shrink-0">
  <span className="text-[10px] font-bold text-[#10B981]">무료</span>
  <button onClick={e => { e.stopPropagation(); toggle(item.id) }}
- className="text-[#B0B8C1] hover:text-[#F04452] transition-colors">
+ className="min-h-11 text-[#B0B8C1] hover:text-[#F04452] transition-colors">
  <X size={13} strokeWidth={2.25} />
  </button>
  </div>
@@ -497,11 +497,11 @@ export default function PricingPage() {
  ))}
  </div>
 
- <div className="border-t border-[#F2F4F6] pt-3.5 mb-4">
+ <div className="border-t border-[var(--lu-canvas)] pt-3.5 mb-4">
  <div className="flex justify-between items-center">
- <span className="text-xs text-[#191F28] font-bold">월 합계</span>
+ <span className="text-xs text-[var(--lu-ink)] font-bold">월 합계</span>
  <span className="inline-flex items-baseline gap-1.5">
- <span className="text-lg sm:text-xl font-black text-[#10B981]">0원</span>
+ <span className="text-lg sm:text-xl font-semibold text-[#10B981]">0원</span>
  <span className="text-[10px] text-[#B0B8C1] line-through">{total.toLocaleString()}원</span>
  </span>
  </div>
@@ -509,11 +509,11 @@ export default function PricingPage() {
  </div>
 
  <Link href="/login"
- className="flex items-center justify-center gap-1.5 w-full py-2.5 sm:py-3 bg-[#10B981] text-white font-bold text-sm rounded-xl hover:bg-[#059669] transition-all shadow-sm">
+ className="flex items-center justify-center gap-1.5 w-full py-2.5 sm:py-3 bg-[#10B981] text-white font-bold text-sm rounded-[6px] hover:bg-[#059669] transition-all shadow-none">
  무료로 시작하기 <ArrowRight size={14} strokeWidth={2.5} />
  </Link>
  <button onClick={requestQuote}
- className="flex items-center justify-center gap-1.5 w-full mt-2 py-2.5 bg-white border-2 border-[#3182F6] text-[#3182F6] font-bold text-sm rounded-xl hover:bg-[#EFF6FF] transition-all">
+ className="min-h-11 flex items-center justify-center gap-1.5 w-full mt-2 py-2.5 bg-white border-2 border-[var(--lu-accent)] text-[var(--lu-accent)] font-bold text-sm rounded-[6px] hover:bg-[var(--lu-accent-soft)] transition-all">
  <MessageCircle size={13} strokeWidth={2.5} />
  이 구성으로 문의하기
  </button>
@@ -523,7 +523,7 @@ export default function PricingPage() {
  </div>
 
  {/* 인기 조합 */}
- <div className="bg-[#ECFDF5] rounded-2xl p-4 mt-3 border border-[#A7F3D0]">
+ <div className="bg-[#ECFDF5] rounded-[10px] p-4 mt-3 border border-[#A7F3D0]">
  <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#059669] mb-2.5">
  <Gift size={12} strokeWidth={2.5} />
  인기 조합 · 전부 무료
@@ -549,21 +549,21 @@ export default function PricingPage() {
  {/* ── FAQ ───────────────────────────────────── */}
  <div className="max-w-2xl mx-auto mt-14 sm:mt-20">
  <div className="text-center mb-6 sm:mb-8">
- <h2 className="text-xl sm:text-2xl md:text-3xl font-black text-[#191F28] mb-2">자주 묻는 질문</h2>
- <p className="text-xs sm:text-sm text-[#8B95A1]">결제 전에 궁금한 점을 확인해보세요</p>
+ <h2 className="text-xl sm:text-2xl md:text-3xl font-semibold text-[var(--lu-ink)] mb-2">자주 묻는 질문</h2>
+ <p className="text-xs sm:text-sm text-[var(--lu-muted)]">결제 전에 궁금한 점을 확인해보세요</p>
  </div>
  <div className="space-y-2.5">
  {faqs.map((faq, idx) => (
- <div key={idx} className="bg-white rounded-2xl border border-[#E5E8EB] overflow-hidden">
+ <div key={idx} className="bg-white rounded-[10px] border border-[var(--lu-line)] overflow-hidden">
  <button
  onClick={() => setOpenFaq(openFaq === idx ? null : idx)}
- className="w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-gray-50 transition-colors gap-3">
- <span className="font-bold text-[#191F28] text-sm break-keep">Q. {faq.q}</span>
+ className="min-h-11 w-full flex items-center justify-between p-4 sm:p-5 text-left hover:bg-gray-50 transition-colors gap-3">
+ <span className="font-bold text-[var(--lu-ink)] text-sm break-keep">Q. {faq.q}</span>
  <ChevronDown size={16} strokeWidth={2.25}
- className={`text-[#8B95A1] transition-transform shrink-0 ${openFaq === idx ? 'rotate-180' : ''}`} />
+ className={`text-[var(--lu-muted)] transition-transform shrink-0 ${openFaq === idx ? 'rotate-180' : ''}`} />
  </button>
  {openFaq === idx && (
- <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-[#4E5968] leading-relaxed break-keep border-t border-[#F2F4F6] pt-3.5">
+ <div className="px-4 sm:px-5 pb-4 sm:pb-5 text-xs sm:text-sm text-[var(--lu-muted)] leading-relaxed break-keep border-t border-[var(--lu-canvas)] pt-3.5">
  {faq.a}
  </div>
  )}
@@ -574,14 +574,14 @@ export default function PricingPage() {
 
  {/* ── 하단 CTA ──────────────────────────────── */}
  <div className="max-w-2xl mx-auto mt-12 sm:mt-16 text-center">
- <div className="bg-gradient-to-br from-[#10B981] to-[#059669] rounded-2xl sm:rounded-3xl p-7 sm:p-10 md:p-12 text-white">
- <h3 className="text-xl sm:text-2xl md:text-3xl font-black mb-2.5 break-keep">아직 고민되신다면?</h3>
+ <div className="bg-[var(--lu-accent)] rounded-[10px] sm:rounded-3xl p-7 sm:p-10 md:p-12 text-white">
+ <h3 className="text-xl sm:text-2xl md:text-3xl font-semibold mb-2.5 break-keep">아직 고민되신다면?</h3>
  <p className="text-green-50 mb-6 text-xs sm:text-sm leading-relaxed break-keep">
  지금은 <b className="underline">베타 테스트 기간 · 전 기능 무료</b>예요.<br/>
  신용카드 등록도, 자동결제도 없으니 부담 없이 써보세요.
  </p>
  <Link href="/login"
- className="inline-flex items-center gap-2 bg-white text-[#059669] font-black px-6 sm:px-8 py-3 sm:py-4 rounded-xl sm:rounded-2xl hover:bg-gray-50 transition-all shadow-lg text-sm sm:text-base">
+ className="inline-flex items-center gap-2 bg-white text-[#059669] font-semibold px-6 sm:px-8 py-3 sm:py-4 rounded-[6px] sm:rounded-[10px] hover:bg-gray-50 transition-all shadow-none text-sm sm:text-base">
  지금 바로 무료 시작하기
  <ArrowRight size={16} strokeWidth={2.5} />
  </Link>
@@ -590,22 +590,22 @@ export default function PricingPage() {
 
  {/* ── 모바일 장바구니 하단 고정 ─────────────── */}
  {cart.length > 0 && (
- <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[#E5E8EB] p-3 shadow-xl z-50 safe-area-pb">
+ <div className="md:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-[var(--lu-line)] p-3 shadow-xl z-50 safe-area-pb">
  <div className="flex items-end justify-between mb-2">
  <div>
- <div className="text-[10px] text-[#8B95A1]">{cart.length}개 선택 · 베타 테스트 기간</div>
+ <div className="text-[10px] text-[var(--lu-muted)]">{cart.length}개 선택 · 베타 테스트 기간</div>
  <div className="inline-flex items-baseline gap-1.5">
- <span className="text-base font-black text-[#10B981]">무료</span>
+ <span className="text-base font-semibold text-[#10B981]">무료</span>
  <span className="text-[10px] text-[#B0B8C1] line-through">월 {total.toLocaleString()}원</span>
  </div>
  </div>
  <Link href="/login"
- className="inline-flex items-center gap-1 bg-[#10B981] text-white font-bold text-xs px-4 py-2.5 rounded-xl hover:bg-[#059669] transition-colors shadow-sm">
+ className="inline-flex items-center gap-1 bg-[#10B981] text-white font-bold text-xs px-4 py-2.5 rounded-[6px] hover:bg-[#059669] transition-colors shadow-none">
  무료로 시작 <ArrowRight size={12} strokeWidth={2.5} />
  </Link>
  </div>
  <button onClick={requestQuote}
- className="flex items-center justify-center gap-1.5 w-full py-2.5 bg-white border-2 border-[#3182F6] text-[#3182F6] font-bold text-xs rounded-xl hover:bg-[#EFF6FF] transition-colors">
+ className="min-h-11 flex items-center justify-center gap-1.5 w-full py-2.5 bg-white border-2 border-[var(--lu-accent)] text-[var(--lu-accent)] font-bold text-xs rounded-[6px] hover:bg-[var(--lu-accent-soft)] transition-colors">
  <MessageCircle size={12} strokeWidth={2.5} />
  이 구성 그대로 문의하기
  </button>

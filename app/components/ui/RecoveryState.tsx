@@ -15,7 +15,7 @@ export default function RecoveryState({ kind, onRetry }: RecoveryStateProps) {
   return (
     <main className="flex min-h-screen items-center justify-center bg-[var(--lu-canvas)] px-4 py-8">
       <section aria-labelledby="recovery-title" className="w-full max-w-md rounded-[10px] border border-[var(--lu-line)] bg-white p-6 text-center shadow-none md:p-8">
-        <div className={`mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-[6px] bg-gradient-to-br shadow-none ring-1 ring-black/5 ${isError ? 'from-red-500 to-rose-600' : 'from-blue-500 to-indigo-500'}`}>
+        <div className={`mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-[6px] shadow-none ${isError ? 'bg-[var(--lu-danger)]' : 'bg-[var(--lu-accent)]'}`}>
           <Icon size={24} className="text-[var(--lu-accent)]" strokeWidth={1.8} aria-hidden="true" />
         </div>
         <p className="mb-2 text-xs font-semibold text-[var(--lu-muted)]">{isError ? '잠시 이용이 어려워요' : '페이지를 찾을 수 없어요'}</p>

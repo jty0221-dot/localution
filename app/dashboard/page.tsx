@@ -51,7 +51,7 @@ function NaverPlaceLogo({ size = 28 }: { size?: number }) {
 function GoogleLogo({ size = 28 }: { size?: number }) {
  return (
  <svg width={size} height={size} viewBox="0 0 48 48">
- <rect width="48" height="48" rx="10" fill="white" stroke="#E5E8EB" strokeWidth="1.5"/>
+ <rect width="48" height="48" rx="10" fill="white" stroke="var(--lu-line)" strokeWidth="1.5"/>
  <path d="M43.6 24.5c0-1.5-.14-3-.38-4.5H24v8.5h10.94c-.5 2.5-1.96 4.6-4.16 6v5h6.74c3.94-3.62 6.08-9 6.08-15z" fill="#4285F4"/>
  <path d="M24 44c5.4 0 9.92-1.8 13.24-4.86l-6.46-5c-1.8 1.2-4.1 1.92-6.78 1.92-5.22 0-9.64-3.52-11.22-8.26H6.12v5.14C9.42 40.02 16.28 44 24 44z" fill="#34A853"/>
  <path d="M12.78 27.8A11.94 11.94 0 0112.2 24c0-1.32.22-2.6.58-3.8v-5.14H6.12A20 20 0 004 24c0 3.22.78 6.28 2.12 9.14l6.66-5.34z" fill="#FBBC05"/>
@@ -299,17 +299,17 @@ function Stars({ rating, size = 'sm' }: { rating: number; size?: 'sm' | 'md' }) 
  key={i}
  size={starSize}
  strokeWidth={0}
- fill={i < full ? '#F5A623' : '#E5E8EB'}
- className={i < full ? 'text-[#F5A623]' : 'text-[#E5E8EB]'}
+ fill={i < full ? '#F5A623' : 'var(--lu-line)'}
+ className={i < full ? 'text-[#F5A623]' : 'text-[var(--lu-line)]'}
  />
  ))}
- <span className={(size === 'md' ? 'text-sm' : 'text-[11px]') + ' ml-1 text-[#4E5968] font-bold'}>{rating}</span>
+ <span className={(size === 'md' ? 'text-sm' : 'text-[11px]') + ' ml-1 text-[var(--lu-muted)] font-bold'}>{rating}</span>
  </span>
  )
 }
 
 function RankBadge({ current, prev }: { current: number; prev: number | null }) {
- if (prev === null) return <span className="text-[10px] text-[#8B95A1] font-medium">신규</span>
+ if (prev === null) return <span className="text-[10px] text-[var(--lu-muted)] font-medium">신규</span>
  const diff = prev - current
  // 한국 증시 컨벤션: 상승 = 빨강, 하락 = 파랑
  if (diff > 0) return (
@@ -318,11 +318,11 @@ function RankBadge({ current, prev }: { current: number; prev: number | null }) 
  </span>
  )
  if (diff < 0) return (
- <span className="inline-flex items-center gap-0.5 text-[10px] text-[#3182F6] font-bold">
+ <span className="inline-flex items-center gap-0.5 text-[10px] text-[var(--lu-accent)] font-bold">
  <ArrowDown size={10} strokeWidth={3} />{Math.abs(diff)}
  </span>
  )
- return <span className="inline-flex items-center gap-0.5 text-[10px] text-[#8B95A1] font-bold"><Minus size={10} strokeWidth={3} /></span>
+ return <span className="inline-flex items-center gap-0.5 text-[10px] text-[var(--lu-muted)] font-bold"><Minus size={10} strokeWidth={3} /></span>
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -442,17 +442,17 @@ function ConnectModal({ platform, initialUrl, isConnected, savedStoreName, onClo
 
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true" aria-label="플랫폼 연결 모달">
- <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
+ <div className="bg-white rounded-[10px] shadow-2xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
  <div className="flex items-center gap-3 mb-4">
  {platform.logo(40)}
  <div className="flex-1">
- <h3 className="text-lg font-black text-[#191F28]">{platform.name} 연동</h3>
- <p className="text-xs text-[#8B95A1]">
+ <h3 className="text-lg font-semibold text-[var(--lu-ink)]">{platform.name} 연동</h3>
+ <p className="text-xs text-[var(--lu-muted)]">
  {isConnected ? '이미 연결됨 · URL 변경 또는 해제 가능' : '매장 URL 또는 ID를 입력하세요'}
  </p>
  </div>
  {isConnected && (
- <div className="flex items-center gap-1 px-2 py-1 bg-[#E8FFF0] text-[#12B76A] rounded-md text-[10px] font-black">
+ <div className="flex items-center gap-1 px-2 py-1 bg-[#E8FFF0] text-[#12B76A] rounded-md text-[10px] font-semibold">
  <Check size={11} strokeWidth={3} />
  연결됨
  </div>
@@ -460,32 +460,32 @@ function ConnectModal({ platform, initialUrl, isConnected, savedStoreName, onClo
  </div>
 
  {isConnected && savedStoreName && (
- <div className="mb-3 p-3 bg-[#F2F4F6] rounded-xl">
- <div className="text-[10px] text-[#8B95A1] mb-0.5">현재 연결된 매장</div>
- <div className="text-sm font-bold text-[#191F28]">{savedStoreName}</div>
+ <div className="mb-3 p-3 bg-[var(--lu-canvas)] rounded-[6px]">
+ <div className="text-[10px] text-[var(--lu-muted)] mb-0.5">현재 연결된 매장</div>
+ <div className="text-sm font-bold text-[var(--lu-ink)]">{savedStoreName}</div>
  </div>
  )}
 
- <label className="block text-xs font-bold text-[#4E5968] mb-1.5">매장 URL</label>
+ <label className="block text-xs font-bold text-[var(--lu-muted)] mb-1.5">매장 URL</label>
  <input
  type="text"
  value={url}
  onChange={e => setUrl(e.target.value)}
  placeholder={placeholder}
- className="w-full px-3 py-2.5 border border-[#E5E8EB] rounded-xl text-sm focus:border-[#3182F6] focus:outline-none mb-3"
+ className="w-full px-3 py-2.5 border border-[var(--lu-line)] rounded-[6px] text-sm focus:border-[var(--lu-accent)] focus:outline-none mb-3"
  />
 
  <button
  onClick={verify}
  disabled={verifying || !url.trim()}
- className="w-full bg-[#F2F4F6] text-[#3182F6] py-2.5 rounded-xl text-sm font-bold hover:bg-[#E8F4FD] transition-colors disabled:opacity-50 mb-3"
+ className="min-h-11 w-full bg-[var(--lu-canvas)] text-[var(--lu-accent)] py-2.5 rounded-[6px] text-sm font-bold hover:bg-[var(--lu-accent-soft)] transition-colors disabled:opacity-50 mb-3"
  >
  {verifying ? '검증 중...' : '연동 확인'}
  </button>
 
  {result && (
  <div className={[
- 'inline-flex items-center gap-1.5 text-xs p-3 rounded-xl mb-3 w-full',
+ 'inline-flex items-center gap-1.5 text-xs p-3 rounded-[6px] mb-3 w-full',
  result.ok ? 'bg-[#E8FFF0] text-[#12B76A]' : 'bg-[#FFF0F0] text-[#F04452]',
  ].join(' ')}>
  {result.ok ? <Check size={14} strokeWidth={2.75} /> : <X size={14} strokeWidth={2.75} />}
@@ -506,7 +506,7 @@ function ConnectModal({ platform, initialUrl, isConnected, savedStoreName, onClo
  }
  }}
  disabled={disconnecting}
- className="w-full mb-2 border border-[#F04452] text-[#F04452] py-2.5 rounded-xl text-xs font-bold hover:bg-[#FFF0F0] disabled:opacity-50"
+ className="min-h-11 w-full mb-2 border border-[#F04452] text-[#F04452] py-2.5 rounded-[6px] text-xs font-bold hover:bg-[#FFF0F0] disabled:opacity-50"
  >
  {disconnecting ? '해제 중...' : '연결 해제'}
  </button>
@@ -515,14 +515,14 @@ function ConnectModal({ platform, initialUrl, isConnected, savedStoreName, onClo
  <div className="flex gap-2">
  <button
  onClick={onClose}
- className="flex-1 border border-[#E5E8EB] text-[#4E5968] py-2.5 rounded-xl text-sm font-bold hover:bg-[#F8F9FA]"
+ className="min-h-11 flex-1 border border-[var(--lu-line)] text-[var(--lu-muted)] py-2.5 rounded-[6px] text-sm font-bold hover:bg-[var(--lu-canvas)]"
  >
  취소
  </button>
  <button
  onClick={save}
  disabled={!result?.ok}
- className="flex-1 bg-[#3182F6] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-[#1B64DA] disabled:opacity-40"
+ className="min-h-11 flex-1 bg-[var(--lu-accent)] text-white py-2.5 rounded-[6px] text-sm font-bold hover:bg-[var(--lu-accent-hover)] disabled:opacity-40"
  >
  {isConnected ? '변경 저장' : '연동 저장'}
  </button>
@@ -599,49 +599,49 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
 
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="ai-reply-modal-title">
- <div className="bg-white rounded-2xl shadow-2xl max-w-2xl w-full p-6" onClick={e => e.stopPropagation()}>
+ <div className="bg-white rounded-[10px] shadow-2xl max-w-2xl w-full p-6" onClick={e => e.stopPropagation()}>
  <div className="flex items-center justify-between mb-4">
- <h3 id="ai-reply-modal-title" className="text-lg font-black text-[#191F28]">AI 답글 생성</h3>
- <button onClick={onClose} aria-label="모달 닫기" className="text-[#8B95A1] hover:text-[#191F28] w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[#F2F4F6] transition-colors">
+ <h3 id="ai-reply-modal-title" className="text-lg font-semibold text-[var(--lu-ink)]">AI 답글 생성</h3>
+ <button onClick={onClose} aria-label="모달 닫기" className="min-h-11 text-[var(--lu-muted)] hover:text-[var(--lu-ink)] w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[var(--lu-canvas)] transition-colors">
  <X size={18} strokeWidth={2.25} />
  </button>
  </div>
 
  {/* 원본 리뷰 */}
- <div className="bg-[#F8F9FA] rounded-xl p-4 mb-4">
+ <div className="bg-[var(--lu-canvas)] rounded-[6px] p-4 mb-4">
  <div className="flex items-center gap-2 mb-2">
  <span
- className="text-[10px] font-black text-white px-2 py-0.5 rounded-full"
+ className="text-[10px] font-semibold text-white px-2 py-0.5 rounded-full"
  style={{ background: review.color }}
  >
  {review.platform}
  </span>
- <span className="text-xs font-bold text-[#4E5968]">{review.name}</span>
+ <span className="text-xs font-bold text-[var(--lu-muted)]">{review.name}</span>
  <Stars rating={review.rating} />
- <span className="text-[10px] text-[#8B95A1]">{review.time}</span>
+ <span className="text-[10px] text-[var(--lu-muted)]">{review.time}</span>
  </div>
- <p className="text-sm text-[#191F28]">{review.text}</p>
+ <p className="text-sm text-[var(--lu-ink)]">{review.text}</p>
  </div>
 
  {/* AI 답변 */}
- <label className="block text-xs font-bold text-[#4E5968] mb-1.5">AI 추천 답변 (수정 가능)</label>
+ <label className="block text-xs font-bold text-[var(--lu-muted)] mb-1.5">AI 추천 답변 (수정 가능)</label>
  {loading ? (
- <div className="bg-[#FAFBFF] rounded-xl p-6 text-center text-sm text-[#8B95A1]">
+ <div className="bg-[#FAFBFF] rounded-[6px] p-6 text-center text-sm text-[var(--lu-muted)]">
  AI가 SEO 최적화된 답변을 생성 중입니다...
  </div>
  ) : error ? (
- <div className="bg-[#FFF0F0] text-[#F04452] rounded-xl p-4 text-sm">{error}</div>
+ <div className="bg-[#FFF0F0] text-[#F04452] rounded-[6px] p-4 text-sm">{error}</div>
  ) : (
  <textarea
  value={reply}
  onChange={e => setReply(e.target.value)}
  rows={8}
- className="w-full px-3 py-2.5 border border-[#E5E8EB] rounded-xl text-sm focus:border-[#3182F6] focus:outline-none resize-none"
+ className="w-full px-3 py-2.5 border border-[var(--lu-line)] rounded-[6px] text-sm focus:border-[var(--lu-accent)] focus:outline-none resize-none"
  />
  )}
 
  {posted && (
- <div className="bg-[#E8FFF0] text-[#12B76A] rounded-xl p-3 text-sm font-bold text-center mt-3 inline-flex items-center justify-center gap-1.5 w-full">
+ <div className="bg-[#E8FFF0] text-[#12B76A] rounded-[6px] p-3 text-sm font-bold text-center mt-3 inline-flex items-center justify-center gap-1.5 w-full">
  <CheckCircle2 size={16} strokeWidth={2.5} />
  답글이 게시되었습니다
  </div>
@@ -651,14 +651,14 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
  <button
  onClick={generate}
  disabled={loading}
- className="flex-1 border border-[#E5E8EB] text-[#4E5968] py-2.5 rounded-xl text-sm font-bold hover:bg-[#F8F9FA] disabled:opacity-50"
+ className="min-h-11 flex-1 border border-[var(--lu-line)] text-[var(--lu-muted)] py-2.5 rounded-[6px] text-sm font-bold hover:bg-[var(--lu-canvas)] disabled:opacity-50"
  >
  다시 생성
  </button>
  <button
  onClick={post}
  disabled={loading || !reply.trim() || posted}
- className="flex-1 bg-[#3182F6] text-white py-2.5 rounded-xl text-sm font-bold hover:bg-[#1B64DA] disabled:opacity-40"
+ className="min-h-11 flex-1 bg-[var(--lu-accent)] text-white py-2.5 rounded-[6px] text-sm font-bold hover:bg-[var(--lu-accent-hover)] disabled:opacity-40"
  >
  {posted ? '게시 완료' : '답변 게시하기'}
  </button>
@@ -681,7 +681,7 @@ const SERVICE_RANKING_INIT = [
  { id: 1, name: 'AI 리뷰 자동 답글', category: '리뷰', badge: 'HOT', color: '#F04452' },
  { id: 2, name: '네이버 플레이스 관리', category: '플레이스', badge: '', color: '#03C75A' },
  { id: 3, name: 'QR 리뷰 자동화', category: 'QR', badge: 'NEW', color: '#7C3AED' },
- { id: 4, name: '매출 캘린더 · 정산', category: '정산', badge: '', color: '#3182F6' },
+ { id: 4, name: '매출 캘린더 · 정산', category: '정산', badge: '', color: 'var(--lu-accent)' },
  { id: 5, name: '고객 CRM 관리', category: 'CRM', badge: '', color: '#F59E0B' },
  { id: 6, name: '키워드 순위 추적', category: 'SEO', badge: '', color: '#10B981' },
  { id: 7, name: '숏폼 퍼블리셔', category: '마케팅', badge: '', color: '#EC4899' },
@@ -694,7 +694,7 @@ const SERVICE_RANKING_INIT = [
 // 함수 정의는 남아있지만 JSX 에서 호출하지 마세요. 자세한 내용은 /DO_NOT_TOUCH.md 참조.
 function QuickNav() {
  const links = [
- { href: '/dashboard', label: '대시보드', bg: '#EFF6FF', color: '#3182F6', icon: 'DB' },
+ { href: '/dashboard', label: '대시보드', bg: 'var(--lu-accent-soft)', color: 'var(--lu-accent)', icon: 'DB' },
  { href: '/reviews', label: '리뷰 관리', bg: '#FFFBEB', color: '#F59E0B', icon: '리뷰' },
  { href: '/marketing/place', label: '마케팅 관리',bg: '#FFF7ED', color: '#EA580C', icon: '마케' },
  { href: '/qr-admin', label: 'QR 관리', bg: '#F5F3FF', color: '#8B5CF6', icon: 'QR' },
@@ -703,19 +703,19 @@ function QuickNav() {
  { href: '/community', label: '커뮤니티', bg: '#FDF2F8', color: '#EC4899', icon: '커뮤' },
  ]
  return (
- <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
- <div className="px-5 py-4 border-b border-[#F2F4F6]">
- <span className="text-sm font-bold text-[#191F28]">빠른 이동</span>
- <p className="text-[10px] text-[#8B95A1] mt-0.5">주요 메뉴 바로가기</p>
+ <div className="bg-white rounded-[10px] shadow-none overflow-hidden">
+ <div className="px-5 py-4 border-b border-[var(--lu-canvas)]">
+ <span className="text-sm font-bold text-[var(--lu-ink)]">빠른 이동</span>
+ <p className="text-[10px] text-[var(--lu-muted)] mt-0.5">주요 메뉴 바로가기</p>
  </div>
  <div className="p-3 space-y-1">
  {links.map(l => (
  <Link key={l.href} href={l.href}
- className="flex items-center gap-3 px-3 py-2.5 rounded-xl hover:bg-[#F8F9FA] transition-colors group">
+ className="flex items-center gap-3 px-3 py-2.5 rounded-[6px] hover:bg-[var(--lu-canvas)] transition-colors group">
  <div className="w-7 h-7 rounded-lg flex items-center justify-center text-[10px] font-bold flex-shrink-0"
  style={{ background: l.bg, color: l.color }}>{l.icon}</div>
- <span className="text-sm font-medium text-[#4E5968] group-hover:text-[#191F28]">{l.label}</span>
- <ArrowRight size={12} strokeWidth={2.5} className="ml-auto text-[#D1D5DB] group-hover:text-[#3182F6] transition-colors" />
+ <span className="text-sm font-medium text-[var(--lu-muted)] group-hover:text-[var(--lu-ink)]">{l.label}</span>
+ <ArrowRight size={12} strokeWidth={2.5} className="ml-auto text-[#D1D5DB] group-hover:text-[var(--lu-accent)] transition-colors" />
  </Link>
  ))}
  </div>
@@ -755,16 +755,16 @@ function ServiceRanking() {
  }, [])
 
  return (
- <div className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col">
- <div className="px-5 py-4 border-b border-[#F2F4F6] flex items-center justify-between">
+ <div className="bg-white rounded-[10px] shadow-none overflow-hidden flex flex-col">
+ <div className="px-5 py-4 border-b border-[var(--lu-canvas)] flex items-center justify-between">
  <div>
  <div className="flex items-center gap-2">
- <span className="text-sm font-bold text-[#191F28]">인기 서비스 TOP 10</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">인기 서비스 TOP 10</span>
  <span className="w-1.5 h-1.5 rounded-full bg-[#F04452] animate-pulse inline-block"/>
  </div>
- <p className="text-[10px] text-[#8B95A1] mt-0.5">실시간 사용량 기준</p>
+ <p className="text-[10px] text-[var(--lu-muted)] mt-0.5">실시간 사용량 기준</p>
  </div>
- <span className="text-[10px] text-[#8B95A1] bg-[#F2F4F6] px-2 py-1 rounded-full">5초마다 갱신</span>
+ <span className="text-[10px] text-[var(--lu-muted)] bg-[var(--lu-canvas)] px-2 py-1 rounded-full">5초마다 갱신</span>
  </div>
  <div className="flex-1">
  {items.map((item) => {
@@ -772,24 +772,24 @@ function ServiceRanking() {
  return (
  <div
  key={item.id}
- className="px-5 py-3 flex items-center gap-3 border-b border-[#F8F9FA] hover:bg-[#FAFBFF] transition-all duration-500"
+ className="px-5 py-3 flex items-center gap-3 border-b border-[var(--lu-canvas)] hover:bg-[#FAFBFF] transition-colors duration-500"
  style={{
  transform: isShuffling ? 'translateX(4px)' : 'translateX(0)',
  opacity: isShuffling ? 0.7 : 1,
  transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
  }}
  >
- <div className={'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-black flex-shrink-0 ' + (item.rank <= 3 ? 'bg-[#3182F6] text-white' : 'bg-[#F2F4F6] text-[#8B95A1]')}>
+ <div className={'w-7 h-7 rounded-lg flex items-center justify-center text-xs font-semibold flex-shrink-0 ' + (item.rank <= 3 ? 'bg-[var(--lu-accent)] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]')}>
  {item.rank}
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-1.5">
- <span className="text-sm font-semibold text-[#191F28] truncate">{item.name}</span>
+ <span className="text-sm font-semibold text-[var(--lu-ink)] truncate">{item.name}</span>
  {item.badge && (
- <span className={'text-[9px] px-1.5 py-0.5 rounded-full font-bold ' + (item.badge === 'HOT' ? 'bg-[#FFF0F0] text-[#F04452]' : 'bg-[#EFF6FF] text-[#3182F6]')}>{item.badge}</span>
+ <span className={'text-[9px] px-1.5 py-0.5 rounded-full font-bold ' + (item.badge === 'HOT' ? 'bg-[#FFF0F0] text-[#F04452]' : 'bg-[var(--lu-accent-soft)] text-[var(--lu-accent)]')}>{item.badge}</span>
  )}
  </div>
- <span className="text-[10px] text-[#8B95A1]">{item.category}</span>
+ <span className="text-[10px] text-[var(--lu-muted)]">{item.category}</span>
  </div>
  <div className="flex-shrink-0 w-12 text-right">
  {/* 한국 증시 컨벤션: 상승 빨강 / 하락 파랑 */}
@@ -799,11 +799,11 @@ function ServiceRanking() {
  </span>
  )}
  {diff < 0 && (
- <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[#3182F6]">
+ <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[var(--lu-accent)]">
  <ArrowDown size={10} strokeWidth={3} />{Math.abs(diff)}
  </span>
  )}
- {diff === 0 && <span className="text-[11px] text-[#8B95A1]">-</span>}
+ {diff === 0 && <span className="text-[11px] text-[var(--lu-muted)]">-</span>}
  </div>
  </div>
  )
@@ -1461,7 +1461,7 @@ export default function Dashboard() {
 
  // 실 데이터 연결 전 가짜 숫자 노출 금지 — 데이터 없으면 '—'로 표시
  const stats = [
- { label: '이번 달 방문자', value: '-', sub: '데이터 수집 중', up: false, color: '#3182F6', ring: '#E8F4FD' },
+ { label: '이번 달 방문자', value: '-', sub: '데이터 수집 중', up: false, color: 'var(--lu-accent)', ring: 'var(--lu-accent-soft)' },
  { label: '총 리뷰 수', value: totalReviews ? totalReviews + '건' : '-', sub: hasRealReviews ? '실시간 동기화됨' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#03C75A', ring: '#E8FFF0' },
  { label: '평균 별점', value: avgRating ? avgRating + '점' : '-', sub: hasRealReviews ? '리뷰 기반 자동 계산' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#F5A623', ring: '#FFF7E8' },
  { label: '키워드 상위', value: '-', sub: '키워드 추적 시작 시 표시', up: false, color: '#9B5CFB', ring: '#F3ECFF' },
@@ -1527,13 +1527,13 @@ export default function Dashboard() {
  label: '오늘 예약',
  count: 0,
  unit: '건',
- color: '#3182F6',
+ color: 'var(--lu-accent)',
  ready: false, // 현재 예약 연동 없음
  },
  ]
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
  {/* DashboardRightSidebar:
    · xl+ (1280px+): position:fixed 로 viewport 우측 고정 · 스크롤 무관 항상 보임
@@ -1570,17 +1570,17 @@ export default function Dashboard() {
 
  {/* ── 부정 리뷰 긴급 알림 (미답변 1~2점 있을 때만) ── */}
  {isLoggedIn && negativeUnansweredCount > 0 && (
- <div className="relative overflow-hidden rounded-2xl shadow-sm mb-5 p-5 border-2 border-[#F04452]"
- style={{ background: 'linear-gradient(135deg, #FEF2F2 0%, #FEE4E4 100%)' }}>
+ <div className="relative overflow-hidden rounded-[10px] shadow-none mb-5 p-5 border-2 border-[#F04452]"
+ style={{ background: 'var(--lu-danger-soft)' }}>
  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
  <div className="flex items-start gap-3">
- <div className="w-10 h-10 rounded-xl bg-[#F04452] flex items-center justify-center text-white shrink-0 animate-pulse">
+ <div className="w-10 h-10 rounded-[6px] bg-[#F04452] flex items-center justify-center text-white shrink-0 animate-pulse">
  <AlertTriangle size={20} strokeWidth={2.5} />
  </div>
  <div>
  <div className="flex items-center gap-2 mb-1 flex-wrap">
  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F04452] text-white">긴급</span>
- <h3 className="text-sm md:text-base font-black text-[#7F1D1D]">
+ <h3 className="text-sm md:text-base font-semibold text-[#7F1D1D]">
  답변이 시급한 부정 리뷰 {negativeUnansweredCount}건
  </h3>
  </div>
@@ -1590,7 +1590,7 @@ export default function Dashboard() {
  </div>
  </div>
  <Link href="/reviews?filter=negative-unanswered"
- className="inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-xl bg-[#F04452] text-white text-sm font-bold hover:bg-[#DC2626] transition-all whitespace-nowrap shrink-0">
+ className="inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-[6px] bg-[#F04452] text-white text-sm font-bold hover:bg-[#DC2626] transition-colors whitespace-nowrap shrink-0">
  지금 답변하기
  <ArrowRight size={14} strokeWidth={2.5} />
  </Link>
@@ -1600,15 +1600,15 @@ export default function Dashboard() {
 
  {/* ── 신규 사용자 온보딩 (연결 0개일 때만) ── */}
  {isLoggedIn && connectedCount === 0 && (
- <div id="start-onboarding-card" className="relative overflow-hidden rounded-2xl shadow-sm mb-5 p-5 md:p-6"
- style={{ background: 'linear-gradient(135deg, #3182F6 0%, #1B64DA 100%)' }}>
+ <div id="start-onboarding-card" className="relative overflow-hidden rounded-[10px] shadow-none mb-5 p-5 md:p-6"
+ style={{ background: 'var(--lu-accent)' }}>
  <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
  <div className="text-white">
  <div className="flex items-center gap-2 mb-1.5">
  <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 backdrop-blur">시작하기</span>
  <span className="text-[10px] text-white/70">3분이면 충분해요</span>
  </div>
- <h2 className="text-xl md:text-2xl font-black mb-1.5 leading-tight">처음이세요? 여기서부터 시작하세요</h2>
+ <h2 className="text-xl md:text-2xl font-semibold mb-1.5 leading-tight">처음이세요? 여기서부터 시작하세요</h2>
  <p className="text-xs md:text-sm text-white/80 leading-relaxed">
  우리 가게 정보를 등록하고 네이버·구글·배민·요기요 같은 플랫폼을 연결하면
  <br className="hidden md:block"/>
@@ -1617,12 +1617,12 @@ export default function Dashboard() {
  </div>
  <div className="flex flex-col sm:flex-row gap-2 shrink-0">
  <Link href={buildSettingsHref('connect')}
- className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-xl bg-white text-[#1B64DA] text-sm font-bold hover:bg-[#F2F4F6] transition-all whitespace-nowrap">
+ className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[6px] bg-white text-[var(--lu-accent-hover)] text-sm font-bold hover:bg-[var(--lu-canvas)] transition-colors whitespace-nowrap">
  <Rocket size={14} strokeWidth={2.5} />
  1단계: 플랫폼 연결
  </Link>
  <Link href="/settings"
- className="px-4 py-2.5 rounded-xl bg-white/10 backdrop-blur text-white text-sm font-bold hover:bg-white/20 transition-all text-center whitespace-nowrap border border-white/20">
+ className="px-4 py-2.5 rounded-[6px] bg-white/10 backdrop-blur text-white text-sm font-bold hover:bg-white/20 transition-colors text-center whitespace-nowrap border border-white/20">
  가게 정보 입력
  </Link>
  </div>
@@ -1633,18 +1633,18 @@ export default function Dashboard() {
  )}
 
  {/* ── 오늘 처리할 작업 ── */}
- <div className="bg-white rounded-2xl shadow-sm px-6 py-5 mb-5">
+ <div className="bg-white rounded-[10px] shadow-none px-6 py-5 mb-5">
  <div className="mb-4">
- <p className="text-[11px] text-[#3182F6] font-bold mb-1">로컬루션 대시보드</p>
+ <p className="text-[11px] text-[var(--lu-accent)] font-bold mb-1">로컬루션 대시보드</p>
  <div className="flex items-center justify-between">
  <div>
  <div className="flex items-center gap-2 mb-1">
- <h1 className="text-xl font-black text-[#191F28]">오늘 처리할 작업</h1>
+ <h1 className="text-xl font-semibold text-[var(--lu-ink)]">오늘 처리할 작업</h1>
  {!reviewPlatformConnected && (
  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">데모</span>
  )}
  </div>
- <p className="text-xs text-[#8B95A1]">
+ <p className="text-xs text-[var(--lu-muted)]">
  {!reviewPlatformConnected
  ? '샘플 데이터입니다. 리뷰 플랫폼(네이버·구글·배민·요기요·쿠팡)을 연결하면 실시간으로 표시됩니다'
  : new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'long' }) + ' · 우선순위가 높은 작업 순으로 표시됩니다'
@@ -1653,7 +1653,7 @@ export default function Dashboard() {
  </div>
  <div className="flex items-center gap-1.5">
  <span className={`w-1.5 h-1.5 rounded-full inline-block ${!reviewPlatformConnected ? 'bg-[#F59E0B]' : 'bg-[#12B76A] animate-pulse'}`}/>
- <span className="text-[10px] text-[#8B95A1] font-medium">{!reviewPlatformConnected ? '데모 데이터' : '실시간 업데이트'}</span>
+ <span className="text-[10px] text-[var(--lu-muted)] font-medium">{!reviewPlatformConnected ? '데모 데이터' : '실시간 업데이트'}</span>
  </div>
  </div>
  </div>
@@ -1666,17 +1666,17 @@ export default function Dashboard() {
  key={t.key}
  href={href}
  className={[
- 'group flex flex-col p-4 rounded-xl border transition-all cursor-pointer',
+ 'group flex flex-col p-4 rounded-[6px] border transition-colors cursor-pointer',
  ready
- ? 'border-[#F2F4F6] hover:border-[#3182F6] hover:shadow-md bg-white'
- : 'border-dashed border-[#E0E0E0] hover:border-[#3182F6] bg-[#FAFBFF]',
+ ? 'border-[var(--lu-canvas)] hover:border-[var(--lu-accent)] hover:shadow-md bg-white'
+ : 'border-dashed border-[#E0E0E0] hover:border-[var(--lu-accent)] bg-[#FAFBFF]',
  ].join(' ')}
  title={ready ? '' : `${t.requiredLabel} 연동 후 이용 가능`}
  >
  <div className="flex items-center justify-between gap-2 mb-2">
  <div className="flex items-center gap-2 min-w-0">
  <div className="w-1 h-8 rounded-full" style={{ background: ready ? t.color : '#D1D5DB' }}/>
- <span className="text-xs text-[#8B95A1] font-medium truncate">{t.label}</span>
+ <span className="text-xs text-[var(--lu-muted)] font-medium truncate">{t.label}</span>
  </div>
  {!ready && (
  <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] flex items-center gap-0.5 flex-shrink-0">
@@ -1684,12 +1684,12 @@ export default function Dashboard() {
  </span>
  )}
  </div>
- <span className="text-2xl font-black mb-1" style={{ color: ready ? t.color : '#9CA3AF' }}>
- {ready ? t.count : 0}<span className="text-sm font-bold text-[#8B95A1]">{t.unit}</span>
+ <span className="text-2xl font-semibold mb-1" style={{ color: ready ? t.color : '#9CA3AF' }}>
+ {ready ? t.count : 0}<span className="text-sm font-bold text-[var(--lu-muted)]">{t.unit}</span>
  </span>
  <span className={[
  'text-[11px] inline-flex items-center gap-1 transition-colors',
- ready ? 'text-[#8B95A1] group-hover:text-[#3182F6]' : 'text-[#F59E0B] font-semibold',
+ ready ? 'text-[var(--lu-muted)] group-hover:text-[var(--lu-accent)]' : 'text-[#F59E0B] font-semibold',
  ].join(' ')}>
  {ready
  ? <>바로 처리하기 <ArrowRight size={11} strokeWidth={2.5} /></>
@@ -1705,20 +1705,20 @@ export default function Dashboard() {
  {/* 우측 사이드바 빠른 액션에서 동일 기능 접근 가능 */}
 
  {/* ── 플랫폼 연동 현황 — 6칸 카드형 ── */}
- <div className="bg-white rounded-2xl shadow-sm p-4 md:p-5 mb-5">
+ <div className="bg-white rounded-[10px] shadow-none p-4 md:p-5 mb-5">
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center gap-2">
- <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#3182F6] to-[#1B64DA] flex items-center justify-center shadow-sm">
+ <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Link2 size={13} className="text-white" strokeWidth={2.5} />
  </div>
  <div>
- <p className="text-sm font-bold text-[#191F28]">플랫폼 연동 현황</p>
- <p className="text-[10px] text-[#8B95A1] mt-0.5">
- <span className="text-[#3182F6] font-bold">{connectedCount}</span> / {platforms.length} 연동됨
+ <p className="text-sm font-bold text-[var(--lu-ink)]">플랫폼 연동 현황</p>
+ <p className="text-[10px] text-[var(--lu-muted)] mt-0.5">
+ <span className="text-[var(--lu-accent)] font-bold">{connectedCount}</span> / {platforms.length} 연동됨
  </p>
  </div>
  </div>
- <a href={isLoggedIn ? "/my/platforms" : "/login"} className="inline-flex items-center gap-1 text-[11px] text-[#3182F6] font-bold hover:underline">
+ <a href={isLoggedIn ? "/my/platforms" : "/login"} className="inline-flex items-center gap-1 text-[11px] text-[var(--lu-accent)] font-bold hover:underline">
  {isLoggedIn ? <>연동 관리 <ArrowRight size={11} strokeWidth={2.5} /></> : '로그인 후 연동'}
  </a>
  </div>
@@ -1728,10 +1728,10 @@ export default function Dashboard() {
  key={p.id}
  onClick={() => handlePlatformClick(p)}
  className={[
- 'group relative flex flex-col items-center gap-1.5 p-2.5 md:p-3 rounded-2xl transition-all cursor-pointer overflow-hidden',
+ 'group relative flex flex-col items-center gap-1.5 p-2.5 md:p-3 rounded-[10px] transition-colors cursor-pointer overflow-hidden',
  p.connected
- ? 'bg-white border-2 border-[#E5E8EB] hover:border-[#3182F6] hover:shadow-lg hover:-translate-y-0.5'
- : 'bg-[#FAFBFC] border-2 border-dashed border-[#E5E8EB] hover:border-[#3182F6] hover:bg-white hover:shadow-md',
+ ? 'bg-white border-2 border-[var(--lu-line)] hover:border-[var(--lu-accent)] hover:shadow-none hover:-translate-y-0.5'
+ : 'bg-[#FAFBFC] border-2 border-dashed border-[var(--lu-line)] hover:border-[var(--lu-accent)] hover:bg-white hover:shadow-md',
  ].join(' ')}
  title={p.connected ? p.name + ' 연동됨 · 클릭하여 정보 수정' : p.name + ' 연동하기'}
  >
@@ -1745,21 +1745,21 @@ export default function Dashboard() {
  <span className="hidden md:block">{p.logo(40)}</span>
  </div>
  {/* 플랫폼명 */}
- <span className="text-[10px] md:text-[11px] font-bold text-[#191F28] text-center leading-tight">{p.shortName}</span>
+ <span className="text-[10px] md:text-[11px] font-bold text-[var(--lu-ink)] text-center leading-tight">{p.shortName}</span>
  {/* 상태 뱃지 */}
  <span className={[
- 'text-[9px] md:text-[10px] font-black px-2 py-0.5 rounded-full',
+ 'text-[9px] md:text-[10px] font-semibold px-2 py-0.5 rounded-full',
  p.connected
- ? 'bg-gradient-to-r from-[#D1FAE5] to-[#A7F3D0] text-[#047857]'
- : 'bg-[#F2F4F6] text-[#8B95A1] group-hover:bg-[#EFF6FF] group-hover:text-[#3182F6]',
+ ? 'bg-[var(--lu-accent)] text-[#047857]'
+ : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)] group-hover:bg-[var(--lu-accent-soft)] group-hover:text-[var(--lu-accent)]',
  ].join(' ')}>
  {p.connected ? '연동됨' : '+ 연동'}
  </span>
  {/* 연동됨 시 별점/리뷰 표시 (있을 때만) */}
  {p.connected && p.rating != null && (
- <div className="text-[9px] text-[#8B95A1] flex items-center gap-0.5">
+ <div className="text-[9px] text-[var(--lu-muted)] flex items-center gap-0.5">
  <Star size={8} strokeWidth={0} fill="#F59E0B" className="text-[#F59E0B]" />
- <span className="font-bold text-[#191F28]">{p.rating.toFixed(1)}</span>
+ <span className="font-bold text-[var(--lu-ink)]">{p.rating.toFixed(1)}</span>
  {p.reviews != null && <span>· {p.reviews}건</span>}
  </div>
  )}
@@ -1772,17 +1772,17 @@ export default function Dashboard() {
  {!reviewPlatformConnected && (
  <div className="mb-2 flex items-center gap-2">
  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">샘플 데이터</span>
- <span className="text-xs text-[#8B95A1]">리뷰 플랫폼(네이버·구글·배민·요기요·쿠팡)을 연동하면 실데이터로 자동 교체됩니다</span>
+ <span className="text-xs text-[var(--lu-muted)]">리뷰 플랫폼(네이버·구글·배민·요기요·쿠팡)을 연동하면 실데이터로 자동 교체됩니다</span>
  </div>
  )}
  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 md:gap-3 mb-5">
  {stats.map((s, i) => (
- <div key={i} className={`bg-white rounded-2xl shadow-sm p-3 md:p-4 min-w-0 ${!reviewPlatformConnected ? 'opacity-75' : ''}`}>
+ <div key={i} className={`bg-white rounded-[10px] shadow-none p-3 md:p-4 min-w-0 ${!reviewPlatformConnected ? 'opacity-75' : ''}`}>
  <div className="flex items-center gap-1.5 mb-1.5">
  <span className="w-1 h-5 rounded-full shrink-0" style={{ background: s.color }}/>
- <span className="text-[10px] md:text-[11px] text-[#8B95A1] font-medium truncate">{s.label}</span>
+ <span className="text-[10px] md:text-[11px] text-[var(--lu-muted)] font-medium truncate">{s.label}</span>
  </div>
- <p className="text-base md:text-lg font-black text-[#191F28] truncate">{s.value}</p>
+ <p className="text-base md:text-lg font-semibold text-[var(--lu-ink)] truncate">{s.value}</p>
  <p className={`inline-flex items-center gap-0.5 text-[10px] font-bold mt-0.5 ${s.up ? 'text-[#12B76A]' : 'text-[#F04452]'}`}>
  {s.up
  ? <ArrowUp size={10} strokeWidth={2.75} />
@@ -1797,21 +1797,21 @@ export default function Dashboard() {
  <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-4 mb-5">
 
  {/* 좌: 연동 플랫폼 별점·리뷰 현황 */}
- <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
- <div className="px-5 py-4 border-b border-[#F2F4F6] flex items-center justify-between">
- <span className="text-sm font-bold text-[#191F28]">플랫폼별 별점 · 리뷰 현황</span>
+ <div className="bg-white rounded-[10px] shadow-none overflow-hidden">
+ <div className="px-5 py-4 border-b border-[var(--lu-canvas)] flex items-center justify-between">
+ <span className="text-sm font-bold text-[var(--lu-ink)]">플랫폼별 별점 · 리뷰 현황</span>
  {/* 30차-15-B: "지금 수집" 버튼 — 네이버 플레이스 연동됐을 때만 노출 */}
  {platforms.find(p => p.id === 'naver_place')?.connected ? (
  <button
  onClick={handleCollectNaverReviews}
  disabled={reviewsFetchState === 'fetching'}
- className="text-[11px] px-2 py-1 rounded-lg bg-[#E8FBF0] text-[#015C2C] font-bold hover:bg-[#D1F7E0] disabled:opacity-50 transition-colors"
+ className="min-h-11 text-[11px] px-2 py-1 rounded-lg bg-[#E8FBF0] text-[#015C2C] font-bold hover:bg-[#D1F7E0] disabled:opacity-50 transition-colors"
  title="네이버 플레이스 공개 리뷰를 지금 불러옵니다"
  >
  {reviewsFetchState === 'fetching' ? '수집 중...' : '↻ 지금 수집'}
  </button>
  ) : (
- <span className="text-[11px] text-[#8B95A1]">연동된 플랫폼만 표시</span>
+ <span className="text-[11px] text-[var(--lu-muted)]">연동된 플랫폼만 표시</span>
  )}
  </div>
  <div className="p-5 space-y-4">
@@ -1824,8 +1824,8 @@ export default function Dashboard() {
  )
  return visiblePlatforms.length === 0 ? (
  <div className="text-center py-8">
- <p className="text-sm text-[#8B95A1] mb-3">아직 연동된 플랫폼이 없습니다</p>
- <p className="text-xs text-[#8B95A1]">상단 로고를 클릭해 연동을 시작하세요</p>
+ <p className="text-sm text-[var(--lu-muted)] mb-3">아직 연동된 플랫폼이 없습니다</p>
+ <p className="text-xs text-[var(--lu-muted)]">상단 로고를 클릭해 연동을 시작하세요</p>
  </div>
  ) : (
  visiblePlatforms.map(p => {
@@ -1833,32 +1833,32 @@ export default function Dashboard() {
  // 30차-23: 이 플랫폼의 최신 리뷰 2건 미니 리스트
  const miniReviews = (platformReviews[p.id] || []).slice(0, 2)
  return (
- <div key={p.id} className="flex flex-col gap-3 pb-4 border-b border-[#F2F4F6] last:border-0 last:pb-0">
+ <div key={p.id} className="flex flex-col gap-3 pb-4 border-b border-[var(--lu-canvas)] last:border-0 last:pb-0">
  <div className="flex items-center gap-4">
  <div className="flex-shrink-0">{p.logo(36)}</div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center justify-between mb-1.5">
- <span className="text-sm font-semibold text-[#191F28]">{p.name}</span>
+ <span className="text-sm font-semibold text-[var(--lu-ink)]">{p.name}</span>
  {(p.rating !== null || (typeof p.reviews === 'number' && p.reviews > 0)) ? (
  <div className="flex items-center gap-3">
  {p.rating !== null ? (
  <Stars rating={p.rating} />
  ) : (
- <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#F2F4F6] text-[#8B95A1] font-semibold">
+ <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--lu-canvas)] text-[var(--lu-muted)] font-semibold">
  키워드 리뷰
  </span>
  )}
  {typeof p.reviews === 'number' && p.reviews > 0 && (
- <span className="text-xs text-[#8B95A1]">리뷰 <strong className="text-[#191F28]">{p.reviews}건</strong></span>
+ <span className="text-xs text-[var(--lu-muted)]">리뷰 <strong className="text-[var(--lu-ink)]">{p.reviews}건</strong></span>
  )}
  </div>
  ) : isFetchingThis ? (
- <span className="inline-flex items-center gap-1.5 text-xs text-[#3182F6] font-semibold">
- <span className="w-2 h-2 rounded-full bg-[#3182F6] animate-pulse" />
+ <span className="inline-flex items-center gap-1.5 text-xs text-[var(--lu-accent)] font-semibold">
+ <span className="w-2 h-2 rounded-full bg-[var(--lu-accent)] animate-pulse" />
  리뷰 수집 중...
  </span>
  ) : p.id === 'naver_place' ? (
- <span className="inline-flex items-center gap-1.5 text-xs text-[#8B95A1]">
+ <span className="inline-flex items-center gap-1.5 text-xs text-[var(--lu-muted)]">
  <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
  아직 수집 전 · 상단 "지금 수집" 클릭
  </span>
@@ -1866,16 +1866,16 @@ export default function Dashboard() {
  <button
  onClick={() => handleCollectWorkerPlatform(p.id)}
  disabled={workerCollecting[p.id]}
- className="text-[11px] px-2 py-1 rounded-lg bg-[#F0F4FF] text-[#3182F6] font-bold hover:bg-[#DBEAFE] disabled:opacity-50 transition-colors"
+ className="min-h-11 text-[11px] px-2 py-1 rounded-lg bg-[#F0F4FF] text-[var(--lu-accent)] font-bold hover:bg-[#DBEAFE] disabled:opacity-50 transition-colors"
  >
  {workerCollecting[p.id] ? '요청 중…' : '↻ 지금 수집'}
  </button>
  )}
  </div>
  {p.rating !== null && (
- <div className="w-full bg-[#F2F4F6] rounded-full h-2 overflow-hidden">
+ <div className="w-full bg-[var(--lu-canvas)] rounded-full h-2 overflow-hidden">
  <div
- className="h-full rounded-full transition-all"
+ className="h-full rounded-full transition-colors"
  style={{ width: `${(p.rating / 5) * 100}%`, background: p.color }}
  />
  </div>
@@ -1889,15 +1889,15 @@ export default function Dashboard() {
  <button
  key={r.id}
  onClick={() => openAIReplyFromReal(r, p.id)}
- className="w-full text-left flex items-start gap-2 px-2.5 py-2 rounded-lg hover:bg-[#FAFBFF] transition-colors group"
+ className="min-h-11 w-full text-left flex items-start gap-2 px-2.5 py-2 rounded-lg hover:bg-[#FAFBFF] transition-colors group"
  >
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-1.5 mb-0.5">
- <span className="text-[11px] font-bold text-[#4E5968] truncate">
+ <span className="text-[11px] font-bold text-[var(--lu-muted)] truncate">
  {r.author_mask || r.author_name || '익명'}
  </span>
  {typeof r.rating === 'number' && <Stars rating={r.rating} />}
- <span className="text-[10px] text-[#8B95A1]">· {timeAgo(r.posted_at)}</span>
+ <span className="text-[10px] text-[var(--lu-muted)]">· {timeAgo(r.posted_at)}</span>
  {(r.has_reply || r.reply_status === 'submitted') ? (
  <span className="inline-flex items-center gap-0.5 text-[9px] bg-[#E8FFF0] text-[#12B76A] px-1.5 py-0.5 rounded-full font-semibold">
  <Check size={9} strokeWidth={3} /> 답변완료
@@ -1908,12 +1908,12 @@ export default function Dashboard() {
  </span>
  )}
  </div>
- <p className="text-xs text-[#4E5968] line-clamp-1 group-hover:text-[#191F28]">
+ <p className="text-xs text-[var(--lu-muted)] line-clamp-1 group-hover:text-[var(--lu-ink)]">
  {r.content || '(내용 없음)'}
  </p>
  </div>
  {!r.has_reply && r.reply_status !== 'submitted' && (
- <span className="text-[10px] text-[#3182F6] font-bold flex-shrink-0 pt-0.5 group-hover:underline">
+ <span className="text-[10px] text-[var(--lu-accent)] font-bold flex-shrink-0 pt-0.5 group-hover:underline">
  AI 답글 →
  </span>
  )}
@@ -1922,7 +1922,7 @@ export default function Dashboard() {
  {(platformReviews[p.id]?.length ?? 0) > 2 && (
  <Link
  href={p.id === 'naver_place' ? '/review-admin/naver' : p.id === 'baemin' ? '/review-admin/baemin' : p.id === 'yogiyo' ? '/review-admin/yogiyo' : p.id === 'coupangeats' ? '/review-admin/coupang' : p.id === 'kakao_map' ? '/review-admin/kakao' : '/reviews'}
- className="block text-center text-[10px] text-[#3182F6] font-bold py-1 hover:underline"
+ className="block text-center text-[10px] text-[var(--lu-accent)] font-bold py-1 hover:underline"
  >
  {p.name} 리뷰 전체보기 ({platformReviews[p.id]?.length ?? 0}건) →
  </Link>
@@ -1936,17 +1936,17 @@ export default function Dashboard() {
  })()}
 
  {platforms.filter(p => !p.connected && (platformReviews[p.id]?.length ?? 0) === 0).length > 0 && (
- <div className="mt-4 p-4 bg-[#F8F9FA] rounded-xl border border-dashed border-[#E0E0E0]">
- <p className="text-xs text-[#8B95A1] mb-2 font-medium">미연동 플랫폼 · 클릭하여 바로 연동</p>
+ <div className="mt-4 p-4 bg-[var(--lu-canvas)] rounded-[6px] border border-dashed border-[#E0E0E0]">
+ <p className="text-xs text-[var(--lu-muted)] mb-2 font-medium">미연동 플랫폼 · 클릭하여 바로 연동</p>
  <div className="flex flex-wrap gap-2">
  {platforms.filter(p => !p.connected && (platformReviews[p.id]?.length ?? 0) === 0).map(p => (
  <button
  key={p.id}
  onClick={() => handlePlatformClick(p)}
- className="flex items-center gap-1.5 bg-white rounded-lg px-2 py-1 border border-[#E5E8EB] hover:border-[#3182F6] transition-colors"
+ className="min-h-11 flex items-center gap-1.5 bg-white rounded-lg px-2 py-1 border border-[var(--lu-line)] hover:border-[var(--lu-accent)] transition-colors"
  >
  {p.logo(18)}
- <span className="text-[11px] text-[#4E5968] font-semibold">{p.shortName}</span>
+ <span className="text-[11px] text-[var(--lu-muted)] font-semibold">{p.shortName}</span>
  </button>
  ))}
  </div>
@@ -1956,11 +1956,11 @@ export default function Dashboard() {
  </div>
 
  {/* 우: 주요 키워드 실시간 순위 */}
- <div className="bg-white rounded-2xl shadow-sm overflow-hidden flex flex-col">
- <div className="px-5 py-4 border-b border-[#F2F4F6] flex items-center justify-between">
+ <div className="bg-white rounded-[10px] shadow-none overflow-hidden flex flex-col">
+ <div className="px-5 py-4 border-b border-[var(--lu-canvas)] flex items-center justify-between">
  <div>
- <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[#191F28]">
- <TrendingUp size={14} strokeWidth={2.25} className="text-[#3182F6]" />
+ <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--lu-ink)]">
+ <TrendingUp size={14} strokeWidth={2.25} className="text-[var(--lu-accent)]" />
  주요 키워드 순위
  {!platforms.find(p => p.id === 'naver_place')?.connected && (
  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">데모</span>
@@ -1968,7 +1968,7 @@ export default function Dashboard() {
  </span>
  <div className="flex items-center gap-1.5 mt-0.5">
  <span className={`w-1.5 h-1.5 rounded-full inline-block ${platforms.find(p => p.id === 'naver_place')?.connected ? 'bg-[#12B76A] animate-pulse' : 'bg-[#F59E0B]'}`}/>
- <span className="text-[10px] text-[#8B95A1]">
+ <span className="text-[10px] text-[var(--lu-muted)]">
  {platforms.find(p => p.id === 'naver_place')?.connected ? `실시간 · ${lastSync}` : '플레이스 연동 시 실시간 조회'}
  </span>
  </div>
@@ -1976,7 +1976,7 @@ export default function Dashboard() {
  <button
  onClick={refreshKeywords}
  disabled={isSyncing || !platforms.find(p => p.id === 'naver_place')?.connected}
- className="text-[11px] text-[#3182F6] font-semibold border border-[#3182F6] px-2.5 py-1 rounded-lg hover:bg-[#E8F4FD] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+ className="min-h-11 text-[11px] text-[var(--lu-accent)] font-semibold border border-[var(--lu-accent)] px-2.5 py-1 rounded-lg hover:bg-[var(--lu-accent-soft)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
  title={!platforms.find(p => p.id === 'naver_place')?.connected ? '네이버 플레이스 연동 후 가능' : ''}
  >
  {isSyncing ? '갱신 중...' : '새로고침'}
@@ -1999,7 +1999,7 @@ export default function Dashboard() {
  : '프로필에 매장 주소를 등록하면 내 지역 키워드가 자동으로 뜹니다. '}
  <button
  onClick={() => handlePlatformClick(platforms.find(p => p.id === 'naver_place')!)}
- className="text-[#92400E] font-bold underline inline-flex items-center gap-0.5"
+ className="min-h-11 text-[#92400E] font-bold underline inline-flex items-center gap-0.5"
  >
  지금 연동하기 <ArrowRight size={9} strokeWidth={3} />
  </button>
@@ -2015,35 +2015,35 @@ export default function Dashboard() {
  </div>
  )}
 
- <div className="flex-1 divide-y divide-[#F2F4F6]">
+ <div className="flex-1 divide-y divide-[var(--lu-canvas)]">
  {keywords.length === 0 ? (
  <div className="px-5 py-10 flex flex-col items-center text-center">
- <div className="w-10 h-10 rounded-full bg-[#F2F4F6] flex items-center justify-center mb-2">
- <MapPin size={18} strokeWidth={2.25} className="text-[#8B95A1]"/>
+ <div className="w-10 h-10 rounded-full bg-[var(--lu-canvas)] flex items-center justify-center mb-2">
+ <MapPin size={18} strokeWidth={2.25} className="text-[var(--lu-muted)]"/>
  </div>
- <p className="text-sm font-bold text-[#191F28] mb-1">아직 추적할 키워드가 없습니다</p>
- <p className="text-[11px] text-[#8B95A1] leading-relaxed mb-3">
+ <p className="text-sm font-bold text-[var(--lu-ink)] mb-1">아직 추적할 키워드가 없습니다</p>
+ <p className="text-[11px] text-[var(--lu-muted)] leading-relaxed mb-3">
  매장 프로필에 주소를 등록하면<br/>
  내 지역 기반 키워드가 자동으로 표시됩니다
  </p>
  <Link href="/settings/profile"
- className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[#3182F6] text-white text-[11px] font-bold hover:bg-[#1B64DA] transition-colors">
+ className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[var(--lu-accent)] text-white text-[11px] font-bold hover:bg-[var(--lu-accent-hover)] transition-colors">
  프로필 설정하기 <ArrowRight size={11} strokeWidth={2.5} />
  </Link>
  </div>
  ) : keywords.map((kw) => (
  <div key={kw.keyword} className="px-5 py-3.5 flex items-center gap-3 hover:bg-[#FAFBFF] transition-colors">
  <div className={[
- 'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-black flex-shrink-0',
- kw.rank <= 3 ? 'bg-[#3182F6] text-white'
- : kw.rank <= 10 ? 'bg-[#E8F4FD] text-[#3182F6]'
- : 'bg-[#F2F4F6] text-[#8B95A1]',
+ 'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold flex-shrink-0',
+ kw.rank <= 3 ? 'bg-[var(--lu-accent)] text-white'
+ : kw.rank <= 10 ? 'bg-[var(--lu-accent-soft)] text-[var(--lu-accent)]'
+ : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]',
  ].join(' ')}>
  {kw.rank}
  </div>
  <div className="flex-1 min-w-0">
- <p className="text-sm font-semibold text-[#191F28] truncate">{kw.keyword}</p>
- <p className="text-[10px] text-[#8B95A1]">{kw.area} · {kw.updatedAt}</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)] truncate">{kw.keyword}</p>
+ <p className="text-[10px] text-[var(--lu-muted)]">{kw.area} · {kw.updatedAt}</p>
  </div>
  <RankBadge current={kw.rank} prev={kw.prevRank} />
  </div>
@@ -2055,17 +2055,17 @@ export default function Dashboard() {
  </div>
 
  {/* ── 최근 리뷰 ── */}
- <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
- <div className="px-4 md:px-5 py-4 border-b border-[#F2F4F6] flex items-start md:items-center justify-between gap-2">
+ <div className="bg-white rounded-[10px] shadow-none overflow-hidden">
+ <div className="px-4 md:px-5 py-4 border-b border-[var(--lu-canvas)] flex items-start md:items-center justify-between gap-2">
  <div className="flex items-center gap-1.5 md:gap-2 flex-wrap min-w-0">
- <span className="text-sm font-bold text-[#191F28] shrink-0">최근 리뷰</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)] shrink-0">최근 리뷰</span>
  {!hasRealReviews && (
  <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">데모</span>
  )}
  {hasRealReviews && (
- <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#E8F4FD] text-[#3182F6] font-bold">전 플랫폼 통합</span>
+ <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] font-bold">전 플랫폼 통합</span>
  )}
- <span className="text-[11px] text-[#8B95A1]">
+ <span className="text-[11px] text-[var(--lu-muted)]">
  미답변 {hasRealReviews ? mergedRealReviews.filter((r) => !r.has_reply && r.reply_status !== 'submitted').length : RECENT_REVIEWS.filter(r => !r.replied).length}건
  </span>
  <span className="flex items-center gap-1 ml-2">
@@ -2074,7 +2074,7 @@ export default function Dashboard() {
  {sentiment.positive}%
  </span>
  {sentimentCount.neutral > 0 && (
- <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#F2F4F6] text-[10px] font-bold text-[#4E5968]" title={`중립 ${sentimentCount.neutral}건`}>
+ <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[var(--lu-canvas)] text-[10px] font-bold text-[var(--lu-muted)]" title={`중립 ${sentimentCount.neutral}건`}>
  <Meh size={11} strokeWidth={2.5} />
  {sentiment.neutral}%
  </span>
@@ -2087,7 +2087,7 @@ export default function Dashboard() {
  )}
  </span>
  </div>
- <Link href="/reviews" className="inline-flex items-center gap-1 text-[11px] text-[#3182F6] font-semibold hover:underline">
+ <Link href="/reviews" className="inline-flex items-center gap-1 text-[11px] text-[var(--lu-accent)] font-semibold hover:underline">
  전체보기 <ArrowRight size={11} strokeWidth={2.5} />
  </Link>
  </div>
@@ -2106,8 +2106,8 @@ export default function Dashboard() {
  )}
  {/* 30차-23: 연결된 플랫폼 뱃지 행 — 리뷰가 어느 플랫폼에서 왔는지 한눈에 */}
  {hasRealReviews && (
- <div className="px-5 py-3 bg-[#FAFBFF] border-b border-[#F2F4F6] flex items-center gap-2 flex-wrap">
- <span className="text-[10px] text-[#8B95A1] font-semibold">집계 플랫폼:</span>
+ <div className="px-5 py-3 bg-[#FAFBFF] border-b border-[var(--lu-canvas)] flex items-center gap-2 flex-wrap">
+ <span className="text-[10px] text-[var(--lu-muted)] font-semibold">집계 플랫폼:</span>
  {platforms
  .filter((p) => p.connected && (platformReviews[p.id]?.length ?? 0) > 0)
  .map((p) => (
@@ -2123,7 +2123,7 @@ export default function Dashboard() {
  ))}
  </div>
  )}
- <div className="divide-y divide-[#F2F4F6]">
+ <div className="divide-y divide-[var(--lu-canvas)]">
  {hasRealReviews ? (
  mergedRealReviews.slice(0, 10).map((r) => {
  const pf = platforms.find((x) => x.id === r._platformId)
@@ -2132,7 +2132,7 @@ export default function Dashboard() {
  return (
  <div key={`${r._platformId}-${r.id}`} className="px-5 py-4 hover:bg-[#FAFBFF] transition-colors flex items-start gap-4">
  <div
- className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black text-white mt-0.5"
+ className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-semibold text-white mt-0.5"
  style={{ background: displayColor }}
  title={pf?.name}
  >
@@ -2140,9 +2140,9 @@ export default function Dashboard() {
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1 flex-wrap">
- <span className="text-xs font-bold text-[#4E5968]">{r.author_mask || r.author_name || '익명'}</span>
+ <span className="text-xs font-bold text-[var(--lu-muted)]">{r.author_mask || r.author_name || '익명'}</span>
  {typeof r.rating === 'number' && <Stars rating={r.rating} />}
- <span className="text-[10px] text-[#8B95A1]">{timeAgo(r.posted_at)}</span>
+ <span className="text-[10px] text-[var(--lu-muted)]">{timeAgo(r.posted_at)}</span>
  {(r.has_reply || r.reply_status === 'submitted') && (
  <span className="inline-flex items-center gap-1 text-[10px] bg-[#E8FFF0] text-[#12B76A] px-1.5 py-0.5 rounded-full font-semibold">
  <Check size={10} strokeWidth={3} />
@@ -2150,12 +2150,12 @@ export default function Dashboard() {
  </span>
  )}
  </div>
- <p className="text-sm text-[#4E5968] line-clamp-1">{r.content || '(내용 없음)'}</p>
+ <p className="text-sm text-[var(--lu-muted)] line-clamp-1">{r.content || '(내용 없음)'}</p>
  </div>
  {!r.has_reply && r.reply_status !== 'submitted' && (
  <button
  onClick={() => openAIReplyFromReal(r, r._platformId)}
- className="flex-shrink-0 ml-4 text-xs bg-[#3182F6] text-white px-3 py-1.5 rounded-xl font-semibold hover:bg-[#1B64DA] transition-colors"
+ className="min-h-11 flex-shrink-0 ml-4 text-xs bg-[var(--lu-accent)] text-white px-3 py-1.5 rounded-[6px] font-semibold hover:bg-[var(--lu-accent-hover)] transition-colors"
  >
  AI 답글
  </button>
@@ -2167,16 +2167,16 @@ export default function Dashboard() {
  RECENT_REVIEWS.map((review, i) => (
  <div key={i} className="px-5 py-4 hover:bg-[#FAFBFF] transition-colors flex items-start gap-4">
  <div
- className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-black text-white mt-0.5"
+ className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-semibold text-white mt-0.5"
  style={{ background: review.color }}
  >
  {review.platform.slice(0, 2)}
  </div>
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1 flex-wrap">
- <span className="text-xs font-bold text-[#4E5968]">{review.name}</span>
+ <span className="text-xs font-bold text-[var(--lu-muted)]">{review.name}</span>
  <Stars rating={review.rating} />
- <span className="text-[10px] text-[#8B95A1]">{review.time}</span>
+ <span className="text-[10px] text-[var(--lu-muted)]">{review.time}</span>
  {review.replied && (
  <span className="inline-flex items-center gap-1 text-[10px] bg-[#E8FFF0] text-[#12B76A] px-1.5 py-0.5 rounded-full font-semibold">
  <Check size={10} strokeWidth={3} />
@@ -2184,12 +2184,12 @@ export default function Dashboard() {
  </span>
  )}
  </div>
- <p className="text-sm text-[#4E5968] line-clamp-1">{review.text}</p>
+ <p className="text-sm text-[var(--lu-muted)] line-clamp-1">{review.text}</p>
  </div>
  {!review.replied && (
  <button
  onClick={() => setReplyReview(review)}
- className="flex-shrink-0 ml-4 text-xs bg-[#3182F6] text-white px-3 py-1.5 rounded-xl font-semibold hover:bg-[#1B64DA] transition-colors"
+ className="min-h-11 flex-shrink-0 ml-4 text-xs bg-[var(--lu-accent)] text-white px-3 py-1.5 rounded-[6px] font-semibold hover:bg-[var(--lu-accent-hover)] transition-colors"
  >
  AI 답글
  </button>

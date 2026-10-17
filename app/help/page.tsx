@@ -224,14 +224,14 @@ export default function HelpPage() {
  <TopNav />
  <div className="flex min-h-screen flex-col pt-20">
  <header className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6">
- <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-[6px] bg-gradient-to-br from-[var(--lu-accent)] to-[var(--lu-accent-hover)] shadow-none"><HelpCircle size={16} className="text-[var(--lu-accent)]" strokeWidth={1.8} aria-hidden="true" /></div>
- <h1 className="text-xl font-black text-[var(--lu-ink)] md:text-2xl">가게 운영에 필요한 도구와 사용 안내</h1>
+ <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-[6px] bg-[var(--lu-accent-soft)] shadow-none"><HelpCircle size={16} className="text-[var(--lu-accent)]" strokeWidth={1.8} aria-hidden="true" /></div>
+ <h1 className="text-xl font-semibold text-[var(--lu-ink)] md:text-2xl">가게 운영에 필요한 도구와 사용 안내</h1>
  <p className="mt-2 text-sm leading-6 text-[var(--lu-muted)]">처음 시작하는 분도, 여러 매장을 관리하는 분도 지금 필요한 작업부터 선택하세요.</p>
  </header>
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full space-y-5 md:space-y-6">
 
- <TaskFinder />
+ <section className="lu-panel p-5"><h2 className="text-xl font-semibold">기능을 영상으로 먼저 살펴보세요</h2><p className="mt-2 text-sm leading-6 text-[var(--lu-muted)]">준비물과 사용 순서를 확인하고, 필요한 도구로 바로 이동하세요.</p><Link href="/help/videos" className="lu-primary mt-4 inline-flex items-center">기능별 영상 설명 보기</Link></section><TaskFinder />
 
  {/* 검색바 */}
  <div className="bg-white rounded-[10px] shadow-none p-3 md:p-4 flex items-center gap-2">
@@ -258,7 +258,7 @@ export default function HelpPage() {
  {SECTIONS.map(s => (
  <a key={s.id} href={`#${s.id}`}
  className="flex flex-col items-center gap-1.5 p-3 rounded-[6px] bg-white border border-[#F2F4F6] hover:border-[var(--lu-accent)] hover:bg-[#FAFBFF] transition-all">
- <div className={`w-9 h-9 rounded-[6px] bg-gradient-to-br ${s.color} flex items-center justify-center shadow-none`}>
+ <div className={`w-9 h-9 rounded-[6px] bg-[var(--lu-accent-soft)] flex items-center justify-center shadow-none`}>
  <s.Icon size={15} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
  <p className="text-[11px] font-bold text-[var(--lu-ink)] text-center leading-tight">{s.label}</p>
@@ -270,7 +270,7 @@ export default function HelpPage() {
  {/* 5분 시작 가이드 */}
  <section id="quick">
  <div className="flex items-center gap-2 mb-3">
- <div className="w-7 h-7 rounded-[6px] bg-gradient-to-br from-[var(--lu-accent)] to-[var(--lu-accent-hover)] flex items-center justify-center shadow-none">
+ <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent-soft)] flex items-center justify-center shadow-none">
  <Rocket size={14} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
  <h2 className="text-base md:text-lg font-bold text-[var(--lu-ink)]">처음이신가요? 시작 순서부터 확인하세요</h2>
@@ -288,7 +288,7 @@ export default function HelpPage() {
  {/* 기능별 사용법 */}
  <section id="features" className="scroll-mt-20">
  <div className="flex items-center gap-2 mb-3">
- <div className="w-7 h-7 rounded-[6px] bg-gradient-to-br from-[#7C3AED] to-[#6D28D9] flex items-center justify-center shadow-none">
+ <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent-soft)] flex items-center justify-center shadow-none">
  <BookOpen size={14} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
  <h2 className="text-base md:text-lg font-bold text-[var(--lu-ink)]">기능별 사용법</h2>
@@ -307,7 +307,7 @@ export default function HelpPage() {
  {!search && (
  <section id="faq" className="scroll-mt-20">
  <div className="flex items-center gap-2 mb-3">
- <div className="w-7 h-7 rounded-[6px] bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-none">
+ <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent-soft)] flex items-center justify-center shadow-none">
  <Lightbulb size={14} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
  <h2 className="text-base md:text-lg font-bold text-[var(--lu-ink)]">자주 묻는 질문</h2>
@@ -319,7 +319,7 @@ export default function HelpPage() {
  <div key={i}>
  <button onClick={() => setOpenFaq(isOpen ? null : i)}
  className="w-full flex items-center gap-2 px-4 py-3 text-left hover:bg-[#FAFBFF] transition-colors">
- <span className="text-xs font-black text-[var(--lu-accent)] flex-shrink-0">Q.</span>
+ <span className="text-xs font-semibold text-[var(--lu-accent)] flex-shrink-0">Q.</span>
  <span className="flex-1 text-sm font-bold text-[var(--lu-ink)]">{f.q}</span>
  {isOpen ? <ChevronDown size={14} className="text-[var(--lu-muted)]" strokeWidth={2.5} />
  : <ChevronRight size={14} className="text-[var(--lu-muted)]" strokeWidth={2.5} />}
@@ -339,8 +339,8 @@ export default function HelpPage() {
  {/* 1:1 문의 CTA */}
  {!search && (
  <section id="inquiry" className="scroll-mt-20">
- <div className="rounded-[10px] shadow-none bg-gradient-to-br from-[#EFF6FF] to-[#F5F3FF] border border-[#DBEAFE] p-5 flex items-start gap-4">
- <div className="w-12 h-12 rounded-[10px] bg-gradient-to-br from-[var(--lu-accent)] to-[#7C3AED] flex items-center justify-center flex-shrink-0 shadow-none">
+ <div className="rounded-[10px] shadow-none bg-[var(--lu-accent-soft)] border border-[#DBEAFE] p-5 flex items-start gap-4">
+ <div className="w-12 h-12 rounded-[10px] bg-[var(--lu-accent-soft)] flex items-center justify-center flex-shrink-0 shadow-none">
  <Mail size={20} className="text-[var(--lu-accent)]" strokeWidth={1.8} />
  </div>
  <div className="flex-1">

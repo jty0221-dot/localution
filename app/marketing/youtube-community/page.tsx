@@ -155,7 +155,7 @@ export default function YoutubeCommunityPage() {
  uploadState !== 'running'
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
 
  <div className="md:ml-[220px] flex flex-col min-h-screen">
@@ -170,12 +170,12 @@ export default function YoutubeCommunityPage() {
 
  {/* 에이전트 연결 상태 */}
  <div className={
- 'flex items-center justify-between px-4 py-3 rounded-2xl border ' +
+ 'flex items-center justify-between px-4 py-3 rounded-[10px] border ' +
  (agentStatus === 'connected'
  ? 'bg-[#F0FDF4] border-[#BBF7D0]'
  : agentStatus === 'disconnected'
  ? 'bg-[#FFF1F2] border-[#FECDD3]'
- : 'bg-white border-[#E5E8EB]')
+ : 'bg-white border-[var(--lu-line)]')
  }>
  <div className="flex items-center gap-2.5">
  {agentStatus === 'connected' ? (
@@ -183,25 +183,25 @@ export default function YoutubeCommunityPage() {
  ) : agentStatus === 'disconnected' ? (
  <AlertCircle size={16} className="text-[#DC2626]" strokeWidth={2.5} />
  ) : (
- <RefreshCw size={14} className="text-[#8B95A1] animate-spin" strokeWidth={2.5} />
+ <RefreshCw size={14} className="text-[var(--lu-muted)] animate-spin" strokeWidth={2.5} />
  )}
  <span className={
  'text-sm font-semibold ' +
  (agentStatus === 'connected' ? 'text-[#059669]'
  : agentStatus === 'disconnected' ? 'text-[#DC2626]'
- : 'text-[#8B95A1]')
+ : 'text-[var(--lu-muted)]')
  }>
  {agentStatus === 'connected' ? '에이전트 연결됨'
  : agentStatus === 'disconnected' ? '에이전트 미연결'
  : '연결 확인 중...'}
  </span>
  {agentStatus === 'disconnected' && (
- <span className="text-xs text-[#8B95A1] hidden sm:inline">· 에이전트를 먼저 실행해 주세요</span>
+ <span className="text-xs text-[var(--lu-muted)] hidden sm:inline">· 에이전트를 먼저 실행해 주세요</span>
  )}
  </div>
  <button
  onClick={checkAgent}
- className="flex items-center gap-1.5 text-xs text-[#8B95A1] hover:text-[#4E5968] px-2.5 py-1.5 rounded-lg hover:bg-white transition-all"
+ className="min-h-11 flex items-center gap-1.5 text-xs text-[var(--lu-muted)] hover:text-[var(--lu-muted)] px-2.5 py-1.5 rounded-lg hover:bg-white transition-all"
  >
  <RefreshCw size={12} strokeWidth={2.5} />
  재확인
@@ -210,13 +210,13 @@ export default function YoutubeCommunityPage() {
 
  {/* 미연결 시 실행 안내 */}
  {agentStatus === 'disconnected' && (
- <div className="rounded-2xl border border-[#FECDD3] overflow-hidden">
+ <div className="rounded-[10px] border border-[#FECDD3] overflow-hidden">
  <button
  onClick={() => setShowGuide(v => !v)}
- className="w-full flex items-center justify-between px-4 py-3 bg-[#FFF1F2] hover:bg-[#FFE4E6] transition-colors text-left"
+ className="min-h-11 w-full flex items-center justify-between px-4 py-3 bg-[#FFF1F2] hover:bg-[#FFE4E6] transition-colors text-left"
  >
  <div className="flex items-center gap-2">
- <div className="w-5 h-5 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center flex-shrink-0">
+ <div className="w-5 h-5 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center flex-shrink-0">
  <Download size={11} className="text-white" strokeWidth={2.5} />
  </div>
  <span className="text-sm font-semibold text-[#DC2626]">에이전트 실행 방법 보기</span>
@@ -237,17 +237,17 @@ export default function YoutubeCommunityPage() {
  <div key={step} className="flex items-start gap-3">
  <span className="w-5 h-5 rounded-full bg-[#FF0000] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{step}</span>
  <div>
- <p className="text-xs font-semibold text-[#191F28]">{title}</p>
- <p className="text-[11px] text-[#8B95A1] mt-0.5">{desc}</p>
+ <p className="text-xs font-semibold text-[var(--lu-ink)]">{title}</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mt-0.5">{desc}</p>
  </div>
  </div>
  ))}
- <p className="text-[11px] text-[#B0B8C1] pt-2 border-t border-[#F2F4F6]">
+ <p className="text-[11px] text-[#B0B8C1] pt-2 border-t border-[var(--lu-canvas)]">
  에이전트는 내 PC에서만 실행되며 외부로 정보가 전송되지 않습니다.
  </p>
  <Link
  href="/marketing/youtube-community/download"
- className="flex items-center justify-center gap-1.5 w-full mt-1 py-2.5 rounded-xl bg-gradient-to-r from-red-500 to-red-600 text-white text-xs font-bold hover:from-red-600 hover:to-red-700 transition-all"
+ className="flex items-center justify-center gap-1.5 w-full mt-1 py-2.5 rounded-[6px] bg-[var(--lu-accent)] text-white text-xs font-bold hover:from-red-600 hover:to-red-700 transition-all"
  >
  <Download size={12} strokeWidth={2.5} />
  다운로드 페이지로 이동
@@ -265,17 +265,17 @@ export default function YoutubeCommunityPage() {
  <div className="space-y-4">
 
  {/* 채널 설정 */}
- <div className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-5">
+ <div className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-5">
  <div className="flex items-center gap-2 mb-4">
- <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center flex-shrink-0">
+ <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center flex-shrink-0">
  <Link2 size={13} className="text-white" strokeWidth={2.5} />
  </div>
- <span className="text-sm font-bold text-[#191F28]">채널 설정</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">채널 설정</span>
  </div>
 
  <div className="space-y-3">
  <div>
- <label className="block text-xs font-semibold text-[#8B95A1] mb-1.5">
+ <label className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">
  채널 URL <span className="text-[#DC2626]">*</span>
  </label>
  <input
@@ -283,13 +283,13 @@ export default function YoutubeCommunityPage() {
  value={channelUrl}
  onChange={e => setChannelUrl(e.target.value)}
  placeholder="https://www.youtube.com/@내채널"
- className="w-full px-3 py-2.5 text-sm rounded-xl border border-[#E5E8EB] focus:outline-none focus:ring-2 focus:ring-[#FF0000]/20 focus:border-[#FF0000] transition-all bg-[#F8F9FA] placeholder:text-[#B0B8C1]"
+ className="min-h-11 w-full px-3 py-2.5 text-base rounded-[6px] border border-[var(--lu-line)] focus:outline-none focus:ring-2 focus:ring-[#FF0000]/20 focus:border-[#FF0000] transition-all bg-[var(--lu-canvas)] placeholder:text-[#B0B8C1]"
  />
  </div>
 
  <button
  onClick={() => setShowAdvanced(v => !v)}
- className="flex items-center gap-1.5 text-xs text-[#8B95A1] hover:text-[#4E5968] transition-colors"
+ className="min-h-11 flex items-center gap-1.5 text-xs text-[var(--lu-muted)] hover:text-[var(--lu-muted)] transition-colors"
  >
  <Settings size={11} strokeWidth={2.5} />
  고급 설정 {showAdvanced ? '닫기' : '(크롬 프로필)'}
@@ -297,13 +297,13 @@ export default function YoutubeCommunityPage() {
 
  {showAdvanced && (
  <div>
- <label className="block text-xs font-semibold text-[#8B95A1] mb-1.5">크롬 프로필 이름</label>
+ <label className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">크롬 프로필 이름</label>
  <input
  type="text"
  value={profileName}
  onChange={e => setProfileName(e.target.value)}
  placeholder="Default"
- className="w-full px-3 py-2.5 text-sm rounded-xl border border-[#E5E8EB] focus:outline-none focus:ring-2 focus:ring-[#3182F6]/20 focus:border-[#3182F6] transition-all bg-[#F8F9FA]"
+ className="min-h-11 w-full px-3 py-2.5 text-base rounded-[6px] border border-[var(--lu-line)] focus:outline-none focus:ring-2 focus:ring-[var(--lu-accent)]/20 focus:border-[var(--lu-accent)] transition-all bg-[var(--lu-canvas)]"
  />
  <p className="text-[11px] text-[#B0B8C1] mt-1.5">
  chrome://version/ 에서 Profile Path 마지막 폴더명 확인
@@ -314,12 +314,12 @@ export default function YoutubeCommunityPage() {
  </div>
 
  {/* 게시물 본문 */}
- <div className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-5">
+ <div className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-5">
  <div className="flex items-center gap-2 mb-4">
- <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center flex-shrink-0">
+ <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center flex-shrink-0">
  <Youtube size={13} className="text-white" strokeWidth={2.5} />
  </div>
- <span className="text-sm font-bold text-[#191F28]">게시물 본문</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">게시물 본문</span>
  <span className="text-[#DC2626] text-xs ml-0.5">*</span>
  </div>
  <textarea
@@ -327,19 +327,19 @@ export default function YoutubeCommunityPage() {
  onChange={e => setPostText(e.target.value)}
  rows={5}
  placeholder="커뮤니티 탭에 올릴 내용을 입력하세요..."
- className="w-full px-3 py-2.5 text-sm rounded-xl border border-[#E5E8EB] focus:outline-none focus:ring-2 focus:ring-[#FF0000]/20 focus:border-[#FF0000] transition-all bg-[#F8F9FA] placeholder:text-[#B0B8C1] resize-none"
+ className="w-full px-3 py-2.5 text-base rounded-[6px] border border-[var(--lu-line)] focus:outline-none focus:ring-2 focus:ring-[#FF0000]/20 focus:border-[#FF0000] transition-all bg-[var(--lu-canvas)] placeholder:text-[#B0B8C1] resize-none"
  />
  <p className="text-[11px] text-[#B0B8C1] mt-1.5 text-right">{postText.length}자</p>
  </div>
 
  {/* 이미지 첨부 */}
- <div className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-5">
+ <div className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-5">
  <div className="flex items-center gap-2 mb-4">
- <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-violet-500 to-violet-700 flex items-center justify-center flex-shrink-0">
+ <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center flex-shrink-0">
  <ImageIcon size={13} className="text-white" strokeWidth={2.5} />
  </div>
- <span className="text-sm font-bold text-[#191F28]">이미지 첨부</span>
- <span className="text-xs text-[#8B95A1]">(선택사항)</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">이미지 첨부</span>
+ <span className="text-xs text-[var(--lu-muted)]">(선택사항)</span>
  </div>
 
  {imagePreview ? (
@@ -347,35 +347,35 @@ export default function YoutubeCommunityPage() {
  <img
  src={imagePreview}
  alt="첨부 이미지 미리보기"
- className="w-full max-h-44 object-cover rounded-xl border border-[#E5E8EB]"
+ className="w-full max-h-44 object-cover rounded-[6px] border border-[var(--lu-line)]"
  />
  <button
  onClick={removeImage}
- className="absolute top-2 right-2 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-[#FFF1F2] transition-colors"
+ className="min-h-11 absolute top-2 right-2 w-6 h-6 rounded-full bg-white shadow-md flex items-center justify-center hover:bg-[#FFF1F2] transition-colors"
  >
  <X size={12} className="text-[#DC2626]" strokeWidth={2.5} />
  </button>
- <p className="text-[11px] text-[#8B95A1] mt-1.5">{imageFile?.name}</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mt-1.5">{imageFile?.name}</p>
  </div>
  ) : (
  <button
  onClick={() => fileInputRef.current?.click()}
- className="w-full h-20 rounded-xl border-2 border-dashed border-[#E5E8EB] flex flex-col items-center justify-center gap-1.5 hover:border-[#3182F6] hover:bg-[#EFF6FF] transition-all group"
+ className="min-h-11 w-full h-20 rounded-[6px] border-2 border-dashed border-[var(--lu-line)] flex flex-col items-center justify-center gap-1.5 hover:border-[var(--lu-accent)] hover:bg-[var(--lu-accent-soft)] transition-all group"
  >
- <Upload size={16} className="text-[#B0B8C1] group-hover:text-[#3182F6]" strokeWidth={2} />
- <span className="text-xs text-[#B0B8C1] group-hover:text-[#3182F6]">클릭하여 이미지 선택</span>
+ <Upload size={16} className="text-[#B0B8C1] group-hover:text-[var(--lu-accent)]" strokeWidth={2} />
+ <span className="text-xs text-[#B0B8C1] group-hover:text-[var(--lu-accent)]">클릭하여 이미지 선택</span>
  </button>
  )}
- <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="hidden" />
+ <input ref={fileInputRef} type="file" accept="image/*" onChange={handleImageChange} className="min-h-11 hidden" />
  </div>
 
  {/* 고정 댓글 */}
- <div className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-5">
+ <div className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-5">
  <div className="flex items-center gap-2 mb-4">
- <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-amber-400 to-amber-500 flex items-center justify-center flex-shrink-0">
+ <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center flex-shrink-0">
  <MessageSquare size={13} className="text-white" strokeWidth={2.5} />
  </div>
- <span className="text-sm font-bold text-[#191F28]">고정 댓글</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">고정 댓글</span>
  <span className="text-[#DC2626] text-xs ml-0.5">*</span>
  </div>
  <input
@@ -383,7 +383,7 @@ export default function YoutubeCommunityPage() {
  value={commentText}
  onChange={e => setCommentText(e.target.value)}
  placeholder="게시물에 자동으로 달리고 고정될 첫 번째 댓글"
- className="w-full px-3 py-2.5 text-sm rounded-xl border border-[#E5E8EB] focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20 focus:border-[#F59E0B] transition-all bg-[#F8F9FA] placeholder:text-[#B0B8C1]"
+ className="min-h-11 w-full px-3 py-2.5 text-base rounded-[6px] border border-[var(--lu-line)] focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/20 focus:border-[#F59E0B] transition-all bg-[var(--lu-canvas)] placeholder:text-[#B0B8C1]"
  />
  </div>
 
@@ -392,10 +392,10 @@ export default function YoutubeCommunityPage() {
  onClick={handleUpload}
  disabled={!canUpload}
  className={
- 'w-full py-3.5 rounded-2xl text-sm font-black transition-all flex items-center justify-center gap-2 ' +
+ 'w-full py-3.5 rounded-[10px] text-sm font-semibold transition-all flex items-center justify-center gap-2 ' +
  (canUpload
- ? 'bg-gradient-to-r from-red-500 to-red-600 text-white shadow-sm hover:shadow-md active:scale-[0.99]'
- : 'bg-[#F2F4F6] text-[#B0B8C1] cursor-not-allowed')
+ ? 'bg-[var(--lu-accent)] text-white shadow-none hover:shadow-md active:scale-[0.99]'
+ : 'bg-[var(--lu-canvas)] text-[#B0B8C1] cursor-not-allowed')
  }
  >
  {uploadState === 'running' ? (
@@ -414,9 +414,9 @@ export default function YoutubeCommunityPage() {
  <div className="space-y-4">
 
  {/* 진행 로그 */}
- <div className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] overflow-hidden">
- <div className="flex items-center justify-between px-4 py-3 border-b border-[#F2F4F6]">
- <span className="text-sm font-bold text-[#191F28]">진행 상태</span>
+ <div className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] overflow-hidden">
+ <div className="flex items-center justify-between px-4 py-3 border-b border-[var(--lu-canvas)]">
+ <span className="text-sm font-bold text-[var(--lu-ink)]">진행 상태</span>
  {uploadState === 'success' && (
  <span className="flex items-center gap-1.5 text-xs font-semibold text-[#059669]">
  <CheckCircle2 size={13} strokeWidth={2.5} />완료
@@ -428,7 +428,7 @@ export default function YoutubeCommunityPage() {
  </span>
  )}
  {uploadState === 'running' && (
- <span className="flex items-center gap-1.5 text-xs font-semibold text-[#3182F6]">
+ <span className="flex items-center gap-1.5 text-xs font-semibold text-[var(--lu-accent)]">
  <RefreshCw size={13} className="animate-spin" strokeWidth={2.5} />실행 중
  </span>
  )}
@@ -443,7 +443,7 @@ export default function YoutubeCommunityPage() {
  <span className={
  log.includes('오류') || log.includes('실패') ? 'text-[#DC2626]'
  : log.includes('완료') || log.includes('성공') ? 'text-[#059669]'
- : 'text-[#4E5968]'
+ : 'text-[var(--lu-muted)]'
  }>{log}</span>
  </div>
  ))
@@ -453,12 +453,12 @@ export default function YoutubeCommunityPage() {
  </div>
 
  {/* 에이전트 설치 안내 */}
- <div id="download" className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-5">
+ <div id="download" className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-5">
  <div className="flex items-center gap-2 mb-4">
- <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#3182F6] to-[#2563EB] flex items-center justify-center flex-shrink-0">
+ <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center flex-shrink-0">
  <Download size={13} className="text-white" strokeWidth={2.5} />
  </div>
- <span className="text-sm font-bold text-[#191F28]">에이전트 설치 안내</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">에이전트 설치 안내</span>
  </div>
 
  <div className="space-y-3">
@@ -468,14 +468,14 @@ export default function YoutubeCommunityPage() {
  { step: '3', title: '이 페이지에서 업로드', desc: '위쪽에 "에이전트 연결됨" 초록 표시 확인 후 사용하세요.' },
  ].map(({ step, title, desc }) => (
  <div key={step} className="flex items-start gap-3">
- <span className="w-5 h-5 rounded-full bg-[#3182F6] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{step}</span>
+ <span className="w-5 h-5 rounded-full bg-[var(--lu-accent)] text-white text-[10px] font-bold flex items-center justify-center flex-shrink-0 mt-0.5">{step}</span>
  <div>
- <p className="text-xs font-semibold text-[#191F28]">{title}</p>
- <p className="text-[11px] text-[#8B95A1] mt-0.5">{desc}</p>
+ <p className="text-xs font-semibold text-[var(--lu-ink)]">{title}</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mt-0.5">{desc}</p>
  </div>
  </div>
  ))}
- <p className="text-[11px] text-[#B0B8C1] pt-1 border-t border-[#F2F4F6]">
+ <p className="text-[11px] text-[#B0B8C1] pt-1 border-t border-[var(--lu-canvas)]">
  에이전트는 내 PC에서만 실행되며 외부로 정보가 전송되지 않습니다.
  </p>
  </div>

@@ -73,13 +73,13 @@ function HashtagModal({ keywords, onClose }: { keywords: string[]; onClose: () =
  }
  return (
  <div className="fixed inset-0 bg-black/40 z-50 flex items-center justify-center p-4" onClick={onClose}>
- <div className="bg-white rounded-2xl w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
- <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-[#F2F4F6]">
+ <div className="bg-white rounded-[10px] w-full max-w-sm shadow-2xl" onClick={e => e.stopPropagation()}>
+ <div className="px-5 pt-5 pb-3 flex items-center justify-between border-b border-[var(--lu-canvas)]">
  <div>
- <p className="font-bold text-[#191F28] text-base">해시태그 추출</p>
- <p className="text-xs text-[#8B95A1] mt-0.5">키워드를 해시태그 형식으로 추출합니다.</p>
+ <p className="font-bold text-[var(--lu-ink)] text-base">해시태그 추출</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5">키워드를 해시태그 형식으로 추출합니다.</p>
  </div>
- <button onClick={onClose} className="p-1.5 rounded-lg hover:bg-[#F2F4F6] text-[#8B95A1]">
+ <button onClick={onClose} className="min-h-11 p-1.5 rounded-lg hover:bg-[var(--lu-canvas)] text-[var(--lu-muted)]">
  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
  <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
  </svg>
@@ -87,11 +87,11 @@ function HashtagModal({ keywords, onClose }: { keywords: string[]; onClose: () =
  </div>
  <div className="p-4 flex flex-col gap-2.5">
  {formats.map((f, i) => (
- <div key={i} className="flex items-center gap-2 bg-[#F8F9FA] rounded-xl px-3 py-2.5">
- <span className="text-xs font-semibold text-[#8B95A1] w-12 shrink-0">{f.label}</span>
- <span className="flex-1 text-sm text-[#191F28] truncate font-medium">{f.value.length > 32 ? f.value.slice(0, 32) + '…' : f.value}</span>
+ <div key={i} className="flex items-center gap-2 bg-[var(--lu-canvas)] rounded-[6px] px-3 py-2.5">
+ <span className="text-xs font-semibold text-[var(--lu-muted)] w-12 shrink-0">{f.label}</span>
+ <span className="flex-1 text-sm text-[var(--lu-ink)] truncate font-medium">{f.value.length > 32 ? f.value.slice(0, 32) + '…' : f.value}</span>
  <button onClick={() => copy(f.value, i)}
- className={'shrink-0 p-1.5 rounded-lg transition-colors ' + (copied === i ? 'bg-[#ECFDF5] text-[#12B76A]' : 'hover:bg-[#E5E8EB] text-[#8B95A1]')}>
+ className={'shrink-0 p-1.5 rounded-lg transition-colors ' + (copied === i ? 'bg-[#ECFDF5] text-[#12B76A]' : 'hover:bg-[var(--lu-line)] text-[var(--lu-muted)]')}>
  {copied === i
  ? <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="20 6 9 17 4 12"/></svg>
  : <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
@@ -102,7 +102,7 @@ function HashtagModal({ keywords, onClose }: { keywords: string[]; onClose: () =
  </div>
  <div className="px-4 pb-4">
  <button onClick={() => copy(formats[2].value, 99)}
- className="w-full py-2.5 rounded-xl bg-[#3182F6] text-white text-sm font-semibold hover:bg-[#1B64DA]">
+ className="min-h-11 w-full py-2.5 rounded-[6px] bg-[var(--lu-accent)] text-white text-sm font-semibold hover:bg-[var(--lu-accent-hover)]">
  {copied === 99 ? '복사됨' : '#해시태그 전체 복사'}
  </button>
  </div>
@@ -117,11 +117,11 @@ type SortDir = 'asc' | 'desc'
 
 function SortBtn({ col, active, dir, onClick }: { col: SortCol; active: boolean; dir: SortDir; onClick: () => void }) {
  return (
- <button onClick={onClick} className="inline-flex flex-col ml-1 leading-none">
- <svg width="7" height="5" viewBox="0 0 7 5" fill={active && dir === 'asc' ? '#3182F6' : '#C9D0D8'}>
+ <button onClick={onClick} className="min-h-11 inline-flex flex-col ml-1 leading-none">
+ <svg width="7" height="5" viewBox="0 0 7 5" fill={active && dir === 'asc' ? '#16685D' : '#C9D0D8'}>
  <path d="M3.5 0L7 5H0L3.5 0Z"/>
  </svg>
- <svg width="7" height="5" viewBox="0 0 7 5" fill={active && dir === 'desc' ? '#3182F6' : '#C9D0D8'} style={{ marginTop: 1 }}>
+ <svg width="7" height="5" viewBox="0 0 7 5" fill={active && dir === 'desc' ? '#16685D' : '#C9D0D8'} style={{ marginTop: 1 }}>
  <path d="M3.5 5L0 0H7L3.5 5Z"/>
  </svg>
  </button>
@@ -152,8 +152,8 @@ function TrendChart({ data }: { data: TrendPoint[] }) {
  <svg viewBox={'0 0 ' + W + ' ' + H} className="w-full min-w-[400px]" style={{ height: H }}>
  <defs>
  <linearGradient id="trendGrad" x1="0" y1="0" x2="0" y2="1">
- <stop offset="0%" stopColor="#3182F6" stopOpacity="0.18"/>
- <stop offset="100%" stopColor="#3182F6" stopOpacity="0"/>
+ <stop offset="0%" stopColor="#16685D" stopOpacity="0.18"/>
+ <stop offset="100%" stopColor="#16685D" stopOpacity="0"/>
  </linearGradient>
  </defs>
  {[0, 25, 50, 75, 100].map(v => {
@@ -166,10 +166,10 @@ function TrendChart({ data }: { data: TrendPoint[] }) {
  )
  })}
  <path d={areaD} fill="url(#trendGrad)"/>
- <path d={pathD} fill="none" stroke="#3182F6" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+ <path d={pathD} fill="none" stroke="#16685D" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
  {pts.map((p, i) => (
  <g key={i}>
- <circle cx={p.x} cy={p.y} r="3" fill="#3182F6"/>
+ <circle cx={p.x} cy={p.y} r="3" fill="#16685D"/>
  {(i === 0 || i === pts.length - 1 || i % Math.ceil(pts.length / 6) === 0) && (
  <text x={p.x} y={H - 4} textAnchor="middle" fontSize="9" fill="#8B95A1">
  {p.period.slice(0, 7)}
@@ -305,7 +305,7 @@ export default function NaverAdsPage() {
  ]
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
  <div className="md:ml-[220px] flex flex-col min-h-screen">
  <PageHeader
@@ -320,45 +320,45 @@ export default function NaverAdsPage() {
  <div className="grid grid-cols-3 gap-3">
  {TAB_LIST.map(t => (
  <button key={t.key} onClick={() => setTab(t.key)}
- className={'rounded-2xl p-4 text-left transition-all border-2 ' + (tab === t.key ? 'bg-white border-[#3182F6] shadow-md' : 'bg-white border-transparent shadow-sm hover:border-[#DBEAFE]')}>
+ className={'rounded-[10px] p-4 text-left transition-all border-2 ' + (tab === t.key ? 'bg-white border-[var(--lu-accent)] shadow-md' : 'bg-white border-transparent shadow-none hover:border-[#DBEAFE]')}>
  <div className="flex items-center gap-2 mb-1">
  <span className="text-xl">{t.icon}</span>
- <span className={'text-sm font-bold ' + (tab === t.key ? 'text-[#3182F6]' : 'text-[#191F28]')}>{t.label}</span>
+ <span className={'text-sm font-bold ' + (tab === t.key ? 'text-[var(--lu-accent)]' : 'text-[var(--lu-ink)]')}>{t.label}</span>
  </div>
- <p className="text-[11px] text-[#8B95A1] leading-snug">{t.desc}</p>
+ <p className="text-[11px] text-[var(--lu-muted)] leading-snug">{t.desc}</p>
  </button>
  ))}
  </div>
 
  {/* ── 검색량 조회 ─────────────────────────────────────── */}
  {tab === 'volume' && (
- <div className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-5 space-y-5">
+ <div className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-5 space-y-5">
  <div>
- <p className="text-sm font-bold text-[#191F28] mb-2">키워드 입력 <span className="text-[#8B95A1] font-normal">(1개)</span></p>
+ <p className="text-sm font-bold text-[var(--lu-ink)] mb-2">키워드 입력 <span className="text-[var(--lu-muted)] font-normal">(1개)</span></p>
  <div className="flex gap-2">
  <input
- className="flex-1 border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6]"
+ className="min-h-11 flex-1 border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)]"
  placeholder="예: 부천맛집"
  value={volInput}
  onChange={e => setVolInput(e.target.value)}
  onKeyDown={e => e.key === 'Enter' && fetchDetail()}
  />
  <button onClick={fetchDetail} disabled={volLoading || !volInput.trim()}
- className="px-5 py-2.5 bg-[#3182F6] text-white rounded-xl text-sm font-semibold disabled:opacity-40 hover:bg-[#1D6EF5] transition-colors">
+ className="min-h-11 px-5 py-2.5 bg-[var(--lu-accent)] text-white rounded-[6px] text-sm font-semibold disabled:opacity-40 hover:bg-[#1D6EF5] transition-colors">
  {volLoading ? '조회 중…' : '조회'}
  </button>
  </div>
  </div>
 
  {volError && (
- <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 text-sm text-[#E11D48]">{volError}</div>
+ <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[6px] p-3 text-sm text-[#E11D48]">{volError}</div>
  )}
 
  {detailData && (
  <div className="space-y-5">
  {/* 키워드 + 경쟁도 */}
  <div className="flex items-center gap-2">
- <span className="text-base font-bold text-[#191F28]">{detailData.keyword}</span>
+ <span className="text-base font-bold text-[var(--lu-ink)]">{detailData.keyword}</span>
  <span className={'text-[11px] font-bold px-2 py-0.5 rounded-full ' + compColor(detailData.volume.compIdx)}>
  경쟁도 {detailData.volume.compIdx}
  </span>
@@ -366,42 +366,42 @@ export default function NaverAdsPage() {
 
  {/* 월간 검색량 */}
  <div>
- <p className="text-[11px] font-bold text-[#8B95A1] mb-2 tracking-widest uppercase">월간 검색량</p>
+ <p className="text-[11px] font-bold text-[var(--lu-muted)] mb-2 tracking-widest uppercase">월간 검색량</p>
  <div className="grid grid-cols-3 gap-3">
- <div className="rounded-xl p-4 bg-[#EFF6FF]">
- <p className="text-[11px] text-[#8B95A1] font-semibold mb-1">PC</p>
- <p className="text-2xl font-black text-[#3182F6]">{fmt(detailData.volume.pc)}</p>
+ <div className="rounded-[6px] p-4 bg-[var(--lu-accent-soft)]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-semibold mb-1">PC</p>
+ <p className="text-2xl font-semibold text-[var(--lu-accent)]">{fmt(detailData.volume.pc)}</p>
  </div>
- <div className="rounded-xl p-4 bg-[#F5F3FF]">
- <p className="text-[11px] text-[#8B95A1] font-semibold mb-1">Mobile</p>
- <p className="text-2xl font-black text-[#7C3AED]">{fmt(detailData.volume.mobile)}</p>
+ <div className="rounded-[6px] p-4 bg-[#F5F3FF]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-semibold mb-1">Mobile</p>
+ <p className="text-2xl font-semibold text-[#7C3AED]">{fmt(detailData.volume.mobile)}</p>
  </div>
- <div className="rounded-xl p-4 bg-[#F8F9FA] border border-[#E5E8EB]">
- <p className="text-[11px] text-[#8B95A1] font-semibold mb-1">Total</p>
- <p className="text-2xl font-black text-[#191F28]">{fmt(detailData.volume.total)}</p>
+ <div className="rounded-[6px] p-4 bg-[var(--lu-canvas)] border border-[var(--lu-line)]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-semibold mb-1">Total</p>
+ <p className="text-2xl font-semibold text-[var(--lu-ink)]">{fmt(detailData.volume.total)}</p>
  </div>
  </div>
  </div>
 
  {/* 콘텐츠 현황 */}
  <div>
- <p className="text-[11px] font-bold text-[#8B95A1] mb-2 tracking-widest uppercase">월간 콘텐츠 발행량</p>
+ <p className="text-[11px] font-bold text-[var(--lu-muted)] mb-2 tracking-widest uppercase">월간 콘텐츠 발행량</p>
  <div className="grid grid-cols-4 gap-3">
- <div className="rounded-xl p-4 bg-[#ECFDF5]">
- <p className="text-[11px] text-[#8B95A1] font-semibold mb-1">블로그</p>
- <p className="text-xl font-black text-[#059669]">{fmt(detailData.content.blog)}</p>
+ <div className="rounded-[6px] p-4 bg-[#ECFDF5]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-semibold mb-1">블로그</p>
+ <p className="text-xl font-semibold text-[#059669]">{fmt(detailData.content.blog)}</p>
  </div>
- <div className="rounded-xl p-4 bg-[#FFFBEB]">
- <p className="text-[11px] text-[#8B95A1] font-semibold mb-1">카페</p>
- <p className="text-xl font-black text-[#D97706]">{fmt(detailData.content.cafe)}</p>
+ <div className="rounded-[6px] p-4 bg-[#FFFBEB]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-semibold mb-1">카페</p>
+ <p className="text-xl font-semibold text-[#D97706]">{fmt(detailData.content.cafe)}</p>
  </div>
- <div className="rounded-xl p-4 bg-[#F8F9FA] border border-[#E5E8EB]">
- <p className="text-[11px] text-[#8B95A1] font-semibold mb-1">전체</p>
- <p className="text-xl font-black text-[#4E5968]">{fmt(detailData.content.total)}</p>
+ <div className="rounded-[6px] p-4 bg-[var(--lu-canvas)] border border-[var(--lu-line)]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-semibold mb-1">전체</p>
+ <p className="text-xl font-semibold text-[var(--lu-muted)]">{fmt(detailData.content.total)}</p>
  </div>
- <div className="rounded-xl p-4 bg-[#F8F9FA] border border-[#E5E8EB]">
- <p className="text-[11px] text-[#8B95A1] font-semibold mb-1">포화 지수</p>
- <p className={'text-xl font-black ' + satColor(detailData.content.saturation)}>
+ <div className="rounded-[6px] p-4 bg-[var(--lu-canvas)] border border-[var(--lu-line)]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-semibold mb-1">포화 지수</p>
+ <p className={'text-xl font-semibold ' + satColor(detailData.content.saturation)}>
  {detailData.content.saturation.toFixed(1)}
  </p>
  <p className={'text-[10px] font-bold mt-0.5 ' + satColor(detailData.content.saturation)}>
@@ -416,10 +416,10 @@ export default function NaverAdsPage() {
  {detailData.trend.length > 0 && (
  <div>
  <div className="flex items-center justify-between mb-2">
- <p className="text-[11px] font-bold text-[#8B95A1] tracking-widest uppercase">검색량 트렌드 (최근 12개월)</p>
+ <p className="text-[11px] font-bold text-[var(--lu-muted)] tracking-widest uppercase">검색량 트렌드 (최근 12개월)</p>
  <p className="text-[11px] text-[#B0B8C1]">네이버 데이터랩 기준 · 상대 지수</p>
  </div>
- <div className="bg-[#F8F9FA] rounded-xl p-3">
+ <div className="bg-[var(--lu-canvas)] rounded-[6px] p-3">
  <TrendChart data={detailData.trend} />
  </div>
  </div>
@@ -435,15 +435,15 @@ export default function NaverAdsPage() {
 
  {/* ── 키워드 확장 ─────────────────────────────────────── */}
  {tab === 'suggest' && (
- <div className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-5 space-y-5">
+ <div className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-5 space-y-5">
  <div>
  <div className="flex items-center justify-between mb-1">
- <p className="text-sm font-bold text-[#191F28]">주키워드 입력</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)]">주키워드 입력</p>
  {sugChecked.size > 0 && (
  <div className="flex items-center gap-2">
- <span className="text-xs text-[#8B95A1]"><strong className="text-[#3182F6]">{sugChecked.size}개</strong> 선택됨</span>
+ <span className="text-xs text-[var(--lu-muted)]"><strong className="text-[var(--lu-accent)]">{sugChecked.size}개</strong> 선택됨</span>
  <button onClick={() => setSugHashModal(true)}
- className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F2F4F6] hover:bg-[#EFF6FF] text-[#3182F6] text-xs font-bold border border-[#E5E8EB] hover:border-[#3182F6]">
+ className="min-h-11 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[var(--lu-canvas)] hover:bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] text-xs font-bold border border-[var(--lu-line)] hover:border-[var(--lu-accent)]">
  #
  </button>
  <button
@@ -457,7 +457,7 @@ export default function NaverAdsPage() {
  })
  downloadExcel(s, sugChecked, '네이버광고_키워드확장_' + new Date().toISOString().slice(0, 10) + '.csv')
  }}
- className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[#F2F4F6] hover:bg-[#ECFDF5] text-[#12B76A] text-xs font-semibold border border-[#E5E8EB] hover:border-[#12B76A]"
+ className="min-h-11 flex items-center gap-1 px-2.5 py-1.5 rounded-lg bg-[var(--lu-canvas)] hover:bg-[#ECFDF5] text-[#12B76A] text-xs font-semibold border border-[var(--lu-line)] hover:border-[#12B76A]"
  title="엑셀 다운로드">
  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>
@@ -466,28 +466,28 @@ export default function NaverAdsPage() {
  </div>
  )}
  </div>
- <p className="text-xs text-[#8B95A1] mb-2">주키워드 하나를 입력하면 파생 키워드와 검색량을 최대 100개 보여줍니다</p>
+ <p className="text-xs text-[var(--lu-muted)] mb-2">주키워드 하나를 입력하면 파생 키워드와 검색량을 최대 100개 보여줍니다</p>
  <div className="flex gap-2">
  <input
- className="flex-1 border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6]"
+ className="min-h-11 flex-1 border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)]"
  placeholder="예: 부천맛집"
  value={sugInput}
  onChange={e => setSugInput(e.target.value)}
  onKeyDown={e => e.key === 'Enter' && fetchSuggest()}
  />
  <button onClick={fetchSuggest} disabled={sugLoading || !sugInput.trim()}
- className="px-5 py-2.5 bg-[#3182F6] text-white rounded-xl text-sm font-semibold disabled:opacity-40 hover:bg-[#1D6EF5] transition-colors">
+ className="min-h-11 px-5 py-2.5 bg-[var(--lu-accent)] text-white rounded-[6px] text-sm font-semibold disabled:opacity-40 hover:bg-[#1D6EF5] transition-colors">
  {sugLoading ? '조회 중…' : '조회'}
  </button>
  </div>
  </div>
 
  {sugError && (
- <div role="alert" className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 text-sm text-[#E11D48]">{sugError}<button onClick={fetchSuggest} className="block min-h-[44px] font-semibold underline">다시 조회하기</button></div>
+ <div role="alert" className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[6px] p-3 text-sm text-[#E11D48]">{sugError}<button onClick={fetchSuggest} className="block min-h-[44px] font-semibold underline">다시 조회하기</button></div>
  )}
 
- {sugWarning && <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">{sugWarning}<button onClick={fetchSuggest} disabled={sugLoading} className="block min-h-[44px] font-semibold underline">전체 다시 조회하기</button></div>}
- {sugKeyword && <p className="text-xs text-[#8B95A1]">조회한 키워드: {sugKeyword}{sugInput.trim() !== sugKeyword ? ' · 입력한 키워드로 다시 조회하면 결과가 바뀝니다.' : ''}</p>}
+ {sugWarning && <div role="status" className="rounded-[6px] border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">{sugWarning}<button onClick={fetchSuggest} disabled={sugLoading} className="block min-h-[44px] font-semibold underline">전체 다시 조회하기</button></div>}
+ {sugKeyword && <p className="text-xs text-[var(--lu-muted)]">조회한 키워드: {sugKeyword}{sugInput.trim() !== sugKeyword ? ' · 입력한 키워드로 다시 조회하면 결과가 바뀝니다.' : ''}</p>}
  {sugData.length > 0 && (() => {
  const compRank: Record<string, number> = { '높음': 3, '중간': 2, '낮음': 1, '': 0 }
  const sorted = [...sugData].sort((a, b) => {
@@ -505,26 +505,26 @@ export default function NaverAdsPage() {
  <div className="overflow-x-auto">
  <table className="w-full text-sm">
  <thead>
- <tr className="border-b-2 border-[#E5E8EB] bg-[#F8F9FA]">
+ <tr className="border-b-2 border-[var(--lu-line)] bg-[var(--lu-canvas)]">
  <th className="py-2.5 px-3 w-10">
  <button
  onClick={() => { if (allChecked) setSugChecked(new Set()); else setSugChecked(new Set(sorted.map((_, i) => i))) }}
- className={'w-4 h-4 rounded border-2 flex items-center justify-center transition-all ' + (allChecked ? 'bg-[#3182F6] border-[#3182F6]' : 'border-[#D1D6DB] hover:border-[#3182F6]')}>
+ className={'w-4 h-4 rounded border-2 flex items-center justify-center transition-all ' + (allChecked ? 'bg-[var(--lu-accent)] border-[var(--lu-accent)]' : 'border-[#D1D6DB] hover:border-[var(--lu-accent)]')}>
  {allChecked && <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><polyline points="2 5 4.5 7.5 8.5 2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
  </button>
  </th>
- <th className="text-center py-2.5 px-2 text-[11px] font-bold text-[#8B95A1] w-10">번호</th>
- <th className="text-left py-2.5 px-3 text-[11px] font-bold text-[#8B95A1]">파생 키워드</th>
- <th className="text-right py-2.5 px-3 text-[11px] font-bold text-[#8B95A1] whitespace-nowrap">
+ <th className="text-center py-2.5 px-2 text-[11px] font-bold text-[var(--lu-muted)] w-10">번호</th>
+ <th className="text-left py-2.5 px-3 text-[11px] font-bold text-[var(--lu-muted)]">파생 키워드</th>
+ <th className="text-right py-2.5 px-3 text-[11px] font-bold text-[var(--lu-muted)] whitespace-nowrap">
  PC 검색량<SortBtn col="pc" active={sugSort === 'pc'} dir={sugSortDir} onClick={() => toggleSort('pc')}/>
  </th>
- <th className="text-right py-2.5 px-3 text-[11px] font-bold text-[#8B95A1] whitespace-nowrap">
+ <th className="text-right py-2.5 px-3 text-[11px] font-bold text-[var(--lu-muted)] whitespace-nowrap">
  모바일 검색량<SortBtn col="mobile" active={sugSort === 'mobile'} dir={sugSortDir} onClick={() => toggleSort('mobile')}/>
  </th>
- <th className="text-right py-2.5 px-3 text-[11px] font-bold text-[#8B95A1] whitespace-nowrap">
+ <th className="text-right py-2.5 px-3 text-[11px] font-bold text-[var(--lu-muted)] whitespace-nowrap">
  총 검색량<SortBtn col="total" active={sugSort === 'total' || sugSort === 'none'} dir={sugSortDir} onClick={() => toggleSort('total')}/>
  </th>
- <th className="text-center py-2.5 px-3 text-[11px] font-bold text-[#8B95A1] whitespace-nowrap">
+ <th className="text-center py-2.5 px-3 text-[11px] font-bold text-[var(--lu-muted)] whitespace-nowrap">
  경쟁도<SortBtn col="comp" active={sugSort === 'comp'} dir={sugSortDir} onClick={() => toggleSort('comp')}/>
  </th>
  </tr>
@@ -535,19 +535,19 @@ export default function NaverAdsPage() {
  const mb = Number(row.monthlyMobileQcCnt) || 0
  const checked = sugChecked.has(i)
  return (
- <tr key={i} className={'border-b border-[#F2F4F6] transition-colors ' + (checked ? 'bg-[#EFF6FF]' : 'hover:bg-[#F8F9FA]')}>
+ <tr key={i} className={'border-b border-[var(--lu-canvas)] transition-colors ' + (checked ? 'bg-[var(--lu-accent-soft)]' : 'hover:bg-[var(--lu-canvas)]')}>
  <td className="py-2 px-3">
  <button
  onClick={() => setSugChecked(prev => { const n = new Set(prev); n.has(i) ? n.delete(i) : n.add(i); return n })}
- className={'w-4 h-4 rounded border-2 flex items-center justify-center transition-all ' + (checked ? 'bg-[#3182F6] border-[#3182F6]' : 'border-[#D1D6DB] hover:border-[#3182F6]')}>
+ className={'w-4 h-4 rounded border-2 flex items-center justify-center transition-all ' + (checked ? 'bg-[var(--lu-accent)] border-[var(--lu-accent)]' : 'border-[#D1D6DB] hover:border-[var(--lu-accent)]')}>
  {checked && <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><polyline points="2 5 4.5 7.5 8.5 2.5" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
  </button>
  </td>
  <td className="py-2 px-2 text-center text-xs text-[#B0B8C1] font-medium">{i + 1}</td>
- <td className="py-2 px-3 font-semibold text-[#191F28]">{row.relKeyword}</td>
- <td className="py-2 px-3 text-right text-[#4E5968] text-xs">{fmt(pc)}</td>
- <td className="py-2 px-3 text-right text-[#4E5968] text-xs">{fmt(mb)}</td>
- <td className="py-2 px-3 text-right font-semibold text-[#3182F6] text-xs">{fmt(pc + mb)}</td>
+ <td className="py-2 px-3 font-semibold text-[var(--lu-ink)]">{row.relKeyword}</td>
+ <td className="py-2 px-3 text-right text-[var(--lu-muted)] text-xs">{fmt(pc)}</td>
+ <td className="py-2 px-3 text-right text-[var(--lu-muted)] text-xs">{fmt(mb)}</td>
+ <td className="py-2 px-3 text-right font-semibold text-[var(--lu-accent)] text-xs">{fmt(pc + mb)}</td>
  <td className="py-2 px-3 text-center">
  <span className={'text-[10px] font-bold px-2 py-0.5 rounded-full ' + compColor(row.compIdx)}>{row.compIdx || '-'}</span>
  </td>
@@ -569,45 +569,45 @@ export default function NaverAdsPage() {
 
  {/* ── 파워링크 입찰가 ─────────────────────────────────── */}
  {tab === 'bid' && (
- <div className="bg-white rounded-2xl shadow-sm border border-[#E5E8EB] p-5 space-y-5">
+ <div className="bg-white rounded-[10px] shadow-none border border-[var(--lu-line)] p-5 space-y-5">
  <div>
- <p className="text-sm font-bold text-[#191F28] mb-2">키워드 입력 <span className="text-[#8B95A1] font-normal">(1개)</span></p>
+ <p className="text-sm font-bold text-[var(--lu-ink)] mb-2">키워드 입력 <span className="text-[var(--lu-muted)] font-normal">(1개)</span></p>
  <div className="flex gap-2">
  <input
- className="flex-1 border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6]"
+ className="min-h-11 flex-1 border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)]"
  placeholder="예: 부천맛집"
  value={bidInput}
  onChange={e => setBidInput(e.target.value)}
  onKeyDown={e => e.key === 'Enter' && fetchBid()}
  />
  <button onClick={fetchBid} disabled={bidLoading || !bidInput.trim()}
- className="px-5 py-2.5 bg-[#3182F6] text-white rounded-xl text-sm font-semibold disabled:opacity-40 hover:bg-[#1D6EF5] transition-colors">
+ className="min-h-11 px-5 py-2.5 bg-[var(--lu-accent)] text-white rounded-[6px] text-sm font-semibold disabled:opacity-40 hover:bg-[#1D6EF5] transition-colors">
  {bidLoading ? '조회 중…' : '조회'}
  </button>
  </div>
  </div>
 
  {bidError && (
- <div role="alert" className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 text-sm text-[#E11D48]">{bidError}<button onClick={fetchBid} className="block min-h-[44px] font-semibold underline">다시 조회하기</button></div>
+ <div role="alert" className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[6px] p-3 text-sm text-[#E11D48]">{bidError}<button onClick={fetchBid} className="block min-h-[44px] font-semibold underline">다시 조회하기</button></div>
  )}
 
- {bidKeyword && <p className="text-xs text-[#8B95A1]">조회한 키워드: {bidKeyword}{bidInput.trim() !== bidKeyword ? ' · 입력한 키워드로 다시 조회하면 결과가 바뀝니다.' : ''}</p>}
+ {bidKeyword && <p className="text-xs text-[var(--lu-muted)]">조회한 키워드: {bidKeyword}{bidInput.trim() !== bidKeyword ? ' · 입력한 키워드로 다시 조회하면 결과가 바뀝니다.' : ''}</p>}
  {bidRows.length > 0 && (
  <div>
- <p className="text-sm font-bold text-[#191F28] mb-3"><span className="text-[#3182F6]">[{bidKeyword}]</span> 파워링크 입찰가</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)] mb-3"><span className="text-[var(--lu-accent)]">[{bidKeyword}]</span> 파워링크 입찰가</p>
  <div className="space-y-2.5">
  {bidRows.map(row => (
- <div key={row.rank} className={'rounded-xl border p-4 flex items-center gap-4 ' + (row.rank === 1 ? 'border-[#FFD700] bg-[#FFFBEB]' : row.rank <= 3 ? 'border-[#E5E8EB] bg-[#FAFBFF]' : 'border-[#E5E8EB] bg-white')}>
- <div className={'w-8 h-8 rounded-full flex items-center justify-center text-sm font-black flex-shrink-0 ' + (row.rank === 1 ? 'bg-[#FFD700] text-white' : row.rank <= 3 ? 'bg-[#3182F6] text-white' : 'bg-[#F2F4F6] text-[#8B95A1]')}>
+ <div key={row.rank} className={'rounded-[6px] border p-4 flex items-center gap-4 ' + (row.rank === 1 ? 'border-[#FFD700] bg-[#FFFBEB]' : row.rank <= 3 ? 'border-[var(--lu-line)] bg-[#FAFBFF]' : 'border-[var(--lu-line)] bg-white')}>
+ <div className={'w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 ' + (row.rank === 1 ? 'bg-[#FFD700] text-white' : row.rank <= 3 ? 'bg-[var(--lu-accent)] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]')}>
  {row.rank}
  </div>
  <div className="flex-1 grid grid-cols-2 gap-2">
- <div className="bg-[#EFF6FF] rounded-lg px-3 py-2">
- <p className="text-[10px] text-[#8B95A1] font-semibold mb-0.5">PC</p>
- <p className="text-sm font-bold text-[#3182F6]">{fmtWon(row.pc)}</p>
+ <div className="bg-[var(--lu-accent-soft)] rounded-lg px-3 py-2">
+ <p className="text-[10px] text-[var(--lu-muted)] font-semibold mb-0.5">PC</p>
+ <p className="text-sm font-bold text-[var(--lu-accent)]">{fmtWon(row.pc)}</p>
  </div>
  <div className="bg-[#F0FDF4] rounded-lg px-3 py-2">
- <p className="text-[10px] text-[#8B95A1] font-semibold mb-0.5">MOBILE</p>
+ <p className="text-[10px] text-[var(--lu-muted)] font-semibold mb-0.5">MOBILE</p>
  <p className="text-sm font-bold text-[#059669]">{fmtWon(row.mobile)}</p>
  </div>
  </div>

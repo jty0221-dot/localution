@@ -33,7 +33,7 @@ type Category = { id: string; label: string; Icon: LucideIcon; color: string }
 const CATEGORIES: Category[] = [
  { id: 'all', label: '전체', Icon: LayoutGrid, color: '#8B95A1' },
  { id: 'tip', label: '마케팅 팁', Icon: Lightbulb, color: '#F59E0B' },
- { id: 'qna', label: '질문/답변', Icon: HelpCircle, color: '#3182F6' },
+ { id: 'qna', label: '질문/답변', Icon: HelpCircle, color: '#16685D' },
  { id: 'success', label: '성공사례', Icon: PartyPopper, color: '#10B981' },
  { id: 'free', label: '자유게시판',Icon: MessageCircle, color: '#8B5CF6' },
 ]
@@ -123,8 +123,8 @@ function CatBadge({ cat, size = 'sm' }: { cat: Category | undefined; size?: 'xs'
 
 function RegionPill({ region_id }: { region_id?: string }) {
  return (
- <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-[#F2F4F6] text-[#4E5968] px-2 py-0.5 rounded-full">
- <MapPin size={10} strokeWidth={2.25} className="text-[#3182F6]" />
+ <span className="inline-flex items-center gap-1 text-[11px] font-medium bg-[var(--lu-canvas)] text-[var(--lu-muted)] px-2 py-0.5 rounded-full">
+ <MapPin size={10} strokeWidth={2.25} className="text-[var(--lu-accent)]" />
  {regionLabel(region_id)}
  </span>
  )
@@ -149,7 +149,7 @@ function PointToast({ amount, label, onClose }: { amount: number; label: string;
  return () => clearTimeout(t)
  }, [onClose])
  return (
- <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-gradient-to-r from-[#FFB703] to-[#FB8500] text-white px-5 py-3 rounded-2xl shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom">
+ <div className="fixed bottom-6 left-1/2 -translate-x-1/2 z-[60] bg-[var(--lu-accent)] text-white px-5 py-3 rounded-[10px] shadow-2xl flex items-center gap-2 animate-in fade-in slide-in-from-bottom">
  <Coins size={18} strokeWidth={2.25} />
  <span className="font-bold text-sm">+{amount}P</span>
  <span className="text-xs opacity-90">{label}</span>
@@ -207,21 +207,21 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
- <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[92vh] overflow-y-auto">
- <div className="flex items-center justify-between p-6 border-b border-[#F2F4F6] sticky top-0 bg-white z-10">
- <h2 className="text-lg font-bold text-[#191F28]">글쓰기 <span className="text-xs text-[#8B95A1] font-medium">· 작성 시 +{POINT_RULES.POST_CREATE.delta}P 적립</span></h2>
- <button onClick={onClose} className="text-[#8B95A1] hover:text-[#191F28] transition-colors">
+ <div className="bg-white rounded-[10px] w-full max-w-2xl shadow-2xl max-h-[92vh] overflow-y-auto">
+ <div className="flex items-center justify-between p-6 border-b border-[var(--lu-canvas)] sticky top-0 bg-white z-10">
+ <h2 className="text-lg font-bold text-[var(--lu-ink)]">글쓰기 <span className="text-xs text-[var(--lu-muted)] font-medium">· 작성 시 +{POINT_RULES.POST_CREATE.delta}P 적립</span></h2>
+ <button onClick={onClose} className="min-h-11 text-[var(--lu-muted)] hover:text-[var(--lu-ink)] transition-colors">
  <X size={22} strokeWidth={2} />
  </button>
  </div>
  <div className="p-6 space-y-4">
  {/* 지역 선택 */}
  <div>
- <label className="block text-sm font-medium text-[#191F28] mb-2">지역 게시판</label>
+ <label className="block text-sm font-medium text-[var(--lu-ink)] mb-2">지역 게시판</label>
  <select
  value={regionId}
  onChange={e => setRegionId(e.target.value)}
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors bg-white"
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors bg-white"
  >
  {grouped.map(g => (
  <optgroup key={g.parent ?? 'nationwide'} label={g.parent ?? '전국'}>
@@ -233,17 +233,17 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
  </optgroup>
  ))}
  </select>
- <p className="text-[11px] text-[#8B95A1] mt-1.5">같은 지역 사장님들만 서로 볼 수 있어요 · 전국 게시판은 누구나 열람 가능</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mt-1.5">같은 지역 사장님들만 서로 볼 수 있어요 · 전국 게시판은 누구나 열람 가능</p>
  </div>
 
  {/* 업종 게시판 (선택) */}
  <div>
- <label className="block text-sm font-medium text-[#191F28] mb-2">
- 업종 게시판 <span className="text-xs text-[#8B95A1] font-normal">(선택 · 미지정 가능)</span>
+ <label className="block text-sm font-medium text-[var(--lu-ink)] mb-2">
+ 업종 게시판 <span className="text-xs text-[var(--lu-muted)] font-normal">(선택 · 미지정 가능)</span>
  {industry && (
  <span className="ml-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-[#FFF7ED] text-[#C2410C] text-[11px] font-bold">
  {findIndustryGroup(industry)?.emoji || ''} {industry}
- <button type="button" onClick={() => setIndustry('')} className="ml-1 hover:text-[#9A3412]">×</button>
+ <button type="button" onClick={() => setIndustry('')} className="min-h-11 ml-1 hover:text-[#9A3412]">×</button>
  </span>
  )}
  </label>
@@ -256,7 +256,7 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
  type="button"
  onClick={() => { setIndustryGroup(g.id); setIndustrySearch('') }}
  title={g.desc}
- className={`px-2 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${industryGroup === g.id ? 'border-[#EA580C] bg-[#EA580C] text-white' : 'border-[#E5E8EB] text-[#4E5968] hover:border-[#EA580C] hover:text-[#EA580C]'}`}
+ className={`px-2 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${industryGroup === g.id ? 'border-[#EA580C] bg-[#EA580C] text-white' : 'border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[#EA580C] hover:text-[#EA580C]'}`}
  >
  <span className="mr-0.5">{g.emoji}</span>{g.label}
  </button>
@@ -271,7 +271,7 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
  key={item}
  type="button"
  onClick={() => setIndustry(item)}
- className={`px-2 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${industry === item ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[#E5E8EB] text-[#4E5968] hover:border-[#FED7AA]'}`}
+ className={`px-2 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${industry === item ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[#FED7AA]'}`}
  >
  {item}
  </button>
@@ -286,7 +286,7 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
  value={industrySearch}
  onChange={e => setIndustrySearch(e.target.value)}
  placeholder="업종 직접 검색 (예: 치과, 필라테스)"
- className="w-full border border-[#E5E8EB] rounded-lg px-3 py-2 text-xs focus:outline-none focus:border-[#EA580C] transition-colors"
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-lg px-3 py-2 text-base focus:outline-none focus:border-[#EA580C] transition-colors"
  />
  {industrySearch && (
  <div className="mt-2 flex flex-wrap gap-1 max-h-32 overflow-y-auto pr-1">
@@ -304,7 +304,7 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
  if (grp) setIndustryGroup(grp.id)
  setIndustrySearch('')
  }}
- className={`px-2 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${industry === l ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[#E5E8EB] text-[#4E5968] hover:border-[#FED7AA]'}`}
+ className={`px-2 py-1 rounded-lg text-[11px] font-semibold border transition-colors ${industry === l ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[#FED7AA]'}`}
  >
  {grp?.emoji} {l}
  </button>
@@ -317,14 +317,14 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
 
  {/* 카테고리 */}
  <div>
- <label className="block text-sm font-medium text-[#191F28] mb-2">카테고리</label>
+ <label className="block text-sm font-medium text-[var(--lu-ink)] mb-2">카테고리</label>
  <div className="flex gap-2 flex-wrap">
  {CATEGORIES.filter(c => c.id !== 'all').map(cat => (
  <button
  key={cat.id}
  onClick={() => setCategory(cat.id)}
  className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium transition-colors ${
- category === cat.id ? 'bg-[#3182F6] text-white' : 'bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'
+ category === cat.id ? 'bg-[var(--lu-accent)] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)] hover:bg-[var(--lu-line)]'
  }`}
  >
  <cat.Icon size={12} strokeWidth={2.25} />
@@ -336,41 +336,41 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
 
  {/* 제목 */}
  <div>
- <label className="block text-sm font-medium text-[#191F28] mb-2">제목</label>
+ <label className="block text-sm font-medium text-[var(--lu-ink)] mb-2">제목</label>
  <input type="text" value={title} onChange={e => setTitle(e.target.value)}
  placeholder="제목을 입력하세요"
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  </div>
 
  {/* 내용 */}
  <div>
- <label className="block text-sm font-medium text-[#191F28] mb-2">내용</label>
+ <label className="block text-sm font-medium text-[var(--lu-ink)] mb-2">내용</label>
  <textarea value={content} onChange={e => setContent(e.target.value)}
  placeholder="소상공인 이웃들과 경험을 나눠보세요!"
  rows={6}
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors resize-none" />
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors resize-none" />
  </div>
 
  {/* 사진/영상 업로드 */}
  <div>
- <label className="block text-sm font-medium text-[#191F28] mb-2">사진·영상 (선택 · 최대 10개)</label>
+ <label className="block text-sm font-medium text-[var(--lu-ink)] mb-2">사진·영상 (선택 · 최대 10개)</label>
  <div className="flex flex-wrap gap-2">
  {media.map((m, i) => (
- <div key={i} className="relative w-20 h-20 rounded-xl overflow-hidden bg-[#F2F4F6] group">
+ <div key={i} className="relative w-20 h-20 rounded-[6px] overflow-hidden bg-[var(--lu-canvas)] group">
  {m.type === 'image'
  ? <img src={m.url} alt={m.name} className="w-full h-full object-cover" />
  : <video src={m.url} className="w-full h-full object-cover" muted />}
  <button type="button" onClick={() => removeMedia(i)}
- className="absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black transition-colors">
+ className="min-h-11 absolute top-1 right-1 w-5 h-5 rounded-full bg-black/70 text-white flex items-center justify-center hover:bg-black transition-colors">
  <X size={10} strokeWidth={2.5} />
  </button>
  </div>
  ))}
  {media.length < 10 && (
- <label className="w-20 h-20 rounded-xl border-2 border-dashed border-[#E5E8EB] flex flex-col items-center justify-center cursor-pointer hover:border-[#3182F6] hover:bg-[#F2F8FF] transition-colors text-[#8B95A1] hover:text-[#3182F6]">
+ <label className="w-20 h-20 rounded-[6px] border-2 border-dashed border-[var(--lu-line)] flex flex-col items-center justify-center cursor-pointer hover:border-[var(--lu-accent)] hover:bg-[#F2F8FF] transition-colors text-[var(--lu-muted)] hover:text-[var(--lu-accent)]">
  <Plus size={18} strokeWidth={2.25} />
  <span className="text-[10px] mt-0.5">사진/영상</span>
- <input type="file" accept="image/*,video/*" multiple onChange={handleFilesPicked} className="hidden" />
+ <input type="file" accept="image/*,video/*" multiple onChange={handleFilesPicked} className="min-h-11 hidden" />
  </label>
  )}
  </div>
@@ -378,11 +378,11 @@ function WriteModal({ onClose, onSubmit, defaultRegion }: {
  </div>
 
  <div className="flex gap-3 p-6 pt-0">
- <button onClick={onClose} className="flex-1 py-3 rounded-xl border border-[#E5E8EB] text-[#4E5968] font-semibold text-sm hover:bg-[#F2F4F6] transition-colors">
+ <button onClick={onClose} className="min-h-11 flex-1 py-3 rounded-[6px] border border-[var(--lu-line)] text-[var(--lu-muted)] font-semibold text-sm hover:bg-[var(--lu-canvas)] transition-colors">
  취소
  </button>
  <button onClick={handleSubmit} disabled={!title.trim() || !content.trim()}
- className="flex-1 py-3 rounded-xl bg-[#3182F6] text-white font-semibold text-sm hover:bg-[#1B64DA] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
+ className="min-h-11 flex-1 py-3 rounded-[6px] bg-[var(--lu-accent)] text-white font-semibold text-sm hover:bg-[var(--lu-accent-hover)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed">
  게시하기 (+{POINT_RULES.POST_CREATE.delta}P)
  </button>
  </div>
@@ -404,43 +404,43 @@ function PostModal({ post, onClose, onLike, onBookmark, onComment }: any) {
 
  return (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
- <div className="bg-white rounded-2xl w-full max-w-2xl shadow-2xl max-h-[90vh] flex flex-col">
- <div className="flex items-center justify-between p-6 border-b border-[#F2F4F6] flex-shrink-0">
+ <div className="bg-white rounded-[10px] w-full max-w-2xl shadow-2xl max-h-[90vh] flex flex-col">
+ <div className="flex items-center justify-between p-6 border-b border-[var(--lu-canvas)] flex-shrink-0">
  <div className="flex items-center gap-2">
- <span className="inline-flex items-center gap-1.5 text-sm font-medium bg-[#EFF6FF] text-[#3182F6] px-3 py-1 rounded-full">
+ <span className="inline-flex items-center gap-1.5 text-sm font-medium bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] px-3 py-1 rounded-full">
  {cat && <cat.Icon size={12} strokeWidth={2.25} />}
  {cat?.label}
  </span>
  <RegionPill region_id={post.region_id} />
  <IndustryPill industry={post.industry} />
  {post.featured && (
- <span className="inline-flex items-center gap-1 text-xs font-bold bg-gradient-to-r from-[#FFB703] to-[#FB8500] text-white px-2 py-1 rounded-full">
+ <span className="inline-flex items-center gap-1 text-xs font-bold bg-[var(--lu-accent)] text-white px-2 py-1 rounded-full">
  <Trophy size={10} strokeWidth={2.5} />인기글
  </span>
  )}
  </div>
- <button onClick={onClose} className="text-[#8B95A1] hover:text-[#191F28] transition-colors">
+ <button onClick={onClose} className="min-h-11 text-[var(--lu-muted)] hover:text-[var(--lu-ink)] transition-colors">
  <X size={22} strokeWidth={2} />
  </button>
  </div>
 
  <div className="overflow-y-auto flex-1 p-6">
  <div className="flex items-center gap-3 mb-4">
- <div className="w-10 h-10 rounded-full bg-[#3182F6] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
+ <div className="w-10 h-10 rounded-full bg-[var(--lu-accent)] text-white flex items-center justify-center font-bold text-sm flex-shrink-0">
  {post.avatar}
  </div>
  <div>
- <div className="font-semibold text-[#191F28]">{post.author}</div>
- <div className="text-xs text-[#8B95A1]">{post.time}</div>
+ <div className="font-semibold text-[var(--lu-ink)]">{post.author}</div>
+ <div className="text-xs text-[var(--lu-muted)]">{post.time}</div>
  </div>
  </div>
- <h2 className="text-xl font-bold text-[#191F28] mb-4">{post.title}</h2>
- <p className="text-[#4E5968] leading-relaxed whitespace-pre-wrap mb-6">{post.content}</p>
+ <h2 className="text-xl font-bold text-[var(--lu-ink)] mb-4">{post.title}</h2>
+ <p className="text-[var(--lu-muted)] leading-relaxed whitespace-pre-wrap mb-6">{post.content}</p>
 
  {post.media && post.media.length > 0 && (
  <div className="grid grid-cols-2 gap-2 mb-6">
  {post.media.map((m: any, i: number) => (
- <div key={i} className="rounded-xl overflow-hidden bg-[#F2F4F6]">
+ <div key={i} className="rounded-[6px] overflow-hidden bg-[var(--lu-canvas)]">
  {m.type === 'image'
  ? <img src={m.url} alt={m.name} className="w-full h-48 object-cover" />
  : <video src={m.url} controls className="w-full h-48 object-cover bg-black" />}
@@ -449,14 +449,14 @@ function PostModal({ post, onClose, onLike, onBookmark, onComment }: any) {
  </div>
  )}
 
- <div className="flex items-center gap-4 pb-6 border-b border-[#F2F4F6]">
+ <div className="flex items-center gap-4 pb-6 border-b border-[var(--lu-canvas)]">
  <button onClick={() => onLike(post.id)}
- className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${post.liked ? 'text-[#FF3B30]' : 'text-[#8B95A1] hover:text-[#FF3B30]'}`}>
+ className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${post.liked ? 'text-[#FF3B30]' : 'text-[var(--lu-muted)] hover:text-[#FF3B30]'}`}>
  <Heart size={16} strokeWidth={post.liked ? 0 : 2} fill={post.liked ? 'currentColor' : 'none'} />
  {post.likes}
  </button>
  <button onClick={() => onBookmark(post.id)}
- className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${post.bookmarked ? 'text-[#3182F6]' : 'text-[#8B95A1] hover:text-[#3182F6]'}`}>
+ className={`inline-flex items-center gap-1.5 text-sm font-medium transition-colors ${post.bookmarked ? 'text-[var(--lu-accent)]' : 'text-[var(--lu-muted)] hover:text-[var(--lu-accent)]'}`}>
  <Bookmark size={16} strokeWidth={post.bookmarked ? 0 : 2} fill={post.bookmarked ? 'currentColor' : 'none'} />
  저장
  </button>
@@ -468,22 +468,22 @@ function PostModal({ post, onClose, onLike, onBookmark, onComment }: any) {
  </div>
 
  <div className="mt-4">
- <div className="text-sm font-semibold text-[#191F28] mb-4">댓글 {post.comments.length}개</div>
+ <div className="text-sm font-semibold text-[var(--lu-ink)] mb-4">댓글 {post.comments.length}개</div>
  {post.comments.length === 0 && (
- <div className="text-center text-[#8B95A1] text-sm py-6">첫 번째 댓글을 남겨보세요! (+{POINT_RULES.COMMENT_CREATE.delta}P)</div>
+ <div className="text-center text-[var(--lu-muted)] text-sm py-6">첫 번째 댓글을 남겨보세요! (+{POINT_RULES.COMMENT_CREATE.delta}P)</div>
  )}
  <div className="space-y-4">
  {post.comments.map((c: any, i: number) => (
  <div key={i} className="flex gap-3">
- <div className="w-8 h-8 rounded-full bg-[#F2F4F6] text-[#4E5968] flex items-center justify-center font-bold text-xs flex-shrink-0">
+ <div className="w-8 h-8 rounded-full bg-[var(--lu-canvas)] text-[var(--lu-muted)] flex items-center justify-center font-bold text-xs flex-shrink-0">
  {c.author[0]}
  </div>
  <div className="flex-1">
  <div className="flex items-center gap-2 mb-1">
- <span className="text-sm font-semibold text-[#191F28]">{c.author}</span>
- <span className="text-xs text-[#8B95A1]">{c.time}</span>
+ <span className="text-sm font-semibold text-[var(--lu-ink)]">{c.author}</span>
+ <span className="text-xs text-[var(--lu-muted)]">{c.time}</span>
  </div>
- <p className="text-sm text-[#4E5968]">{c.text}</p>
+ <p className="text-sm text-[var(--lu-muted)]">{c.text}</p>
  </div>
  </div>
  ))}
@@ -491,14 +491,14 @@ function PostModal({ post, onClose, onLike, onBookmark, onComment }: any) {
  </div>
  </div>
 
- <div className="p-4 border-t border-[#F2F4F6] flex-shrink-0">
+ <div className="p-4 border-t border-[var(--lu-canvas)] flex-shrink-0">
  <div className="flex gap-2">
  <input type="text" value={comment} onChange={e => setComment(e.target.value)}
  onKeyDown={e => e.key === 'Enter' && submitComment()}
  placeholder="댓글을 입력하세요... (+50P)"
- className="flex-1 border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#3182F6] transition-colors" />
+ className="min-h-11 flex-1 border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  <button onClick={submitComment}
- className="px-4 py-2.5 bg-[#3182F6] text-white text-sm font-semibold rounded-xl hover:bg-[#1B64DA] transition-colors">
+ className="min-h-11 px-4 py-2.5 bg-[var(--lu-accent)] text-white text-sm font-semibold rounded-[6px] hover:bg-[var(--lu-accent-hover)] transition-colors">
  등록
  </button>
  </div>
@@ -726,7 +726,7 @@ export default function Community() {
  const regionGroups = useMemo(() => groupedRegions(), [])
 
  return (
- <div className="min-h-screen bg-[#F8F9FA] flex">
+ <div className="min-h-screen bg-[var(--lu-canvas)] flex">
  <Sidebar />
  <main className="flex-1 md:ml-[220px] pt-4 md:pt-0 min-w-0">
  <PageHeader
@@ -741,7 +741,7 @@ export default function Community() {
  {balance.toLocaleString()}P
  </div>
  <button onClick={() => setShowWrite(true)}
- className="inline-flex items-center gap-1.5 bg-white text-[#EA580C] font-bold px-4 py-2 rounded-full text-sm shadow hover:shadow-lg transition-all">
+ className="min-h-11 inline-flex items-center gap-1.5 bg-white text-[#EA580C] font-bold px-4 py-2 rounded-full text-sm shadow hover:shadow-none transition-all">
  <Pencil size={14} strokeWidth={2.5} />
  글쓰기
  </button>
@@ -752,12 +752,12 @@ export default function Community() {
  <div className="max-w-5xl mx-auto p-4 md:p-6 w-full">
  {/* 모바일 상단 바 */}
  <div className="md:hidden flex items-center justify-between mb-4 gap-2">
- <div className="flex items-center gap-1.5 bg-gradient-to-r from-[#FFB703] to-[#FB8500] text-white px-3 py-1.5 rounded-full text-sm font-bold shadow">
+ <div className="flex items-center gap-1.5 bg-[var(--lu-accent)] text-white px-3 py-1.5 rounded-full text-sm font-bold shadow">
  <Coins size={14} strokeWidth={2.5} />
  {balance.toLocaleString()}P
  </div>
  <button onClick={() => setShowWrite(true)}
- className="inline-flex items-center gap-1.5 bg-[#3182F6] text-white font-bold px-4 py-2 rounded-full text-sm shadow">
+ className="min-h-11 inline-flex items-center gap-1.5 bg-[var(--lu-accent)] text-white font-bold px-4 py-2 rounded-full text-sm shadow">
  <Pencil size={14} strokeWidth={2.5} />
  글쓰기
  </button>
@@ -767,9 +767,9 @@ export default function Community() {
  <SlideAdBanner className="mb-4" />
 
  {/* 포인트 이벤트 배너 */}
- <div className="bg-gradient-to-r from-[#FFF7ED] via-[#FFFBEB] to-[#FEF3C7] border border-[#FED7AA] rounded-2xl px-5 py-4 mb-4">
+ <div className="bg-[var(--lu-accent)] border border-[#FED7AA] rounded-[10px] px-5 py-4 mb-4">
  <div className="flex items-start gap-3">
- <span className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFB703] to-[#FB8500] flex items-center justify-center text-white flex-shrink-0 shadow">
+ <span className="w-10 h-10 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center text-white flex-shrink-0 shadow">
  <Coins size={18} strokeWidth={2.25} />
  </span>
  <div className="flex-1">
@@ -783,25 +783,25 @@ export default function Community() {
  </div>
 
  {/* 공지 배너 */}
- <div className="bg-[#EFF6FF] border border-[#BFDBFE] rounded-2xl px-5 py-3.5 mb-4 flex items-start gap-3">
- <span className="w-9 h-9 rounded-xl bg-white flex items-center justify-center flex-shrink-0">
- <Megaphone size={18} strokeWidth={2} className="text-[#3182F6]" />
+ <div className="bg-[var(--lu-accent-soft)] border border-[#BFDBFE] rounded-[10px] px-5 py-3.5 mb-4 flex items-start gap-3">
+ <span className="w-9 h-9 rounded-[6px] bg-white flex items-center justify-center flex-shrink-0">
+ <Megaphone size={18} strokeWidth={2} className="text-[var(--lu-accent)]" />
  </span>
  <div>
- <p className="text-sm font-bold text-[#3182F6] mb-0.5">커뮤니티 이용 안내</p>
- <p className="text-xs text-[#4E5968] leading-relaxed">서로 존중하는 댓글 문화 · 광고성 게시글은 삭제될 수 있어요 · 좋은 정보는 저장·공유 환영</p>
+ <p className="text-sm font-bold text-[var(--lu-accent)] mb-0.5">커뮤니티 이용 안내</p>
+ <p className="text-xs text-[var(--lu-muted)] leading-relaxed">서로 존중하는 댓글 문화 · 광고성 게시글은 삭제될 수 있어요 · 좋은 정보는 저장·공유 환영</p>
  </div>
  </div>
 
  {/* 모바일 · 태블릿 전용 지역 게시판 선택 (lg 이상은 우측 사이드바 카드로 표시) */}
- <div className="lg:hidden bg-white rounded-2xl px-4 py-2.5 mb-4 shadow-sm border border-[#F2F4F6]">
+ <div className="lg:hidden bg-white rounded-[10px] px-4 py-2.5 mb-4 shadow-none border border-[var(--lu-canvas)]">
  <div className="flex items-center gap-2">
- <MapPin size={13} strokeWidth={2.25} className="text-[#3182F6] flex-shrink-0" />
- <span className="text-xs font-bold text-[#191F28] flex-shrink-0">지역</span>
+ <MapPin size={13} strokeWidth={2.25} className="text-[var(--lu-accent)] flex-shrink-0" />
+ <span className="text-xs font-bold text-[var(--lu-ink)] flex-shrink-0">지역</span>
  <select
  value={activeRegion}
  onChange={e => setActiveRegion(e.target.value)}
- className="flex-1 min-w-0 text-xs bg-[#F2F4F6] border-none rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#3182F6]/30 font-semibold text-[#191F28]"
+ className="min-h-11 flex-1 min-w-0 text-base bg-[var(--lu-canvas)] border-none rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--lu-accent)]/30 font-semibold text-[var(--lu-ink)]"
  >
  {regionGroups.map(g => (
  <optgroup key={g.parent ?? 'nationwide'} label={g.parent ?? '전국'}>
@@ -816,7 +816,7 @@ export default function Community() {
  <button
  onClick={requestGeoLocation}
  disabled={geoStatus === 'loading'}
- className="flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-[#EFF6FF] text-[#3182F6] hover:bg-[#DBEAFE] transition-colors disabled:opacity-60"
+ className="min-h-11 flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-[11px] font-semibold bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] hover:bg-[#DBEAFE] transition-colors disabled:opacity-60"
  >
  {geoStatus === 'loading'
  ? <Loader2 size={11} strokeWidth={2.5} className="animate-spin" />
@@ -835,14 +835,14 @@ export default function Community() {
  </div>
 
  {/* 모바일 · 태블릿 전용 업종 게시판 선택 (lg 이상은 우측 사이드바 카드로 표시) */}
- <div className="lg:hidden bg-white rounded-2xl px-4 py-2.5 mb-4 shadow-sm border border-[#F2F4F6]">
+ <div className="lg:hidden bg-white rounded-[10px] px-4 py-2.5 mb-4 shadow-none border border-[var(--lu-canvas)]">
  <div className="flex items-center gap-2 mb-2">
  <Store size={13} strokeWidth={2.25} className="text-[#EA580C] flex-shrink-0" />
- <span className="text-xs font-bold text-[#191F28] flex-shrink-0">업종</span>
+ <span className="text-xs font-bold text-[var(--lu-ink)] flex-shrink-0">업종</span>
  <select
  value={activeIndustryGroup}
  onChange={e => { setActiveIndustryGroup(e.target.value); setActiveIndustry('all') }}
- className="flex-1 min-w-0 text-xs bg-[#FFF7ED] border-none rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#EA580C]/30 font-semibold text-[#9A3412]"
+ className="min-h-11 flex-1 min-w-0 text-base bg-[#FFF7ED] border-none rounded-lg px-2.5 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#EA580C]/30 font-semibold text-[#9A3412]"
  >
  <option value="all">전체 업종</option>
  {INDUSTRY_CATALOG.map(g => (
@@ -852,7 +852,7 @@ export default function Community() {
  {(activeIndustryGroup !== 'all' || activeIndustry !== 'all') && (
  <button
  onClick={() => { setActiveIndustryGroup('all'); setActiveIndustry('all') }}
- className="flex-shrink-0 text-[10px] text-[#8B95A1] hover:text-[#4E5968] px-1.5 py-0.5"
+ className="min-h-11 flex-shrink-0 text-[10px] text-[var(--lu-muted)] hover:text-[var(--lu-muted)] px-1.5 py-0.5"
  >초기화</button>
  )}
  </div>
@@ -861,7 +861,7 @@ export default function Community() {
  <button
  type="button"
  onClick={() => setActiveIndustry('all')}
- className={`flex-shrink-0 px-2 py-1 rounded-lg text-[10px] font-semibold border transition-colors ${activeIndustry === 'all' ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[#E5E8EB] text-[#8B95A1]'}`}
+ className={`flex-shrink-0 px-2 py-1 rounded-lg text-[10px] font-semibold border transition-colors ${activeIndustry === 'all' ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[var(--lu-line)] text-[var(--lu-muted)]'}`}
  >
  전체
  </button>
@@ -870,7 +870,7 @@ export default function Community() {
  key={item}
  type="button"
  onClick={() => setActiveIndustry(item)}
- className={`flex-shrink-0 px-2 py-1 rounded-lg text-[10px] font-semibold border transition-colors ${activeIndustry === item ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[#E5E8EB] text-[#4E5968]'}`}
+ className={`flex-shrink-0 px-2 py-1 rounded-lg text-[10px] font-semibold border transition-colors ${activeIndustry === item ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[var(--lu-line)] text-[var(--lu-muted)]'}`}
  >
  {item}
  </button>
@@ -880,8 +880,8 @@ export default function Community() {
  </div>
 
  {/* 광고 문의 라인 */}
- <div className="mb-5 flex items-center justify-between bg-white rounded-2xl px-4 py-2.5 shadow-sm border border-[#F2F4F6]">
- <p className="text-xs text-[#8B95A1]">
+ <div className="mb-5 flex items-center justify-between bg-white rounded-[10px] px-4 py-2.5 shadow-none border border-[var(--lu-canvas)]">
+ <p className="text-xs text-[var(--lu-muted)]">
  이 공간은 매장·서비스 홍보 배너로도 활용됩니다
  </p>
  <Link href="/inquiry?category=ad"
@@ -892,10 +892,10 @@ export default function Community() {
 
  {/* 검색 */}
  <div className="relative mb-5">
- <Search size={16} strokeWidth={2} className="absolute left-4 top-1/2 -translate-y-1/2 text-[#8B95A1]" />
+ <Search size={16} strokeWidth={2} className="absolute left-4 top-1/2 -translate-y-1/2 text-[var(--lu-muted)]" />
  <input type="text" value={searchQuery} onChange={e => setSearchQuery(e.target.value)}
  placeholder="궁금한 내용을 검색해보세요..."
- className="w-full bg-white border border-[#E5E8EB] rounded-xl pl-10 pr-4 py-3 text-sm focus:outline-none focus:border-[#3182F6] transition-colors shadow-sm" />
+ className="min-h-11 w-full bg-white border border-[var(--lu-line)] rounded-[6px] pl-10 pr-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors shadow-none" />
  </div>
 
  <div className="flex gap-6">
@@ -907,8 +907,8 @@ export default function Community() {
  return (
  <button key={cat.id} onClick={() => setActiveCategory(cat.id)}
  className={`flex-shrink-0 flex items-center gap-1.5 px-4 py-2 rounded-full text-sm font-medium transition-colors ${
- active ? 'bg-[#3182F6] text-white shadow-sm'
- : 'bg-white text-[#4E5968] border border-[#E5E8EB] hover:border-[#3182F6] hover:text-[#3182F6]'
+ active ? 'bg-[var(--lu-accent)] text-white shadow-none'
+ : 'bg-white text-[var(--lu-muted)] border border-[var(--lu-line)] hover:border-[var(--lu-accent)] hover:text-[var(--lu-accent)]'
  }`}>
  <cat.Icon size={14} strokeWidth={2.25} style={active ? undefined : { color: cat.color }} />
  {cat.label}
@@ -918,7 +918,7 @@ export default function Community() {
  </div>
 
  {/* 현재 필터 요약 */}
- <div className="text-xs text-[#8B95A1] mb-3">
+ <div className="text-xs text-[var(--lu-muted)] mb-3">
  {regionLabel(activeRegion)} ·
  {activeIndustry !== 'all'
  ? ` ${findIndustryGroup(activeIndustry)?.emoji || ''} ${activeIndustry}`
@@ -930,12 +930,12 @@ export default function Community() {
 
  {/* 게시글 목록 */}
  {filteredPosts.length === 0 ? (
- <div className="bg-white rounded-2xl p-12 text-center shadow-sm">
- <div className="w-14 h-14 rounded-2xl bg-[#F2F4F6] mx-auto mb-3 flex items-center justify-center">
- <Search size={26} strokeWidth={1.75} className="text-[#8B95A1]" />
+ <div className="bg-white rounded-[10px] p-12 text-center shadow-none">
+ <div className="w-14 h-14 rounded-[10px] bg-[var(--lu-canvas)] mx-auto mb-3 flex items-center justify-center">
+ <Search size={26} strokeWidth={1.75} className="text-[var(--lu-muted)]" />
  </div>
- <div className="font-semibold text-[#191F28] mb-1">게시글이 없어요</div>
- <div className="text-sm text-[#8B95A1]">우리 동네에 첫 글을 남겨보세요 (+{POINT_RULES.POST_CREATE.delta}P)</div>
+ <div className="font-semibold text-[var(--lu-ink)] mb-1">게시글이 없어요</div>
+ <div className="text-sm text-[var(--lu-muted)]">우리 동네에 첫 글을 남겨보세요 (+{POINT_RULES.POST_CREATE.delta}P)</div>
  </div>
  ) : (
  <div className="space-y-3">
@@ -943,37 +943,37 @@ export default function Community() {
  const cat = CATEGORIES.find(c => c.id === post.category)
  return (
  <div key={post.id} onClick={() => setSelectedPost(post)}
- className="bg-white rounded-2xl p-5 shadow-sm hover:shadow-md transition-all cursor-pointer group">
+ className="bg-white rounded-[10px] p-5 shadow-none hover:shadow-md transition-all cursor-pointer group">
  <div className="flex items-start justify-between gap-3">
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-2 flex-wrap">
- <span className="text-xs font-medium bg-[#F2F4F6] text-[#4E5968] px-2 py-0.5 rounded-full">
+ <span className="text-xs font-medium bg-[var(--lu-canvas)] text-[var(--lu-muted)] px-2 py-0.5 rounded-full">
  <CatBadge cat={cat} size="xs" />
  </span>
  <RegionPill region_id={post.region_id} />
  <IndustryPill industry={post.industry} />
  {post.featured && (
- <span className="inline-flex items-center gap-1 text-xs font-bold bg-gradient-to-r from-[#FFB703] to-[#FB8500] text-white px-2 py-0.5 rounded-full">
+ <span className="inline-flex items-center gap-1 text-xs font-bold bg-[var(--lu-accent)] text-white px-2 py-0.5 rounded-full">
  <Trophy size={10} strokeWidth={2.5} />인기
  </span>
  )}
  {post.bookmarked && (
- <span className="inline-flex items-center gap-1 text-xs text-[#3182F6]">
+ <span className="inline-flex items-center gap-1 text-xs text-[var(--lu-accent)]">
  <Bookmark size={10} strokeWidth={0} fill="currentColor" />
  저장됨
  </span>
  )}
  </div>
- <h3 className="font-semibold text-[#191F28] group-hover:text-[#3182F6] transition-colors mb-1 truncate">
+ <h3 className="font-semibold text-[var(--lu-ink)] group-hover:text-[var(--lu-accent)] transition-colors mb-1 truncate">
  {post.title}
  </h3>
- <p className="text-sm text-[#8B95A1] line-clamp-2 leading-relaxed">
+ <p className="text-sm text-[var(--lu-muted)] line-clamp-2 leading-relaxed">
  {post.content}
  </p>
  {post.media && post.media.length > 0 && (
  <div className="flex gap-1.5 mt-2">
  {post.media.slice(0, 3).map((m: any, i: number) => (
- <div key={i} className="w-14 h-14 rounded-lg overflow-hidden bg-[#F2F4F6] relative">
+ <div key={i} className="w-14 h-14 rounded-lg overflow-hidden bg-[var(--lu-canvas)] relative">
  {m.type === 'image'
  ? <img src={m.url} alt="" className="w-full h-full object-cover" />
  : <>
@@ -985,19 +985,19 @@ export default function Community() {
  </div>
  ))}
  {post.media.length > 3 && (
- <div className="w-14 h-14 rounded-lg bg-[#F2F4F6] flex items-center justify-center text-xs text-[#4E5968] font-bold">+{post.media.length - 3}</div>
+ <div className="w-14 h-14 rounded-lg bg-[var(--lu-canvas)] flex items-center justify-center text-xs text-[var(--lu-muted)] font-bold">+{post.media.length - 3}</div>
  )}
  </div>
  )}
  </div>
- <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[#EFF6FF] text-[#3182F6] flex items-center justify-center font-bold text-sm">
+ <div className="flex-shrink-0 w-10 h-10 rounded-full bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] flex items-center justify-center font-bold text-sm">
  {post.avatar}
  </div>
  </div>
- <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[#F2F4F6]">
- <span className="text-xs text-[#8B95A1]">{post.author}</span>
- <span className="text-xs text-[#8B95A1]">{post.time}</span>
- <span className="ml-auto flex items-center gap-3 text-xs text-[#8B95A1]">
+ <div className="flex items-center gap-4 mt-3 pt-3 border-t border-[var(--lu-canvas)]">
+ <span className="text-xs text-[var(--lu-muted)]">{post.author}</span>
+ <span className="text-xs text-[var(--lu-muted)]">{post.time}</span>
+ <span className="ml-auto flex items-center gap-3 text-xs text-[var(--lu-muted)]">
  <span className={`inline-flex items-center gap-1 ${post.liked ? 'text-[#FF3B30]' : ''}`}>
  <Heart size={12} strokeWidth={post.liked ? 0 : 2} fill={post.liked ? 'currentColor' : 'none'} />
  {post.likes}
@@ -1018,15 +1018,15 @@ export default function Community() {
  {/* 데스크탑 사이드 — 슬림 버전 (w-64 → w-52, p-5 → p-4) */}
  <div className="hidden lg:block w-52 flex-shrink-0 space-y-3">
  {/* 지역 게시판 (최상단 · 메인 라인에서 제거된 것을 사이드바에 컴팩트화) */}
- <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-[#F2F4F6]">
+ <div className="bg-white rounded-[10px] p-3.5 shadow-none border border-[var(--lu-canvas)]">
  <div className="flex items-center gap-1.5 mb-2">
- <MapPin size={12} strokeWidth={2.25} className="text-[#3182F6]" />
- <h3 className="font-bold text-[#191F28] text-xs">지역 게시판</h3>
+ <MapPin size={12} strokeWidth={2.25} className="text-[var(--lu-accent)]" />
+ <h3 className="font-bold text-[var(--lu-ink)] text-xs">지역 게시판</h3>
  <button
  onClick={requestGeoLocation}
  disabled={geoStatus === 'loading'}
  title="내 위치 찾기"
- className="ml-auto inline-flex items-center justify-center w-6 h-6 rounded-full bg-[#EFF6FF] text-[#3182F6] hover:bg-[#DBEAFE] transition-colors disabled:opacity-60"
+ className="min-h-11 ml-auto inline-flex items-center justify-center w-6 h-6 rounded-full bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] hover:bg-[#DBEAFE] transition-colors disabled:opacity-60"
  >
  {geoStatus === 'loading'
  ? <Loader2 size={10} strokeWidth={2.5} className="animate-spin" />
@@ -1036,7 +1036,7 @@ export default function Community() {
  <select
  value={activeRegion}
  onChange={e => setActiveRegion(e.target.value)}
- className="w-full text-[11px] font-semibold text-[#191F28] bg-[#F2F4F6] border-none rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#3182F6]/30"
+ className="min-h-11 w-full text-[11px] font-semibold text-[var(--lu-ink)] bg-[var(--lu-canvas)] border-none rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[var(--lu-accent)]/30"
  >
  {regionGroups.map(g => (
  <optgroup key={g.parent ?? 'nationwide'} label={g.parent ?? '전국'}>
@@ -1048,7 +1048,7 @@ export default function Community() {
  </optgroup>
  ))}
  </select>
- <p className="text-[10px] text-[#8B95A1] mt-1.5 leading-snug">선택한 지역만 보기 · 전국 누구나 열람</p>
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1.5 leading-snug">선택한 지역만 보기 · 전국 누구나 열람</p>
  {geoStatus === 'denied' && (
  <p className="text-[10px] text-[#FB8500] mt-1 leading-snug">위치 권한이 차단돼 있어요. 브라우저 설정에서 허용해 주세요</p>
  )}
@@ -1064,14 +1064,14 @@ export default function Community() {
  </div>
 
  {/* 업종 게시판 (지역 게시판 바로 아래) */}
- <div className="bg-white rounded-2xl p-3.5 shadow-sm border border-[#F2F4F6]">
+ <div className="bg-white rounded-[10px] p-3.5 shadow-none border border-[var(--lu-canvas)]">
  <div className="flex items-center gap-1.5 mb-2">
  <Store size={12} strokeWidth={2.25} className="text-[#EA580C]" />
- <h3 className="font-bold text-[#191F28] text-xs">업종 게시판</h3>
+ <h3 className="font-bold text-[var(--lu-ink)] text-xs">업종 게시판</h3>
  {(activeIndustryGroup !== 'all' || activeIndustry !== 'all') && (
  <button
  onClick={() => { setActiveIndustryGroup('all'); setActiveIndustry('all') }}
- className="ml-auto text-[10px] text-[#8B95A1] hover:text-[#4E5968]"
+ className="min-h-11 ml-auto text-[10px] text-[var(--lu-muted)] hover:text-[var(--lu-muted)]"
  >초기화</button>
  )}
  </div>
@@ -1080,7 +1080,7 @@ export default function Community() {
  <select
  value={activeIndustryGroup}
  onChange={e => { setActiveIndustryGroup(e.target.value); setActiveIndustry('all') }}
- className="w-full text-[11px] font-semibold text-[#9A3412] bg-[#FFF7ED] border-none rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#EA580C]/30"
+ className="min-h-11 w-full text-[11px] font-semibold text-[#9A3412] bg-[#FFF7ED] border-none rounded-lg px-2 py-1.5 focus:outline-none focus:ring-2 focus:ring-[#EA580C]/30"
  >
  <option value="all">전체 업종</option>
  {INDUSTRY_CATALOG.map(g => (
@@ -1094,7 +1094,7 @@ export default function Community() {
  <button
  type="button"
  onClick={() => setActiveIndustry('all')}
- className={`px-1.5 py-0.5 rounded-md text-[10px] font-semibold border transition-colors ${activeIndustry === 'all' ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[#E5E8EB] text-[#8B95A1] hover:border-[#FED7AA]'}`}
+ className={`px-1.5 py-0.5 rounded-md text-[10px] font-semibold border transition-colors ${activeIndustry === 'all' ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[#FED7AA]'}`}
  >
  전체
  </button>
@@ -1103,32 +1103,32 @@ export default function Community() {
  key={item}
  type="button"
  onClick={() => setActiveIndustry(item)}
- className={`px-1.5 py-0.5 rounded-md text-[10px] font-semibold border transition-colors ${activeIndustry === item ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[#E5E8EB] text-[#4E5968] hover:border-[#FED7AA]'}`}
+ className={`px-1.5 py-0.5 rounded-md text-[10px] font-semibold border transition-colors ${activeIndustry === item ? 'border-[#EA580C] bg-[#FFF7ED] text-[#C2410C]' : 'border-[var(--lu-line)] text-[var(--lu-muted)] hover:border-[#FED7AA]'}`}
  >
  {item}
  </button>
  ))}
  </div>
  )}
- <p className="text-[10px] text-[#8B95A1] mt-1.5 leading-snug">
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1.5 leading-snug">
  같은 업종 사장님 글만 보기 · 총 {INDUSTRY_LABELS.length}개 업종
  </p>
  </div>
 
  {/* 내 포인트 */}
- <div className="bg-gradient-to-br from-[#FFF7ED] to-[#FFFBF0] rounded-2xl p-3.5 border border-[#FED7AA]">
+ <div className="bg-[var(--lu-accent)] rounded-[10px] p-3.5 border border-[#FED7AA]">
  <div className="flex items-center gap-1.5 mb-1">
  <Coins size={13} strokeWidth={2.25} className="text-[#EA580C]" />
  <h3 className="font-bold text-[#EA580C] text-[11px]">내 포인트</h3>
  </div>
- <p className="text-xl font-black text-[#9A3412] leading-tight">{balance.toLocaleString()}<span className="text-xs ml-1">P</span></p>
+ <p className="text-xl font-semibold text-[#9A3412] leading-tight">{balance.toLocaleString()}<span className="text-xs ml-1">P</span></p>
  <p className="text-[10px] text-[#78350F] mt-1 leading-snug opacity-90">활동하면 쌓여요 · 결제·광고에 사용</p>
  </div>
 
  {/* 내 근처 지역 (geo OK 일 때만) */}
  {geoStatus === 'ok' && nearRegions.length > 0 && (
- <div className="bg-white rounded-2xl p-3.5 shadow-sm">
- <h3 className="font-bold text-[#191F28] mb-2 flex items-center gap-1.5 text-xs">
+ <div className="bg-white rounded-[10px] p-3.5 shadow-none">
+ <h3 className="font-bold text-[var(--lu-ink)] mb-2 flex items-center gap-1.5 text-xs">
  <Navigation size={12} strokeWidth={2.25} className="text-[#059669]" />
  내 근처
  </h3>
@@ -1140,7 +1140,7 @@ export default function Community() {
  className={`w-full flex items-center justify-between px-2 py-1.5 rounded-lg text-[11px] transition-colors ${
  activeRegion === r.id
  ? 'bg-[#F0FDF4] text-[#059669] font-bold'
- : 'text-[#4E5968] hover:bg-[#F8F9FA]'
+ : 'text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)]'
  }`}
  >
  <span className="truncate">
@@ -1156,8 +1156,8 @@ export default function Community() {
  )}
 
  {/* 인기 게시글 */}
- <div className="bg-white rounded-2xl p-3.5 shadow-sm">
- <h3 className="font-bold text-[#191F28] mb-2.5 flex items-center gap-1.5 text-xs">
+ <div className="bg-white rounded-[10px] p-3.5 shadow-none">
+ <h3 className="font-bold text-[var(--lu-ink)] mb-2.5 flex items-center gap-1.5 text-xs">
  <Flame size={12} strokeWidth={2.25} className="text-[#FF3B30]" />
  인기 게시글
  </h3>
@@ -1165,10 +1165,10 @@ export default function Community() {
  {hotPosts.map((post, i) => (
  <div key={post.id} onClick={() => setSelectedPost(post)} className="cursor-pointer group">
  <div className="flex items-start gap-1.5">
- <span className={`text-xs font-bold flex-shrink-0 ${i === 0 ? 'text-[#FF3B30]' : i === 1 ? 'text-[#FF8C00]' : 'text-[#8B95A1]'}`}>{i + 1}</span>
+ <span className={`text-xs font-bold flex-shrink-0 ${i === 0 ? 'text-[#FF3B30]' : i === 1 ? 'text-[#FF8C00]' : 'text-[var(--lu-muted)]'}`}>{i + 1}</span>
  <div className="min-w-0">
- <p className="text-[11px] font-medium text-[#191F28] group-hover:text-[#3182F6] transition-colors line-clamp-2 leading-snug">{post.title}</p>
- <p className="inline-flex items-center gap-1 text-[10px] text-[#8B95A1] mt-0.5">
+ <p className="text-[11px] font-medium text-[var(--lu-ink)] group-hover:text-[var(--lu-accent)] transition-colors line-clamp-2 leading-snug">{post.title}</p>
+ <p className="inline-flex items-center gap-1 text-[10px] text-[var(--lu-muted)] mt-0.5">
  <Heart size={9} strokeWidth={0} fill="currentColor" className="text-[#FF3B30]" />
  {post.likes}
  <span className="text-[9px] opacity-75 truncate">· {regionLabel(post.region_id)}</span>
@@ -1181,9 +1181,9 @@ export default function Community() {
  </div>
 
  {/* 카테고리별 게시글 */}
- <div className="bg-white rounded-2xl p-3.5 shadow-sm">
- <h3 className="font-bold text-[#191F28] mb-2 flex items-center gap-1.5 text-xs">
- <BarChart3 size={12} strokeWidth={2.25} className="text-[#3182F6]" />
+ <div className="bg-white rounded-[10px] p-3.5 shadow-none">
+ <h3 className="font-bold text-[var(--lu-ink)] mb-2 flex items-center gap-1.5 text-xs">
+ <BarChart3 size={12} strokeWidth={2.25} className="text-[var(--lu-accent)]" />
  카테고리별
  </h3>
  <div className="space-y-1">
@@ -1200,11 +1200,11 @@ export default function Community() {
  }).length
  return (
  <div key={cat.id} className="flex items-center justify-between text-[11px]">
- <span className="inline-flex items-center gap-1 text-[#4E5968]">
+ <span className="inline-flex items-center gap-1 text-[var(--lu-muted)]">
  <cat.Icon size={12} strokeWidth={2.25} style={{ color: cat.color }} />
  {cat.label}
  </span>
- <span className="font-semibold text-[#191F28]">{count}</span>
+ <span className="font-semibold text-[var(--lu-ink)]">{count}</span>
  </div>
  )
  })}

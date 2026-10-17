@@ -70,28 +70,28 @@ function RankTab() {
  const sorted = [...rows].sort((a, b) => sort === 'rank' ? a.rank - b.rank : b.volume - a.volume)
 
  function rankBadge(r: number) {
- if (r <= 3) return <span className="inline-block bg-[#3182F6] text-white text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{r}위</span>
- if (r <= 10) return <span className="inline-block bg-[#E8F1FE] text-[#3182F6] text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{r}위</span>
- return <span className="inline-block bg-[#F2F4F6] text-[#8B95A1] text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{r}위</span>
+ if (r <= 3) return <span className="inline-block bg-[var(--lu-accent)] text-white text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{r}위</span>
+ if (r <= 10) return <span className="inline-block bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{r}위</span>
+ return <span className="inline-block bg-[var(--lu-canvas)] text-[var(--lu-muted)] text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{r}위</span>
  }
 
  function diffEl(curr: number, prev: number) {
  const d = curr - prev
  if (d < 0) return <span className="inline-flex items-center gap-0.5 text-[#2DB400] font-semibold text-xs whitespace-nowrap"><ArrowUp size={11} strokeWidth={2.75} />{Math.abs(d)}</span>
  if (d > 0) return <span className="inline-flex items-center gap-0.5 text-[#F04452] font-semibold text-xs whitespace-nowrap"><ArrowDown size={11} strokeWidth={2.75} />{Math.abs(d)}</span>
- return <span className="inline-flex items-center gap-0.5 text-[#8B95A1] text-xs whitespace-nowrap"><Minus size={11} strokeWidth={2.75} />-</span>
+ return <span className="inline-flex items-center gap-0.5 text-[var(--lu-muted)] text-xs whitespace-nowrap"><Minus size={11} strokeWidth={2.75} />-</span>
  }
 
  function gradeLabel(r: number) {
  if (r <= 3) return <span className="text-xs font-semibold text-[#2DB400] whitespace-nowrap">최상위</span>
- if (r <= 10) return <span className="text-xs font-semibold text-[#3182F6] whitespace-nowrap">상위</span>
+ if (r <= 10) return <span className="text-xs font-semibold text-[var(--lu-accent)] whitespace-nowrap">상위</span>
  if (r <= 20) return <span className="text-xs font-semibold text-[#F5A623] whitespace-nowrap">중위</span>
  return <span className="text-xs font-semibold text-[#F04452] whitespace-nowrap">하위</span>
  }
 
  function gradePill(r: number) {
  if (r <= 3) return <span className="inline-block text-[10px] font-bold text-[#2DB400] bg-[#F0FBF0] px-2 py-0.5 rounded-md whitespace-nowrap">최상위</span>
- if (r <= 10) return <span className="inline-block text-[10px] font-bold text-[#3182F6] bg-[#E8F1FE] px-2 py-0.5 rounded-md whitespace-nowrap">상위</span>
+ if (r <= 10) return <span className="inline-block text-[10px] font-bold text-[var(--lu-accent)] bg-[var(--lu-accent-soft)] px-2 py-0.5 rounded-md whitespace-nowrap">상위</span>
  if (r <= 20) return <span className="inline-block text-[10px] font-bold text-[#F5A623] bg-[#FEF9E8] px-2 py-0.5 rounded-md whitespace-nowrap">중위</span>
  return <span className="inline-block text-[10px] font-bold text-[#F04452] bg-[#FEF0F1] px-2 py-0.5 rounded-md whitespace-nowrap">하위</span>
  }
@@ -111,40 +111,40 @@ function RankTab() {
  </div>
  <div className="flex items-center justify-between mb-4">
  <div className="flex items-center gap-2">
- <span className="text-sm text-[#8B95A1]">정렬:</span>
- <button onClick={() => setSort('rank')} className={['text-xs px-3 py-1.5 rounded-lg font-medium', sort === 'rank' ? 'bg-[#3182F6] text-white' : 'bg-white text-[#8B95A1] border border-[#E5E8EB]'].join(' ')}>순위순</button>
- <button onClick={() => setSort('volume')} className={['text-xs px-3 py-1.5 rounded-lg font-medium', sort === 'volume' ? 'bg-[#3182F6] text-white' : 'bg-white text-[#8B95A1] border border-[#E5E8EB]'].join(' ')}>검색량순</button>
+ <span className="text-sm text-[var(--lu-muted)]">정렬:</span>
+ <button onClick={() => setSort('rank')} className={['text-xs px-3 py-1.5 rounded-lg font-medium', sort === 'rank' ? 'bg-[var(--lu-accent)] text-white' : 'bg-white text-[var(--lu-muted)] border border-[var(--lu-line)]'].join(' ')}>순위순</button>
+ <button onClick={() => setSort('volume')} className={['text-xs px-3 py-1.5 rounded-lg font-medium', sort === 'volume' ? 'bg-[var(--lu-accent)] text-white' : 'bg-white text-[var(--lu-muted)] border border-[var(--lu-line)]'].join(' ')}>검색량순</button>
  </div>
- <button onClick={() => setAdding(true)} className="text-xs bg-[#3182F6] text-white px-3 py-1.5 rounded-lg font-medium hover:bg-[#1B64DA] transition-colors">+ 키워드 추가</button>
+ <button onClick={() => setAdding(true)} className="min-h-11 text-xs bg-[var(--lu-accent)] text-white px-3 py-1.5 rounded-lg font-medium hover:bg-[var(--lu-accent-hover)] transition-colors">+ 키워드 추가</button>
  </div>
 
  {adding && (
  <div className="flex gap-2 mb-4">
  <input value={newKw} onChange={e => setNewKw(e.target.value)} onKeyDown={e => e.key === 'Enter' && handleAdd()}
- placeholder="키워드 입력 후 Enter" className="flex-1 border border-[#3182F6] rounded-lg px-3 py-2 text-sm outline-none" autoFocus/>
- <button onClick={handleAdd} className="bg-[#3182F6] text-white px-4 py-2 rounded-lg text-sm font-medium">추가</button>
- <button onClick={() => setAdding(false)} className="bg-[#F2F4F6] text-[#8B95A1] px-4 py-2 rounded-lg text-sm">취소</button>
+ placeholder="키워드 입력 후 Enter" className="flex-1 border border-[var(--lu-accent)] rounded-lg px-3 py-2 text-sm outline-none" autoFocus/>
+ <button onClick={handleAdd} className="min-h-11 bg-[var(--lu-accent)] text-white px-4 py-2 rounded-lg text-sm font-medium">추가</button>
+ <button onClick={() => setAdding(false)} className="min-h-11 bg-[var(--lu-canvas)] text-[var(--lu-muted)] px-4 py-2 rounded-lg text-sm">취소</button>
  </div>
  )}
 
- <div className="bg-white rounded-2xl border border-[#E5E8EB] overflow-hidden">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] overflow-hidden">
  {/* 모바일: 카드형 리스트 */}
- <div className="block md:hidden divide-y divide-[#F2F4F6]">
+ <div className="block md:hidden divide-y divide-[var(--lu-canvas)]">
  {sorted.map((row, i) => (
  <div key={i} className="px-4 py-3.5 hover:bg-[#FAFBFF] transition-colors">
  <div className="flex items-center justify-between gap-2 mb-2">
- <span className="text-sm font-bold text-[#191F28] truncate min-w-0">{row.keyword}</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)] truncate min-w-0">{row.keyword}</span>
  <div className="flex items-center gap-1.5 flex-shrink-0">
  {rankBadge(row.rank)}
  {gradePill(row.rank)}
  </div>
  </div>
  <div className="flex items-center justify-between text-xs">
- <span className="inline-flex items-center gap-1 text-[#8B95A1] whitespace-nowrap">
- 월 <span className="font-semibold text-[#4E5968]">{row.volume.toLocaleString()}</span>
+ <span className="inline-flex items-center gap-1 text-[var(--lu-muted)] whitespace-nowrap">
+ 월 <span className="font-semibold text-[var(--lu-muted)]">{row.volume.toLocaleString()}</span>
  </span>
  <span className="inline-flex items-center gap-1 whitespace-nowrap">
- <span className="text-[#8B95A1]">변화</span>
+ <span className="text-[var(--lu-muted)]">변화</span>
  {diffEl(row.rank, row.prev)}
  </span>
  </div>
@@ -154,28 +154,28 @@ function RankTab() {
  {/* 데스크탑: 테이블 */}
  <table className="hidden md:table w-full">
  <thead>
- <tr className="bg-[#F8F9FA] border-b border-[#E5E8EB]">
- <th className="text-left text-xs text-[#8B95A1] font-medium px-5 py-3 whitespace-nowrap">키워드</th>
- <th className="text-center text-xs text-[#8B95A1] font-medium px-4 py-3 whitespace-nowrap">현재 순위</th>
- <th className="text-center text-xs text-[#8B95A1] font-medium px-4 py-3 whitespace-nowrap">변화</th>
- <th className="text-center text-xs text-[#8B95A1] font-medium px-4 py-3 whitespace-nowrap">월 검색량</th>
- <th className="text-center text-xs text-[#8B95A1] font-medium px-4 py-3 whitespace-nowrap">노출 등급</th>
+ <tr className="bg-[var(--lu-canvas)] border-b border-[var(--lu-line)]">
+ <th className="text-left text-xs text-[var(--lu-muted)] font-medium px-5 py-3 whitespace-nowrap">키워드</th>
+ <th className="text-center text-xs text-[var(--lu-muted)] font-medium px-4 py-3 whitespace-nowrap">현재 순위</th>
+ <th className="text-center text-xs text-[var(--lu-muted)] font-medium px-4 py-3 whitespace-nowrap">변화</th>
+ <th className="text-center text-xs text-[var(--lu-muted)] font-medium px-4 py-3 whitespace-nowrap">월 검색량</th>
+ <th className="text-center text-xs text-[var(--lu-muted)] font-medium px-4 py-3 whitespace-nowrap">노출 등급</th>
  </tr>
  </thead>
  <tbody>
  {sorted.map((row, i) => (
- <tr key={i} className="border-b border-[#F2F4F6] hover:bg-[#FAFBFF] transition-colors">
- <td className="px-5 py-3.5 text-sm font-medium text-[#191F28] whitespace-nowrap">{row.keyword}</td>
+ <tr key={i} className="border-b border-[var(--lu-canvas)] hover:bg-[#FAFBFF] transition-colors">
+ <td className="px-5 py-3.5 text-sm font-medium text-[var(--lu-ink)] whitespace-nowrap">{row.keyword}</td>
  <td className="px-4 py-3.5 text-center">{rankBadge(row.rank)}</td>
  <td className="px-4 py-3.5 text-center">{diffEl(row.rank, row.prev)}</td>
- <td className="px-4 py-3.5 text-center text-sm text-[#4E5968] whitespace-nowrap">{row.volume.toLocaleString()}</td>
+ <td className="px-4 py-3.5 text-center text-sm text-[var(--lu-muted)] whitespace-nowrap">{row.volume.toLocaleString()}</td>
  <td className="px-4 py-3.5 text-center">{gradeLabel(row.rank)}</td>
  </tr>
  ))}
  </tbody>
  </table>
  </div>
- <p className="text-xs text-[#8B95A1] mt-3">* 네이버 플레이스 기준 / 매일 오전 6시 업데이트</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-3">* 네이버 플레이스 기준 / 매일 오전 6시 업데이트</p>
  </div>
  )
 }
@@ -231,7 +231,7 @@ function ScoreTab() {
 
  function getGrade(s: number) {
  if (s >= 80) return { label: 'A+', color: '#2DB400', bg: '#F0FBF0' }
- if (s >= 65) return { label: 'B', color: '#3182F6', bg: '#E8F1FE' }
+ if (s >= 65) return { label: 'B', color: 'var(--lu-accent)', bg: 'var(--lu-accent-soft)' }
  if (s >= 50) return { label: 'C', color: '#F5A623', bg: '#FEF9E8' }
  return { label: 'D', color: '#F04452', bg: '#FEF0F1' }
  }
@@ -240,11 +240,11 @@ function ScoreTab() {
  return (
  <div>
  <div className="flex justify-between text-xs mb-1">
- <span className="text-[#4E5968]">{label}</span>
- <span className="font-semibold text-[#191F28]">{value}점</span>
+ <span className="text-[var(--lu-muted)]">{label}</span>
+ <span className="font-semibold text-[var(--lu-ink)]">{value}점</span>
  </div>
- <div className="h-2 bg-[#F2F4F6] rounded-full overflow-hidden">
- <div className="h-full rounded-full transition-all duration-700" style={{ width: value + '%', backgroundColor: color }}/>
+ <div className="h-2 bg-[var(--lu-canvas)] rounded-full overflow-hidden">
+ <div className="h-full rounded-full transition-colors duration-700" style={{ width: value + '%', backgroundColor: color }}/>
  </div>
  </div>
  )
@@ -252,14 +252,14 @@ function ScoreTab() {
 
  return (
  <div>
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5 mb-5">
- <p className="text-sm font-semibold text-[#191F28] mb-3">키워드 분석</p>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5 mb-5">
+ <p className="text-sm font-semibold text-[var(--lu-ink)] mb-3">키워드 분석</p>
  <div className="flex gap-3">
  <input value={keyword} onChange={e => setKeyword(e.target.value)} onKeyDown={e => e.key === 'Enter' && analyze()}
  placeholder="예: 강남 삼겹살, 홍대 카페"
- className="flex-1 border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm outline-none focus:border-[#3182F6] transition-colors"/>
+ className="flex-1 border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-sm outline-none focus:border-[var(--lu-accent)] transition-colors"/>
  <button onClick={() => analyze()} disabled={loading}
- className="bg-[#3182F6] text-white px-5 py-2.5 rounded-xl text-sm font-semibold hover:bg-[#1B64DA] transition-colors disabled:opacity-60 inline-flex items-center gap-2">
+ className="min-h-11 bg-[var(--lu-accent)] text-white px-5 py-2.5 rounded-[6px] text-sm font-semibold hover:bg-[var(--lu-accent-hover)] transition-colors disabled:opacity-60 inline-flex items-center gap-2">
  {loading ? '분석 중...' : <><Search size={16} strokeWidth={2.25} /> 분석하기</>}
  </button>
  </div>
@@ -272,48 +272,48 @@ function ScoreTab() {
  return (
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
  <div className="flex flex-col gap-4">
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5 text-center">
- <p className="text-xs text-[#8B95A1] mb-3">종합 노출 점수</p>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5 text-center">
+ <p className="text-xs text-[var(--lu-muted)] mb-3">종합 노출 점수</p>
  <div className="inline-flex items-center justify-center w-20 h-20 rounded-full border-4 mb-2"
  style={{ borderColor: g.color, backgroundColor: g.bg }}>
- <span className="text-2xl font-black" style={{ color: g.color }}>{result.totalScore}</span>
+ <span className="text-2xl font-semibold" style={{ color: g.color }}>{result.totalScore}</span>
  </div>
- <p className="text-lg font-black" style={{ color: g.color }}>등급 {g.label}</p>
+ <p className="text-lg font-semibold" style={{ color: g.color }}>등급 {g.label}</p>
  </div>
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5">
- <p className="text-xs font-semibold text-[#8B95A1] mb-3">키워드 현황</p>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5">
+ <p className="text-xs font-semibold text-[var(--lu-muted)] mb-3">키워드 현황</p>
  <div className="space-y-3">
  <div className="flex justify-between">
- <span className="text-xs text-[#4E5968]">월 검색량</span>
- <span className="text-xs font-bold text-[#191F28]">{result.volume.toLocaleString()}회</span>
+ <span className="text-xs text-[var(--lu-muted)]">월 검색량</span>
+ <span className="text-xs font-bold text-[var(--lu-ink)]">{result.volume.toLocaleString()}회</span>
  </div>
  <div className="flex justify-between">
- <span className="text-xs text-[#4E5968]">경쟁 업체 수</span>
- <span className="text-xs font-bold text-[#191F28]">{result.places}개</span>
+ <span className="text-xs text-[var(--lu-muted)]">경쟁 업체 수</span>
+ <span className="text-xs font-bold text-[var(--lu-ink)]">{result.places}개</span>
  </div>
  <div className="flex justify-between">
- <span className="text-xs text-[#4E5968]">경쟁 강도</span>
+ <span className="text-xs text-[var(--lu-muted)]">경쟁 강도</span>
  <span className="text-xs font-bold" style={{ color: compColor }}>{compText}</span>
  </div>
  </div>
  </div>
  </div>
  <div className="col-span-2 flex flex-col gap-4">
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5">
- <p className="text-xs font-semibold text-[#8B95A1] mb-4">항목별 점수</p>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5">
+ <p className="text-xs font-semibold text-[var(--lu-muted)] mb-4">항목별 점수</p>
  <div className="space-y-4">
- <ScoreBar label="플레이스 최적화" value={result.optimizeScore} color="#3182F6"/>
+ <ScoreBar label="플레이스 최적화" value={result.optimizeScore} color="var(--lu-accent)"/>
  <ScoreBar label="리뷰 점수" value={result.reviewScore} color="#2DB400"/>
  <ScoreBar label="사진 풍부도" value={result.photoScore} color="#F5A623"/>
  <ScoreBar label="업데이트 활성도" value={result.updateScore} color="#8B5CF6"/>
  </div>
  </div>
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5">
- <p className="text-xs font-semibold text-[#8B95A1] mb-3">연관 키워드 추천</p>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5">
+ <p className="text-xs font-semibold text-[var(--lu-muted)] mb-3">연관 키워드 추천</p>
  <div className="flex flex-wrap gap-2">
  {result.relatedKeywords.map((kw, i) => (
  <button key={i} onClick={() => analyze(kw)}
- className="text-xs bg-[#F2F4F6] text-[#4E5968] px-3 py-1.5 rounded-lg hover:bg-[#E8F1FE] hover:text-[#3182F6] transition-colors">
+ className="min-h-11 text-xs bg-[var(--lu-canvas)] text-[var(--lu-muted)] px-3 py-1.5 rounded-lg hover:bg-[var(--lu-accent-soft)] hover:text-[var(--lu-accent)] transition-colors">
  {kw}
  </button>
  ))}
@@ -352,44 +352,44 @@ function DiagTab() {
  return (
  <div>
  <div className="grid grid-cols-1 md:grid-cols-4 gap-3 mb-5">
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5 text-center flex flex-col items-center justify-center">
- <p className="text-xs text-[#8B95A1] mb-2">종합 진단 점수</p>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5 text-center flex flex-col items-center justify-center">
+ <p className="text-xs text-[var(--lu-muted)] mb-2">종합 진단 점수</p>
  <div className="relative w-24 h-24 mb-2">
  <svg viewBox="0 0 100 100" className="w-24 h-24" style={{ transform: 'rotate(-90deg)' }}>
- <circle cx="50" cy="50" r="40" fill="none" stroke="#F2F4F6" strokeWidth="10"/>
+ <circle cx="50" cy="50" r="40" fill="none" stroke="var(--lu-canvas)" strokeWidth="10"/>
  <circle cx="50" cy="50" r="40" fill="none" stroke={gradeColor} strokeWidth="10"
  strokeDasharray={dashArray} strokeLinecap="round"/>
  </svg>
  <div className="absolute inset-0 flex flex-col items-center justify-center">
- <span className="text-2xl font-black text-[#191F28]">{pct}</span>
- <span className="text-xs text-[#8B95A1]">/ 100</span>
+ <span className="text-2xl font-semibold text-[var(--lu-ink)]">{pct}</span>
+ <span className="text-xs text-[var(--lu-muted)]">/ 100</span>
  </div>
  </div>
  <span className="text-sm font-bold" style={{ color: gradeColor }}>{gradeLabel}</span>
  </div>
  <div className="col-span-3 grid grid-cols-1 md:grid-cols-3 gap-3">
- <div className="bg-[#F0FBF0] rounded-2xl p-5 flex flex-col items-center justify-center">
- <span className="text-3xl font-black text-[#2DB400]">{okCount}</span>
- <span className="text-xs font-medium text-[#4E5968] mt-1">양호 항목</span>
+ <div className="bg-[#F0FBF0] rounded-[10px] p-5 flex flex-col items-center justify-center">
+ <span className="text-3xl font-semibold text-[#2DB400]">{okCount}</span>
+ <span className="text-xs font-medium text-[var(--lu-muted)] mt-1">양호 항목</span>
  </div>
- <div className="bg-[#FEF9E8] rounded-2xl p-5 flex flex-col items-center justify-center">
- <span className="text-3xl font-black text-[#F5A623]">{warnCount}</span>
- <span className="text-xs font-medium text-[#4E5968] mt-1">주의 항목</span>
+ <div className="bg-[#FEF9E8] rounded-[10px] p-5 flex flex-col items-center justify-center">
+ <span className="text-3xl font-semibold text-[#F5A623]">{warnCount}</span>
+ <span className="text-xs font-medium text-[var(--lu-muted)] mt-1">주의 항목</span>
  </div>
- <div className="bg-[#FEF0F1] rounded-2xl p-5 flex flex-col items-center justify-center">
- <span className="text-3xl font-black text-[#F04452]">{badCount}</span>
- <span className="text-xs font-medium text-[#4E5968] mt-1">개선 필요</span>
+ <div className="bg-[#FEF0F1] rounded-[10px] p-5 flex flex-col items-center justify-center">
+ <span className="text-3xl font-semibold text-[#F04452]">{badCount}</span>
+ <span className="text-xs font-medium text-[var(--lu-muted)] mt-1">개선 필요</span>
  </div>
  </div>
  </div>
 
  <div className="space-y-4">
  {diagData.map((cat, ci) => (
- <div key={ci} className="bg-white rounded-2xl border border-[#E5E8EB] overflow-hidden">
- <div className="bg-[#F8F9FA] px-5 py-3 border-b border-[#E5E8EB]">
- <span className="text-sm font-bold text-[#191F28]">{cat.category}</span>
+ <div key={ci} className="bg-white rounded-[10px] border border-[var(--lu-line)] overflow-hidden">
+ <div className="bg-[var(--lu-canvas)] px-5 py-3 border-b border-[var(--lu-line)]">
+ <span className="text-sm font-bold text-[var(--lu-ink)]">{cat.category}</span>
  </div>
- <div className="divide-y divide-[#F2F4F6]">
+ <div className="divide-y divide-[var(--lu-canvas)]">
  {cat.items.map((item, ii) => {
  const st = statusMap[item.status]
  const StIcon = st.Icon
@@ -401,15 +401,15 @@ function DiagTab() {
  {st.label}
  </span>
  <div>
- <p className="text-sm font-medium text-[#191F28]">{item.label}</p>
- <p className="text-xs text-[#8B95A1]">{item.desc}</p>
+ <p className="text-sm font-medium text-[var(--lu-ink)]">{item.label}</p>
+ <p className="text-xs text-[var(--lu-muted)]">{item.desc}</p>
  </div>
  </div>
  <div className="flex items-center gap-2">
- <div className="w-16 h-1.5 bg-[#F2F4F6] rounded-full overflow-hidden">
+ <div className="w-16 h-1.5 bg-[var(--lu-canvas)] rounded-full overflow-hidden">
  <div className="h-full rounded-full" style={{ width: (item.score * 10) + '%', backgroundColor: st.barColor }}/>
  </div>
- <span className="text-xs font-semibold text-[#4E5968] w-8 text-right">{item.score}/10</span>
+ <span className="text-xs font-semibold text-[var(--lu-muted)] w-8 text-right">{item.score}/10</span>
  </div>
  </div>
  )
@@ -429,35 +429,35 @@ function InflowTab() {
  return (
  <div>
  <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-5">
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5">
- <p className="text-xs text-[#8B95A1] mb-1">이번 달 총 유입</p>
- <p className="text-2xl font-black text-[#191F28]">{total.toLocaleString()}<span className="text-base ml-0.5 text-[#8B95A1]">회</span></p>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5">
+ <p className="text-xs text-[var(--lu-muted)] mb-1">이번 달 총 유입</p>
+ <p className="text-2xl font-semibold text-[var(--lu-ink)]">{total.toLocaleString()}<span className="text-base ml-0.5 text-[var(--lu-muted)]">회</span></p>
  </div>
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5">
- <p className="text-xs text-[#8B95A1] mb-1">전월 대비</p>
- <p className="text-2xl font-black text-[#2DB400]">+12.4<span className="text-base ml-0.5 text-[#8B95A1]">%</span></p>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5">
+ <p className="text-xs text-[var(--lu-muted)] mb-1">전월 대비</p>
+ <p className="text-2xl font-semibold text-[#2DB400]">+12.4<span className="text-base ml-0.5 text-[var(--lu-muted)]">%</span></p>
  </div>
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5">
- <p className="text-xs text-[#8B95A1] mb-1">유입 키워드 수</p>
- <p className="text-2xl font-black text-[#8B5CF6]">{mockInflow.length}<span className="text-base ml-0.5 text-[#8B95A1]">개</span></p>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-5">
+ <p className="text-xs text-[var(--lu-muted)] mb-1">유입 키워드 수</p>
+ <p className="text-2xl font-semibold text-[#8B5CF6]">{mockInflow.length}<span className="text-base ml-0.5 text-[var(--lu-muted)]">개</span></p>
  </div>
  </div>
 
- <div className="bg-white rounded-2xl border border-[#E5E8EB] overflow-hidden">
- <div className="bg-[#F8F9FA] px-5 py-3 border-b border-[#E5E8EB] flex items-center justify-between">
- <span className="text-sm font-bold text-[#191F28]">검색어별 유입 현황</span>
- <span className="text-xs text-[#8B95A1]">2026년 4월 기준</span>
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] overflow-hidden">
+ <div className="bg-[var(--lu-canvas)] px-5 py-3 border-b border-[var(--lu-line)] flex items-center justify-between">
+ <span className="text-sm font-bold text-[var(--lu-ink)]">검색어별 유입 현황</span>
+ <span className="text-xs text-[var(--lu-muted)]">2026년 4월 기준</span>
  </div>
- <div className="divide-y divide-[#F2F4F6]">
+ <div className="divide-y divide-[var(--lu-canvas)]">
  {mockInflow.map((row, i) => (
  <div key={i} className="px-5 py-4 hover:bg-[#FAFBFF] transition-colors">
  <div className="flex items-center justify-between mb-2">
  <div className="flex items-center gap-2">
- <span className="text-xs font-bold text-[#8B95A1] w-5">{i + 1}</span>
- <span className="text-sm font-semibold text-[#191F28]">{row.keyword}</span>
+ <span className="text-xs font-bold text-[var(--lu-muted)] w-5">{i + 1}</span>
+ <span className="text-sm font-semibold text-[var(--lu-ink)]">{row.keyword}</span>
  </div>
  <div className="flex items-center gap-4">
- <span className={['inline-flex items-center gap-0.5 text-xs font-semibold', row.change > 0 ? 'text-[#2DB400]' : row.change < 0 ? 'text-[#F04452]' : 'text-[#8B95A1]'].join(' ')}>
+ <span className={['inline-flex items-center gap-0.5 text-xs font-semibold', row.change > 0 ? 'text-[#2DB400]' : row.change < 0 ? 'text-[#F04452]' : 'text-[var(--lu-muted)]'].join(' ')}>
  {row.change > 0
  ? <ArrowUp size={11} strokeWidth={2.75} />
  : row.change < 0
@@ -465,20 +465,20 @@ function InflowTab() {
  : <Minus size={11} strokeWidth={2.75} />}
  {Math.abs(row.change)}%
  </span>
- <span className="text-sm font-bold text-[#191F28]">{row.visits.toLocaleString()}회</span>
- <span className="text-xs text-[#8B95A1] w-10 text-right">{row.pct}%</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">{row.visits.toLocaleString()}회</span>
+ <span className="text-xs text-[var(--lu-muted)] w-10 text-right">{row.pct}%</span>
  </div>
  </div>
  <div className="ml-7">
- <div className="h-1.5 bg-[#F2F4F6] rounded-full overflow-hidden">
- <div className="h-full bg-[#3182F6] rounded-full" style={{ width: row.pct + '%' }}/>
+ <div className="h-1.5 bg-[var(--lu-canvas)] rounded-full overflow-hidden">
+ <div className="h-full bg-[var(--lu-accent)] rounded-full" style={{ width: row.pct + '%' }}/>
  </div>
  </div>
  </div>
  ))}
  </div>
  </div>
- <p className="text-xs text-[#8B95A1] mt-3">* 네이버 플레이스 API 연동 시 실제 데이터로 업데이트됩니다</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-3">* 네이버 플레이스 API 연동 시 실제 데이터로 업데이트됩니다</p>
  </div>
  )
 }
@@ -495,7 +495,7 @@ export default function MarketingPage() {
  ]
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <div className="flex flex-1">
  <Sidebar/>
  <main className="flex-1 ml-0 md:ml-[220px] pt-4 md:pt-0 min-w-0">
@@ -507,14 +507,14 @@ export default function MarketingPage() {
  />
  <div className="max-w-5xl mx-auto p-4 md:p-8">
  <MarketingToolChooser />
- <h2 className="mb-2 text-lg font-bold text-[#191F28]">기존 분석 예시 살펴보기</h2>
- <p className="mb-4 text-sm leading-6 text-[#4E5968]">아래 예시로 분석 화면을 살펴보세요. 실제 매장 자료와 구분해 확인해 주세요.</p>
- <div className="flex gap-1 bg-white border border-[#E5E8EB] rounded-2xl p-1 mb-6 overflow-x-auto whitespace-nowrap max-w-full md:w-fit -mx-1 px-1 scrollbar-hide">
+ <h2 className="mb-2 text-lg font-bold text-[var(--lu-ink)]">기존 분석 예시 살펴보기</h2>
+ <p className="mb-4 text-sm leading-6 text-[var(--lu-muted)]">아래 예시로 분석 화면을 살펴보세요. 실제 매장 자료와 구분해 확인해 주세요.</p>
+ <div className="flex gap-1 bg-white border border-[var(--lu-line)] rounded-[10px] p-1 mb-6 overflow-x-auto whitespace-nowrap max-w-full md:w-fit -mx-1 px-1 scrollbar-hide">
  {tabs.map(t => {
  const Icon = t.Icon
  return (
  <button key={t.id} onClick={() => setTab(t.id)}
- className={['inline-flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-xl text-sm font-medium transition-all flex-shrink-0 whitespace-nowrap', tab === t.id ? 'bg-[#3182F6] text-white shadow-sm' : 'text-[#8B95A1] hover:text-[#191F28]'].join(' ')}>
+ className={['inline-flex items-center gap-1.5 px-3 md:px-4 py-2 rounded-[6px] text-sm font-medium transition-colors flex-shrink-0 whitespace-nowrap', tab === t.id ? 'bg-[var(--lu-accent)] text-white shadow-none' : 'text-[var(--lu-muted)] hover:text-[var(--lu-ink)]'].join(' ')}>
  <Icon size={16} strokeWidth={2.25} />
  {t.label}
  </button>

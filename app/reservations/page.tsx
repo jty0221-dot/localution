@@ -42,7 +42,7 @@ function loadResv(): Reservation[] {
  try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') } catch { return [] }
 }
 function saveResv(list: Reservation[]) {
- try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)) } catch {}
+ localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
 }
 
 export default function ReservationsPage() {
@@ -52,6 +52,7 @@ export default function ReservationsPage() {
  const [resv, setResv] = useState<Reservation[]>([])
  const [selectedDate, setSelectedDate] = useState<string | null>(null)
  const [addOpen, setAddOpen] = useState(false)
+ const [saveError, setSaveError] = useState<string | null>(null)
 
   // 마운트 시 로드 (useMemo 안에서 setState 호출은 React 규칙 위반 — useEffect 로 수정)
  useEffect(() => {
@@ -92,11 +93,13 @@ export default function ReservationsPage() {
 
  function addReservation(r: Omit<Reservation, 'id'>) {
  const next = [...resv, { ...r, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }]
- setResv(next); saveResv(next)
+ try { saveResv(next); setResv(next); setSaveError(null); return true }
+ catch { setSaveError('예약을 이 기기에 저장하지 못했어요. 저장 공간과 브라우저 설정을 확인한 뒤 다시 시도해주세요.'); return false }
  }
  function cancelReservation(id: string) {
  const next = resv.map(r => r.id === id ? { ...r, status: 'cancelled' as const } : r)
- setResv(next); saveResv(next)
+ try { saveResv(next); setResv(next); setSaveError(null); return true }
+ catch { setSaveError('예약을 이 기기에 저장하지 못했어요. 저장 공간과 브라우저 설정을 확인한 뒤 다시 시도해주세요.'); return false }
  }
 
  return (
@@ -112,6 +115,7 @@ export default function ReservationsPage() {
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full space-y-4 md:space-y-6">
 
+ {saveError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{saveError}</p>}
  {/* 베타 안내 */}
  <div className="rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] p-3 md:p-4 flex items-start gap-2.5">
  <AlertCircle size={14} className="text-[#92400E] flex-shrink-0 mt-0.5" strokeWidth={2.5} />
@@ -237,7 +241,8 @@ export default function ReservationsPage() {
  <AddModal
  defaultDate={selectedDate || today.toISOString().slice(0, 10)}
  onClose={() => setAddOpen(false)}
- onAdd={(r) => { addReservation(r); setAddOpen(false) }}
+ onAdd={(r) => { if (addReservation(r)) setAddOpen(false) }}
+ saveError={saveError}
  />
  )}
  </div>
@@ -275,7 +280,8 @@ function ResvRow({ r, compact, onCancel }: { r: Reservation; compact?: boolean; 
  )
 }
 
-function AddModal({ defaultDate, onClose, onAdd }: {
+function AddModal({ defaultDate, onClose, onAdd, saveError }: {
+ saveError?: string | null;
  defaultDate: string;
  onClose: () => void;
  onAdd: (r: Omit<Reservation, 'id'>) => void;
@@ -334,6 +340,7 @@ function AddModal({ defaultDate, onClose, onAdd }: {
  className="w-full px-2.5 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:border-[#3182F6] resize-y min-h-[60px]" />
  </div>
  </div>
+ {saveError && <p role="alert" className="mt-3 text-sm text-red-700">{saveError}</p>}
  <div className="flex gap-2 mt-5">
  <button onClick={onClose}
  className="flex-1 px-3 py-2.5 rounded-xl border border-[#E5E8EB] text-sm font-bold text-[#4E5968] hover:bg-[#F8F9FA]">

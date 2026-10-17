@@ -20,7 +20,7 @@ const SERVICE_RANKING_INIT = [
   { id: 1, name: 'AI 리뷰 자동 답글', category: '리뷰', badge: 'HOT', color: '#F04452' },
   { id: 2, name: '네이버 플레이스 관리', category: '플레이스', badge: '', color: '#03C75A' },
   { id: 3, name: 'QR 리뷰 자동화', category: 'QR', badge: 'NEW', color: '#7C3AED' },
-  { id: 4, name: '매출 캘린더 · 정산', category: '정산', badge: '', color: '#3182F6' },
+  { id: 4, name: '매출 캘린더 · 정산', category: '정산', badge: '', color: '#16685D' },
   { id: 5, name: '고객 CRM 관리', category: 'CRM', badge: '', color: '#F59E0B' },
   { id: 6, name: '키워드 순위 추적', category: 'SEO', badge: '', color: '#10B981' },
   { id: 7, name: '숏폼 퍼블리셔', category: '마케팅', badge: '', color: '#EC4899' },
@@ -37,7 +37,7 @@ function RankBadge({ diff }: { diff: number }) {
     </span>
   )
   if (diff < 0) return (
-    <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[#3182F6] tabular-nums">
+    <span className="inline-flex items-center gap-0.5 text-[11px] font-bold text-[#16685D] tabular-nums">
       <ArrowDown size={11} strokeWidth={3} /> {Math.abs(diff)}
     </span>
   )
@@ -82,14 +82,14 @@ function ServiceRankingMini() {
   }, [])
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
-      <div className="px-4 py-3 border-b border-[#F2F4F6]">
+    <div className="bg-white rounded-[10px] shadow-none overflow-hidden">
+      <div className="px-4 py-3 border-b border-[var(--lu-canvas)]">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-[14px] font-bold text-[#191F28]">인기 서비스 TOP 10</span>
+            <span className="text-[14px] font-bold text-[var(--lu-ink)]">인기 서비스 TOP 10</span>
             <span className="w-1.5 h-1.5 rounded-full bg-[#F04452] animate-pulse inline-block" />
           </div>
-          <span className="text-[11px] font-bold text-[#8B95A1]">실시간</span>
+          <span className="text-[11px] font-bold text-[var(--lu-muted)]">실시간</span>
         </div>
       </div>
       <div>
@@ -98,20 +98,20 @@ function ServiceRankingMini() {
           return (
             <div
               key={item.id}
-              className="px-4 py-2.5 flex items-center gap-2.5 border-b border-[#F8F9FA] last:border-0 hover:bg-[#FAFBFF]"
+              className="px-4 py-2.5 flex items-center gap-2.5 border-b border-[var(--lu-canvas)] last:border-0 hover:bg-[#FAFBFF]"
               style={{
                 opacity: isShuffling ? 0.7 : 1,
                 transform: isShuffling ? 'translateX(2px)' : 'translateX(0)',
                 transition: 'all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94)',
               }}
             >
-              <div className={'w-6 h-6 rounded-md flex items-center justify-center text-[12px] font-black flex-shrink-0 tabular-nums ' + (item.rank <= 3 ? 'bg-[#3182F6] text-white' : 'bg-[#F2F4F6] text-[#8B95A1]')}>
+              <div className={'w-6 h-6 rounded-md flex items-center justify-center text-[12px] font-semibold flex-shrink-0 tabular-nums ' + (item.rank <= 3 ? 'bg-[#16685D] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]')}>
                 {item.rank}
               </div>
               <div className="flex-1 min-w-0 flex items-center gap-1.5">
-                <span className="text-[13px] font-bold text-[#191F28] truncate leading-tight">{item.name}</span>
+                <span className="text-[13px] font-bold text-[var(--lu-ink)] truncate leading-tight">{item.name}</span>
                 {item.badge && (
-                  <span className="text-[10px] font-black text-white px-1.5 py-0.5 rounded flex-shrink-0 leading-none"
+                  <span className="text-[10px] font-semibold text-white px-1.5 py-0.5 rounded flex-shrink-0 leading-none"
                     style={{ background: item.color }}>
                     {item.badge}
                   </span>
@@ -134,7 +134,7 @@ function SidebarCards() {
       <ServiceRankingMini />
 
       {/* 2) 실시간 리뷰 알림 */}
-      <div className="rounded-2xl bg-gradient-to-br from-[#FFFBEB] to-[#FEF3C7] border border-[#FDE68A] p-4">
+      <div className="rounded-[10px] bg-[var(--lu-accent)] border border-[#FDE68A] p-4">
         <div className="flex items-center gap-2 mb-2">
           <BellRing size={16} className="text-[#D97706]" strokeWidth={2.5} />
           <h3 className="text-[14px] font-bold text-[#92400E]">실시간 리뷰 알림</h3>
@@ -145,23 +145,23 @@ function SidebarCards() {
       </div>
 
       {/* 3) 도움이 필요하세요? */}
-      <div className="bg-white rounded-2xl shadow-sm p-4">
-        <h3 className="text-[14px] font-bold text-[#191F28] mb-2.5">도움이 필요하세요?</h3>
+      <div className="bg-white rounded-[10px] shadow-none p-4">
+        <h3 className="text-[14px] font-bold text-[var(--lu-ink)] mb-2.5">도움이 필요하세요?</h3>
         <div className="space-y-1">
           <Link href="/help"
-            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[#4E5968] transition-colors">
-            <HelpCircle size={15} className="text-[#3182F6]" strokeWidth={2.5} />
+            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[var(--lu-muted)] transition-colors">
+            <HelpCircle size={15} className="text-[#16685D]" strokeWidth={2.5} />
             <span>도움말 · 가이드</span>
             <ArrowRight size={12} className="ml-auto text-[#D1D5DB]" strokeWidth={2.5} />
           </Link>
           <Link href="/inquiry"
-            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[#4E5968] transition-colors">
+            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[var(--lu-muted)] transition-colors">
             <Mail size={15} className="text-[#7C3AED]" strokeWidth={2.5} />
             <span>1:1 문의</span>
             <ArrowRight size={12} className="ml-auto text-[#D1D5DB]" strokeWidth={2.5} />
           </Link>
           <Link href="/updates"
-            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[#4E5968] transition-colors">
+            className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-lg hover:bg-[#FAFBFF] text-[13px] font-bold text-[var(--lu-muted)] transition-colors">
             <Sparkles size={15} className="text-[#EC4899]" strokeWidth={2.5} />
             <span>업데이트 내역</span>
             <ArrowRight size={12} className="ml-auto text-[#D1D5DB]" strokeWidth={2.5} />

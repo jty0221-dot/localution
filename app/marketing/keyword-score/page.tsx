@@ -190,56 +190,56 @@ function ScoreCard({ data }: { data: KeywordScore }) {
  const [open, setOpen] = useState(false)
 
  return (
- <div className="bg-white rounded-2xl shadow-sm overflow-hidden border border-[#F2F4F6] hover:border-[#3182F6] transition-colors">
+ <div className="bg-white rounded-[10px] shadow-none overflow-hidden border border-[var(--lu-canvas)] hover:border-[var(--lu-accent)] transition-colors">
  {/* 카드 헤더 */}
- <button onClick={() => setOpen(v => !v)} className="w-full px-5 py-4 text-left hover:bg-[#FAFBFF] transition-colors">
+ <button onClick={() => setOpen(v => !v)} className="min-h-11 w-full px-5 py-4 text-left hover:bg-[#FAFBFF] transition-colors">
  <div className="flex items-center gap-4">
  {/* 종합 점수 */}
- <div className={`w-14 h-14 rounded-xl flex flex-col items-center justify-center flex-shrink-0 ${scoreBg(data.totalScore)}`}>
- <span className="text-lg font-black" style={{ color: scoreColor(data.totalScore) }}>{data.totalScore}</span>
+ <div className={`w-14 h-14 rounded-[6px] flex flex-col items-center justify-center flex-shrink-0 ${scoreBg(data.totalScore)}`}>
+ <span className="text-lg font-semibold" style={{ color: scoreColor(data.totalScore) }}>{data.totalScore}</span>
  <span className="text-[8px] font-bold" style={{ color: scoreColor(data.totalScore) }}>{scoreLabel(data.totalScore)}</span>
  </div>
 
  {/* 키워드 정보 */}
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-1">
- <span className="text-sm font-bold text-[#191F28]">{data.keyword}</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">{data.keyword}</span>
  <CompBadge level={data.competition} />
  {data.trend === 'up' && <span className="text-[10px] text-[#12B76A] font-bold">▲ 상승세</span>}
  {data.trend === 'down' && <span className="text-[10px] text-[#F04452] font-bold">▼ 하락세</span>}
- {data.trend === 'stable' && <span className="text-[10px] text-[#8B95A1] font-bold">· 유지</span>}
+ {data.trend === 'stable' && <span className="text-[10px] text-[var(--lu-muted)] font-bold">· 유지</span>}
  </div>
- <div className="flex items-center gap-4 text-[11px] text-[#8B95A1]">
- <span>월간 검색량 <strong className="text-[#191F28]">{data.searchVol.toLocaleString()}</strong></span>
- <span>현재 순위 <strong className={data.currentRank && data.currentRank <= 5 ? 'text-[#3182F6]' : data.currentRank && data.currentRank <= 10 ? 'text-[#F59E0B]' : 'text-[#F04452]'}>{data.currentRank ?? '-'}위</strong></span>
+ <div className="flex items-center gap-4 text-[11px] text-[var(--lu-muted)]">
+ <span>월간 검색량 <strong className="text-[var(--lu-ink)]">{data.searchVol.toLocaleString()}</strong></span>
+ <span>현재 순위 <strong className={data.currentRank && data.currentRank <= 5 ? 'text-[var(--lu-accent)]' : data.currentRank && data.currentRank <= 10 ? 'text-[#F59E0B]' : 'text-[#F04452]'}>{data.currentRank ?? '-'}위</strong></span>
  </div>
  {/* 미니 요소별 바 */}
  <div className="flex gap-1 mt-2">
  {data.factors.map((f, i) => (
- <div key={i} className="flex-1 h-1.5 rounded-full bg-[#F2F4F6] overflow-hidden" title={`${f.label}: ${f.score}점`}>
+ <div key={i} className="flex-1 h-1.5 rounded-full bg-[var(--lu-canvas)] overflow-hidden" title={`${f.label}: ${f.score}점`}>
  <div className="h-full rounded-full" style={{ width: `${f.score}%`, background: scoreColor(f.score) }} />
  </div>
  ))}
  </div>
  </div>
 
- <span className={`text-xs text-[#8B95A1] transition-transform ${open ? 'rotate-180' : ''}`}>▾</span>
+ <span className={`text-xs text-[var(--lu-muted)] transition-transform ${open ? 'rotate-180' : ''}`}>▾</span>
  </div>
  </button>
 
  {/* 상세 요소별 분석 */}
  {open && (
- <div className="border-t border-[#F2F4F6] px-5 py-4 space-y-3">
+ <div className="border-t border-[var(--lu-canvas)] px-5 py-4 space-y-3">
  {data.factors.map((f, i) => (
  <div key={i}>
  <div className="flex items-center justify-between mb-1">
- <span className="text-xs font-semibold text-[#191F28]">{f.label}</span>
+ <span className="text-xs font-semibold text-[var(--lu-ink)]">{f.label}</span>
  <span className="text-xs font-bold" style={{ color: scoreColor(f.score) }}>{f.score} / {f.max}</span>
  </div>
- <div className="w-full h-2 rounded-full bg-[#F2F4F6] overflow-hidden mb-1">
+ <div className="w-full h-2 rounded-full bg-[var(--lu-canvas)] overflow-hidden mb-1">
  <div className="h-full rounded-full transition-all" style={{ width: `${f.score}%`, background: scoreColor(f.score) }} />
  </div>
- <p className="text-[11px] text-[#8B95A1]">{f.tip}</p>
+ <p className="text-[11px] text-[var(--lu-muted)]">{f.tip}</p>
  </div>
  ))}
  </div>
@@ -279,7 +279,7 @@ export default function KeywordScorePage() {
  const lowCount = scores.filter(k => k.totalScore < 60).length
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
  <main className="flex-1 ml-0 md:ml-[220px] pt-4 md:pt-0 min-w-0">
  <PageHeader
@@ -293,13 +293,13 @@ export default function KeywordScorePage() {
  {/* 헤더 */}
  <div className="flex items-start justify-between mb-6">
  <div>
- <h1 className="text-xl font-black text-[#191F28]">키워드 점수분석</h1>
- <p className="text-sm text-[#8B95A1] mt-0.5">키워드별 최적화 상태를 요소별로 분석하여 개선 방향을 제시합니다</p>
+ <h1 className="text-xl font-semibold text-[var(--lu-ink)]">키워드 점수분석</h1>
+ <p className="text-sm text-[var(--lu-muted)] mt-0.5">키워드별 최적화 상태를 요소별로 분석하여 개선 방향을 제시합니다</p>
  </div>
  </div>
 
  {/* 데모 안내 배너 */}
- <div className="mb-6 bg-[#FFFBEB] border border-[#FDE68A] rounded-2xl px-5 py-4">
+ <div className="mb-6 bg-[#FFFBEB] border border-[#FDE68A] rounded-[10px] px-5 py-4">
  <p className="text-xs font-bold text-[#92400E] mb-1">아래는 예시 데이터입니다</p>
  <p className="text-[11px] text-[#92400E] leading-relaxed">
  현재 보이는 키워드와 점수는 데모용 샘플입니다. 네이버 Search API 또는 외부 순위 측정 서비스(selfrank·키워드마스터 등)를 연동하면 내 매장의 실제 키워드 점수로 교체됩니다.
@@ -308,32 +308,32 @@ export default function KeywordScorePage() {
 
  {/* 요약 카드 */}
  <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
- <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
- <p className="text-xs text-[#8B95A1] mb-1">총 키워드</p>
- <p className="text-2xl font-black text-[#191F28]">{scores.length}개</p>
+ <div className="bg-white rounded-[10px] shadow-none p-5 text-center">
+ <p className="text-xs text-[var(--lu-muted)] mb-1">총 키워드</p>
+ <p className="text-2xl font-semibold text-[var(--lu-ink)]">{scores.length}개</p>
  </div>
- <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
- <p className="text-xs text-[#8B95A1] mb-1">평균 점수</p>
- <p className="text-2xl font-black" style={{ color: scoreColor(avgScore) }}>{avgScore}점</p>
+ <div className="bg-white rounded-[10px] shadow-none p-5 text-center">
+ <p className="text-xs text-[var(--lu-muted)] mb-1">평균 점수</p>
+ <p className="text-2xl font-semibold" style={{ color: scoreColor(avgScore) }}>{avgScore}점</p>
  </div>
- <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
- <p className="text-xs text-[#8B95A1] mb-1">우수 키워드 (80+)</p>
- <p className="text-2xl font-black text-[#12B76A]">{highCount}개</p>
+ <div className="bg-white rounded-[10px] shadow-none p-5 text-center">
+ <p className="text-xs text-[var(--lu-muted)] mb-1">우수 키워드 (80+)</p>
+ <p className="text-2xl font-semibold text-[#12B76A]">{highCount}개</p>
  </div>
- <div className="bg-white rounded-2xl shadow-sm p-5 text-center">
- <p className="text-xs text-[#8B95A1] mb-1">개선 필요 (60 미만)</p>
- <p className="text-2xl font-black text-[#F04452]">{lowCount}개</p>
+ <div className="bg-white rounded-[10px] shadow-none p-5 text-center">
+ <p className="text-xs text-[var(--lu-muted)] mb-1">개선 필요 (60 미만)</p>
+ <p className="text-2xl font-semibold text-[#F04452]">{lowCount}개</p>
  </div>
  </div>
 
  {/* 정렬 */}
  <div className="flex items-center justify-between mb-4">
- <p className="text-sm font-bold text-[#191F28]">키워드별 점수 상세 <span className="text-[#8B95A1] font-normal">(클릭하여 요소별 분석 확인)</span></p>
+ <p className="text-sm font-bold text-[var(--lu-ink)]">키워드별 점수 상세 <span className="text-[var(--lu-muted)] font-normal">(클릭하여 요소별 분석 확인)</span></p>
  <div className="flex items-center gap-2">
- <span className="text-xs text-[#8B95A1]">정렬:</span>
+ <span className="text-xs text-[var(--lu-muted)]">정렬:</span>
  {([['score', '점수순'], ['volume', '검색량순'], ['rank', '순위순']] as const).map(([key, label]) => (
  <button key={key} onClick={() => setSortBy(key)}
- className={`text-xs px-3 py-1 rounded-lg font-medium transition-colors ${sortBy === key ? 'bg-[#3182F6] text-white' : 'bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'}`}>
+ className={`text-xs px-3 py-1 rounded-lg font-medium transition-colors ${sortBy === key ? 'bg-[var(--lu-accent)] text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)] hover:bg-[var(--lu-line)]'}`}>
  {label}
  </button>
  ))}
@@ -348,9 +348,9 @@ export default function KeywordScorePage() {
  </div>
 
  {/* 하단 안내 */}
- <div className="mt-6 p-4 bg-white rounded-2xl shadow-sm text-center">
- <p className="text-[11px] text-[#8B95A1]">
- 점수는 <strong className="text-[#3182F6]">네이버 플레이스 알고리즘</strong> 주요 요소를 기반으로 산출됩니다.
+ <div className="mt-6 p-4 bg-white rounded-[10px] shadow-none text-center">
+ <p className="text-[11px] text-[var(--lu-muted)]">
+ 점수는 <strong className="text-[var(--lu-accent)]">네이버 플레이스 알고리즘</strong> 주요 요소를 기반으로 산출됩니다.
  실제 순위와 차이가 있을 수 있으며, 정기적 분석을 통해 최적화 전략을 수립하세요.
  </p>
  </div>

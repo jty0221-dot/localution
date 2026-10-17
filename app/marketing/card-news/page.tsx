@@ -162,7 +162,7 @@ export default function CardNewsPage() {
  const slideSize = ratio === '1:1' ? { w: 540, h: 540 } : { w: 540, h: 675 }
 
  return (
- <div className="min-h-screen bg-[#F8F9FA] flex">
+ <div className="min-h-screen bg-[var(--lu-canvas)] flex">
  <Sidebar />
  <main className="flex-1 ml-0 md:ml-[220px] pt-4 md:pt-0 min-w-0">
  <PageHeader
@@ -174,8 +174,8 @@ export default function CardNewsPage() {
 
  <div className="max-w-6xl mx-auto px-4 md:px-6 pt-4 md:pt-6 pb-20">
  {/* 브레드크럼 */}
- <div className="flex items-center gap-2 text-xs text-[#8B95A1] mb-4">
- <Link href="/marketing" className="hover:text-[#191F28]">마케팅 관리</Link>
+ <div className="flex items-center gap-2 text-xs text-[var(--lu-muted)] mb-4">
+ <Link href="/marketing" className="hover:text-[var(--lu-ink)]">마케팅 관리</Link>
  <ArrowRight size={12} />
  <span className="text-[#EC4899] font-medium">인스타 캐러셀 카드뉴스</span>
  </div>
@@ -188,18 +188,18 @@ export default function CardNewsPage() {
  <span className="text-xs font-semibold text-[#6366F1] bg-[#EEF2FF] px-2 py-1 rounded-full align-middle">NEW</span>
  <span className="text-xs font-semibold text-[#EC4899] bg-[#FCE7F3] px-2 py-1 rounded-full align-middle">Carousel</span>
  </h1>
- <p className="text-sm text-[#4E5968] mt-1.5">
+ <p className="text-sm text-[var(--lu-muted)] mt-1.5">
  인스타그램 캐러셀 전용 · 최대 10장 슬라이드 · Claude Design(UX Copy · 접근성 · 비평) 자동 내장 · 스와이프 유도 + 진행도 도트 포함.
  </p>
  </div>
  </div>
 
  {/* Form */}
- <div className="bg-white rounded-2xl border border-gray-200 p-6 mb-6">
+ <div className="bg-white rounded-[10px] border border-gray-200 p-6 mb-6">
  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
  <Field label="주제 (핵심 메시지 1문장)" required>
  <input
- className="form-input"
+ className="min-h-11 form-input"
  placeholder="예) 네이버 플레이스 예약 전환율 올리는 3가지 훅"
  value={topic}
  onChange={e => setTopic(e.target.value)}
@@ -207,7 +207,7 @@ export default function CardNewsPage() {
  </Field>
  <Field label="타겟 (업종·상황)">
  <input
- className="form-input"
+ className="min-h-11 form-input"
  placeholder="예) 카페 사장님 / 1인 미용실 원장님"
  value={target}
  onChange={e => setTarget(e.target.value)}
@@ -215,7 +215,7 @@ export default function CardNewsPage() {
  </Field>
 
  <Field label="톤">
- <select className="form-input" value={tone} onChange={e => setTone(e.target.value as Tone)}>
+ <select className="min-h-11 form-input" value={tone} onChange={e => setTone(e.target.value as Tone)}>
  {(Object.keys(TONE_LABEL) as Tone[]).map(k => (
  <option key={k} value={k}>{TONE_LABEL[k]}</option>
  ))}
@@ -223,7 +223,7 @@ export default function CardNewsPage() {
  </Field>
 
  <Field label="비율">
- <select className="form-input" value={ratio} onChange={e => setRatio(e.target.value as Ratio)}>
+ <select className="min-h-11 form-input" value={ratio} onChange={e => setRatio(e.target.value as Ratio)}>
  {(Object.keys(RATIO_LABEL) as Ratio[]).map(k => (
  <option key={k} value={k}>{RATIO_LABEL[k]}</option>
  ))}
@@ -240,7 +240,7 @@ export default function CardNewsPage() {
  className={`flex-1 py-2 rounded-lg border text-sm font-medium ${
  slideCount === n
  ? 'bg-[#1F2937] text-white border-[#1F2937]'
- : 'bg-white text-[#4E5968] border-gray-300 hover:bg-gray-50'
+ : 'bg-white text-[var(--lu-muted)] border-gray-300 hover:bg-gray-50'
  }`}
  >
  {n}장
@@ -251,7 +251,7 @@ export default function CardNewsPage() {
 
  <Field label="(선택) 유튜브 제목 연동 · 주제 일치화" hint="youtube-production-team 스킬로 만든 영상 제목 입력 시 CTA에 '영상으로 보기' 자동 삽입.">
  <input
- className="form-input"
+ className="min-h-11 form-input"
  placeholder="예) 플레이스 예약 전환율 3배 올린 실전 3가지"
  value={youtubeTitle}
  onChange={e => setYoutubeTitle(e.target.value)}
@@ -269,7 +269,7 @@ export default function CardNewsPage() {
  <button
  onClick={runGenerate}
  disabled={loading}
- className="px-6 py-3 bg-gradient-to-r from-[#EC4899] to-[#F97316] hover:opacity-90 disabled:opacity-50 rounded-xl font-bold text-white shadow-sm"
+ className="min-h-11 px-6 py-3 bg-[var(--lu-accent)] hover:opacity-90 disabled:opacity-50 rounded-[6px] font-bold text-white shadow-none"
  >
  {loading ? '생성 중… (15~25초)' : '캐러셀 생성'}
  </button>
@@ -277,19 +277,19 @@ export default function CardNewsPage() {
  <>
  <button
  onClick={downloadAll}
- className="px-5 py-3 bg-[#1F2937] hover:bg-black rounded-xl font-medium text-white"
+ className="min-h-11 px-5 py-3 bg-[#1F2937] hover:bg-black rounded-[6px] font-medium text-white"
  >
  10장 전체 PNG 다운로드
  </button>
  <button
  onClick={copyCaption}
- className="px-5 py-3 bg-white border border-gray-300 hover:bg-gray-50 rounded-xl font-medium text-[#4E5968]"
+ className="min-h-11 px-5 py-3 bg-white border border-gray-300 hover:bg-gray-50 rounded-[6px] font-medium text-[var(--lu-muted)]"
  >
  인스타 캡션 복사
  </button>
  <button
  onClick={sendToThreads}
- className="px-5 py-3 bg-black hover:bg-gray-900 rounded-xl font-medium text-white flex items-center gap-2"
+ className="min-h-11 px-5 py-3 bg-black hover:bg-gray-900 rounded-[6px] font-medium text-white flex items-center gap-2"
  >
  <Send size={15} strokeWidth={2.5} />
  스레드로 보내기
@@ -313,14 +313,14 @@ export default function CardNewsPage() {
  <h2 className="text-lg font-bold text-[#111827]">
  캐러셀 미리보기 · {data.slides.length}장
  </h2>
- <div className="text-xs text-[#4E5968]">
+ <div className="text-xs text-[var(--lu-muted)]">
  대비 {data.accessibility.contrast_ratio} / 최소폰트 {data.accessibility.min_font_size} / {data.accessibility.passed ? 'WCAG AA 통과' : '재조정 권장'}
  </div>
  </div>
 
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
  {data.slides.map((s, i) => (
- <div key={i} className="bg-white border border-gray-200 rounded-xl overflow-hidden">
+ <div key={i} className="bg-white border border-gray-200 rounded-[6px] overflow-hidden">
  <div
  ref={el => { slidesRef.current[i] = el }}
  style={{
@@ -340,12 +340,12 @@ export default function CardNewsPage() {
  />
  </div>
  <div className="flex items-center justify-between px-3 py-2 bg-gray-50 border-t">
- <span className="text-xs font-medium text-[#4E5968]">
+ <span className="text-xs font-medium text-[var(--lu-muted)]">
  {i + 1}/{data.slides.length} · {s.role === 'cover' ? '표지' : s.role === 'cta' ? 'CTA' : '본문'}
  </span>
  <button
  onClick={() => downloadPng(i)}
- className="text-xs text-[#3182F6] hover:underline font-medium"
+ className="min-h-11 text-xs text-[var(--lu-accent)] hover:underline font-medium"
  >
  PNG 저장
  </button>
@@ -361,7 +361,7 @@ export default function CardNewsPage() {
  </div>
 
  {/* Hashtags */}
- <div className="bg-white border border-gray-200 rounded-2xl p-6">
+ <div className="bg-white border border-gray-200 rounded-[10px] p-6">
  <h3 className="font-bold text-[#111827] mb-3">인스타그램 해시태그 (15개)</h3>
  <div className="space-y-3 text-sm">
  <HashtagRow label="인스타그램 메인" tags={data.hashtags.instagram} />
@@ -373,7 +373,7 @@ export default function CardNewsPage() {
  )}
 
  {!data && !loading && (
- <div className="bg-white border border-dashed border-gray-300 rounded-2xl p-12 text-center text-[#4E5968]">
+ <div className="bg-white border border-dashed border-gray-300 rounded-[10px] p-12 text-center text-[var(--lu-muted)]">
  <div className="text-4xl mb-3"></div>
  <div className="font-medium mb-1">주제를 입력하고 캐러셀 생성 버튼을 누르세요</div>
  <div className="text-xs">Claude가 인스타 캐러셀 10장 + 캡션 + 해시태그 + 디자인 비평까지 한 번에 뽑아줍니다.</div>
@@ -397,7 +397,7 @@ export default function CardNewsPage() {
  transition: border-color 0.15s, box-shadow 0.15s;
  }
  .form-input:focus {
- border-color: #3182F6;
+ border-color: #16685D;
  box-shadow: 0 0 0 3px rgba(49, 130, 246, 0.12);
  }
  `}</style>
@@ -429,9 +429,9 @@ function Field({
 
 function InfoCard({ title, items }: { title: string; items: string[] }) {
  return (
- <div className="bg-white border border-gray-200 rounded-2xl p-5">
+ <div className="bg-white border border-gray-200 rounded-[10px] p-5">
  <h3 className="font-bold text-[#111827] mb-2">{title}</h3>
- <ul className="space-y-1.5 text-sm text-[#4E5968]">
+ <ul className="space-y-1.5 text-sm text-[var(--lu-muted)]">
  {items.map((it, i) => (
  <li key={i} className="flex gap-2">
  <span className="text-[#EC4899] mt-0.5">▸</span>
@@ -451,12 +451,12 @@ function HashtagRow({ label, tags }: { label: string; tags: string[] }) {
  return (
  <div>
  <div className="flex items-center justify-between mb-1">
- <span className="text-xs font-semibold text-[#4E5968]">{label}</span>
- <button onClick={copy} className="text-xs text-[#3182F6] hover:underline">복사</button>
+ <span className="text-xs font-semibold text-[var(--lu-muted)]">{label}</span>
+ <button onClick={copy} className="min-h-11 text-xs text-[var(--lu-accent)] hover:underline">복사</button>
  </div>
  <div className="flex flex-wrap gap-1.5">
  {tags.map((t, i) => (
- <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded-md text-[#4E5968]">#{t}</span>
+ <span key={i} className="text-xs bg-gray-100 px-2 py-1 rounded-md text-[var(--lu-muted)]">#{t}</span>
  ))}
  </div>
  </div>

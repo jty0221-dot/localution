@@ -43,7 +43,7 @@ type AccountInfo = {
 function StatusBadge({ status }: { status: ThreadsPost['status'] }) {
  const map = {
  draft: { label: '임시저장', bg: 'bg-[#F3F4F6]', text: 'text-[#6B7280]' },
- scheduled: { label: '예약됨', bg: 'bg-[#EFF6FF]', text: 'text-[#3182F6]' },
+ scheduled: { label: '예약됨', bg: 'bg-[var(--lu-accent-soft)]', text: 'text-[var(--lu-accent)]' },
  publishing: { label: '발행중', bg: 'bg-[#FFF7ED]', text: 'text-[#EA580C]' },
  published: { label: '발행완료', bg: 'bg-[#ECFDF5]', text: 'text-[#059669]' },
  failed: { label: '실패', bg: 'bg-[#FFF1F2]', text: 'text-[#E11D48]' },
@@ -61,13 +61,13 @@ function StatusBadge({ status }: { status: ThreadsPost['status'] }) {
 // ──────────────────────────────────────────
 function ConnectBanner() {
  return (
- <div className="bg-[#FFF7F0] border border-[#FED7AA] rounded-2xl p-5 flex items-start gap-4 mb-6">
- <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F97316] to-[#EA580C] shadow-sm flex items-center justify-center flex-shrink-0">
+ <div className="bg-[#FFF7F0] border border-[#FED7AA] rounded-[10px] p-5 flex items-start gap-4 mb-6">
+ <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center flex-shrink-0">
  <AlertTriangle size={16} className="text-white" strokeWidth={2.5} />
  </div>
  <div className="flex-1 min-w-0">
  <p className="font-semibold text-[#111827] text-sm">Threads 계정이 연결되지 않았습니다</p>
- <p className="text-xs text-[#4E5968] mt-1">Meta API 인증 후 자동 발행 기능을 사용할 수 있습니다.</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-1">Meta API 인증 후 자동 발행 기능을 사용할 수 있습니다.</p>
  <Link
  href="/marketing/threads/connect"
  className="mt-3 inline-flex items-center gap-1.5 bg-[#111827] text-white text-xs font-semibold px-3 py-2 rounded-lg hover:bg-[#1F2937] transition-colors"
@@ -104,8 +104,8 @@ function PersonaChips({ value, onChange }: { value: PersonaId; onChange: (v: Per
  title={p.sub}
  className={`px-3 py-1.5 rounded-full text-xs font-semibold transition-all ${
  value === p.id
- ? 'bg-[#111827] text-white shadow-sm'
- : 'bg-[#F3F4F6] text-[#4E5968] hover:bg-[#E5E8EB]'
+ ? 'bg-[#111827] text-white shadow-none'
+ : 'bg-[#F3F4F6] text-[var(--lu-muted)] hover:bg-[var(--lu-line)]'
  }`}
  >
  {p.label}
@@ -156,14 +156,14 @@ function AIDraftPanel({
  }
 
  return (
- <div className="bg-white border border-[#E5E8EB] rounded-2xl overflow-hidden">
+ <div className="bg-white border border-[var(--lu-line)] rounded-[10px] overflow-hidden">
  <button
  type="button"
  onClick={() => setOpen(v => !v)}
- className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#F9FAFB] transition-colors"
+ className="min-h-11 w-full flex items-center justify-between px-4 py-3 hover:bg-[#F9FAFB] transition-colors"
  >
  <span className="flex items-center gap-2">
- <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#6D28D9] flex items-center justify-center shadow-sm">
+ <div className="w-7 h-7 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Sparkles size={13} className="text-white" strokeWidth={2.5} />
  </div>
  <span className="text-sm font-semibold text-[#111827]">AI 초안 생성</span>
@@ -180,7 +180,7 @@ function AIDraftPanel({
  onChange={e => setTopic(e.target.value)}
  onKeyDown={e => { if (e.key === 'Enter' && !loading) generate() }}
  placeholder="예: 오늘 신메뉴 출시, 봄 시즌 할인, 단골 감사 이벤트"
- className="w-full border border-[#E5E8EB] rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED]"
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-3 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-[#7C3AED]/20 focus:border-[#7C3AED]"
  />
  <p className="text-xs text-[#9CA3AF]">위에서 선택한 페르소나 말투로 생성됩니다.</p>
  {error && <p className="text-xs text-[#E11D48]">{error}</p>}
@@ -188,7 +188,7 @@ function AIDraftPanel({
  type="button"
  onClick={generate}
  disabled={!topic.trim() || loading}
- className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#7C3AED] to-[#6D28D9] hover:from-[#6D28D9] hover:to-[#5B21B6] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-xl transition-all text-sm"
+ className="min-h-11 w-full flex items-center justify-center gap-2 bg-[var(--lu-accent)] hover:from-[#6D28D9] hover:to-[#5B21B6] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-[6px] transition-all text-sm"
  >
  {loading ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} strokeWidth={2.5} />}
  {loading ? '생성 중...' : '초안 생성'}
@@ -244,14 +244,14 @@ function TemplatePanel({ blocks, onLoad }: { blocks: PostBlock[]; onLoad: (b: Po
  }
 
  return (
- <div className="bg-white border border-[#E5E8EB] rounded-2xl overflow-hidden">
+ <div className="bg-white border border-[var(--lu-line)] rounded-[10px] overflow-hidden">
  <button
  type="button"
  onClick={() => setOpen(v => !v)}
- className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#F9FAFB] transition-colors"
+ className="min-h-11 w-full flex items-center justify-between px-4 py-3 hover:bg-[#F9FAFB] transition-colors"
  >
  <span className="flex items-center gap-2">
- <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-sm">
+ <div className="w-7 h-7 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <BookMarked size={13} className="text-white" strokeWidth={2.5} />
  </div>
  <span className="text-sm font-semibold text-[#111827]">템플릿</span>
@@ -271,14 +271,14 @@ function TemplatePanel({ blocks, onLoad }: { blocks: PostBlock[]; onLoad: (b: Po
  onKeyDown={e => { if (e.key === 'Enter') handleSave() }}
  placeholder="템플릿 이름"
  autoFocus
- className="flex-1 border border-[#E5E8EB] rounded-xl px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30 focus:border-[#F59E0B]"
+ className="min-h-11 flex-1 border border-[var(--lu-line)] rounded-[6px] px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-[#F59E0B]/30 focus:border-[#F59E0B]"
  />
  <button type="button" onClick={handleSave} disabled={!saveName.trim()}
- className="px-3 py-2 bg-[#111827] text-white text-xs font-semibold rounded-xl disabled:opacity-40 transition-colors">
+ className="min-h-11 px-3 py-2 bg-[#111827] text-white text-xs font-semibold rounded-[6px] disabled:opacity-40 transition-colors">
  저장
  </button>
  <button type="button" onClick={() => setSaving(false)}
- className="px-3 py-2 text-[#6B7280] text-xs rounded-xl hover:bg-[#F3F4F6] transition-colors">
+ className="min-h-11 px-3 py-2 text-[#6B7280] text-xs rounded-[6px] hover:bg-[#F3F4F6] transition-colors">
  취소
  </button>
  </div>
@@ -286,7 +286,7 @@ function TemplatePanel({ blocks, onLoad }: { blocks: PostBlock[]; onLoad: (b: Po
  <button
  type="button"
  onClick={() => setSaving(true)}
- className="flex items-center gap-1.5 text-xs font-semibold text-[#F59E0B] hover:text-[#D97706] border border-dashed border-[#FCD34D] hover:border-[#F59E0B] px-3 py-2 rounded-xl transition-colors"
+ className="min-h-11 flex items-center gap-1.5 text-xs font-semibold text-[#F59E0B] hover:text-[#D97706] border border-dashed border-[#FCD34D] hover:border-[#F59E0B] px-3 py-2 rounded-[6px] transition-colors"
  >
  <BookMarked size={12} strokeWidth={2.5} />
  현재 내용을 템플릿으로 저장
@@ -298,7 +298,7 @@ function TemplatePanel({ blocks, onLoad }: { blocks: PostBlock[]; onLoad: (b: Po
  ) : (
  <div className="space-y-2">
  {templates.map(t => (
- <div key={t.id} className="flex items-center gap-2 p-2.5 bg-[#F9FAFB] rounded-xl">
+ <div key={t.id} className="flex items-center gap-2 p-2.5 bg-[#F9FAFB] rounded-[6px]">
  <div className="flex-1 min-w-0">
  <p className="text-xs font-semibold text-[#111827] truncate">{t.name}</p>
  <p className="text-xs text-[#B0B8C1] mt-0.5 truncate">
@@ -311,14 +311,14 @@ function TemplatePanel({ blocks, onLoad }: { blocks: PostBlock[]; onLoad: (b: Po
  onLoad(t.blocks.map(b => ({ ...b, id: Math.random().toString(36).slice(2) })))
  setOpen(false)
  }}
- className="text-xs font-semibold text-[#3182F6] hover:text-[#2563EB] px-2 py-1 rounded-lg hover:bg-[#EFF6FF] transition-colors flex-shrink-0"
+ className="min-h-11 text-xs font-semibold text-[var(--lu-accent)] hover:text-[#2563EB] px-2 py-1 rounded-lg hover:bg-[var(--lu-accent-soft)] transition-colors flex-shrink-0"
  >
  불러오기
  </button>
  <button
  type="button"
  onClick={() => handleDelete(t.id)}
- className="p-1 text-[#D1D5DB] hover:text-[#E11D48] rounded-lg transition-colors flex-shrink-0"
+ className="min-h-11 p-1 text-[#D1D5DB] hover:text-[#E11D48] rounded-lg transition-colors flex-shrink-0"
  >
  <Trash2 size={12} strokeWidth={2} />
  </button>
@@ -408,14 +408,14 @@ function ReviewDraftPanel({
  }
 
  return (
- <div className="bg-white border border-[#E5E8EB] rounded-2xl overflow-hidden">
+ <div className="bg-white border border-[var(--lu-line)] rounded-[10px] overflow-hidden">
  <button
  type="button"
  onClick={() => setOpen(v => !v)}
- className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#F9FAFB] transition-colors"
+ className="min-h-11 w-full flex items-center justify-between px-4 py-3 hover:bg-[#F9FAFB] transition-colors"
  >
  <span className="flex items-center gap-2">
- <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#059669] to-[#047857] flex items-center justify-center shadow-sm">
+ <div className="w-7 h-7 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <Star size={13} className="text-white" strokeWidth={2.5} />
  </div>
  <span className="text-sm font-semibold text-[#111827]">리뷰에서 생성</span>
@@ -441,10 +441,10 @@ function ReviewDraftPanel({
  key={r.id}
  type="button"
  onClick={() => setSelectedId(r.id === selectedId ? null : r.id)}
- className={`w-full text-left p-2.5 rounded-xl border transition-all ${
+ className={`w-full text-left p-2.5 rounded-[6px] border transition-all ${
  r.id === selectedId
  ? 'border-[#059669] bg-[#F0FDF4]'
- : 'border-[#E5E8EB] hover:border-[#D1D5DB] bg-[#F9FAFB]'
+ : 'border-[var(--lu-line)] hover:border-[#D1D5DB] bg-[#F9FAFB]'
  }`}
  >
  <div className="flex items-center gap-2 mb-1">
@@ -469,7 +469,7 @@ function ReviewDraftPanel({
  type="button"
  onClick={generate}
  disabled={generating}
- className="w-full flex items-center justify-center gap-2 bg-gradient-to-r from-[#059669] to-[#047857] hover:from-[#047857] hover:to-[#065F46] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-xl transition-all text-sm"
+ className="min-h-11 w-full flex items-center justify-center gap-2 bg-[var(--lu-accent)] hover:from-[#047857] hover:to-[#065F46] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-2.5 rounded-[6px] transition-all text-sm"
  >
  {generating ? <Loader2 size={14} className="animate-spin" /> : <Sparkles size={14} strokeWidth={2.5} />}
  {generating ? '생성 중...' : '이 리뷰로 스레드 생성'}
@@ -510,14 +510,14 @@ function HashtagInput({
  {tags.map(tag => (
  <span
  key={tag}
- className="inline-flex items-center gap-1 bg-[#EFF6FF] text-[#3182F6] text-xs font-medium px-2.5 py-1 rounded-full"
+ className="inline-flex items-center gap-1 bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] text-xs font-medium px-2.5 py-1 rounded-full"
  >
  <Hash size={10} strokeWidth={2.5} />
  {tag}
  <button
  type="button"
  onClick={() => removeTag(tag)}
- className="ml-0.5 hover:text-[#DC2626] transition-colors"
+ className="min-h-11 ml-0.5 hover:text-[#DC2626] transition-colors"
  >
  ×
  </button>
@@ -536,7 +536,7 @@ function HashtagInput({
  }}
  onBlur={() => { if (input.trim()) addTag(input) }}
  placeholder="해시태그 입력 후 Enter (# 없이)"
- className="w-full border border-[#E5E8EB] rounded-xl px-3 py-2.5 text-sm text-[#111827] placeholder:text-[#B0B8C1] focus:outline-none focus:ring-2 focus:ring-[#111827]/20 focus:border-[#111827]"
+ className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-3 py-2.5 text-base text-[#111827] placeholder:text-[#B0B8C1] focus:outline-none focus:ring-2 focus:ring-[#111827]/20 focus:border-[#111827]"
  />
  </div>
  )
@@ -588,13 +588,13 @@ function ImageDropZone({
 
  if (imageUrl) {
  return (
- <div className="relative mt-3 rounded-xl overflow-hidden border border-[#E5E8EB] group">
+ <div className="relative mt-3 rounded-[6px] overflow-hidden border border-[var(--lu-line)] group">
  <NextImage src={imageUrl} alt="업로드 이미지" width={600} height={400}
  className="w-full max-h-64 object-cover" unoptimized />
  <button
  type="button"
  onClick={onClear}
- className="absolute top-2 right-2 w-7 h-7 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-colors"
+ className="min-h-11 absolute top-2 right-2 w-7 h-7 bg-black/60 hover:bg-black/80 text-white rounded-full flex items-center justify-center transition-colors"
  >
  <X size={13} strokeWidth={2.5} />
  </button>
@@ -609,7 +609,7 @@ function ImageDropZone({
  onDragLeave={() => setDragging(false)}
  onDrop={onDrop}
  onClick={() => inputRef.current?.click()}
- className={`border-2 border-dashed rounded-xl px-4 py-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors ${
+ className={`border-2 border-dashed rounded-[6px] px-4 py-8 flex flex-col items-center justify-center gap-2 cursor-pointer transition-colors ${
  dragging ? 'border-[#111827] bg-[#F3F4F6]' : 'border-[#D1D5DB] hover:border-[#9CA3AF] hover:bg-[#F9FAFB]'
  }`}
  >
@@ -624,7 +624,7 @@ function ImageDropZone({
  <p className="text-xs text-[#B0B8C1]">JPG, PNG, GIF, WebP · 최대 8MB</p>
  </div>
  {error && <p className="mt-1.5 text-xs text-[#E11D48]">{error}</p>}
- <input ref={inputRef} type="file" accept="image/*" className="hidden"
+ <input ref={inputRef} type="file" accept="image/*" className="min-h-11 hidden"
  onChange={e => { const f = e.target.files?.[0]; if (f) uploadFile(f) }} />
  </div>
  )
@@ -663,17 +663,17 @@ function PostBlockEditor({
  <div className="relative flex gap-3">
  {/* 스레드 연결선 */}
  <div className="flex flex-col items-center flex-shrink-0" style={{ width: 32 }}>
- <div className="w-8 h-8 rounded-full bg-[#F3F4F6] border border-[#E5E8EB] flex items-center justify-center text-xs font-bold text-[#6B7280]">
+ <div className="w-8 h-8 rounded-full bg-[#F3F4F6] border border-[var(--lu-line)] flex items-center justify-center text-xs font-bold text-[#6B7280]">
  {index + 1}
  </div>
- {!isFirst || true ? <div className="w-0.5 flex-1 mt-1 bg-[#E5E8EB] min-h-[20px]" /> : null}
+ {!isFirst || true ? <div className="w-0.5 flex-1 mt-1 bg-[var(--lu-line)] min-h-[20px]" /> : null}
  </div>
 
  <div className="flex-1 min-w-0 pb-4">
  {/* 삭제 버튼 */}
  {canRemove && (
  <button type="button" onClick={onRemove}
- className="float-right ml-2 p-1 rounded-lg hover:bg-[#FFF1F2] text-[#D1D5DB] hover:text-[#E11D48] transition-colors">
+ className="min-h-11 float-right ml-2 p-1 rounded-lg hover:bg-[#FFF1F2] text-[#D1D5DB] hover:text-[#E11D48] transition-colors">
  <X size={14} strokeWidth={2.5} />
  </button>
  )}
@@ -684,7 +684,7 @@ function PostBlockEditor({
  onChange={e => onChange({ ...block, text: e.target.value.slice(0, MAX_CHARS) })}
  rows={isFirst ? 4 : 3}
  placeholder={isFirst ? '스레드에 올릴 내용을 작성하세요...' : '답글 내용을 입력하세요...'}
- className="w-full border border-[#E5E8EB] rounded-xl px-4 py-3 text-sm text-[#111827] placeholder:text-[#B0B8C1] focus:outline-none focus:ring-2 focus:ring-[#111827]/20 focus:border-[#111827] resize-none"
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base text-[#111827] placeholder:text-[#B0B8C1] focus:outline-none focus:ring-2 focus:ring-[#111827]/20 focus:border-[#111827] resize-none"
  />
  <p className={`text-right text-xs mt-0.5 ${charCount >= 450 ? 'text-[#F59E0B]' : 'text-[#B0B8C1]'} ${charCount >= MAX_CHARS ? 'text-[#DC2626]' : ''}`}>
  {charCount} / {MAX_CHARS}
@@ -703,7 +703,7 @@ function PostBlockEditor({
  <label className="flex items-center gap-2 cursor-pointer w-fit">
  <div
  onClick={() => onChange({ ...block, useImage: !block.useImage, imageUrl: block.useImage ? '' : block.imageUrl })}
- className={`w-8 h-4 rounded-full transition-colors relative ${block.useImage ? 'bg-[#111827]' : 'bg-[#E5E8EB]'}`}
+ className={`w-8 h-4 rounded-full transition-colors relative ${block.useImage ? 'bg-[#111827]' : 'bg-[var(--lu-line)]'}`}
  >
  <div className={`absolute top-0.5 w-3 h-3 bg-white rounded-full shadow transition-transform ${block.useImage ? 'translate-x-4' : 'translate-x-0.5'}`} />
  </div>
@@ -946,7 +946,7 @@ function ComposeTab({
  />
 
  {result && (
- <div className={`flex items-center gap-2.5 p-4 rounded-xl text-sm font-medium ${
+ <div className={`flex items-center gap-2.5 p-4 rounded-[6px] text-sm font-medium ${
  result.ok ? 'bg-[#ECFDF5] text-[#059669]' : 'bg-[#FFF1F2] text-[#E11D48]'
  }`}>
  {result.ok ? <CheckCircle2 size={16} strokeWidth={2.5} /> : <XCircle size={16} strokeWidth={2.5} />}
@@ -955,7 +955,7 @@ function ComposeTab({
  )}
 
  {/* 포스트 블록들 */}
- <div className="bg-white border border-[#E5E8EB] rounded-2xl p-4 md:p-5">
+ <div className="bg-white border border-[var(--lu-line)] rounded-[10px] p-4 md:p-5">
  <div className="mb-4 pb-3 border-b border-[#F3F4F6]">
  <PersonaChips value={persona} onChange={setPersona} />
  </div>
@@ -977,7 +977,7 @@ function ComposeTab({
  <button
  type="button"
  onClick={addReply}
- className="flex items-center gap-1.5 text-xs font-semibold text-[#6B7280] hover:text-[#111827] px-3 py-1.5 rounded-lg border border-dashed border-[#D1D5DB] hover:border-[#9CA3AF] transition-colors"
+ className="min-h-11 flex items-center gap-1.5 text-xs font-semibold text-[#6B7280] hover:text-[#111827] px-3 py-1.5 rounded-lg border border-dashed border-[#D1D5DB] hover:border-[#9CA3AF] transition-colors"
  >
  <Plus size={13} strokeWidth={2.5} />
  답글 추가
@@ -990,7 +990,7 @@ function ComposeTab({
  </div>
 
  {/* 예약 날짜 */}
- <div className="bg-white border border-[#E5E8EB] rounded-2xl p-4">
+ <div className="bg-white border border-[var(--lu-line)] rounded-[10px] p-4">
  <label className="block text-sm font-semibold text-[#111827] mb-2 flex items-center gap-1.5">
  <CalendarClock size={14} strokeWidth={2} />
  예약 발행 (선택)
@@ -1001,11 +1001,11 @@ function ComposeTab({
  value={scheduledAt}
  onChange={e => setScheduledAt(e.target.value)}
  min={new Date().toISOString().slice(0, 16)}
- className="border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#111827]/20 focus:border-[#111827]"
+ className="min-h-11 border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:ring-2 focus:ring-[#111827]/20 focus:border-[#111827]"
  />
  {scheduledAt && (
  <button type="button" onClick={() => setScheduledAt('')}
- className="text-xs text-[#6B7280] hover:text-[#DC2626] underline">초기화</button>
+ className="min-h-11 text-xs text-[#6B7280] hover:text-[#DC2626] underline">초기화</button>
  )}
  </div>
  </div>
@@ -1014,16 +1014,16 @@ function ComposeTab({
  <TemplatePanel blocks={blocks} onLoad={setBlocks} />
 
  {/* YouTube 동시 발행 */}
- <div className="bg-white border border-[#E5E8EB] rounded-2xl overflow-hidden">
+ <div className="bg-white border border-[var(--lu-line)] rounded-[10px] overflow-hidden">
   <div className="flex items-center justify-between px-4 py-3">
    <div className="flex items-center gap-2 min-w-0">
-    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center shadow-sm flex-shrink-0">
+    <div className="w-7 h-7 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none flex-shrink-0">
      <Youtube size={13} className="text-white" strokeWidth={2.5} />
     </div>
     <span className="text-sm font-semibold text-[#111827] truncate">유튜브 커뮤니티 동시 발행</span>
     {ytEnabled && (
      <span className={`text-xs font-semibold flex-shrink-0 ${
-      ytAgentOk === true ? 'text-[#059669]' : ytAgentOk === false ? 'text-[#DC2626]' : 'text-[#8B95A1]'
+      ytAgentOk === true ? 'text-[#059669]' : ytAgentOk === false ? 'text-[#DC2626]' : 'text-[var(--lu-muted)]'
      }`}>
       · {ytAgentOk === true ? '연결됨' : ytAgentOk === false ? '미연결' : '확인 중'}
      </span>
@@ -1032,7 +1032,7 @@ function ComposeTab({
    <button
     type="button"
     onClick={() => { const next = !ytEnabled; setYtEnabled(next); if (next) checkYtAgent() }}
-    className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ml-2 ${ytEnabled ? 'bg-[#FF0000]' : 'bg-[#E5E8EB]'}`}
+    className={`w-10 h-5 rounded-full transition-colors relative flex-shrink-0 ml-2 ${ytEnabled ? 'bg-[#FF0000]' : 'bg-[var(--lu-line)]'}`}
    >
     <div className={`absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-transform ${ytEnabled ? 'translate-x-5' : 'translate-x-0.5'}`} />
    </button>
@@ -1041,43 +1041,43 @@ function ComposeTab({
   {ytEnabled && (
    <div className="px-4 pb-4 border-t border-[#F3F4F6] pt-3 space-y-3">
     {ytAgentOk === false && (
-     <div className="flex items-center justify-between p-2.5 bg-[#FFF1F2] rounded-xl border border-[#FECDD3]">
+     <div className="flex items-center justify-between p-2.5 bg-[#FFF1F2] rounded-[6px] border border-[#FECDD3]">
       <span className="text-xs text-[#DC2626] font-medium">에이전트가 실행 중이어야 업로드됩니다.</span>
       <Link href="/marketing/youtube-community/download" className="text-xs font-bold text-[#DC2626] underline flex-shrink-0 ml-2">다운로드</Link>
      </div>
     )}
     <div>
-     <label className="block text-xs font-semibold text-[#8B95A1] mb-1.5">채널 URL</label>
+     <label className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">채널 URL</label>
      <input
       type="url"
       value={ytChannelUrl}
       onChange={e => setYtChannelUrl(e.target.value)}
       placeholder="https://www.youtube.com/@내채널"
-      className="w-full px-3 py-2.5 text-sm rounded-xl border border-[#E5E8EB] focus:outline-none focus:ring-2 focus:ring-[#FF0000]/20 focus:border-[#FF0000] transition-all bg-[#F8F9FA] placeholder:text-[#B0B8C1]"
+      className="min-h-11 w-full px-3 py-2.5 text-base rounded-[6px] border border-[var(--lu-line)] focus:outline-none focus:ring-2 focus:ring-[#FF0000]/20 focus:border-[#FF0000] transition-all bg-[var(--lu-canvas)] placeholder:text-[#B0B8C1]"
      />
     </div>
     <div>
-     <label className="block text-xs font-semibold text-[#8B95A1] mb-1.5">고정 댓글 내용</label>
+     <label className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">고정 댓글 내용</label>
      <input
       type="text"
       value={ytComment}
       onChange={e => setYtComment(e.target.value)}
       placeholder="게시물에 자동으로 달리고 고정될 댓글"
-      className="w-full px-3 py-2.5 text-sm rounded-xl border border-[#E5E8EB] focus:outline-none focus:ring-2 focus:ring-[#FF0000]/20 focus:border-[#FF0000] transition-all bg-[#F8F9FA] placeholder:text-[#B0B8C1]"
+      className="min-h-11 w-full px-3 py-2.5 text-base rounded-[6px] border border-[var(--lu-line)] focus:outline-none focus:ring-2 focus:ring-[#FF0000]/20 focus:border-[#FF0000] transition-all bg-[var(--lu-canvas)] placeholder:text-[#B0B8C1]"
      />
     </div>
     <p className="text-[11px] text-[#B0B8C1]">채널 URL · 댓글 내용은 자동으로 저장됩니다.</p>
     {ytState !== 'idle' && (
-     <div className={`rounded-xl border p-3 text-xs space-y-1 max-h-28 overflow-y-auto font-mono ${
+     <div className={`rounded-[6px] border p-3 text-xs space-y-1 max-h-28 overflow-y-auto font-mono ${
       ytState === 'done' ? 'bg-[#F0FDF4] border-[#BBF7D0]'
       : ytState === 'error' ? 'bg-[#FFF1F2] border-[#FECDD3]'
-      : 'bg-[#F8F9FA] border-[#E5E8EB]'
+      : 'bg-[var(--lu-canvas)] border-[var(--lu-line)]'
      }`}>
       {ytLogs.map((log, i) => (
        <div key={i} className={
         log.includes('완료') ? 'text-[#059669]'
         : log.includes('오류') || log.includes('실패') ? 'text-[#DC2626]'
-        : 'text-[#4E5968]'
+        : 'text-[var(--lu-muted)]'
        }>{log}</div>
       ))}
      </div>
@@ -1091,7 +1091,7 @@ function ComposeTab({
  <button
  onClick={() => submit(true)}
  disabled={!blocks[0].text.trim() || loading}
- className="flex-1 flex items-center justify-center gap-2 bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-xl transition-colors"
+ className="min-h-11 flex-1 flex items-center justify-center gap-2 bg-[#111827] hover:bg-[#1F2937] disabled:opacity-40 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-[6px] transition-colors"
  >
  {loading ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} strokeWidth={2.5} />}
  지금 발행
@@ -1099,7 +1099,7 @@ function ComposeTab({
  <button
  onClick={() => submit(false)}
  disabled={!blocks[0].text.trim() || !scheduledAt || loading}
- className="flex-1 flex items-center justify-center gap-2 bg-white hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed border border-[#E5E8EB] text-[#374151] font-semibold py-3 px-6 rounded-xl transition-colors"
+ className="min-h-11 flex-1 flex items-center justify-center gap-2 bg-white hover:bg-[#F9FAFB] disabled:opacity-40 disabled:cursor-not-allowed border border-[var(--lu-line)] text-[#374151] font-semibold py-3 px-6 rounded-[6px] transition-colors"
  >
  <CalendarClock size={16} strokeWidth={2} />
  예약 저장
@@ -1158,13 +1158,13 @@ function ScheduledTab() {
  <div className="space-y-3">
  <div className="flex items-center justify-between mb-2">
  <p className="text-sm text-[#6B7280]">총 {posts.length}개</p>
- <button onClick={load} className="text-xs text-[#6B7280] hover:text-[#111827] flex items-center gap-1">
+ <button onClick={load} className="min-h-11 text-xs text-[#6B7280] hover:text-[#111827] flex items-center gap-1">
  <RefreshCw size={12} strokeWidth={2} />
  새로고침
  </button>
  </div>
  {posts.map(post => (
- <div key={post.id} className="bg-white border border-[#E5E8EB] rounded-2xl p-4 md:p-5">
+ <div key={post.id} className="bg-white border border-[var(--lu-line)] rounded-[10px] p-4 md:p-5">
  <div className="flex items-start justify-between gap-3">
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -1178,7 +1178,7 @@ function ScheduledTab() {
  </div>
  <p className="text-sm text-[#374151] line-clamp-2">{post.text_content}</p>
  {post.hashtags.length > 0 && (
- <p className="text-xs text-[#3182F6] mt-1 truncate">
+ <p className="text-xs text-[var(--lu-accent)] mt-1 truncate">
  {post.hashtags.map(t => `#${t}`).join(' ')}
  </p>
  )}
@@ -1187,14 +1187,14 @@ function ScheduledTab() {
  <button
  onClick={() => handlePublishNow(post.id)}
  title="지금 발행"
- className="p-2 rounded-lg hover:bg-[#111827] hover:text-white text-[#6B7280] transition-colors"
+ className="min-h-11 p-2 rounded-lg hover:bg-[#111827] hover:text-white text-[#6B7280] transition-colors"
  >
  <Send size={14} strokeWidth={2.5} />
  </button>
  <button
  onClick={() => handleDelete(post.id)}
  title="삭제"
- className="p-2 rounded-lg hover:bg-[#FFF1F2] hover:text-[#E11D48] text-[#6B7280] transition-colors"
+ className="min-h-11 p-2 rounded-lg hover:bg-[#FFF1F2] hover:text-[#E11D48] text-[#6B7280] transition-colors"
  >
  <Trash2 size={14} strokeWidth={2} />
  </button>
@@ -1247,13 +1247,13 @@ function HistoryTab({ onRegen }: { onRegen: (text: string, hashtags: string[]) =
  <div className="space-y-3">
  <div className="flex items-center justify-between mb-2">
  <p className="text-sm text-[#6B7280]">총 {posts.length}개</p>
- <button onClick={load} className="text-xs text-[#6B7280] hover:text-[#111827] flex items-center gap-1">
+ <button onClick={load} className="min-h-11 text-xs text-[#6B7280] hover:text-[#111827] flex items-center gap-1">
  <RefreshCw size={12} strokeWidth={2} />
  새로고침
  </button>
  </div>
  {posts.map(post => (
- <div key={post.id} className="bg-white border border-[#E5E8EB] rounded-2xl p-4 md:p-5">
+ <div key={post.id} className="bg-white border border-[var(--lu-line)] rounded-[10px] p-4 md:p-5">
  <div className="flex items-start gap-3">
  <div className="flex-1 min-w-0">
  <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -1266,7 +1266,7 @@ function HistoryTab({ onRegen }: { onRegen: (text: string, hashtags: string[]) =
  </div>
  <p className="text-sm text-[#374151] line-clamp-2">{post.text_content}</p>
  {post.hashtags.length > 0 && (
- <p className="text-xs text-[#3182F6] mt-1 truncate">
+ <p className="text-xs text-[var(--lu-accent)] mt-1 truncate">
  {post.hashtags.map(t => `#${t}`).join(' ')}
  </p>
  )}
@@ -1280,7 +1280,7 @@ function HistoryTab({ onRegen }: { onRegen: (text: string, hashtags: string[]) =
  <button
  onClick={() => onRegen(post.text_content, post.hashtags)}
  title="이 글 스타일로 재생성"
- className="flex-shrink-0 flex items-center gap-1 text-xs font-semibold text-[#6B7280] hover:text-[#7C3AED] px-2 py-1.5 rounded-lg hover:bg-[#F5F3FF] transition-colors"
+ className="min-h-11 flex-shrink-0 flex items-center gap-1 text-xs font-semibold text-[#6B7280] hover:text-[#7C3AED] px-2 py-1.5 rounded-lg hover:bg-[#F5F3FF] transition-colors"
  >
  <RefreshCw size={12} strokeWidth={2.5} />
  재생성
@@ -1299,7 +1299,7 @@ function HistoryTab({ onRegen }: { onRegen: (text: string, hashtags: string[]) =
 function AccountStatus({ info }: { info: AccountInfo | null }) {
  if (!info?.connected) return null
  return (
- <div className="flex items-center gap-2 bg-[#ECFDF5] border border-[#A7F3D0] rounded-xl px-3 py-2">
+ <div className="flex items-center gap-2 bg-[#ECFDF5] border border-[#A7F3D0] rounded-[6px] px-3 py-2">
  <CheckCircle2 size={14} className="text-[#059669]" strokeWidth={2.5} />
  <span className="text-xs font-medium text-[#059669]">
  @{info.username} 연결됨 · {info.expires_in_days}일 후 갱신
@@ -1368,13 +1368,13 @@ function ThreadsPageContent() {
  style={{ background: 'radial-gradient(800px 240px at 20% -20%, rgba(255,255,255,0.08), transparent 60%)' }} />
  <div className="relative max-w-5xl mx-auto px-4 md:px-8 py-9 md:py-12 flex items-center gap-3.5 md:gap-5">
  {/* Threads 로고 */}
- <div className="w-14 h-14 md:w-16 md:h-16 rounded-2xl bg-white/10 ring-1 ring-white/20 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] flex items-center justify-center flex-shrink-0">
+ <div className="w-14 h-14 md:w-16 md:h-16 rounded-[10px] bg-white/10 ring-1 ring-white/20 shadow-[0_8px_24px_-8px_rgba(0,0,0,0.4)] flex items-center justify-center flex-shrink-0">
  <svg viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg" className="w-8 h-8 md:w-9 md:h-9">
  <path fill="white" d="M141.537 88.988c-.827-.396-1.667-.778-2.518-1.143-1.482-27.307-16.403-42.94-41.457-43.1h-.315c-14.986 0-27.317 6.397-34.563 17.849l13.138 8.945c5.449-8.146 13.998-10.192 21.437-10.192h.3c8.44.05 14.844 2.548 18.991 7.448 3.026 3.575 5.035 8.502 6.011 14.682-7.542-1.281-15.694-1.661-24.367-1.21-24.873 1.29-40.236 16.053-39.196 36.161.527 10.125 5.47 18.746 13.948 24.368 7.181 4.834 16.574 7.207 26.337 6.682 12.98-.7 23.328-5.625 30.498-14.593 5.49-7.038 8.85-16.25 10.11-27.808 5.089 3.097 8.863 7.375 10.799 12.775 3.323 9.467 3.486 25.074-7.189 35.726-9.342 9.317-20.645 13.533-38.734 13.663-19.99-.13-35.495-6.18-45.704-17.987-9.694-11.352-14.7-27.769-14.884-47.796.185-20.027 5.19-36.444 14.884-47.796 10.21-11.808 25.714-17.857 45.704-17.987 20.204.13 35.856 6.211 46.217 18.252 5.038 5.85 8.921 13.439 11.573 22.593l13.695-3.848c-3.218-10.914-8.274-20.167-15.111-27.454-13-14.322-31.472-21.695-56.294-21.916h-.173c-24.733.22-43.069 7.621-55.9 22.08-11.435 12.79-17.373 31.048-17.58 54.361v1.731c.207 23.313 6.145 41.571 17.58 54.362 12.831 14.458 31.167 21.86 55.9 22.08h.173c22.42-.2 39.362-6.624 50.794-19.056 14.533-15.787 14.06-36.142 9.44-49.123-3.323-9.298-10.006-16.89-19.443-21.855zm-45.56 43.777c-11.444 0-21.324-5.566-21.903-14.395-.393-6.767 3.367-12.63 10.354-15.467.27-.107.539-.21.81-.305 5.657-2.04 12.609-2.327 20.18-.812.278.055.552.118.821.189.3 4.213.37 8.656.2 13.247-.484 13.011-4.473 17.543-10.462 17.543z"/>
  </svg>
  </div>
  <div className="flex-1 min-w-0">
- <h1 className="text-[22px] md:text-[28px] font-black tracking-tight text-white leading-tight">스레드 자동 발행</h1>
+ <h1 className="text-[22px] md:text-[28px] font-semibold tracking-tight text-white leading-tight">스레드 자동 발행</h1>
  <p className="text-white/75 text-[12px] md:text-sm mt-1.5 leading-relaxed">즉시 발행 또는 예약 발행 · 카드뉴스 해시태그 자동 연동</p>
  </div>
  <div className="hidden md:flex items-center gap-1.5 text-[11px] font-bold text-white/90 bg-white/10 border border-white/20 px-3 py-1.5 rounded-full flex-shrink-0">
@@ -1385,13 +1385,13 @@ function ThreadsPageContent() {
 
  <main className="flex-1 max-w-6xl mx-auto w-full px-4 md:px-6 py-6 pb-20">
  {connectedParam === '1' && (
- <div className="bg-[#ECFDF5] border border-[#A7F3D0] rounded-2xl p-4 flex items-center gap-3 mb-6">
+ <div className="bg-[#ECFDF5] border border-[#A7F3D0] rounded-[10px] p-4 flex items-center gap-3 mb-6">
  <CheckCircle2 size={18} className="text-[#059669]" strokeWidth={2.5} />
  <p className="text-sm font-medium text-[#059669]">Threads 계정이 성공적으로 연결되었습니다.</p>
  </div>
  )}
  {errorParam && (
- <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-2xl p-4 mb-6">
+ <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[10px] p-4 mb-6">
  <p className="text-sm font-semibold text-[#E11D48] mb-1">
  연결 오류: {errorParam}
  </p>
@@ -1405,7 +1405,7 @@ function ThreadsPageContent() {
  {account && <div className="mb-5"><AccountStatus info={account} /></div>}
 
  {/* 탭 바 */}
- <div className="flex border-b border-[#E5E8EB] mb-6">
+ <div className="flex border-b border-[var(--lu-line)] mb-6">
  {tabs.map(t => (
  <button
  key={t.key}
@@ -1434,7 +1434,7 @@ function ThreadsPageContent() {
 
 export default function ThreadsPage() {
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
  <div className="md:ml-[220px] flex flex-col min-h-screen">
  <Suspense>

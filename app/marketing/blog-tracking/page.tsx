@@ -102,12 +102,12 @@ type CronStatus = {
 function rankBadgeStyle(rank: number | null): { label: string; cls: string; desc: string } {
  if (rank === null) return {
  label: '미노출',
- cls: 'bg-[#F2F4F6] text-[#8B95A1] border-[#E5E8EB]',
+ cls: 'bg-[var(--lu-canvas)] text-[var(--lu-muted)] border-[var(--lu-line)]',
  desc: '아직 인기글에 잡히지 않음',
  }
  if (rank <= 3) return { label: `${rank}위`, cls: 'bg-[#03C75A] text-white border-[#03C75A]', desc: 'TOP3 · 최상위' }
  if (rank <= 10) return { label: `${rank}위`, cls: 'bg-[#E8F6EA] text-[#03C75A] border-[#C7E9CE]', desc: 'TOP10 · 상위권' }
- if (rank <= 30) return { label: `${rank}위`, cls: 'bg-[#E8F1FE] text-[#3182F6] border-[#CFDFFC]', desc: '중상위' }
+ if (rank <= 30) return { label: `${rank}위`, cls: 'bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] border-[#CFDFFC]', desc: '중상위' }
  return { label: `${rank}위`, cls: 'bg-[#FEF9E8] text-[#F5A623] border-[#FCEBC0]', desc: '중하위' }
 }
 
@@ -346,7 +346,7 @@ export default function BlogTrackingPage() {
  // 렌더
  // ─────────────────────────────────────────────────────
  return (
- <div className="min-h-screen bg-[#F8F9FA] flex">
+ <div className="min-h-screen bg-[var(--lu-canvas)] flex">
  <Sidebar />
  <main className="flex-1 ml-0 md:ml-[220px] pt-4 md:pt-0 min-w-0">
  <PageHeader
@@ -358,22 +358,22 @@ export default function BlogTrackingPage() {
 
  <div className="max-w-5xl mx-auto pt-6 pb-20 px-4 md:px-8">
  {/* 브레드크럼 */}
- <div className="flex items-center gap-2 text-xs text-[#8B95A1] mb-4">
- <Link href="/marketing" className="hover:text-[#191F28]">마케팅 관리</Link>
+ <div className="flex items-center gap-2 text-xs text-[var(--lu-muted)] mb-4">
+ <Link href="/marketing" className="hover:text-[var(--lu-ink)]">마케팅 관리</Link>
  <ArrowRight size={12} />
- <span className="text-[#3182F6] font-medium">블로그 순위 추적</span>
+ <span className="text-[var(--lu-accent)] font-medium">블로그 순위 추적</span>
  </div>
 
  {/* 상단 타이틀 블록 */}
  <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
  <div>
- <h1 className="text-2xl md:text-3xl font-bold text-[#191F28] flex items-center gap-2">
- <span className="inline-flex items-center justify-center w-9 h-9 rounded-xl bg-gradient-to-br from-[#3182F6] to-[#1B64DA] text-white">
+ <h1 className="text-2xl md:text-3xl font-bold text-[var(--lu-ink)] flex items-center gap-2">
+ <span className="inline-flex items-center justify-center w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] text-white">
  <TrendingUp size={18} />
  </span>
  블로그 순위 추적
  </h1>
- <p className="text-sm text-[#4E5968] mt-1.5">
+ <p className="text-sm text-[var(--lu-muted)] mt-1.5">
  체험단 글·블로그 포스팅 URL과 검색 키워드를 등록하면, <b>네이버 모바일 인기글 몇 위</b>인지 자동으로 체크합니다.
  </p>
  </div>
@@ -381,10 +381,10 @@ export default function BlogTrackingPage() {
  <button
  onClick={() => setShowTable(v => !v)}
  disabled={!targets.length}
- className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border text-sm font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed ${
+ className={`inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] border text-sm font-semibold transition disabled:opacity-40 disabled:cursor-not-allowed ${
  showTable
- ? 'bg-[#3182F6] border-[#3182F6] text-white hover:bg-[#1B64DA]'
- : 'bg-white border-[#E5E8EB] text-[#4E5968] hover:text-[#191F28] hover:border-[#3182F6]'
+ ? 'bg-[var(--lu-accent)] border-[var(--lu-accent)] text-white hover:bg-[var(--lu-accent-hover)]'
+ : 'bg-white border-[var(--lu-line)] text-[var(--lu-muted)] hover:text-[var(--lu-ink)] hover:border-[var(--lu-accent)]'
  }`}
  title="기간별 순위 변동을 표·스파크라인으로 보기"
  >
@@ -394,14 +394,14 @@ export default function BlogTrackingPage() {
  <button
  onClick={handleCheckAll}
  disabled={bulkChecking || !targets.length}
- className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl border border-[#E5E8EB] bg-white text-sm font-semibold text-[#4E5968] hover:text-[#191F28] hover:border-[#3182F6] disabled:opacity-40 disabled:cursor-not-allowed transition"
+ className="min-h-11 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] border border-[var(--lu-line)] bg-white text-sm font-semibold text-[var(--lu-muted)] hover:text-[var(--lu-ink)] hover:border-[var(--lu-accent)] disabled:opacity-40 disabled:cursor-not-allowed transition"
  >
  {bulkChecking ? <Loader2 size={14} className="animate-spin" /> : <RefreshCw size={14} />}
  전체 순위 갱신
  </button>
  <button
  onClick={() => setFormOpen(v => !v)}
- className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#3182F6] hover:bg-[#1B64DA] text-white text-sm font-semibold transition"
+ className="min-h-11 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-[6px] bg-[var(--lu-accent)] hover:bg-[var(--lu-accent-hover)] text-white text-sm font-semibold transition"
  >
  <Plus size={14} strokeWidth={2.5} />
  새 타겟 등록
@@ -410,23 +410,23 @@ export default function BlogTrackingPage() {
  </div>
 
  {/* 블로그 TOP5 조회 섹션 */}
- <div className="bg-white rounded-2xl border border-[#E5E8EB] shadow-sm mb-4">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] shadow-none mb-4">
  <button
  onClick={() => setTop5Open(v => !v)}
- className="w-full flex items-center justify-between px-5 py-4 text-left"
+ className="min-h-11 w-full flex items-center justify-between px-5 py-4 text-left"
  >
  <div className="flex items-center gap-2">
  <span className="w-7 h-7 rounded-lg bg-[#03C75A] flex items-center justify-center text-white text-xs font-bold flex-shrink-0">N</span>
- <span className="text-sm font-bold text-[#191F28]">블로그 TOP5 조회</span>
- <span className="text-[11px] text-[#8B95A1] hidden sm:inline">키워드로 네이버 상위 블로그 5개 확인</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">블로그 TOP5 조회</span>
+ <span className="text-[11px] text-[var(--lu-muted)] hidden sm:inline">키워드로 네이버 상위 블로그 5개 확인</span>
  </div>
- <span className={"text-xs text-[#8B95A1] transition-transform " + (top5Open ? 'rotate-180' : '')}>▾</span>
+ <span className={"text-xs text-[var(--lu-muted)] transition-transform " + (top5Open ? 'rotate-180' : '')}>▾</span>
  </button>
  {top5Open && (
- <div className="px-5 pb-5 space-y-4 border-t border-[#F2F4F6] pt-4">
+ <div className="px-5 pb-5 space-y-4 border-t border-[var(--lu-canvas)] pt-4">
  <div className="flex gap-2">
  <input
- className="flex-1 border border-[#E5E8EB] rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:border-[#03C75A]"
+ className="min-h-11 flex-1 border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[#03C75A]"
  placeholder="예: 부천맛집"
  value={top5Input}
  onChange={e => setTop5Input(e.target.value)}
@@ -435,19 +435,19 @@ export default function BlogTrackingPage() {
  <button
  onClick={fetchTop5}
  disabled={top5Loading || !top5Input.trim()}
- className="px-5 py-2.5 bg-[#03C75A] text-white rounded-xl text-sm font-semibold disabled:opacity-40 hover:bg-[#02B350] transition-colors"
+ className="min-h-11 px-5 py-2.5 bg-[#03C75A] text-white rounded-[6px] text-sm font-semibold disabled:opacity-40 hover:bg-[#02B350] transition-colors"
  >
  {top5Loading ? '조회 중…' : '조회'}
  </button>
  </div>
 
  {top5Error && (
- <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 text-sm text-[#E11D48]">{top5Error}</div>
+ <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-[6px] p-3 text-sm text-[#E11D48]">{top5Error}</div>
  )}
 
  {top5Data.length > 0 && (
  <div className="space-y-2.5">
- <p className="text-xs text-[#8B95A1]">
+ <p className="text-xs text-[var(--lu-muted)]">
  <span className="font-bold text-[#03C75A]">[{top5Keyword}]</span> 네이버 블로그 상위 노출 결과 (관련도순)
  </p>
  {top5Data.map(item => (
@@ -456,14 +456,14 @@ export default function BlogTrackingPage() {
  href={item.link}
  target="_blank"
  rel="noopener noreferrer"
- className="flex items-start gap-3 p-3.5 rounded-xl border border-[#E5E8EB] hover:border-[#03C75A] hover:bg-[#F0FDF4] transition-all group"
+ className="flex items-start gap-3 p-3.5 rounded-[6px] border border-[var(--lu-line)] hover:border-[#03C75A] hover:bg-[#F0FDF4] transition-all group"
  >
- <div className={"w-7 h-7 rounded-full flex items-center justify-center text-sm font-black flex-shrink-0 " + (item.rank === 1 ? 'bg-[#03C75A] text-white' : item.rank <= 3 ? 'bg-[#ECFDF5] text-[#03C75A]' : 'bg-[#F2F4F6] text-[#8B95A1]')}>
+ <div className={"w-7 h-7 rounded-full flex items-center justify-center text-sm font-semibold flex-shrink-0 " + (item.rank === 1 ? 'bg-[#03C75A] text-white' : item.rank <= 3 ? 'bg-[#ECFDF5] text-[#03C75A]' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]')}>
  {item.rank}
  </div>
  <div className="min-w-0 flex-1">
- <p className="text-sm font-semibold text-[#191F28] group-hover:text-[#03C75A] truncate">{item.title}</p>
- <p className="text-[11px] text-[#8B95A1] mt-0.5 line-clamp-1">{item.description}</p>
+ <p className="text-sm font-semibold text-[var(--lu-ink)] group-hover:text-[#03C75A] truncate">{item.title}</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mt-0.5 line-clamp-1">{item.description}</p>
  <p className="text-[10px] text-[#B0B8C1] mt-1">{item.bloggername} · {item.postdate ? item.postdate.replace(/(\d{4})(\d{2})(\d{2})/, '$1.$2.$3') : ''}</p>
  </div>
  <ExternalLink size={13} className="text-[#B0B8C1] group-hover:text-[#03C75A] flex-shrink-0 mt-1" />
@@ -493,9 +493,9 @@ export default function BlogTrackingPage() {
 
  {/* 자동 체크 상태 카드 (18차-3) */}
  {cron?.enabled && (
- <div className="bg-gradient-to-br from-[#0B1F3B] via-[#1B3B8A] to-[#3182F6] text-white rounded-2xl p-5 mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-[0_8px_32px_-8px_rgba(49,130,246,0.4)]">
+ <div className="bg-[var(--lu-accent)] text-white rounded-[10px] p-5 mb-4 flex flex-col sm:flex-row items-start sm:items-center gap-4 shadow-[0_8px_32px_-8px_rgba(49,130,246,0.4)]">
  <div className="flex items-center gap-3 flex-1 min-w-0">
- <div className="w-11 h-11 rounded-xl bg-white/15 flex items-center justify-center flex-shrink-0 relative">
+ <div className="w-11 h-11 rounded-[6px] bg-white/15 flex items-center justify-center flex-shrink-0 relative">
  <Activity size={20} className="text-white" />
  <span className="absolute -top-0.5 -right-0.5 w-3 h-3 rounded-full bg-[#03C75A] border-2 border-[#0B1F3B] animate-pulse" />
  </div>
@@ -534,8 +534,8 @@ export default function BlogTrackingPage() {
  )}
 
  {/* 안내 인포박스 */}
- <div className="bg-[#EFF6FF] border border-[#DBEAFE] rounded-2xl p-4 mb-6 flex gap-3">
- <Search size={18} className="text-[#3182F6] flex-shrink-0 mt-0.5" />
+ <div className="bg-[var(--lu-accent-soft)] border border-[#DBEAFE] rounded-[10px] p-4 mb-6 flex gap-3">
+ <Search size={18} className="text-[var(--lu-accent)] flex-shrink-0 mt-0.5" />
  <div className="text-[13px] text-[#1E40AF] leading-relaxed">
  <b>조회 기준</b>: 네이버 모바일 통합검색 <b>인기글</b> 영역에서 해당 블로그 글의 노출 순위를 찾습니다.
  블로그탭이나 PC 검색과 다를 수 있으며, 인기글에 잡히지 않으면 <b>미노출</b>로 기록됩니다.
@@ -545,7 +545,7 @@ export default function BlogTrackingPage() {
 
  {/* 에러 메시지 */}
  {error && (
- <div className="mb-4 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] rounded-xl p-3 text-sm flex items-start gap-2">
+ <div className="mb-4 bg-[#FEF2F2] border border-[#FECACA] text-[#DC2626] rounded-[6px] p-3 text-sm flex items-start gap-2">
  <AlertCircle size={16} className="flex-shrink-0 mt-0.5" />
  <span>{error}</span>
  </div>
@@ -555,69 +555,69 @@ export default function BlogTrackingPage() {
  {formOpen && (
  <form
  onSubmit={handleCreate}
- className="bg-white border border-[#E5E8EB] rounded-2xl p-5 md:p-6 mb-6 shadow-sm"
+ className="bg-white border border-[var(--lu-line)] rounded-[10px] p-5 md:p-6 mb-6 shadow-none"
  >
- <h3 className="text-base font-bold text-[#191F28] mb-4 flex items-center gap-2">
- <Plus size={16} className="text-[#3182F6]" />
+ <h3 className="text-base font-bold text-[var(--lu-ink)] mb-4 flex items-center gap-2">
+ <Plus size={16} className="text-[var(--lu-accent)]" />
  새 블로그 타겟 등록
  </h3>
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
  <div>
- <label className="block text-xs font-semibold text-[#4E5968] mb-1.5">라벨 *</label>
+ <label className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">라벨 *</label>
  <input
  type="text"
  value={fLabel}
  onChange={e => setFLabel(e.target.value)}
  placeholder="예) 4월 강남 식당 체험단 1번"
- className="w-full px-3 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3182F6] focus:border-transparent"
+ className="min-h-11 w-full px-3 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[var(--lu-accent)] focus:border-transparent"
  maxLength={60}
  required
  />
  </div>
  <div>
- <label className="block text-xs font-semibold text-[#4E5968] mb-1.5">검색 키워드 *</label>
+ <label className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">검색 키워드 *</label>
  <input
  type="text"
  value={fKeyword}
  onChange={e => setFKeyword(e.target.value)}
  placeholder="예) 강남 맛집"
- className="w-full px-3 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3182F6] focus:border-transparent"
+ className="min-h-11 w-full px-3 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[var(--lu-accent)] focus:border-transparent"
  maxLength={80}
  required
  />
  </div>
  </div>
  <div className="mb-3">
- <label className="block text-xs font-semibold text-[#4E5968] mb-1.5">블로그 글 URL *</label>
+ <label className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">블로그 글 URL *</label>
  <input
  type="url"
  value={fUrl}
  onChange={e => setFUrl(e.target.value)}
  placeholder="https://blog.naver.com/blogId/postId"
- className="w-full px-3 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3182F6] focus:border-transparent font-mono"
+ className="min-h-11 w-full px-3 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[var(--lu-accent)] focus:border-transparent font-mono"
  required
  />
- <p className="text-[11px] text-[#8B95A1] mt-1">
+ <p className="text-[11px] text-[var(--lu-muted)] mt-1">
  네이버 블로그 글 주소 · blog.naver.com/아이디/글번호 형태
  </p>
  </div>
  <div className="mb-4">
- <label className="block text-xs font-semibold text-[#4E5968] mb-1.5">메모 (선택)</label>
+ <label className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">메모 (선택)</label>
  <input
  type="text"
  value={fMemo}
  onChange={e => setFMemo(e.target.value)}
  placeholder="예) 체험단, 광고, 사장님 직접 작성"
- className="w-full px-3 py-2 border border-[#E5E8EB] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#3182F6] focus:border-transparent"
+ className="min-h-11 w-full px-3 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-[var(--lu-accent)] focus:border-transparent"
  maxLength={120}
  />
  </div>
- <label className="flex items-center gap-2 mb-4 text-sm text-[#4E5968] cursor-pointer select-none">
+ <label className="flex items-center gap-2 mb-4 text-sm text-[var(--lu-muted)] cursor-pointer select-none">
  <input
  type="checkbox"
  checked={fCheckNow}
  onChange={e => setFCheckNow(e.target.checked)}
- className="w-4 h-4 rounded accent-[#3182F6]"
+ className="min-h-11 w-4 h-4 rounded accent-[var(--lu-accent)]"
  />
  등록과 동시에 바로 1회 순위 체크
  </label>
@@ -625,7 +625,7 @@ export default function BlogTrackingPage() {
  <button
  type="submit"
  disabled={submitting}
- className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#3182F6] hover:bg-[#1B64DA] text-white text-sm font-bold transition disabled:opacity-50"
+ className="min-h-11 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-[6px] bg-[var(--lu-accent)] hover:bg-[var(--lu-accent-hover)] text-white text-sm font-bold transition disabled:opacity-50"
  >
  {submitting ? <Loader2 size={14} className="animate-spin" /> : <Plus size={14} strokeWidth={2.5} />}
  {submitting ? '등록 중…' : '등록하기'}
@@ -633,7 +633,7 @@ export default function BlogTrackingPage() {
  <button
  type="button"
  onClick={() => setFormOpen(false)}
- className="px-4 py-2.5 rounded-xl border border-[#E5E8EB] text-sm font-semibold text-[#4E5968] hover:bg-[#F2F4F6] transition"
+ className="min-h-11 px-4 py-2.5 rounded-[6px] border border-[var(--lu-line)] text-sm font-semibold text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)] transition"
  >
  취소
  </button>
@@ -645,10 +645,10 @@ export default function BlogTrackingPage() {
  {loading ? (
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
  {[0, 1, 2, 3].map(i => (
- <div key={i} className="bg-white border border-[#E5E8EB] rounded-2xl p-5 animate-pulse">
- <div className="h-4 w-32 bg-[#F2F4F6] rounded mb-2" />
- <div className="h-3 w-24 bg-[#F2F4F6] rounded mb-4" />
- <div className="h-10 w-20 bg-[#F2F4F6] rounded" />
+ <div key={i} className="bg-white border border-[var(--lu-line)] rounded-[10px] p-5 animate-pulse">
+ <div className="h-4 w-32 bg-[var(--lu-canvas)] rounded mb-2" />
+ <div className="h-3 w-24 bg-[var(--lu-canvas)] rounded mb-4" />
+ <div className="h-10 w-20 bg-[var(--lu-canvas)] rounded" />
  </div>
  ))}
  </div>
@@ -677,17 +677,17 @@ export default function BlogTrackingPage() {
  return (
  <div
  key={t.target_id}
- className="bg-white border border-[#E5E8EB] rounded-2xl p-5 hover:shadow-sm transition"
+ className="bg-white border border-[var(--lu-line)] rounded-[10px] p-5 hover:shadow-none transition"
  >
  {/* 라벨 + 삭제 */}
  <div className="flex items-start justify-between gap-2 mb-2">
- <h4 className="text-[15px] font-bold text-[#191F28] break-keep line-clamp-2">
+ <h4 className="text-[15px] font-bold text-[var(--lu-ink)] break-keep line-clamp-2">
  {t.label}
  </h4>
  <button
  onClick={() => handleDelete(t.target_id, t.label)}
  aria-label="삭제"
- className="flex-shrink-0 w-7 h-7 rounded-lg text-[#8B95A1] hover:bg-[#FEF2F2] hover:text-[#DC2626] transition flex items-center justify-center"
+ className="min-h-11 flex-shrink-0 w-7 h-7 rounded-lg text-[var(--lu-muted)] hover:bg-[#FEF2F2] hover:text-[#DC2626] transition flex items-center justify-center"
  >
  <Trash2 size={14} />
  </button>
@@ -695,28 +695,28 @@ export default function BlogTrackingPage() {
 
  {/* 키워드 */}
  <div className="flex items-center gap-1 mb-3">
- <Search size={12} className="text-[#8B95A1] flex-shrink-0" />
- <span className="text-[12px] font-semibold text-[#4E5968] truncate">
+ <Search size={12} className="text-[var(--lu-muted)] flex-shrink-0" />
+ <span className="text-[12px] font-semibold text-[var(--lu-muted)] truncate">
  {t.keyword}
  </span>
  </div>
 
  {/* 순위 뱃지 + 세부 */}
  <div className="flex items-center gap-3 mb-3">
- <div className={`inline-flex flex-col items-center justify-center min-w-[72px] py-2 px-3 rounded-xl border ${badge.cls}`}>
- <span className="text-lg font-black leading-none">{badge.label}</span>
+ <div className={`inline-flex flex-col items-center justify-center min-w-[72px] py-2 px-3 rounded-[6px] border ${badge.cls}`}>
+ <span className="text-lg font-semibold leading-none">{badge.label}</span>
  </div>
  <div className="flex-1 min-w-0">
- <div className="text-[11px] text-[#8B95A1] mb-0.5">
+ <div className="text-[11px] text-[var(--lu-muted)] mb-0.5">
  {bestHit
  ? <>
- <b className="text-[#191F28]">{bestHit.block_title}</b>
+ <b className="text-[var(--lu-ink)]">{bestHit.block_title}</b>
  <span className="mx-1">·</span>
  {bestHit.type === 'blog_tab' ? '블로그탭' : '스마트블록'}
  </>
  : badge.desc}
  </div>
- <div className="flex items-center gap-1 text-[11px] text-[#8B95A1]">
+ <div className="flex items-center gap-1 text-[11px] text-[var(--lu-muted)]">
  <Clock size={10} />
  <span>{formatDateTime(t.last_checked_at)}</span>
  </div>
@@ -731,7 +731,7 @@ export default function BlogTrackingPage() {
  href={t.target_url}
  target="_blank"
  rel="noreferrer"
- className="inline-flex items-center gap-1 text-[11px] text-[#3182F6] hover:underline mb-3 max-w-full truncate"
+ className="inline-flex items-center gap-1 text-[11px] text-[var(--lu-accent)] hover:underline mb-3 max-w-full truncate"
  >
  <LinkIcon size={10} />
  <span className="truncate">{shortenUrl(t.target_url)}</span>
@@ -743,14 +743,14 @@ export default function BlogTrackingPage() {
  <button
  onClick={() => handleCheckOne(t.target_id)}
  disabled={checking || bulkChecking}
- className="flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-2 rounded-lg bg-[#F2F4F6] hover:bg-[#E5E8EB] text-[#4E5968] text-[12px] font-semibold transition disabled:opacity-50"
+ className="min-h-11 flex-1 inline-flex items-center justify-center gap-1 px-2.5 py-2 rounded-lg bg-[var(--lu-canvas)] hover:bg-[var(--lu-line)] text-[var(--lu-muted)] text-[12px] font-semibold transition disabled:opacity-50"
  >
  {checking ? <Loader2 size={12} className="animate-spin" /> : <RefreshCw size={12} />}
  지금 확인
  </button>
  <button
  onClick={() => toggleExpand(t.target_id)}
- className="inline-flex items-center justify-center gap-1 px-2.5 py-2 rounded-lg bg-[#F2F4F6] hover:bg-[#E5E8EB] text-[#4E5968] text-[12px] font-semibold transition"
+ className="min-h-11 inline-flex items-center justify-center gap-1 px-2.5 py-2 rounded-lg bg-[var(--lu-canvas)] hover:bg-[var(--lu-line)] text-[var(--lu-muted)] text-[12px] font-semibold transition"
  >
  <Activity size={12} />
  이력
@@ -760,9 +760,9 @@ export default function BlogTrackingPage() {
 
  {/* 이력 (펼치면) */}
  {expanded && (
- <div className="mt-4 pt-4 border-t border-[#E5E8EB]">
+ <div className="mt-4 pt-4 border-t border-[var(--lu-line)]">
  {history.length === 0 ? (
- <div className="text-[11px] text-[#8B95A1] text-center py-4">
+ <div className="text-[11px] text-[var(--lu-muted)] text-center py-4">
  아직 체크 이력이 없습니다.
  </div>
  ) : (
@@ -784,19 +784,19 @@ export default function BlogTrackingPage() {
  <div className="flex items-center gap-1.5 min-w-0">
  <span className={
  isCron
- ? 'px-1.5 py-0.5 rounded-md bg-[#E8F1FE] text-[#3182F6] font-bold text-[10px] border border-[#CFDFFC]'
- : 'px-1.5 py-0.5 rounded-md bg-[#F2F4F6] text-[#4E5968] font-bold text-[10px] border border-[#E5E8EB]'
+ ? 'px-1.5 py-0.5 rounded-md bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] font-bold text-[10px] border border-[#CFDFFC]'
+ : 'px-1.5 py-0.5 rounded-md bg-[var(--lu-canvas)] text-[var(--lu-muted)] font-bold text-[10px] border border-[var(--lu-line)]'
  } title={isCron ? '자동 일일 체크' : '사용자 수동 체크'}>
  {isCron ? '자동' : '수동'}
  </span>
- <span className="text-[#8B95A1] truncate">{formatDateTime(h.checked_at)}</span>
+ <span className="text-[var(--lu-muted)] truncate">{formatDateTime(h.checked_at)}</span>
  {hitCount > 1 && (
  <span className="px-1.5 py-0.5 rounded-md bg-[#E8F6EA] text-[#03C75A] font-bold text-[10px] border border-[#C7E9CE]">
  {hitCount}곳
  </span>
  )}
  </div>
- <span className={`font-bold flex-shrink-0 ${h.rank === null ? 'text-[#8B95A1]' : 'text-[#191F28]'}`}>
+ <span className={`font-bold flex-shrink-0 ${h.rank === null ? 'text-[var(--lu-muted)]' : 'text-[var(--lu-ink)]'}`}>
  {h.rank === null ? '미노출' : `${h.rank}위`}
  </span>
  </div>
@@ -824,20 +824,20 @@ export default function BlogTrackingPage() {
 // ─────────────────────────────────────────────────────────────
 function EmptyState({ onCreate }: { onCreate: () => void }) {
  return (
- <div className="bg-white border border-[#E5E8EB] rounded-2xl p-10 text-center">
- <div className="w-14 h-14 rounded-2xl bg-[#EFF6FF] text-[#3182F6] mx-auto flex items-center justify-center mb-4">
+ <div className="bg-white border border-[var(--lu-line)] rounded-[10px] p-10 text-center">
+ <div className="w-14 h-14 rounded-[10px] bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] mx-auto flex items-center justify-center mb-4">
  <Eye size={24} />
  </div>
- <h3 className="text-base font-bold text-[#191F28] mb-1.5">
+ <h3 className="text-base font-bold text-[var(--lu-ink)] mb-1.5">
  추적 중인 블로그 글이 없습니다
  </h3>
- <p className="text-[13px] text-[#8B95A1] mb-5 leading-relaxed">
+ <p className="text-[13px] text-[var(--lu-muted)] mb-5 leading-relaxed">
  체험단이 쓴 글이나 사장님이 직접 쓴 블로그 포스팅을 등록하면,<br />
  네이버 인기글에서 몇 위에 있는지 자동으로 확인해드려요.
  </p>
  <button
  onClick={onCreate}
- className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-xl bg-[#3182F6] hover:bg-[#1B64DA] text-white text-sm font-bold transition"
+ className="min-h-11 inline-flex items-center gap-1.5 px-4 py-2.5 rounded-[6px] bg-[var(--lu-accent)] hover:bg-[var(--lu-accent-hover)] text-white text-sm font-bold transition"
  >
  <Plus size={14} strokeWidth={2.5} />
  첫 타겟 등록하기
@@ -879,17 +879,17 @@ function Sparkline({ history }: { history: HistoryPoint[] }) {
  .join(' ')
 
  return (
- <div className="bg-[#F8F9FB] rounded-xl p-3">
+ <div className="bg-[#F8F9FB] rounded-[6px] p-3">
  <div className="flex items-center justify-between mb-1.5">
- <span className="text-[10px] font-semibold text-[#8B95A1]">최근 순위 변화</span>
- <span className="text-[10px] text-[#8B95A1]">{data.length}회 체크</span>
+ <span className="text-[10px] font-semibold text-[var(--lu-muted)]">최근 순위 변화</span>
+ <span className="text-[10px] text-[var(--lu-muted)]">{data.length}회 체크</span>
  </div>
  <svg width="100%" viewBox={`0 0 ${W} ${H}`} preserveAspectRatio="none" className="block">
  {/* 10위 기준선 */}
  <line x1={PAD} x2={W - PAD} y1={yOf(10)} y2={yOf(10)} stroke="#CFDFFC" strokeDasharray="2 3" strokeWidth="1" />
  {/* 추이 선 */}
  {polyline && (
- <polyline points={polyline} fill="none" stroke="#3182F6" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
+ <polyline points={polyline} fill="none" stroke="#16685D" strokeWidth="2" strokeLinejoin="round" strokeLinecap="round" />
  )}
  {/* 점 */}
  {pts.map((p, i) => (
@@ -898,13 +898,13 @@ function Sparkline({ history }: { history: HistoryPoint[] }) {
  cx={p.x}
  cy={p.y}
  r={p.rank === null ? 2.5 : 3}
- fill={p.rank === null ? '#CBD5E1' : (p.rank <= 10 ? '#03C75A' : p.rank <= 30 ? '#3182F6' : '#F5A623')}
+ fill={p.rank === null ? '#CBD5E1' : (p.rank <= 10 ? '#03C75A' : p.rank <= 30 ? '#16685D' : '#F5A623')}
  />
  ))}
  </svg>
- <div className="flex items-center gap-3 mt-1 text-[9px] text-[#8B95A1]">
+ <div className="flex items-center gap-3 mt-1 text-[9px] text-[var(--lu-muted)]">
  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#03C75A]" /> TOP10</span>
- <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#3182F6]" /> 11~30</span>
+ <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[var(--lu-accent)]" /> 11~30</span>
  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#F5A623]" /> 31~50</span>
  <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#CBD5E1]" /> 미노출</span>
  </div>
@@ -938,11 +938,11 @@ function BlockHitsSummary({
  className={
  hit
  ? 'inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10.5px] font-semibold bg-[#E8F6EA] text-[#03874D] border border-[#C7E9CE]'
- : 'inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10.5px] font-medium bg-[#F2F4F6] text-[#8B95A1] border border-[#E5E8EB]'
+ : 'inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10.5px] font-medium bg-[var(--lu-canvas)] text-[var(--lu-muted)] border border-[var(--lu-line)]'
  }
  >
  <span className="truncate max-w-[140px]">{b.block_title}</span>
- <span className={hit ? 'font-black' : ''}>
+ <span className={hit ? 'font-semibold' : ''}>
  {hit ? `${b.my_rank}위` : '-'}
  </span>
  </span>
@@ -953,12 +953,12 @@ function BlockHitsSummary({
  title={`블로그 탭 상위 ${blogTab.items}건 중 ${blogTab.my_rank !== null ? blogTab.my_rank + '위' : '미노출'}`}
  className={
  blogTab.my_rank !== null
- ? 'inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10.5px] font-semibold bg-[#E8F1FE] text-[#1B64DA] border border-[#CFDFFC]'
- : 'inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10.5px] font-medium bg-[#F2F4F6] text-[#8B95A1] border border-[#E5E8EB]'
+ ? 'inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10.5px] font-semibold bg-[var(--lu-accent-soft)] text-[var(--lu-accent-hover)] border border-[#CFDFFC]'
+ : 'inline-flex items-center gap-1 px-2 py-1 rounded-md text-[10.5px] font-medium bg-[var(--lu-canvas)] text-[var(--lu-muted)] border border-[var(--lu-line)]'
  }
  >
  블로그탭
- <span className={blogTab.my_rank !== null ? 'font-black' : ''}>
+ <span className={blogTab.my_rank !== null ? 'font-semibold' : ''}>
  {blogTab.my_rank !== null ? `${blogTab.my_rank}위` : '-'}
  </span>
  </span>
@@ -983,12 +983,12 @@ function BlockSnapshotDetail({ history }: { history: HistoryPoint[] }) {
  if (smartBlocks.length === 0 && (!blogTab || !blogTab.checked)) return null
 
  return (
- <div className="bg-gradient-to-br from-[#F8F9FB] to-[#EFF6FF] border border-[#E5E8EB] rounded-xl p-3 mb-3">
+ <div className="bg-[var(--lu-accent)] border border-[var(--lu-line)] rounded-[6px] p-3 mb-3">
  <div className="flex items-center justify-between mb-2">
- <span className="text-[10px] font-bold text-[#191F28] uppercase tracking-wider">
+ <span className="text-[10px] font-bold text-[var(--lu-ink)] uppercase tracking-wider">
  최신 스냅샷
  </span>
- <span className="text-[10px] text-[#8B95A1]">
+ <span className="text-[10px] text-[var(--lu-muted)]">
  {formatDateTime(latest.checked_at)}
  </span>
  </div>
@@ -999,27 +999,27 @@ function BlockSnapshotDetail({ history }: { history: HistoryPoint[] }) {
  <div
  key={b.block_id}
  className={`flex items-center justify-between gap-2 text-[11px] px-2 py-1.5 rounded-md ${
- hit ? 'bg-[#E8F6EA] border border-[#C7E9CE]' : 'bg-white border border-[#E5E8EB]'
+ hit ? 'bg-[#E8F6EA] border border-[#C7E9CE]' : 'bg-white border border-[var(--lu-line)]'
  }`}
  >
  <div className="flex items-center gap-1.5 min-w-0">
  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
  hit
  ? 'bg-[#03C75A] text-white'
- : 'bg-[#E5E8EB] text-[#8B95A1]'
+ : 'bg-[var(--lu-line)] text-[var(--lu-muted)]'
  }`}>
  {b.block_id.toUpperCase()}
  </span>
- <span className={`truncate ${hit ? 'font-bold text-[#191F28]' : 'text-[#4E5968]'}`}>
+ <span className={`truncate ${hit ? 'font-bold text-[var(--lu-ink)]' : 'text-[var(--lu-muted)]'}`}>
  {b.block_title}
  </span>
  </div>
- <div className="flex-shrink-0 text-[10px] text-[#8B95A1] flex items-center gap-1.5">
+ <div className="flex-shrink-0 text-[10px] text-[var(--lu-muted)] flex items-center gap-1.5">
  <span>총 {b.items}개</span>
  <span className={
  hit
- ? 'px-1.5 py-0.5 rounded bg-[#03C75A] text-white font-black text-[10px]'
- : 'text-[#8B95A1]'
+ ? 'px-1.5 py-0.5 rounded bg-[#03C75A] text-white font-semibold text-[10px]'
+ : 'text-[var(--lu-muted)]'
  }>
  {hit ? `${b.my_rank}위` : '미노출'}
  </span>
@@ -1031,27 +1031,27 @@ function BlockSnapshotDetail({ history }: { history: HistoryPoint[] }) {
  <div
  className={`flex items-center justify-between gap-2 text-[11px] px-2 py-1.5 rounded-md ${
  blogTab.my_rank !== null
- ? 'bg-[#E8F1FE] border border-[#CFDFFC]'
- : 'bg-white border border-[#E5E8EB]'
+ ? 'bg-[var(--lu-accent-soft)] border border-[#CFDFFC]'
+ : 'bg-white border border-[var(--lu-line)]'
  }`}
  >
  <div className="flex items-center gap-1.5 min-w-0">
  <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded ${
  blogTab.my_rank !== null
- ? 'bg-[#3182F6] text-white'
- : 'bg-[#E5E8EB] text-[#8B95A1]'
+ ? 'bg-[var(--lu-accent)] text-white'
+ : 'bg-[var(--lu-line)] text-[var(--lu-muted)]'
  }`}>
  블로그
  </span>
- <span className={`truncate ${blogTab.my_rank !== null ? 'font-bold text-[#191F28]' : 'text-[#4E5968]'}`}>
+ <span className={`truncate ${blogTab.my_rank !== null ? 'font-bold text-[var(--lu-ink)]' : 'text-[var(--lu-muted)]'}`}>
  블로그 탭 상위 {blogTab.items}건
  </span>
  </div>
  <div className="flex-shrink-0 text-[10px]">
  <span className={
  blogTab.my_rank !== null
- ? 'px-1.5 py-0.5 rounded bg-[#3182F6] text-white font-black text-[10px]'
- : 'text-[#8B95A1]'
+ ? 'px-1.5 py-0.5 rounded bg-[var(--lu-accent)] text-white font-semibold text-[10px]'
+ : 'text-[var(--lu-muted)]'
  }>
  {blogTab.my_rank !== null ? `${blogTab.my_rank}위` : '미노출'}
  </span>

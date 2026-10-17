@@ -51,7 +51,7 @@ const PRINCIPLES = [
 type FeatureItem = { Icon: LucideIcon; color: string; title: string; desc: string }
 const FEATURES: FeatureItem[] = [
  { Icon: MapPin, color: '#03C75A', title: '네이버 플레이스', desc: 'AI 상위노출·리뷰 자동 답글' },
- { Icon: PenLine, color: '#3182F6', title: '블로그·상세페이지', desc: '키워드 분석 기반 자동 생성' },
+ { Icon: PenLine, color: '#16685D', title: '블로그·상세페이지', desc: '키워드 분석 기반 자동 생성' },
  { Icon: Smartphone, color: '#7C3AED', title: '인스타·쇼츠', desc: '매장 사진 1장 → 릴스 자동 제작' },
  { Icon: MessageSquare, color: '#F59E0B', title: '리뷰 관리', desc: '배민·요기요·쿠팡이츠 통합' },
  { Icon: MapIcon, color: '#DC2626', title: '지도 최적화', desc: '카카오맵·구글맵 노출 자동화' },
@@ -86,38 +86,38 @@ export default function AboutPage() {
  const [openFaq, setOpenFaq] = useState<number | null>(0)
 
  return (
- <main className="min-h-screen bg-white text-[#191F28]">
+ <main className="min-h-screen bg-white text-[var(--lu-ink)]">
 
  {/* ═══════════════════════════════════════════════════════
  1. Hero
  ═══════════════════════════════════════════════════════ */}
- <section className="relative px-5 pt-24 pb-16 md:pt-32 md:pb-24 bg-gradient-to-b from-[#F5F9FF] to-white overflow-hidden">
+ <section className="relative px-5 pt-24 pb-16 md:pt-32 md:pb-24 bg-[var(--lu-accent)] overflow-hidden">
  <div className="absolute inset-0 opacity-[0.03] pointer-events-none select-none"
- style={{ backgroundImage: 'radial-gradient(circle at 20% 30%, #3182F6 0%, transparent 40%), radial-gradient(circle at 80% 70%, #1B64DA 0%, transparent 40%)' }}
+ style={{ backgroundImage: 'radial-gradient(circle at 20% 30%, #16685D 0%, transparent 40%), radial-gradient(circle at 80% 70%, #105448 0%, transparent 40%)' }}
  aria-hidden="true" />
  <div className="relative max-w-3xl mx-auto text-center">
- <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-[#D1E5FF] rounded-full text-xs font-semibold text-[#3182F6] mb-6 shadow-sm">
+ <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white border border-[#D1E5FF] rounded-full text-xs font-semibold text-[var(--lu-accent)] mb-6 shadow-none">
  <span>LOCALUTION · AI Marketing OS</span>
  </div>
- <h1 className="text-2xl sm:text-4xl md:text-5xl font-black leading-tight tracking-tight mb-5">
+ <h1 className="text-2xl sm:text-4xl md:text-5xl font-semibold leading-tight tracking-tight mb-5">
  사장님의 마케팅을<br className="md:hidden" />
  {' '}AI가 대신합니다.
  </h1>
- <p className="text-sm md:text-lg text-[#4E5968] leading-relaxed text-left sm:text-center">
- 리뷰 답글, SNS 운영, 광고 집행 · <strong className="text-[#191F28]">하루 10분</strong>이면 충분합니다.
+ <p className="text-sm md:text-lg text-[var(--lu-muted)] leading-relaxed text-left sm:text-center">
+ 리뷰 답글, SNS 운영, 광고 집행 · <strong className="text-[var(--lu-ink)]">하루 10분</strong>이면 충분합니다.
  <br className="hidden md:block" />
- {' '}500곳 매장 데이터를 학습한 로컬루션이, <strong className="text-[#191F28]">24시간 자동</strong>으로 돌립니다.
+ {' '}500곳 매장 데이터를 학습한 로컬루션이, <strong className="text-[var(--lu-ink)]">24시간 자동</strong>으로 돌립니다.
  </p>
  <div className="mt-10 flex flex-col sm:flex-row gap-3 justify-center">
- <Link href="/signup" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#3182F6] text-white font-semibold rounded-2xl shadow-[0_4px_14px_rgba(49,130,246,0.35)] hover:bg-[#1B64DA] transition-colors">
+ <Link href="/signup" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[var(--lu-accent)] text-white font-semibold rounded-[10px] shadow-[0_4px_14px_rgba(49,130,246,0.35)] hover:bg-[var(--lu-accent-hover)] transition-colors">
  14일 무료로 시작하기
  <span aria-hidden="true">→</span>
  </Link>
- <a href="https://open.kakao.com/o/gSC9jrqi" target="_blank" rel="noopener" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FEE500] text-[#191F28] font-semibold rounded-2xl hover:brightness-95 transition-all">
+ <a href="https://open.kakao.com/o/gSC9jrqi" target="_blank" rel="noopener" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FEE500] text-[var(--lu-ink)] font-semibold rounded-[10px] hover:brightness-95 transition-all">
  로컬루션 오픈채팅방
  </a>
  </div>
- <p className="mt-5 text-xs text-[#8B95A1]">
+ <p className="mt-5 text-xs text-[var(--lu-muted)]">
  월 6,900원 · 신용카드 등록 없이 시작 · 언제든 해지
  </p>
  </div>
@@ -144,12 +144,12 @@ export default function AboutPage() {
  <section className="px-5 py-16 md:py-24">
  <div className="max-w-4xl mx-auto">
  <div className="text-center mb-12">
- <div className="text-xs font-bold text-[#3182F6] tracking-widest mb-3">WHY LOCALUTION</div>
- <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight mb-4">
+ <div className="text-xs font-bold text-[var(--lu-accent)] tracking-widest mb-3">WHY LOCALUTION</div>
+ <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight mb-4">
  대행사처럼 맡기고,<br className="md:hidden" />
  {' '}도구처럼 쓰세요.
  </h2>
- <p className="text-[#4E5968] text-sm md:text-base text-left sm:text-center">
+ <p className="text-[var(--lu-muted)] text-sm md:text-base text-left sm:text-center">
  로컬루션이 기존 마케팅 대행·툴과 다른 3가지.
  </p>
  </div>
@@ -160,21 +160,21 @@ export default function AboutPage() {
  { num: '10분', label: '세팅 완료', desc: '매장 정보만 입력' },
  { num: '24h', label: '자동 운영', desc: '리뷰·SNS·광고 동시' },
  ].map((s, i) => (
- <div key={i} className="bg-[#F9FAFB] rounded-2xl md:rounded-3xl p-4 md:p-8 text-center hover:bg-[#F5F9FF] transition-colors">
- <div className="text-2xl sm:text-3xl md:text-5xl font-black text-[#3182F6] mb-1 md:mb-2">{s.num}</div>
- <div className="text-xs sm:text-sm font-bold text-[#191F28] mb-0.5 md:mb-1 break-keep">{s.label}</div>
- <div className="text-[10px] sm:text-xs text-[#4E5968] leading-relaxed hidden sm:block">{s.desc}</div>
+ <div key={i} className="bg-[#F9FAFB] rounded-[10px] md:rounded-3xl p-4 md:p-8 text-center hover:bg-[#F5F9FF] transition-colors">
+ <div className="text-2xl sm:text-3xl md:text-5xl font-semibold text-[var(--lu-accent)] mb-1 md:mb-2">{s.num}</div>
+ <div className="text-xs sm:text-sm font-bold text-[var(--lu-ink)] mb-0.5 md:mb-1 break-keep">{s.label}</div>
+ <div className="text-[10px] sm:text-xs text-[var(--lu-muted)] leading-relaxed hidden sm:block">{s.desc}</div>
  </div>
  ))}
  </div>
 
  {/* 비교 테이블 */}
- <div className="mt-10 overflow-x-auto rounded-3xl shadow-sm border border-gray-100">
+ <div className="mt-10 overflow-x-auto rounded-3xl shadow-none border border-gray-100">
  <div className="bg-white min-w-[320px]">
  <div className="grid grid-cols-3 text-[11px] sm:text-xs md:text-sm">
  <div className="p-3 sm:p-4 md:p-6 bg-[#FAFBFC] border-r border-gray-100">
- <div className="font-bold text-[#8B95A1] mb-3">&nbsp;</div>
- <div className="space-y-3 text-[#4E5968]">
+ <div className="font-bold text-[var(--lu-muted)] mb-3">&nbsp;</div>
+ <div className="space-y-3 text-[var(--lu-muted)]">
  <div>월 비용</div>
  <div>세팅 기간</div>
  <div>실행 속도</div>
@@ -182,8 +182,8 @@ export default function AboutPage() {
  </div>
  </div>
  <div className="p-3 sm:p-4 md:p-6 border-r border-gray-100">
- <div className="font-bold text-[#8B95A1] mb-3">기존 대행사</div>
- <div className="space-y-3 text-[#4E5968]">
+ <div className="font-bold text-[var(--lu-muted)] mb-3">기존 대행사</div>
+ <div className="space-y-3 text-[var(--lu-muted)]">
  <div>30~300만원</div>
  <div>1~2주</div>
  <div>사람 리드타임</div>
@@ -191,8 +191,8 @@ export default function AboutPage() {
  </div>
  </div>
  <div className="p-3 sm:p-4 md:p-6 bg-[#F5F9FF]">
- <div className="font-bold text-[#3182F6] mb-3">로컬루션</div>
- <div className="space-y-3 text-[#191F28] font-semibold">
+ <div className="font-bold text-[var(--lu-accent)] mb-3">로컬루션</div>
+ <div className="space-y-3 text-[var(--lu-ink)] font-semibold">
  <div>월 6,900원~</div>
  <div>10분</div>
  <div>AI 24시간</div>
@@ -211,46 +211,46 @@ export default function AboutPage() {
  <section className="px-5 py-16 md:py-24 bg-[#FAFBFC]">
  <div className="max-w-4xl mx-auto">
  <div className="text-center mb-10">
- <div className="text-xs font-bold text-[#3182F6] tracking-widest mb-3">FOUNDER'S NOTE</div>
- <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight">
+ <div className="text-xs font-bold text-[var(--lu-accent)] tracking-widest mb-3">FOUNDER'S NOTE</div>
+ <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
  왜 만들었나
  </h2>
  </div>
 
  <article className="bg-white rounded-3xl p-6 sm:p-8 md:p-14 shadow-[0_4px_30px_rgba(0,0,0,0.04)] border border-gray-100">
- <div className="space-y-5 text-[#191F28] text-sm md:text-base leading-[1.75] md:leading-[1.9]">
- <p className="font-semibold text-base md:text-xl text-[#191F28]">
+ <div className="space-y-5 text-[var(--lu-ink)] text-sm md:text-base leading-[1.75] md:leading-[1.9]">
+ <p className="font-semibold text-base md:text-xl text-[var(--lu-ink)]">
  자영업자 편에서 10년을 일했습니다.
  </p>
- <p className="text-[#4E5968]">
+ <p className="text-[var(--lu-muted)]">
  군대 전역하고 카페를 직접 열었다가 코로나 때 망해봤습니다.
  너무 힘든 시기였습니다. 새벽 쪽잠, 3잡…
  </p>
- <p className="font-semibold text-[#191F28]">
+ <p className="font-semibold text-[var(--lu-ink)]">
  그때 깨달았습니다.
  </p>
- <p className="text-[#4E5968]">
- 사장님들에게 필요한 건 <strong className="text-[#191F28]">비싼 대행</strong>이 아니라,
- {' '}<strong className="text-[#191F28]">언제든 옆에서 도움 줄 수 있는 사람과 도구</strong>라는 것을요.
+ <p className="text-[var(--lu-muted)]">
+ 사장님들에게 필요한 건 <strong className="text-[var(--lu-ink)]">비싼 대행</strong>이 아니라,
+ {' '}<strong className="text-[var(--lu-ink)]">언제든 옆에서 도움 줄 수 있는 사람과 도구</strong>라는 것을요.
  </p>
- <p className="text-[#4E5968]">
+ <p className="text-[var(--lu-muted)]">
  로컬루션은 그 경험을 제품으로 옮긴 결과입니다.
  자영업자+마케팅 대행사 등 10년 이상의 경험과 판단으로
  500곳 이상의 데이터, 수백 번의 실패를{' '}
- <strong className="text-[#191F28]">AI가 대표님, 사장님 대신 24시간 일합니다.</strong>{' '}
+ <strong className="text-[var(--lu-ink)]">AI가 대표님, 사장님 대신 24시간 일합니다.</strong>{' '}
  사장님은 결과만 확인하면 됩니다.
  </p>
- <p className="text-lg sm:text-xl md:text-2xl font-black text-[#191F28] leading-snug tracking-tight border-l-4 border-[#3182F6] pl-4 md:pl-5 py-1">
+ <p className="text-lg sm:text-xl md:text-2xl font-semibold text-[var(--lu-ink)] leading-snug tracking-tight border-l-4 border-[var(--lu-accent)] pl-4 md:pl-5 py-1">
  "사장님이 원하는 마케팅"을<br />
  사장님이 직접 돌릴 수 있게,<br />
- <span className="text-[#3182F6]">그게 로컬루션이 존재하는 이유입니다.</span>
+ <span className="text-[var(--lu-accent)]">그게 로컬루션이 존재하는 이유입니다.</span>
  </p>
  </div>
  <div className="mt-8 pt-6 border-t border-gray-100 flex items-center gap-3">
- <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-[#3182F6] to-[#1B64DA] flex items-center justify-center text-white font-black text-sm">전</div>
+ <div className="w-10 h-10 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center text-white font-semibold text-sm">전</div>
  <div>
- <div className="text-sm font-bold text-[#191F28]">전태영</div>
- <div className="text-xs text-[#8B95A1]">Founder · 10년차 자영업자 마케팅</div>
+ <div className="text-sm font-bold text-[var(--lu-ink)]">전태영</div>
+ <div className="text-xs text-[var(--lu-muted)]">Founder · 10년차 자영업자 마케팅</div>
  </div>
  </div>
  </article>
@@ -263,11 +263,11 @@ export default function AboutPage() {
  <section className="px-5 py-16 md:py-24">
  <div className="max-w-5xl mx-auto">
  <div className="text-center mb-12">
- <div className="text-xs font-bold text-[#3182F6] tracking-widest mb-3">OUR PRINCIPLES</div>
- <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight mb-4">
+ <div className="text-xs font-bold text-[var(--lu-accent)] tracking-widest mb-3">OUR PRINCIPLES</div>
+ <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight mb-4">
  로컬루션이 지키는 5가지 원칙
  </h2>
- <p className="text-[#4E5968] text-sm md:text-base text-left sm:text-center">
+ <p className="text-[var(--lu-muted)] text-sm md:text-base text-left sm:text-center">
  제품은 말이 아니라 운영 원칙으로 증명합니다.
  </p>
  </div>
@@ -276,13 +276,13 @@ export default function AboutPage() {
  {PRINCIPLES.map((p, i) => (
  <div key={i} className="group bg-white border border-gray-100 rounded-3xl p-5 md:p-7 hover:shadow-[0_6px_24px_rgba(49,130,246,0.1)] hover:border-[#D1E5FF] transition-all">
  <div className="flex items-center gap-3 mb-3">
- <span className="inline-flex items-center justify-center w-8 h-8 rounded-xl bg-[#EFF6FF] text-[#3182F6] text-xs font-black tracking-tight shrink-0 group-hover:bg-[#3182F6] group-hover:text-white transition-colors">
+ <span className="inline-flex items-center justify-center w-8 h-8 rounded-[6px] bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] text-xs font-semibold tracking-tight shrink-0 group-hover:bg-[var(--lu-accent)] group-hover:text-white transition-colors">
  {String(i + 1).padStart(2, '0')}
  </span>
  <div className="h-px flex-1 bg-gray-100 group-hover:bg-[#D1E5FF] transition-colors" />
  </div>
- <h3 className="text-sm md:text-base font-black text-[#191F28] mb-2 tracking-tight">{p.title}</h3>
- <p className="text-xs md:text-sm text-[#4E5968] leading-relaxed">{p.desc}</p>
+ <h3 className="text-sm md:text-base font-semibold text-[var(--lu-ink)] mb-2 tracking-tight">{p.title}</h3>
+ <p className="text-xs md:text-sm text-[var(--lu-muted)] leading-relaxed">{p.desc}</p>
  </div>
  ))}
  </div>
@@ -295,30 +295,30 @@ export default function AboutPage() {
  <section className="px-5 py-16 md:py-24 bg-[#FAFBFC]">
  <div className="max-w-5xl mx-auto">
  <div className="text-center mb-12">
- <div className="text-xs font-bold text-[#3182F6] tracking-widest mb-3">WHAT WE AUTOMATE</div>
- <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight mb-4">
+ <div className="text-xs font-bold text-[var(--lu-accent)] tracking-widest mb-3">WHAT WE AUTOMATE</div>
+ <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight mb-4">
  로컬루션이 대신 처리하는 것
  </h2>
- <p className="text-[#4E5968] text-sm md:text-base text-left sm:text-center">
+ <p className="text-[var(--lu-muted)] text-sm md:text-base text-left sm:text-center">
  사장님이 손댈 필요 없습니다. 결과만 확인하세요.
  </p>
  </div>
 
  <div className="grid grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
  {FEATURES.map((s, i) => (
- <div key={i} className="bg-white rounded-2xl p-5 md:p-6 border border-gray-100 hover:border-[#D1E5FF] hover:shadow-sm transition-all">
- <div className="w-11 h-11 md:w-12 md:h-12 rounded-xl flex items-center justify-center mb-3 shadow-sm" style={{ background: s.color + '15' }}>
+ <div key={i} className="bg-white rounded-[10px] p-5 md:p-6 border border-gray-100 hover:border-[#D1E5FF] hover:shadow-none transition-all">
+ <div className="w-11 h-11 md:w-12 md:h-12 rounded-[6px] flex items-center justify-center mb-3 shadow-none" style={{ background: s.color + '15' }}>
  <s.Icon size={22} style={{ color: s.color }} strokeWidth={2.5} />
  </div>
- <div className="text-sm md:text-base font-black text-[#191F28] mb-1">{s.title}</div>
- <div className="text-xs md:text-sm text-[#4E5968] leading-relaxed">{s.desc}</div>
- <div className="mt-3 text-[11px] font-bold text-[#3182F6] tracking-wider">AI 자동</div>
+ <div className="text-sm md:text-base font-semibold text-[var(--lu-ink)] mb-1">{s.title}</div>
+ <div className="text-xs md:text-sm text-[var(--lu-muted)] leading-relaxed">{s.desc}</div>
+ <div className="mt-3 text-[11px] font-bold text-[var(--lu-accent)] tracking-wider">AI 자동</div>
  </div>
  ))}
  </div>
 
  <div className="mt-10 text-center">
- <Link href="/service-intro" className="inline-flex items-center gap-2 text-sm font-semibold text-[#3182F6] hover:text-[#1B64DA] transition-colors">
+ <Link href="/service-intro" className="inline-flex items-center gap-2 text-sm font-semibold text-[var(--lu-accent)] hover:text-[var(--lu-accent-hover)] transition-colors">
  기능 전체 보기 <span aria-hidden="true">→</span>
  </Link>
  </div>
@@ -331,8 +331,8 @@ export default function AboutPage() {
  <section className="px-5 py-16 md:py-24">
  <div className="max-w-4xl mx-auto">
  <div className="text-center mb-10">
- <div className="text-xs font-bold text-[#3182F6] tracking-widest mb-3">FAQ</div>
- <h2 className="text-xl sm:text-3xl md:text-4xl font-black tracking-tight">
+ <div className="text-xs font-bold text-[var(--lu-accent)] tracking-widest mb-3">FAQ</div>
+ <h2 className="text-xl sm:text-3xl md:text-4xl font-semibold tracking-tight">
  자주 묻는 질문
  </h2>
  </div>
@@ -341,19 +341,19 @@ export default function AboutPage() {
  {FAQ.map((item, i) => {
  const isOpen = openFaq === i
  return (
- <div key={i} className="bg-white border border-gray-100 rounded-2xl overflow-hidden">
+ <div key={i} className="bg-white border border-gray-100 rounded-[10px] overflow-hidden">
  <button
  type="button"
  onClick={() => setOpenFaq(isOpen ? null : i)}
  aria-expanded={isOpen}
- className="w-full px-5 md:px-6 py-4 md:py-5 flex items-start justify-between gap-3 text-left hover:bg-[#F9FAFB] transition-colors"
+ className="min-h-11 w-full px-5 md:px-6 py-4 md:py-5 flex items-start justify-between gap-3 text-left hover:bg-[#F9FAFB] transition-colors"
  >
  <div className="flex items-start gap-3 min-w-0 flex-1">
- <span className="text-[#3182F6] font-black text-sm md:text-base flex-shrink-0 mt-0.5">Q.</span>
- <span className="text-sm md:text-base font-bold text-[#191F28]">{item.q}</span>
+ <span className="text-[var(--lu-accent)] font-semibold text-sm md:text-base flex-shrink-0 mt-0.5">Q.</span>
+ <span className="text-sm md:text-base font-bold text-[var(--lu-ink)]">{item.q}</span>
  </div>
  <span
- className={`text-[#8B95A1] text-xl flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+ className={`text-[var(--lu-muted)] text-xl flex-shrink-0 transition-transform ${isOpen ? 'rotate-180' : ''}`}
  aria-hidden="true"
  >
  ⌄
@@ -361,8 +361,8 @@ export default function AboutPage() {
  </button>
  {isOpen && (
  <div className="px-5 md:px-6 pb-5 md:pb-6 pt-0 flex items-start gap-3">
- <span className="text-[#3182F6] font-black text-sm md:text-base flex-shrink-0 mt-0.5">A.</span>
- <p className="text-sm md:text-[15px] text-[#4E5968] leading-[1.8]">{item.a}</p>
+ <span className="text-[var(--lu-accent)] font-semibold text-sm md:text-base flex-shrink-0 mt-0.5">A.</span>
+ <p className="text-sm md:text-[15px] text-[var(--lu-muted)] leading-[1.8]">{item.a}</p>
  </div>
  )}
  </div>
@@ -375,12 +375,12 @@ export default function AboutPage() {
  {/* ═══════════════════════════════════════════════════════
  7. 최종 CTA
  ═══════════════════════════════════════════════════════ */}
- <section className="px-5 py-16 md:py-24 bg-gradient-to-br from-[#3182F6] to-[#1B64DA] text-white">
+ <section className="px-5 py-16 md:py-24 bg-[var(--lu-accent)] text-white">
  <div className="max-w-3xl mx-auto text-center">
  <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-white/15 backdrop-blur-sm rounded-full text-xs font-semibold mb-6 border border-white/20">
  <span>14일 무료 체험 진행 중</span>
  </div>
- <h2 className="text-xl sm:text-2xl md:text-4xl font-black tracking-tight mb-4 break-keep">
+ <h2 className="text-xl sm:text-2xl md:text-4xl font-semibold tracking-tight mb-4 break-keep">
  지금 쓰는 마케팅,<br className="hidden sm:block" />
  {' '}로컬루션이 더 싸고 빠르게 대신합니다.
  </h2>
@@ -389,10 +389,10 @@ export default function AboutPage() {
  </p>
 
  <div className="flex flex-col sm:flex-row gap-3 justify-center">
- <Link href="/signup" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-[#3182F6] font-bold rounded-2xl hover:bg-[#F5F9FF] transition-colors shadow-[0_4px_14px_rgba(0,0,0,0.15)]">
+ <Link href="/signup" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-white text-[var(--lu-accent)] font-bold rounded-[10px] hover:bg-[#F5F9FF] transition-colors shadow-[0_4px_14px_rgba(0,0,0,0.15)]">
  무료로 시작하기 <span aria-hidden="true">→</span>
  </Link>
- <a href="https://open.kakao.com/o/gSC9jrqi" target="_blank" rel="noopener" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FEE500] text-[#191F28] font-bold rounded-2xl hover:brightness-95 transition-all shadow-[0_4px_14px_rgba(0,0,0,0.15)]">
+ <a href="https://open.kakao.com/o/gSC9jrqi" target="_blank" rel="noopener" className="inline-flex items-center justify-center gap-2 px-6 py-3.5 bg-[#FEE500] text-[var(--lu-ink)] font-bold rounded-[10px] hover:brightness-95 transition-all shadow-[0_4px_14px_rgba(0,0,0,0.15)]">
  <MessageSquare size={16} strokeWidth={2.5} />
  로컬루션 오픈채팅방
  </a>
@@ -409,7 +409,7 @@ export default function AboutPage() {
  { step: '완료', desc: '24h 자동' },
  ].map((item, i) => (
  <div key={i} className="flex flex-col items-center">
- <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-11 md:h-11 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center text-xs md:text-sm font-black">
+ <div className="w-8 h-8 sm:w-9 sm:h-9 md:w-11 md:h-11 rounded-full bg-white/15 backdrop-blur-sm border border-white/30 flex items-center justify-center text-xs md:text-sm font-semibold">
  {i + 1}
  </div>
  <div className="mt-1.5 text-[10px] sm:text-[11px] md:text-xs font-semibold text-white/90 whitespace-nowrap">{item.step}</div>
@@ -423,15 +423,15 @@ export default function AboutPage() {
 
  {/* 소형 브랜드 푸터 영역 (중복 회피 · 전역 Footer가 법적 정보 담당) */}
  <section className="px-5 py-10 md:py-12 border-t border-gray-100">
- <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-[#8B95A1]">
+ <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-[var(--lu-muted)]">
  <div className="flex items-center gap-3">
  <Image src="/logo.svg" alt="로컬루션 로고" width={28} height={28} className="select-none" />
- <div className="text-[#191F28] font-bold">LOCALUTION</div>
+ <div className="text-[var(--lu-ink)] font-bold">LOCALUTION</div>
  </div>
  <div className="flex items-center gap-4">
- <Link href="/pricing" className="hover:text-[#3182F6] transition-colors">요금제</Link>
- <Link href="/inquiry" className="hover:text-[#3182F6] transition-colors">문의하기</Link>
- <Link href="/community" className="hover:text-[#3182F6] transition-colors">커뮤니티</Link>
+ <Link href="/pricing" className="hover:text-[var(--lu-accent)] transition-colors">요금제</Link>
+ <Link href="/inquiry" className="hover:text-[var(--lu-accent)] transition-colors">문의하기</Link>
+ <Link href="/community" className="hover:text-[var(--lu-accent)] transition-colors">커뮤니티</Link>
  </div>
  </div>
  </section>

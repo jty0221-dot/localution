@@ -150,7 +150,7 @@ function Stars({ n, color }: { n: number; color: string }) {
  return (
  <span className="text-sm tracking-tight" style={{ color }}>
  {Array.from({ length: v }).map((_, i) => <Star key={'f' + i} size={12} className="inline fill-current" />)}
- {Array.from({ length: 5 - v }).map((_, i) => <Star key={'e' + i} size={12} className="inline text-[#E5E8EB]" />)}
+ {Array.from({ length: 5 - v }).map((_, i) => <Star key={'e' + i} size={12} className="inline text-[var(--lu-line)]" />)}
  </span>
  )
 }
@@ -234,7 +234,7 @@ function StatusBadge({ status }: { status: ReplyStatus }) {
  if (status === 'none') return null
  const map: Record<ReplyStatus, { label: string; bg: string; fg: string }> = {
  none: { label: '', bg: '', fg: '' },
- draft: { label: '초안 저장됨', bg: '#EFF6FF', fg: '#1D4ED8' },
+ draft: { label: '초안 저장됨', bg: 'var(--lu-accent-soft)', fg: '#1D4ED8' },
  queued: { label: ' 자동 발행 중', bg: '#E0F2FE', fg: '#075985' },
  submitting: { label: ' 등록 중...', bg: '#E0F2FE', fg: '#075985' },
  submitted: { label: '등록 완료', bg: '#ECFDF5', fg: '#059669' },
@@ -879,7 +879,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  ).length
 
  return (
- <div className="min-h-screen bg-[#F8F9FA]">
+ <div className="min-h-screen bg-[var(--lu-canvas)]">
  <div className="flex flex-1">
  <Sidebar />
  <main className="flex-1 ml-0 md:ml-[220px] pt-4 md:pt-0 min-w-0">
@@ -910,41 +910,41 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <div className="max-w-4xl mx-auto p-4 md:p-6 w-full">
  {/* 브레드크럼 + 상태 */}
  <div className="flex items-center gap-2 mb-4 flex-wrap">
- <Link href="/review-admin" className="text-xs text-[#8B95A1] hover:text-[#4E5968] font-semibold">← 리뷰 관리</Link>
- <span className="text-[#E5E8EB]">·</span>
+ <Link href="/review-admin" className="text-xs text-[var(--lu-muted)] hover:text-[var(--lu-muted)] font-semibold">← 리뷰 관리</Link>
+ <span className="text-[var(--lu-line)]">·</span>
  {loadingConn ? (
- <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#F2F4F6] text-[#8B95A1] font-semibold">확인 중...</span>
+ <span className="text-[10px] px-2 py-0.5 rounded-full bg-[var(--lu-canvas)] text-[var(--lu-muted)] font-semibold">확인 중...</span>
  ) : connected ? (
  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#ECFDF5] text-[#059669] font-semibold">● 연결됨</span>
  ) : (
  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-semibold">미연결</span>
  )}
  {connected && agg.latest_collected_at && (
- <span className="text-[10px] text-[#8B95A1]">마지막 수집 · {timeAgo(agg.latest_collected_at)}</span>
+ <span className="text-[10px] text-[var(--lu-muted)]">마지막 수집 · {timeAgo(agg.latest_collected_at)}</span>
  )}
  </div>
 
  {/* 미연결 안내 */}
  {!loadingConn && !connected && (
- <div className="bg-white border border-[#E5E8EB] rounded-2xl p-5 mb-5">
+ <div className="bg-white border border-[var(--lu-line)] rounded-[10px] p-5 mb-5">
  <div className="flex items-start gap-3 flex-wrap">
  <span className="text-3xl leading-none mt-0.5"></span>
  <div className="flex-1 min-w-[220px]">
- <p className="text-sm font-bold text-[#191F28] mb-1">아직 {config.label}이 연결되지 않았어요</p>
- <p className="text-xs text-[#4E5968] leading-relaxed mb-3">
+ <p className="text-sm font-bold text-[var(--lu-ink)] mb-1">아직 {config.label}이 연결되지 않았어요</p>
+ <p className="text-xs text-[var(--lu-muted)] leading-relaxed mb-3">
  사장님 계정 로그인 정보를 한 번만 입력하면 리뷰가 자동으로 이 페이지에 쌓여요.
  </p>
  <div className="flex gap-2 flex-wrap">
  <Link
  href={config.connectHref}
- className="px-4 py-2 rounded-xl text-xs font-bold text-white hover:opacity-90"
+ className="px-4 py-2 rounded-[6px] text-xs font-bold text-white hover:opacity-90"
  style={{ background: config.color }}
  >
  + {config.label} 연결하기
  </Link>
  <Link
  href="/my/platforms"
- className="px-4 py-2 rounded-xl text-xs font-bold bg-[#F2F4F6] text-[#4E5968] hover:bg-[#E5E8EB]"
+ className="px-4 py-2 rounded-[6px] text-xs font-bold bg-[var(--lu-canvas)] text-[var(--lu-muted)] hover:bg-[var(--lu-line)]"
  >
  플랫폼 허브로
  </Link>
@@ -957,28 +957,28 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  {/* 통계 카드 */}
  {connected && (
  <div className="grid grid-cols-4 gap-3 mb-5">
- <div className="bg-white rounded-2xl p-4 border border-[#E5E8EB]">
- <p className="text-[11px] text-[#8B95A1] font-medium mb-1">총 리뷰</p>
- <p className="text-xl font-black text-[#191F28]">{agg.review_count}건</p>
+ <div className="bg-white rounded-[10px] p-4 border border-[var(--lu-line)]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-medium mb-1">총 리뷰</p>
+ <p className="text-xl font-semibold text-[var(--lu-ink)]">{agg.review_count}건</p>
  </div>
- <div className="bg-white rounded-2xl p-4 border border-[#E5E8EB]">
- <p className="text-[11px] text-[#8B95A1] font-medium mb-1">평균 별점</p>
+ <div className="bg-white rounded-[10px] p-4 border border-[var(--lu-line)]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-medium mb-1">평균 별점</p>
  {agg.rating_avg === null && agg.review_count > 0 ? (
- <p className="text-xs font-bold text-[#4E5968] leading-tight">
+ <p className="text-xs font-bold text-[var(--lu-muted)] leading-tight">
  키워드 리뷰<br/>
- <span className="text-[10px] text-[#8B95A1] font-medium">별점 없음</span>
+ <span className="text-[10px] text-[var(--lu-muted)] font-medium">별점 없음</span>
  </p>
  ) : (
- <p className="text-xl font-black text-[#191F28]">{ratingDisplay}점</p>
+ <p className="text-xl font-semibold text-[var(--lu-ink)]">{ratingDisplay}점</p>
  )}
  </div>
- <div className="bg-white rounded-2xl p-4 border border-[#E5E8EB]">
- <p className="text-[11px] text-[#8B95A1] font-medium mb-1">미답변</p>
- <p className="text-xl font-black text-[#F59E0B]">{agg.unreplied_count}건</p>
+ <div className="bg-white rounded-[10px] p-4 border border-[var(--lu-line)]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-medium mb-1">미답변</p>
+ <p className="text-xl font-semibold text-[#F59E0B]">{agg.unreplied_count}건</p>
  </div>
- <div className="bg-white rounded-2xl p-4 border border-[#E5E8EB]">
- <p className="text-[11px] text-[#8B95A1] font-medium mb-1">주의 리뷰</p>
- <p className="text-xl font-black text-[#F04452]">{negativeCount}건</p>
+ <div className="bg-white rounded-[10px] p-4 border border-[var(--lu-line)]">
+ <p className="text-[11px] text-[var(--lu-muted)] font-medium mb-1">주의 리뷰</p>
+ <p className="text-xl font-semibold text-[#F04452]">{negativeCount}건</p>
  </div>
  </div>
  )}
@@ -986,7 +986,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  {/* 일괄 초안 진행중 배너 */}
  {bulkRunning && (
  <div
- className="mb-4 rounded-2xl border p-4"
+ className="mb-4 rounded-[10px] border p-4"
  style={{ background: config.bg, borderColor: config.color + '60' }}
  >
  <div className="flex items-center justify-between gap-3 flex-wrap">
@@ -996,21 +996,21 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  </p>
  <div className="w-full bg-white rounded-full h-2 overflow-hidden">
  <div
- className="h-2 rounded-full transition-all"
+ className="h-2 rounded-full transition-colors"
  style={{
  width: `${bulkProgress.total ? (bulkProgress.done / bulkProgress.total) * 100 : 0}%`,
  background: config.color,
  }}
  />
  </div>
- <p className="text-[11px] text-[#4E5968] mt-1">
+ <p className="text-[11px] text-[var(--lu-muted)] mt-1">
  리뷰 1건당 평균 4~8초 소요. 도중에 이탈하면 진행이 멈춰요.
  </p>
  </div>
  <button
  onClick={cancelBulk}
  disabled={bulkCancelled}
- className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white border border-[#E5E8EB] text-[#4E5968] hover:bg-[#F9FAFB] disabled:opacity-50"
+ className="min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold bg-white border border-[var(--lu-line)] text-[var(--lu-muted)] hover:bg-[#F9FAFB] disabled:opacity-50"
  >
  {bulkCancelled ? '중단 요청됨…' : '중단'}
  </button>
@@ -1020,11 +1020,11 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
 
  {/* 네이버 플레이스 전용 안내 */}
  {connected && config.platform === 'naver_place' && (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-4 mb-4">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-4 mb-4">
  <div className="flex items-start gap-3 flex-wrap">
  <span className="text-xl leading-none mt-0.5"></span>
  <div className="flex-1 min-w-[200px]">
- <p className="text-sm font-bold text-[#191F28] mb-1">네이버 플레이스 리뷰 · 자동 수집 + 사장님 답글 작성</p>
+ <p className="text-sm font-bold text-[var(--lu-ink)] mb-1">네이버 플레이스 리뷰 · 자동 수집 + 사장님 답글 작성</p>
  </div>
  {placeId && (
  <a
@@ -1043,17 +1043,17 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  {/* 플랫폼 공통 안내 배너 (kakao_map / baemin 등) */}
  {connected && config.platformInfoBanner && (
  <div
- className="rounded-2xl border p-4 mb-4"
+ className="rounded-[10px] border p-4 mb-4"
  style={{ background: config.bg, borderColor: config.color + '55' }}
  >
  <div className="flex items-center gap-3 flex-wrap">
  <div
- className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0 overflow-hidden"
+ className="w-10 h-10 rounded-[6px] flex items-center justify-center shrink-0 overflow-hidden"
  style={{ background: config.color }}
  >
  {config.logoNode
  ? <div style={{ transform: 'scale(0.55)', transformOrigin: 'center' }}>{config.logoNode}</div>
- : <span className="text-base font-black" style={{ color: config.textColor }}>{config.iconLetter}</span>
+ : <span className="text-base font-semibold" style={{ color: config.textColor }}>{config.iconLetter}</span>
  }
  </div>
  <div className="flex-1 min-w-[200px]">
@@ -1087,10 +1087,10 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
 
  {/* 필터 + 액션 바 */}
  {connected && (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] p-3 mb-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+ <div className="bg-white rounded-[10px] border border-[var(--lu-line)] p-3 mb-4 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
  {/* 30차-23: 기간 필터 */}
  <div className="flex items-center gap-1.5 flex-wrap">
- <span className="text-[11px] text-[#8B95A1] font-semibold mr-1">기간</span>
+ <span className="text-[11px] text-[var(--lu-muted)] font-semibold mr-1">기간</span>
  {(
  [
  ['7', '최근 7일'],
@@ -1101,7 +1101,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  key={v}
  onClick={() => setPeriod(v)}
- className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${period === v ? 'text-white' : 'bg-[#F2F4F6] text-[#4E5968]'}`}
+ className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${period === v ? 'text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]'}`}
  style={period === v ? { background: config.color } : {}}
  >
  {l}
@@ -1109,10 +1109,10 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  ))}
  </div>
  <div className="flex items-center gap-1.5 flex-wrap">
- <span className="text-[11px] text-[#8B95A1] font-semibold mr-1">평점</span>
+ <span className="text-[11px] text-[var(--lu-muted)] font-semibold mr-1">평점</span>
  <button
  onClick={() => setFilterRating(null)}
- className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${filterRating === null ? 'text-white' : 'bg-[#F2F4F6] text-[#4E5968]'}`}
+ className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${filterRating === null ? 'text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]'}`}
  style={filterRating === null ? { background: config.color } : {}}
  >
  전체
@@ -1121,7 +1121,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  key={n}
  onClick={() => setFilterRating(n)}
- className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${filterRating === n ? 'text-white' : 'bg-[#F2F4F6] text-[#4E5968]'}`}
+ className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${filterRating === n ? 'text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]'}`}
  style={filterRating === n ? { background: config.color } : {}}
  >
  {n}<Star size={10} className="inline ml-0.5 fill-current" />
@@ -1129,7 +1129,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  ))}
  </div>
  <div className="flex items-center gap-1.5 flex-wrap">
- <span className="text-[11px] text-[#8B95A1] font-semibold mr-1">상태</span>
+ <span className="text-[11px] text-[var(--lu-muted)] font-semibold mr-1">상태</span>
  {(
  [
  ['all', '전체'],
@@ -1141,7 +1141,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  key={v}
  onClick={() => setFilterReplied(v)}
- className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${filterReplied === v ? 'text-white' : 'bg-[#F2F4F6] text-[#4E5968]'}`}
+ className={`px-2.5 py-1 rounded-lg text-xs font-semibold ${filterReplied === v ? 'text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]'}`}
  style={filterReplied === v ? { background: v === 'negative' ? '#F04452' : config.color } : {}}
  >
  {l}
@@ -1153,7 +1153,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  onClick={runBulkDraft}
  disabled={bulkRunning || bulkEligibleCount === 0}
- className="px-3 py-2 rounded-xl text-xs font-bold text-white hover:opacity-90 disabled:opacity-40 shadow-sm"
+ className="min-h-11 px-3 py-2 rounded-[6px] text-xs font-bold text-white hover:opacity-90 disabled:opacity-40 shadow-none"
  style={{ background: config.color }}
  title={`미답변 ${bulkEligibleCount}건에 대해 AI 초안을 한 번에 생성`}
  >
@@ -1163,7 +1163,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  onClick={collectNow}
  disabled={fetching}
- className="px-3 py-2 rounded-xl text-xs font-bold text-[#4E5968] bg-[#F2F4F6] hover:bg-[#E5E8EB] disabled:opacity-50"
+ className="min-h-11 px-3 py-2 rounded-[6px] text-xs font-bold text-[var(--lu-muted)] bg-[var(--lu-canvas)] hover:bg-[var(--lu-line)] disabled:opacity-50"
  >
  {fetching ? '수집 중...' : '↻ 지금 수집'}
  </button>
@@ -1182,15 +1182,15 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  {/* 리뷰 목록 — connected 무관, 로딩 완료 후 항상 표시 */}
  {(!loadingConn || loadingReviews || reviews.length > 0) ? (
  loadingReviews ? (
- <div className="bg-white rounded-2xl p-12 text-center text-sm text-[#8B95A1] border border-[#E5E8EB]">
+ <div className="bg-white rounded-[10px] p-12 text-center text-sm text-[var(--lu-muted)] border border-[var(--lu-line)]">
  리뷰 불러오는 중...
  </div>
  ) : reviews.length === 0 ? (
- <div className="bg-white rounded-2xl p-6 md:p-8 text-center border border-[#E5E8EB]">
- <p className="text-sm font-bold text-[#191F28] mb-1">
+ <div className="bg-white rounded-[10px] p-6 md:p-8 text-center border border-[var(--lu-line)]">
+ <p className="text-sm font-bold text-[var(--lu-ink)] mb-1">
  {fetching ? '수집 중입니다...' : '아직 수집된 리뷰가 없어요'}
  </p>
- <p className="text-xs text-[#8B95A1] mb-4">
+ <p className="text-xs text-[var(--lu-muted)] mb-4">
  {config.supportsFetch
  ? (fetching ? '1~3분 정도 걸려요. 매장이 여러 개면 아래에서 매장을 선택해 주세요.' : '"↻ 지금 수집" 버튼을 누르면 공개 리뷰를 불러옵니다')
  : 'Worker 가 연결되면 자동 수집이 시작돼요 (23차-5)'}
@@ -1204,7 +1204,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  )}
  </div>
  ) : filtered.length === 0 ? (
- <div className="bg-white rounded-2xl p-8 text-center text-sm text-[#8B95A1] border border-[#E5E8EB]">
+ <div className="bg-white rounded-[10px] p-8 text-center text-sm text-[var(--lu-muted)] border border-[var(--lu-line)]">
  선택하신 조건에 맞는 리뷰가 없어요 
  </div>
  ) : (
@@ -1255,15 +1255,15 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  return (
  <div
  key={review.id}
- className={`bg-white rounded-2xl border p-4 md:p-5 ${isNegative ? 'border-[#FCA5A5]' : 'border-[#E5E8EB]'} ${isBulkTarget ? 'ring-2' : ''}`}
+ className={`bg-white rounded-[10px] border p-4 md:p-5 ${isNegative ? 'border-[#FCA5A5]' : 'border-[var(--lu-line)]'} ${isBulkTarget ? 'ring-2' : ''}`}
  style={isBulkTarget ? { ['--tw-ring-color' as any]: config.color } : {}}
  >
  <div className="flex items-center justify-between mb-2 flex-wrap gap-2">
  <div className="flex items-center gap-2 flex-wrap">
- <span className="text-sm font-bold text-[#191F28]">{review.author}</span>
+ <span className="text-sm font-bold text-[var(--lu-ink)]">{review.author}</span>
  {typeof review.rating === 'number' && <Stars n={review.rating} color={config.color} />}
  {review.photoCount > 0 && (
- <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#EFF6FF] text-[#3182F6] font-semibold">
+ <span className="text-[10px] px-1.5 py-0.5 rounded bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] font-semibold">
  사진 {review.photoCount}
  </span>
  )}
@@ -1277,7 +1277,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  type="button"
  onClick={() => setExpiredInfoOpen(true)}
- className="text-[10px] px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] font-semibold hover:bg-[#FDE68A] transition-colors inline-flex items-center gap-0.5"
+ className="min-h-11 text-[10px] px-1.5 py-0.5 rounded bg-[#FEF3C7] text-[#92400E] font-semibold hover:bg-[#FDE68A] transition-colors inline-flex items-center gap-0.5"
  title="자세히 보기"
  >
  30일 경과 <span className="opacity-60">ⓘ</span>
@@ -1287,7 +1287,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  {!review.hasReply && <StatusBadge status={review.replyStatus} />}
  </div>
  <div className="flex items-center gap-2">
- <span className="text-[11px] text-[#8B95A1]">{timeAgo(review.postedAt || review.collectedAt)}</span>
+ <span className="text-[11px] text-[var(--lu-muted)]">{timeAgo(review.postedAt || review.collectedAt)}</span>
  {review.hasReply ? (
  <span className="text-[10px] px-1.5 py-0.5 rounded bg-[#ECFDF5] text-[#059669] font-semibold">답변완료</span>
  ) : (
@@ -1295,7 +1295,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  )}
  </div>
  </div>
- <p className="text-sm text-[#4E5968] leading-relaxed mb-3 break-words whitespace-pre-wrap">
+ <p className="text-sm text-[var(--lu-muted)] leading-relaxed mb-3 break-words whitespace-pre-wrap">
  {review.content || '(내용 없음)'}
  </p>
 
@@ -1306,7 +1306,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  key={i}
  onClick={() => setLightboxUrl(url)}
- className="relative aspect-square rounded-lg overflow-hidden bg-[#F2F4F6] group"
+ className="min-h-11 relative aspect-square rounded-lg overflow-hidden bg-[var(--lu-canvas)] group"
  title="크게 보기"
  >
  {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -1321,7 +1321,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  </button>
  ))}
  {review.photos.length > 10 && (
- <div className="aspect-square rounded-lg bg-[#F2F4F6] flex items-center justify-center text-xs font-bold text-[#8B95A1]">
+ <div className="aspect-square rounded-lg bg-[var(--lu-canvas)] flex items-center justify-center text-xs font-bold text-[var(--lu-muted)]">
  +{review.photos.length - 10}
  </div>
  )}
@@ -1331,7 +1331,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  {/* 편집중 UI */}
  {isEditing && (
  <div
- className="rounded-xl p-3 mb-3 border"
+ className="rounded-[6px] p-3 mb-3 border"
  style={{ background: config.bg, borderColor: config.color + '40' }}
  >
  {generating ? (
@@ -1341,10 +1341,10 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  ) : (
  <>
  {/* ── 페르소나 패널 ── */}
- <div className="rounded-xl border border-[#E5E8EB] bg-white p-3 mb-3 space-y-2.5">
+ <div className="rounded-[6px] border border-[var(--lu-line)] bg-white p-3 mb-3 space-y-2.5">
  {/* 말투 */}
  <div>
- <p className="text-[10px] font-bold text-[#8B95A1] mb-1.5">말투</p>
+ <p className="text-[10px] font-bold text-[var(--lu-muted)] mb-1.5">말투</p>
  <div className="flex flex-wrap gap-1">
  {TONE_OPTIONS.map(({ value, label, Icon }) => {
  const active = persona.tone === value
@@ -1352,7 +1352,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  key={value}
  onClick={() => setPersona((p) => ({ ...p, tone: value }))}
- className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition inline-flex items-center gap-1 ${active ? 'text-white' : 'bg-[#F2F4F6] text-[#4E5968]'}`}
+ className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition inline-flex items-center gap-1 ${active ? 'text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]'}`}
  style={active ? { background: config.color } : {}}
  >
  <Icon size={11} strokeWidth={2.5} /> {label}
@@ -1362,7 +1362,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  </div>
  {/* v1.6y: custom 톤 선택 시 사장님 맞춤 프롬프트 입력 */}
  {persona.tone === 'custom' && (
- <div className="mt-2 rounded-lg bg-gradient-to-br from-[#FAF5FF] to-[#F3E8FF] border border-[#E9D5FF] p-2.5">
+ <div className="mt-2 rounded-lg bg-[var(--lu-accent)] border border-[#E9D5FF] p-2.5">
  <p className="text-[10px] font-bold text-[#7C3AED] mb-1.5 flex items-center gap-1">
  <Edit3 size={11} strokeWidth={2.5} /> 사장님 맞춤 톤 (자유 작성)
  </p>
@@ -1371,9 +1371,9 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  onChange={(e) => setCustomPrompt(e.target.value)}
  onBlur={() => { try { localStorage.setItem(CUSTOM_PROMPT_KEY, customPrompt) } catch {} }}
  placeholder={"예) 정성스러운 한식당 사장님처럼 소박한 말투. 메뉴 칭찬 + 재방문 유도. \"이모티콘 절대 금지\""}
- className="w-full rounded-md border border-[#E9D5FF] bg-white p-2 text-[12px] text-[#191F28] focus:outline-none focus:ring-2 focus:ring-[#7C3AED40] resize-y min-h-[60px]"
+ className="w-full rounded-md border border-[#E9D5FF] bg-white p-2 text-[12px] text-[var(--lu-ink)] focus:outline-none focus:ring-2 focus:ring-[#7C3AED40] resize-y min-h-[60px]"
  />
- <p className="text-[10px] text-[#8B95A1] mt-1">
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1">
  {customPrompt.length}자 · 입력 후 다른 곳을 클릭하면 자동 저장
  </p>
  </div>
@@ -1381,7 +1381,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  </div>
  {/* 성별 */}
  <div>
- <p className="text-[10px] font-bold text-[#8B95A1] mb-1.5">고객 성별</p>
+ <p className="text-[10px] font-bold text-[var(--lu-muted)] mb-1.5">고객 성별</p>
  <div className="flex flex-wrap gap-1">
  {GENDER_OPTIONS.map(({ value, label }) => {
  const active = persona.gender === value
@@ -1389,7 +1389,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  key={value}
  onClick={() => setPersona((p) => ({ ...p, gender: value }))}
- className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${active ? 'text-white' : 'bg-[#F2F4F6] text-[#4E5968]'}`}
+ className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${active ? 'text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]'}`}
  style={active ? { background: config.color } : {}}
  >
  {label}
@@ -1400,7 +1400,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  </div>
  {/* 연령 */}
  <div>
- <p className="text-[10px] font-bold text-[#8B95A1] mb-1.5">고객 연령대</p>
+ <p className="text-[10px] font-bold text-[var(--lu-muted)] mb-1.5">고객 연령대</p>
  <div className="flex flex-wrap gap-1">
  {AGE_OPTIONS.map(({ value, label }) => {
  const active = persona.age === value
@@ -1408,7 +1408,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  key={value}
  onClick={() => setPersona((p) => ({ ...p, age: value }))}
- className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${active ? 'text-white' : 'bg-[#F2F4F6] text-[#4E5968]'}`}
+ className={`px-2.5 py-1 rounded-lg text-[11px] font-bold transition ${active ? 'text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]'}`}
  style={active ? { background: config.color } : {}}
  >
  {label}
@@ -1423,25 +1423,25 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  try { localStorage.setItem(PERSONA_KEY, JSON.stringify(persona)) } catch {}
  toast.success('기본 페르소나 저장됨 ')
  }}
- className="text-[10px] px-2.5 py-1 rounded-lg font-bold bg-[#F2F4F6] text-[#8B95A1] hover:bg-[#E5E8EB] hover:text-[#4E5968]"
+ className="min-h-11 text-[10px] px-2.5 py-1 rounded-lg font-bold bg-[var(--lu-canvas)] text-[var(--lu-muted)] hover:bg-[var(--lu-line)] hover:text-[var(--lu-muted)]"
  >
  기본값으로 저장
  </button>
  </div>
  </div>
 
- <p className="text-[10px] text-[#8B95A1] mb-1 flex items-center gap-1">
+ <p className="text-[10px] text-[var(--lu-muted)] mb-1 flex items-center gap-1">
  필요하면 직접 수정한 뒤 등록하세요
  </p>
  <textarea
  value={draftText}
  onChange={(e) => setDraftText(e.target.value)}
  disabled={isQueued || isSubmitted || submitting}
- className="w-full rounded-lg border border-[#E5E8EB] p-2.5 text-sm text-[#191F28] bg-white focus:outline-none focus:ring-2 leading-relaxed resize-y min-h-[120px] disabled:bg-[#F9FAFB]"
+ className="w-full rounded-lg border border-[var(--lu-line)] p-2.5 text-sm text-[var(--lu-ink)] bg-white focus:outline-none focus:ring-2 leading-relaxed resize-y min-h-[120px] disabled:bg-[#F9FAFB]"
  style={{ ['--tw-ring-color' as any]: config.color + '40' }}
  placeholder="AI 초안이 여기에 나타나요..."
  />
- <p className="text-[10px] text-[#8B95A1] mt-1 text-right">
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1 text-right">
  {draftText.length}자
  </p>
 
@@ -1453,8 +1453,8 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  colorAccent={config.color}
  />
  {hasDraft && !isSubmitted && (
- <div className="mt-2 pt-2 border-t border-[#F2F4F6] flex items-center gap-2 flex-wrap">
- <span className="text-[10px] text-[#8B95A1]">AI 초안 평가:</span>
+ <div className="mt-2 pt-2 border-t border-[var(--lu-canvas)] flex items-center gap-2 flex-wrap">
+ <span className="text-[10px] text-[var(--lu-muted)]">AI 초안 평가:</span>
  <ReplyFeedbackButtons reviewId={review.id} compact={true} />
  </div>
  )}
@@ -1463,7 +1463,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  onClick={() => handleGenerateDraft(review, persona)}
  disabled={generating || submitting || isQueued || isSubmitted}
- className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white border hover:bg-[#F9FAFB] disabled:opacity-50"
+ className="min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold bg-white border hover:bg-[#F9FAFB] disabled:opacity-50"
  style={{ borderColor: config.color + '60', color: config.textColor }}
  >
  AI 재생성
@@ -1473,7 +1473,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  type="button"
  onClick={() => setExpiredInfoOpen(true)}
- className="px-4 py-1.5 rounded-lg text-xs font-bold border-2 border-dashed border-[#FCA5A5] bg-[#FEF2F2] text-[#DC2626] hover:bg-[#FEE2E2] inline-flex items-center gap-1"
+ className="min-h-11 px-4 py-1.5 rounded-lg text-xs font-bold border-2 border-dashed border-[#FCA5A5] bg-[#FEF2F2] text-[#DC2626] hover:bg-[#FEE2E2] inline-flex items-center gap-1"
  title="클릭해서 이유 보기"
  >
  답글 불가 <span className="opacity-70">ⓘ</span>
@@ -1482,7 +1482,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  onClick={() => handleSubmit(review)}
  disabled={generating || submitting || !draftText.trim() || isSubmitted || review.hasReply}
- className="px-4 py-1.5 rounded-lg text-xs font-bold text-white hover:opacity-90 disabled:opacity-50 shadow-sm"
+ className="min-h-11 px-4 py-1.5 rounded-lg text-xs font-bold text-white hover:opacity-90 disabled:opacity-50 shadow-none"
  style={{ background: config.color }}
  title="자동 발행이 실패하면 '복사 + 직접 등록' 버튼이 가장 안정적이에요"
  >
@@ -1501,7 +1501,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  window.open(config.reviewAdminUrl!, '_blank', 'noopener')
  }}
  disabled={!draftText.trim() || submitting}
- className="px-3 py-1.5 rounded-lg text-xs font-bold bg-white border hover:bg-[#F9FAFB] disabled:opacity-50"
+ className="min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold bg-white border hover:bg-[#F9FAFB] disabled:opacity-50"
  style={{ borderColor: config.color + '60', color: config.textColor }}
  title={`답글을 복사하고 ${config.label} 답글 작성 페이지를 새 탭으로 열어요`}
  >
@@ -1512,7 +1512,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  onClick={() => { setEditingId(null); setDraftText('') }}
  disabled={submitting}
- className="px-3 py-1.5 rounded-lg text-xs font-bold text-[#8B95A1] hover:bg-[#F2F4F6] ml-auto"
+ className="min-h-11 px-3 py-1.5 rounded-lg text-xs font-bold text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)] ml-auto"
  >
  닫기
  </button>
@@ -1534,7 +1534,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  onClick={() => handleSubmit(review)}
  disabled={submitting}
- className="mt-1.5 text-[11px] px-2 py-1 rounded bg-[#F97316] text-white font-bold hover:bg-[#EA580C] disabled:opacity-50"
+ className="min-h-11 mt-1.5 text-[11px] px-2 py-1 rounded bg-[#F97316] text-white font-bold hover:bg-[#EA580C] disabled:opacity-50"
  >
  다시 시도
  </button>
@@ -1603,7 +1603,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  {/* 등록 완료 또는 플랫폼에 이미 달린 답글 — 답글 내용 표시 */}
  {/* 68차-3: replyContent 가 있으면 무조건 노출 (hasReply boolean 우회) */}
  {!isEditing && (isSubmitted || review.hasReply || !!review.replyContent) && (
- <div className="rounded-xl p-3 mb-2 border border-[#ECFDF5] bg-[#F0FDF4]">
+ <div className="rounded-[6px] p-3 mb-2 border border-[#ECFDF5] bg-[#F0FDF4]">
  <p className="text-[10px] font-bold text-[#059669] mb-1">
  {isSubmitted ? `사장님 답글 (${config.label} 등록 완료)` : `사장님 답글 (${config.label}에 등록됨)`}
  </p>
@@ -1620,12 +1620,12 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <>
  <button
  onClick={() => openEditor(review)}
- className="px-4 py-2 rounded-xl text-xs font-bold text-white hover:opacity-90 shadow-sm"
+ className="min-h-11 px-4 py-2 rounded-[6px] text-xs font-bold text-white hover:opacity-90 shadow-none"
  style={{ background: config.color }}
  >
  초안 이어서 편집
  </button>
- <span className="text-[11px] text-[#8B95A1] truncate max-w-[280px]">
+ <span className="text-[11px] text-[var(--lu-muted)] truncate max-w-[280px]">
  {(review.draftReply || '').slice(0, 60)}{(review.draftReply || '').length > 60 ? '...' : ''}
  </span>
  </>
@@ -1634,7 +1634,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  onClick={() => handleGenerateDraft(review)}
  disabled={bulkRunning}
- className="px-4 py-2 rounded-xl text-xs font-bold text-white hover:opacity-90 shadow-sm disabled:opacity-50"
+ className="min-h-11 px-4 py-2 rounded-[6px] text-xs font-bold text-white hover:opacity-90 shadow-none disabled:opacity-50"
  style={{ background: config.color }}
  title="지역·업종·사진·키워드 자동 분석 → AI 답글 초안 생성"
  >
@@ -1643,7 +1643,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <button
  onClick={() => { setEditingId(review.id); setDraftText('') }}
  disabled={bulkRunning}
- className="px-4 py-2 rounded-xl text-xs font-bold bg-white border border-[#E5E8EB] text-[#4E5968] hover:bg-[#F2F4F6] shadow-sm disabled:opacity-50"
+ className="min-h-11 px-4 py-2 rounded-[6px] text-xs font-bold bg-white border border-[var(--lu-line)] text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)] shadow-none disabled:opacity-50"
  >
  직접 작성
  </button>
@@ -1685,7 +1685,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  />
  <button
  onClick={() => setLightboxUrl(null)}
- className="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 text-[#191F28] font-bold text-lg flex items-center justify-center hover:bg-white"
+ className="min-h-11 absolute top-4 right-4 w-10 h-10 rounded-full bg-white/90 text-[var(--lu-ink)] font-bold text-lg flex items-center justify-center hover:bg-white"
  aria-label="닫기"
  >
  <X size={18} strokeWidth={2.5} />
@@ -1702,19 +1702,19 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  onClick={() => setExpiredInfoOpen(false)}
  >
  <div
- className="bg-white rounded-2xl shadow-xl max-w-md w-full overflow-hidden"
+ className="bg-white rounded-[10px] shadow-xl max-w-md w-full overflow-hidden"
  onClick={(e) => e.stopPropagation()}
  >
- <div className="px-5 py-4 border-b border-[#F2F4F6] flex items-center justify-between">
+ <div className="px-5 py-4 border-b border-[var(--lu-canvas)] flex items-center justify-between">
  <div className="flex items-center gap-2">
- <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#F59E0B] to-[#D97706] flex items-center justify-center shadow-sm">
+ <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
  <span className="text-white text-lg">⏰</span>
  </div>
- <span className="text-base font-bold text-[#191F28]">답글 등록 불가 안내</span>
+ <span className="text-base font-bold text-[var(--lu-ink)]">답글 등록 불가 안내</span>
  </div>
  <button
  onClick={() => setExpiredInfoOpen(false)}
- className="text-[#8B95A1] hover:text-[#191F28] text-lg font-bold"
+ className="min-h-11 text-[var(--lu-muted)] hover:text-[var(--lu-ink)] text-lg font-bold"
  aria-label="닫기"
  >
  <X size={18} strokeWidth={2.5} />
@@ -1722,7 +1722,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  </div>
 
  <div className="px-5 py-5 space-y-3">
- <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-xl p-3">
+ <div className="bg-[#FEF3C7] border border-[#FDE68A] rounded-[6px] p-3">
  <p className="text-sm font-bold text-[#92400E] mb-1">배민 자체 정책 제한</p>
  <p className="text-xs text-[#92400E] leading-relaxed">
  배민은 등록된 지 <strong>30일이 지난 리뷰</strong>에는 사장님 댓글을 등록할 수 없습니다.
@@ -1730,33 +1730,33 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  </div>
 
  <div>
- <p className="text-xs font-bold text-[#191F28] mb-1.5">왜 이런 정책이 있나요?</p>
- <p className="text-xs text-[#4E5968] leading-relaxed">
+ <p className="text-xs font-bold text-[var(--lu-ink)] mb-1.5">왜 이런 정책이 있나요?</p>
+ <p className="text-xs text-[var(--lu-muted)] leading-relaxed">
  배민은 답글 신뢰성을 위해 30일 제한을 두고 있어요.
  로컬루션은 답글 발행 가능한 30일 이내 리뷰를 우선으로 처리합니다.
  </p>
  </div>
 
  <div>
- <p className="text-xs font-bold text-[#191F28] mb-1.5">대안</p>
- <ul className="text-xs text-[#4E5968] leading-relaxed space-y-1 list-disc list-inside">
+ <p className="text-xs font-bold text-[var(--lu-ink)] mb-1.5">대안</p>
+ <ul className="text-xs text-[var(--lu-muted)] leading-relaxed space-y-1 list-disc list-inside">
  <li>매일 오후 1시 자동 수집되는 새 리뷰에는 즉시 답글 가능</li>
  <li>새 리뷰 들어오면 카카오톡/Web Push 알림 받으세요</li>
  <li>24시간 이내 답글이 가장 효과적입니다</li>
  </ul>
  </div>
 
- <div className="bg-[#F0F9FF] border border-[#BAE6FD] rounded-xl p-3">
+ <div className="bg-[#F0F9FF] border border-[#BAE6FD] rounded-[6px] p-3">
  <p className="text-xs text-[#075985] leading-relaxed">
  <strong>로컬루션은 사장님이 놓치지 않도록 매일 자동 수집하고 알림까지 보내드립니다.</strong>
  </p>
  </div>
  </div>
 
- <div className="px-5 py-3 bg-[#F8F9FA] border-t border-[#F2F4F6]">
+ <div className="px-5 py-3 bg-[var(--lu-canvas)] border-t border-[var(--lu-canvas)]">
  <button
  onClick={() => setExpiredInfoOpen(false)}
- className="w-full px-4 py-2.5 bg-[#3182F6] text-white rounded-xl font-bold text-sm hover:bg-[#1B64DA] transition-colors"
+ className="min-h-11 w-full px-4 py-2.5 bg-[var(--lu-accent)] text-white rounded-[6px] font-bold text-sm hover:bg-[var(--lu-accent-hover)] transition-colors"
  >
  확인
  </button>
@@ -1830,46 +1830,46 @@ function KeywordAnalysis({ platform, platformLabel, platformColor }: { platform:
   }, [data, sortBy])
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm overflow-hidden mb-3">
+    <div className="bg-white rounded-[10px] shadow-none overflow-hidden mb-3">
       <button
         onClick={() => setOpen(o => !o)}
-        className="w-full flex items-center justify-between px-4 py-3 hover:bg-[#FAFBFF] transition-colors"
+        className="min-h-11 w-full flex items-center justify-between px-4 py-3 hover:bg-[#FAFBFF] transition-colors"
       >
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-[#7C3AED] to-[#EC4899] flex items-center justify-center shadow-sm">
+          <div className="w-8 h-8 rounded-lg bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
             <Sparkles size={14} className="text-white" strokeWidth={2.5} />
           </div>
           <div className="text-left">
-            <p className="text-sm font-black text-[#191F28]">키워드 분석 · 마케팅 추천</p>
-            <p className="text-[10px] text-[#8B95A1]">SEO 키워드 자동 추출 + 활용 가이드</p>
+            <p className="text-sm font-semibold text-[var(--lu-ink)]">키워드 분석 · 마케팅 추천</p>
+            <p className="text-[10px] text-[var(--lu-muted)]">SEO 키워드 자동 추출 + 활용 가이드</p>
           </div>
         </div>
-        <span className="text-xs text-[#8B95A1]">{open ? '접기' : '열기'}</span>
+        <span className="text-xs text-[var(--lu-muted)]">{open ? '접기' : '열기'}</span>
       </button>
 
       {open && (
-        <div className="px-3 md:px-4 pb-4 border-t border-[#F2F4F6]">
+        <div className="px-3 md:px-4 pb-4 border-t border-[var(--lu-canvas)]">
           {loading ? (
-            <p className="text-xs text-[#8B95A1] py-6 text-center">분석 중...</p>
+            <p className="text-xs text-[var(--lu-muted)] py-6 text-center">분석 중...</p>
           ) : !data || data.keywords.length === 0 ? (
-            <p className="text-xs text-[#8B95A1] py-6 text-center">분석할 키워드가 부족해요 (리뷰 더 모이면 자동 분석)</p>
+            <p className="text-xs text-[var(--lu-muted)] py-6 text-center">분석할 키워드가 부족해요 (리뷰 더 모이면 자동 분석)</p>
           ) : (
             <>
               {/* 탭 */}
-              <div className="inline-flex rounded-xl bg-[#F2F4F6] p-0.5 my-3 flex-wrap">
+              <div className="inline-flex rounded-[6px] bg-[var(--lu-canvas)] p-0.5 my-3 flex-wrap">
                 <button onClick={() => setTab('features')}
                   className={'px-3 py-1.5 rounded-lg text-xs font-bold ' +
-                    (tab === 'features' ? 'bg-white text-[#191F28] shadow-sm' : 'text-[#8B95A1]')}>
+                    (tab === 'features' ? 'bg-white text-[var(--lu-ink)] shadow-none' : 'text-[var(--lu-muted)]')}>
                   메뉴 · 특징
                 </button>
                 <button onClick={() => setTab('recommend')}
                   className={'px-3 py-1.5 rounded-lg text-xs font-bold ' +
-                    (tab === 'recommend' ? 'bg-white text-[#191F28] shadow-sm' : 'text-[#8B95A1]')}>
+                    (tab === 'recommend' ? 'bg-white text-[var(--lu-ink)] shadow-none' : 'text-[var(--lu-muted)]')}>
                   마케팅 추천
                 </button>
                 <button onClick={() => setTab('all')}
                   className={'px-3 py-1.5 rounded-lg text-xs font-bold ' +
-                    (tab === 'all' ? 'bg-white text-[#191F28] shadow-sm' : 'text-[#8B95A1]')}>
+                    (tab === 'all' ? 'bg-white text-[var(--lu-ink)] shadow-none' : 'text-[var(--lu-muted)]')}>
                   전체 ({data.keywords.length})
                 </button>
               </div>
@@ -1895,8 +1895,8 @@ function KeywordAnalysis({ platform, platformLabel, platformColor }: { platform:
                     <CategoryBlock
                       title="마케팅 활용 강점"
                       desc="긍정 비율 75%+ · SNS 캡션·광고 카피·해시태그에 사용"
-                      color="#3182F6"
-                      bg="#EFF6FF"
+                      color="var(--lu-accent)"
+                      bg="var(--lu-accent-soft)"
                       keywords={data.by_category.marketing_pick}
                     />
                   )}
@@ -1924,11 +1924,11 @@ function KeywordAnalysis({ platform, platformLabel, platformColor }: { platform:
                    data.by_category.marketing_pick.length === 0 &&
                    data.by_category.blog_topic.length === 0 &&
                    data.by_category.improvement.length === 0 && (
-                    <p className="text-xs text-[#8B95A1] py-4 text-center">아직 추천할 만한 키워드가 부족해요. 리뷰 30개 이상 모이면 더 정확해져요.</p>
+                    <p className="text-xs text-[var(--lu-muted)] py-4 text-center">아직 추천할 만한 키워드가 부족해요. 리뷰 30개 이상 모이면 더 정확해져요.</p>
                   )}
 
                   {/* 통합 활용 안내 */}
-                  <div className="mt-4 p-3 rounded-xl bg-gradient-to-br from-[#FAFBFF] to-[#FEF3C7] border border-[#FDE68A]">
+                  <div className="mt-4 p-3 rounded-[6px] bg-[var(--lu-accent)] border border-[#FDE68A]">
                     <p className="text-[11px] font-bold text-[#92400E] mb-1.5">활용 가이드</p>
                     <ul className="text-[11px] text-[#92400E] space-y-1 leading-relaxed list-disc pl-5">
                       <li><strong>시그니처</strong> 키워드 → 네이버 플레이스 소개글·매장 슬로건·메뉴판 강조</li>
@@ -1943,7 +1943,7 @@ function KeywordAnalysis({ platform, platformLabel, platformColor }: { platform:
               {tab === 'all' && (
                 <>
                   <div className="flex items-center gap-2 mb-2 flex-wrap">
-                    <span className="text-[11px] text-[#8B95A1]">{data.total_reviews}개 리뷰 · {data.keywords.length}개 키워드 ·</span>
+                    <span className="text-[11px] text-[var(--lu-muted)]">{data.total_reviews}개 리뷰 · {data.keywords.length}개 키워드 ·</span>
                     {([
                       ['score', '마케팅 점수'],
                       ['count', '빈도'],
@@ -1953,7 +1953,7 @@ function KeywordAnalysis({ platform, platformLabel, platformColor }: { platform:
                     ] as const).map(([v, l]) => (
                       <button key={v} onClick={() => setSortBy(v)}
                         className={'text-[11px] font-bold px-2 py-1 rounded-lg ' +
-                          (sortBy === v ? 'text-white' : 'bg-[#F2F4F6] text-[#4E5968]')}
+                          (sortBy === v ? 'text-white' : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]')}
                         style={sortBy === v ? { background: platformColor } : {}}>
                         {l}
                       </button>
@@ -1979,7 +1979,7 @@ function FeaturesTab({ byFeature, order, platformColor }: {
   platformColor: string
 }) {
   const FEATURE_LABELS: Record<string, { color: string; bg: string; desc: string }> = {
-    '메뉴': { color: '#3182F6', bg: '#EFF6FF', desc: '리뷰에서 언급된 메뉴 (자주 + 별점)' },
+    '메뉴': { color: '#16685D', bg: 'var(--lu-accent-soft)', desc: '리뷰에서 언급된 메뉴 (자주 + 별점)' },
     '맛': { color: '#DC2626', bg: '#FEF2F2', desc: '맛 관련 표현 (맛있/풍미/담백 등)' },
     '서비스': { color: '#7C3AED', bg: '#F5F3FF', desc: '직원/사장님 응대' },
     '청결도': { color: '#0891B2', bg: '#ECFEFF', desc: '깨끗함/위생' },
@@ -1990,27 +1990,27 @@ function FeaturesTab({ byFeature, order, platformColor }: {
     '만족도': { color: '#059669', bg: '#D1FAE5', desc: '재방문/추천/만족' },
     '목적': { color: '#8B5CF6', bg: '#EDE9FE', desc: '데이트/가족/회식 등' },
     '예약': { color: '#0EA5E9', bg: '#E0F2FE', desc: '예약/웨이팅' },
-    '기타': { color: '#6B7280', bg: '#F2F4F6', desc: '미분류' },
+    '기타': { color: '#6B7280', bg: 'var(--lu-canvas)', desc: '미분류' },
   }
   const nonEmpty = order.filter(c => (byFeature[c] || []).length > 0)
   if (nonEmpty.length === 0) {
-    return <p className="text-xs text-[#8B95A1] py-6 text-center">분류된 키워드가 부족해요</p>
+    return <p className="text-xs text-[var(--lu-muted)] py-6 text-center">분류된 키워드가 부족해요</p>
   }
 
   return (
     <div className="space-y-3">
-      <p className="text-[11px] text-[#8B95A1] leading-relaxed">
+      <p className="text-[11px] text-[var(--lu-muted)] leading-relaxed">
         네이버 플레이스 스타일 분류 · 메뉴 + 10개 특징으로 키워드를 자동 분류했어요. 카테고리별로 어떤 점이 많이 언급되는지 한눈에 보세요.
       </p>
       {nonEmpty.map(cat => {
         const meta = FEATURE_LABELS[cat] || FEATURE_LABELS['기타']
         const items = byFeature[cat] || []
         return (
-          <div key={cat} className="rounded-xl p-3 border" style={{ background: meta.bg, borderColor: meta.color + '30' }}>
+          <div key={cat} className="rounded-[6px] p-3 border" style={{ background: meta.bg, borderColor: meta.color + '30' }}>
             <div className="flex items-center justify-between gap-2 mb-2 flex-wrap">
               <div>
-                <span className="text-sm font-black" style={{ color: meta.color }}>{cat}</span>
-                <span className="text-[10px] text-[#8B95A1] ml-2">{items.length}개</span>
+                <span className="text-sm font-semibold" style={{ color: meta.color }}>{cat}</span>
+                <span className="text-[10px] text-[var(--lu-muted)] ml-2">{items.length}개</span>
               </div>
               <span className="text-[10px]" style={{ color: meta.color + 'cc' }}>{meta.desc}</span>
             </div>
@@ -2020,8 +2020,8 @@ function FeaturesTab({ byFeature, order, platformColor }: {
                   className="inline-flex items-center gap-1 px-2 py-1 rounded-lg bg-white border text-[11px] font-bold"
                   style={{ borderColor: meta.color + '40' }}
                   title={`긍정 ${k.positive_ratio}%${k.avg_rating !== null ? ' · 별점 ' + k.avg_rating : ''}`}>
-                  <span className="text-[#191F28]">{k.keyword}</span>
-                  <span className="text-[#8B95A1] tabular-nums">{k.count}</span>
+                  <span className="text-[var(--lu-ink)]">{k.keyword}</span>
+                  <span className="text-[var(--lu-muted)] tabular-nums">{k.count}</span>
                   {k.avg_rating !== null && (
                     <span className="tabular-nums" style={{
                       color: k.avg_rating >= 4 ? '#059669' : k.avg_rating >= 3 ? '#F59E0B' : '#DC2626'
@@ -2031,7 +2031,7 @@ function FeaturesTab({ byFeature, order, platformColor }: {
                   )}
                 </span>
               ))}
-              {items.length > 16 && <span className="text-[11px] text-[#8B95A1] self-center">+{items.length - 16}개</span>}
+              {items.length > 16 && <span className="text-[11px] text-[var(--lu-muted)] self-center">+{items.length - 16}개</span>}
             </div>
           </div>
         )
@@ -2044,9 +2044,9 @@ function CategoryBlock({ title, desc, color, bg, keywords }: {
   title: string; desc: string; color: string; bg: string; keywords: Keyword[]
 }) {
   return (
-    <div className="rounded-xl p-3 border" style={{ background: bg, borderColor: color + '30' }}>
+    <div className="rounded-[6px] p-3 border" style={{ background: bg, borderColor: color + '30' }}>
       <div className="mb-2">
-        <p className="text-sm font-black" style={{ color }}>{title}</p>
+        <p className="text-sm font-semibold" style={{ color }}>{title}</p>
         <p className="text-[10px] mt-0.5" style={{ color: color + 'cc' }}>{desc}</p>
       </div>
       <div className="space-y-1.5">
@@ -2054,8 +2054,8 @@ function CategoryBlock({ title, desc, color, bg, keywords }: {
           <div key={k.keyword} className="bg-white rounded-lg p-2.5 border border-white">
             <div className="flex items-center justify-between gap-2 flex-wrap">
               <div className="flex items-center gap-2 min-w-0 flex-1">
-                <span className="text-sm font-black text-[#191F28] truncate">#{k.keyword}</span>
-                <span className="text-[10px] text-[#8B95A1] tabular-nums flex-shrink-0">{k.count}회</span>
+                <span className="text-sm font-semibold text-[var(--lu-ink)] truncate">#{k.keyword}</span>
+                <span className="text-[10px] text-[var(--lu-muted)] tabular-nums flex-shrink-0">{k.count}회</span>
               </div>
               <div className="flex items-center gap-1.5 text-[11px] flex-shrink-0">
                 {k.avg_rating !== null && (
@@ -2075,7 +2075,7 @@ function CategoryBlock({ title, desc, color, bg, keywords }: {
             {k.suggested_use.length > 0 && (
               <div className="mt-1.5 flex flex-wrap gap-1">
                 {k.suggested_use.map(u => (
-                  <span key={u} className="text-[9px] px-1.5 py-0.5 rounded bg-[#F2F4F6] text-[#4E5968] font-bold">
+                  <span key={u} className="text-[9px] px-1.5 py-0.5 rounded bg-[var(--lu-canvas)] text-[var(--lu-muted)] font-bold">
                     {u}
                   </span>
                 ))}
@@ -2090,12 +2090,12 @@ function CategoryBlock({ title, desc, color, bg, keywords }: {
 
 function KeywordRow({ k }: { k: Keyword }) {
   return (
-    <div className="flex items-center justify-between gap-2 p-2.5 rounded-xl bg-[#FAFBFF] border border-[#F2F4F6]">
+    <div className="flex items-center justify-between gap-2 p-2.5 rounded-[6px] bg-[#FAFBFF] border border-[var(--lu-canvas)]">
       <div className="flex items-center gap-2 min-w-0 flex-1">
-        <span className="text-sm font-bold text-[#191F28] truncate">{k.keyword}</span>
-        <span className="text-[10px] text-[#8B95A1] flex-shrink-0">{k.count}회</span>
+        <span className="text-sm font-bold text-[var(--lu-ink)] truncate">{k.keyword}</span>
+        <span className="text-[10px] text-[var(--lu-muted)] flex-shrink-0">{k.count}회</span>
         {k.marketing_score >= 70 && (
-          <span className="text-[9px] font-black bg-[#7C3AED] text-white px-1 py-0.5 rounded flex-shrink-0">
+          <span className="text-[9px] font-semibold bg-[#7C3AED] text-white px-1 py-0.5 rounded flex-shrink-0">
             점수 {k.marketing_score}
           </span>
         )}
@@ -2165,7 +2165,7 @@ function CoupangStorePicker({ onPicked }: { onPicked: () => void | Promise<void>
  return (
  <button
  onClick={() => { setOpen(true); load() }}
- className="inline-flex items-center gap-1.5 px-3 py-2 rounded-xl bg-[#FFF7ED] border border-[#FED7AA] text-[#9A3412] text-xs font-bold hover:bg-[#FFEDD5]"
+ className="min-h-11 inline-flex items-center gap-1.5 px-3 py-2 rounded-[6px] bg-[#FFF7ED] border border-[#FED7AA] text-[#9A3412] text-xs font-bold hover:bg-[#FFEDD5]"
  >
  매장이 여러 개인가요? 직접 선택
  </button>
@@ -2173,10 +2173,10 @@ function CoupangStorePicker({ onPicked }: { onPicked: () => void | Promise<void>
  }
 
  return (
- <div className="mt-3 p-4 rounded-2xl bg-[#FFF7ED] border border-[#FED7AA] text-left">
+ <div className="mt-3 p-4 rounded-[10px] bg-[#FFF7ED] border border-[#FED7AA] text-left">
  <div className="flex items-center justify-between mb-3">
  <h3 className="text-sm font-bold text-[#9A3412]">매장 선택</h3>
- <button onClick={() => setOpen(false)} className="text-xs text-[#9A3412]">닫기</button>
+ <button onClick={() => setOpen(false)} className="min-h-11 text-xs text-[#9A3412]">닫기</button>
  </div>
  {loading && <p className="text-xs text-[#9A3412]">매장 목록 불러오는 중...</p>}
  {errorMsg && (
@@ -2226,7 +2226,7 @@ function CoupangStorePicker({ onPicked }: { onPicked: () => void | Promise<void>
  } catch (e: any) { setErrorMsg(e?.message || '오류') }
  finally { setPicking(null) }
  }}
- className="px-3 py-2 rounded-lg bg-[#F97316] text-white text-xs font-bold hover:bg-[#EA580C]"
+ className="min-h-11 px-3 py-2 rounded-lg bg-[#F97316] text-white text-xs font-bold hover:bg-[#EA580C]"
  >
  매장 URL 직접 입력
  </button>
@@ -2258,7 +2258,7 @@ function CoupangStorePicker({ onPicked }: { onPicked: () => void | Promise<void>
  finally { setPicking(null) }
  }}
  disabled={picking !== null}
- className="px-2.5 py-1 rounded-lg bg-[#9A3412] text-white text-[11px] font-bold hover:bg-[#7C2D12] disabled:opacity-50 flex-shrink-0"
+ className="min-h-11 px-2.5 py-1 rounded-lg bg-[#9A3412] text-white text-[11px] font-bold hover:bg-[#7C2D12] disabled:opacity-50 flex-shrink-0"
  >
  전체 {stores.length}개 한꺼번에
  </button>
@@ -2268,16 +2268,16 @@ function CoupangStorePicker({ onPicked }: { onPicked: () => void | Promise<void>
  key={s.storeId}
  onClick={() => pick(s.storeId)}
  disabled={picking !== null}
- className={'w-full text-left p-3 rounded-xl border-2 transition disabled:opacity-50 ' +
+ className={'w-full text-left p-3 rounded-[6px] border-2 transition disabled:opacity-50 ' +
  (currentPrimary === s.storeId ? 'border-[#F97316] bg-white' : 'border-transparent bg-white hover:border-[#FED7AA]')}
  >
  <div className="flex items-center justify-between">
  <div className="min-w-0">
- <div className="text-sm font-bold text-[#191F28] truncate">
+ <div className="text-sm font-bold text-[var(--lu-ink)] truncate">
  {s.name || '매장명 미지정'}
  {currentPrimary === s.storeId && <span className="ml-2 text-[10px] text-[#F97316]">(현재)</span>}
  </div>
- <div className="text-[11px] text-[#8B95A1] font-mono">매장 ID: {s.storeId}</div>
+ <div className="text-[11px] text-[var(--lu-muted)] font-mono">매장 ID: {s.storeId}</div>
  </div>
  <span className="text-xs font-bold text-[#F97316] flex-shrink-0 ml-2">
  {picking === s.storeId ? '...' : '선택'}

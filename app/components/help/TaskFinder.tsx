@@ -40,7 +40,7 @@ export default function TaskFinder() {
   return (
     <section id="find-tools" aria-labelledby="find-tools-title" className="scroll-mt-24 rounded-[10px] border border-[var(--lu-line)] bg-white p-4 shadow-none md:p-6">
       <div className="mb-5 flex items-start gap-3">
-        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-gradient-to-br from-[var(--lu-accent)] to-[var(--lu-accent-hover)] shadow-none"><Compass size={16} className="text-[var(--lu-accent)]" strokeWidth={1.8} aria-hidden="true" /></div>
+        <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-[6px] bg-[var(--lu-accent)] shadow-none"><Compass size={16} className="text-[var(--lu-accent)]" strokeWidth={1.8} aria-hidden="true" /></div>
         <div className="min-w-0">
           <h2 id="find-tools-title" className="text-lg font-bold text-[var(--lu-ink)]">내 가게에 필요한 일부터 찾아보세요</h2>
           <p className="mt-1 text-sm leading-6 text-[var(--lu-muted)]">업종을 고르거나 짧은 검색어로 필요한 작업을 찾아보세요.</p>
@@ -55,7 +55,7 @@ export default function TaskFinder() {
       <label htmlFor="business-task-search" className="mb-2 block text-sm font-semibold text-[var(--lu-ink)]">작업 검색</label>
       <div className="flex min-h-[48px] items-center gap-2 rounded-[6px] border border-[var(--lu-line)] px-3 focus-within:border-[var(--lu-accent)] focus-within:ring-2 focus-within:ring-blue-100">
         <Search size={18} className="shrink-0 text-[var(--lu-muted)]" aria-hidden="true" />
-        <input id="business-task-search" type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: 휴무" aria-describedby="task-search-hint" className="min-w-0 flex-1 bg-transparent py-3 text-base text-[var(--lu-ink)] outline-none" />
+        <input id="business-task-search" type="search" value={query} onChange={event => setQuery(event.target.value)} placeholder="예: 휴무" aria-describedby="task-search-hint" className="min-h-11 min-w-0 flex-1 bg-transparent py-3 text-base text-[var(--lu-ink)] outline-none" />
       </div>
       <p id="task-search-hint" className="mt-2 text-xs leading-5 text-[var(--lu-muted)]">휴무, 예약처럼 짧은 단어로 찾아보세요. 아래 예시를 눌러도 돼요.</p>
       <div className="mt-2 flex flex-wrap gap-2">{EXAMPLES.map(example => <button key={example} type="button" onClick={() => setQuery(example)} className="min-h-[44px] rounded-[6px] bg-[var(--lu-canvas)] px-3 py-2 text-sm text-[var(--lu-muted)] hover:bg-[var(--lu-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[var(--lu-accent)]">{example}</button>)}</div>

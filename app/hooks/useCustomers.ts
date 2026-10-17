@@ -52,6 +52,7 @@ export function useCustomers(): UseCustomersResult {
  const [loading, setLoading] = useState(true);
  const [error, setError] = useState<string | null>(null);
  const migratedRef = useRef(false);
+ const bootstrapSequence = useRef(0);
 
  // ---------- 로컬 (게스트 모드) ----------
  const readLocal = (): Customer[] => {
@@ -72,21 +73,9 @@ export function useCustomers(): UseCustomersResult {
  };
 
  // ---------- DB 모드 캐시 (오프라인 즉시 표시) ----------
- const readCache = (): Customer[] => {
- try {
- const raw = localStorage.getItem(LS_CACHE_KEY);
- if (!raw) return [];
- const parsed = JSON.parse(raw);
- return Array.isArray(parsed) ? (parsed as Customer[]) : [];
- } catch {
- return [];
- }
- };
-
- const writeCache = (next: Customer[]) => {
- try {
- localStorage.setItem(LS_CACHE_KEY, JSON.stringify(next));
- } catch {}
+ // Legacy shared cache has no verified account owner. Never read or persist it.
+ const writeCache = (_next: Customer[]) => {
+ try { localStorage.removeItem(LS_CACHE_KEY); } catch {}
  };
 
  // ---------- 원격 (우리 API) ----------
@@ -157,15 +146,17 @@ export function useCustomers(): UseCustomersResult {
 
  // ---------- 초기 로드 ----------
  const bootstrap = useCallback(async () => {
+ const sequence = ++bootstrapSequence.current;
  setLoading(true);
+ setCustomers([]);
+ setMode('loading');
  setError(null);
+ writeCache([]);
  try {
- // 1. 캐시 즉시 표시 (UX) — 네트워크 응답 대기 안 함
- const cached = readCache();
- if (cached.length > 0) setCustomers(cached);
 
  // 2. 우리 API 호출 — 401 이면 미로그인
  const r = await fetch('/api/customers', { credentials: 'include', cache: 'no-store' });
+ if (sequence !== bootstrapSequence.current) return;
  if (r.status === 401 || r.status === 403) {
  // 미로그인 → 로컬 모드 (게스트)
  setCustomers(readLocal());
@@ -174,11 +165,14 @@ export function useCustomers(): UseCustomersResult {
  }
  if (r.ok) {
  const j = await r.json();
+ if (sequence !== bootstrapSequence.current) return;
  if (j.ok) {
  // 첫 진입 시 1회 마이그레이션 시도
  await ensureMigrated();
+ if (sequence !== bootstrapSequence.current) return;
  // 마이그레이션 후 재조회 (DB가 source of truth)
  const refetched = await fetchRemote();
+ if (sequence !== bootstrapSequence.current) return;
  setCustomers(refetched || []);
  setMode('remote');
  return;
@@ -188,15 +182,27 @@ export function useCustomers(): UseCustomersResult {
  setCustomers(readLocal());
  setMode('local');
  } catch (_) {
+ if (sequence !== bootstrapSequence.current) return;
  setCustomers(readLocal());
  setMode('local');
  } finally {
- setLoading(false);
+ if (sequence === bootstrapSequence.current) setLoading(false);
  }
  }, [ensureMigrated, fetchRemote]);
 
  useEffect(() => {
- bootstrap();
+ void bootstrap();
+ const recheck = () => { void bootstrap(); };
+ const visibility = () => { if (document.visibilityState === 'visible') recheck(); };
+ window.addEventListener('focus', recheck);
+ window.addEventListener('localution:auth-changed', recheck);
+ document.addEventListener('visibilitychange', visibility);
+ return () => {
+ bootstrapSequence.current++;
+ window.removeEventListener('focus', recheck);
+ window.removeEventListener('localution:auth-changed', recheck);
+ document.removeEventListener('visibilitychange', visibility);
+ };
  }, [bootstrap]);
 
  // ---------- CRUD ----------

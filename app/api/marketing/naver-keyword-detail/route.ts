@@ -40,20 +40,30 @@ export async function GET(req: NextRequest) {
  const keyword = new URL(req.url).searchParams.get('keyword') || ''
  if (!keyword.trim()) return NextResponse.json({ error: '키워드를 입력해주세요.' }, { status: 400 })
 
+ const sourceStatus: Record<string, string> = {}
+ const request = async (source: string, url: string, init?: RequestInit) => {
+ const controller = new AbortController()
+ const timer = setTimeout(() => controller.abort(), 12000)
+ try {
+ const response = await fetch(url, { ...init, signal: controller.signal, cache: 'no-store' })
+ if (!response.ok) { sourceStatus[source] = `http_${response.status}`; return null }
+ const data = await response.json()
+ sourceStatus[source] = 'success'
+ return data
+ } catch { sourceStatus[source] = controller.signal.aborted ? 'timeout' : 'network_error'; return null }
+ finally { clearTimeout(timer) }
+ }
+ const unavailable = () => NextResponse.json({ ok: false, code: 'upstream_unavailable', error: '일부 검색 자료를 가져오지 못했어요. 조회 실패를 0건으로 표시하지 않았어요. 잠시 후 다시 시도해주세요.', sourceStatus, partial: Object.values(sourceStatus).some(value => value === 'success') }, { status: 502 })
  try {
  const adPath = '/keywordstool'
  const adQs = '?hintKeywords=' + encodeURIComponent(keyword) + '&showDetail=1'
 
- const [adRes, blogRes, cafeRes] = await Promise.all([
- fetch(AD_BASE + adPath + adQs, { headers: adHeaders('GET', adPath) }),
- fetch('https://openapi.naver.com/v1/search/blog?query=' + encodeURIComponent(keyword) + '&display=1', { headers: openHeaders() }),
- fetch('https://openapi.naver.com/v1/search/cafearticle?query=' + encodeURIComponent(keyword) + '&display=1', { headers: openHeaders() }),
+ const [adData, blogData, cafeData] = await Promise.all([
+ request('ads', AD_BASE + adPath + adQs, { headers: adHeaders('GET', adPath) }),
+ request('blog', 'https://openapi.naver.com/v1/search/blog?query=' + encodeURIComponent(keyword) + '&display=1', { headers: openHeaders() }),
+ request('cafe', 'https://openapi.naver.com/v1/search/cafearticle?query=' + encodeURIComponent(keyword) + '&display=1', { headers: openHeaders() }),
  ])
-
- const adData = adRes.ok ? await adRes.json() : null
- const blogData = blogRes.ok ? await blogRes.json() : null
- const cafeData = cafeRes.ok ? await cafeRes.json() : null
-
+ if (!adData || !blogData || !cafeData) return unavailable()
  const kwData = (adData?.keywordList || []).find((k: { relKeyword: string }) => k.relKeyword === keyword)
  || adData?.keywordList?.[0]
  || null
@@ -62,7 +72,7 @@ export async function GET(req: NextRequest) {
  const endDate = now.toISOString().slice(0, 10)
  const startDate = new Date(now.getFullYear() - 1, now.getMonth(), 1).toISOString().slice(0, 10)
 
- const dlRes = await fetch('https://openapi.naver.com/v1/datalab/search', {
+ const dlData = await request('datalab', 'https://openapi.naver.com/v1/datalab/search', {
  method: 'POST',
  headers: { ...openHeaders(), 'Content-Type': 'application/json' },
  body: JSON.stringify({
@@ -70,18 +80,23 @@ export async function GET(req: NextRequest) {
  keywordGroups: [{ groupName: keyword, keywords: [keyword] }],
  }),
  })
- const dlData = dlRes.ok ? await dlRes.json() : null
+ if (!dlData) return unavailable()
+ const numeric = (value: unknown) => typeof value === 'number' && Number.isFinite(value) && value >= 0 || typeof value === 'string' && /^\d+$/.test(value)
+ if (!kwData || !numeric(kwData.monthlyPcQcCnt) || !numeric(kwData.monthlyMobileQcCnt) || !numeric(blogData.total) || !numeric(cafeData.total) || !Array.isArray(dlData.results?.[0]?.data)) {
+ sourceStatus.validation = 'invalid_or_limited_data'
+ return unavailable()
+ }
 
  const pc = Number(kwData?.monthlyPcQcCnt) || 0
  const mobile = Number(kwData?.monthlyMobileQcCnt) || 0
  const total = pc + mobile
- const blog = blogData?.total || 0
- const cafe = cafeData?.total || 0
+ const blog = Number(blogData.total)
+ const cafe = Number(cafeData.total)
  const contentTotal = blog + cafe
  const saturation = total > 0 ? Math.round((contentTotal / total) * 10) / 10 : 0
 
  return NextResponse.json({
- ok: true, keyword,
+ ok: true, keyword, sourceStatus,
  volume: { pc, mobile, total, compIdx: kwData?.compIdx || '-' },
  content: { blog, cafe, total: contentTotal, saturation },
  trend: dlData?.results?.[0]?.data || [],
