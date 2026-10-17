@@ -3,10 +3,10 @@
 // ============================================================
 // HarangMarketingPopup — 하랑마케팅 홍보 팝업 (우측 하단)
 //   · 일반 자영업자가 로컬루션 사용 중 마케팅 대행을 검토할 수 있도록 안내
-//   · 첫 방문 후 5초 뒤 슬라이드 업, 닫으면 24시간 안 보임 (localStorage)
-//   · 모바일/PC 모두 우측 하단 고정 (z-40, 작고 비방해)
+//   · 상담 버튼으로 먼저 표시, 펼치기와 세션 단위 닫기 지원
+//   · 모바일/PC 모두 우측 하단 고정 (z-40)
 //
-//   [주의] DO_NOT_TOUCH: 사장님 (하랑마케팅) 자체 홍보 — 함부로 텍스트/색상 변경 금지
+//   2026-10-18 대표 전체 디자인 변경 지시: 홍보 내용과 연결은 보존하고 업무보드 토큰 적용
 // ============================================================
 import { useState, useEffect } from 'react'
 import Link from 'next/link'
@@ -17,7 +17,7 @@ import { X, Sparkles, ArrowRight, Megaphone } from 'lucide-react'
 export default function HarangMarketingPopup() {
   // 사장님 요청: 항상 보이게 (5초 지연 / 24시간 닫기 기억 모두 제거)
   const [show, setShow] = useState(true)
-  const [expanded, setExpanded] = useState(true)
+  const [expanded, setExpanded] = useState(false)
 
   function dismiss() {
     setShow(false)
@@ -41,11 +41,12 @@ export default function HarangMarketingPopup() {
     return (
       <button
         onClick={() => setExpanded(true)}
-        className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 px-4 py-3 rounded-full shadow-lg shadow-purple-300/40 bg-gradient-to-r from-[#7C3AED] via-[#A855F7] to-[#EC4899] text-white text-sm font-bold hover:scale-105 transition-transform"
+        className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 px-4 py-3 min-h-11 rounded-[6px] border border-[var(--lu-line)] bg-white text-[var(--lu-accent)] text-sm font-semibold shadow-sm hover:bg-[var(--lu-accent-soft)] transition-colors"
         style={{ animation: 'harangSlideUp 0.4s ease-out' }}
-        aria-label="하랑마케팅 문의"
+        aria-label="하랑마케팅 문의 안내 펼치기"
+        aria-expanded={false}
       >
-        <Megaphone size={16} strokeWidth={2.5} className="animate-pulse" />
+        <Megaphone size={16} strokeWidth={2.5} aria-hidden="true" />
         <span className="hidden sm:inline">마케팅 도움 받기</span>
         <span className="sm:hidden">상담</span>
         <style>{`
@@ -60,20 +61,20 @@ export default function HarangMarketingPopup() {
 
   return (
     <div
-      className="fixed bottom-4 right-4 z-40 w-[calc(100vw-2rem)] max-w-[340px] rounded-2xl shadow-2xl shadow-purple-300/30 overflow-hidden bg-white border border-[#E9D5FF]"
+      className="fixed bottom-4 right-4 z-40 w-[calc(100vw-2rem)] max-w-[340px] max-h-[calc(100dvh-6rem)] overflow-y-auto rounded-[10px] shadow-sm bg-white border border-[var(--lu-line)]"
       style={{ animation: 'harangPopIn 0.35s cubic-bezier(0.16, 1, 0.3, 1)' }}
     >
       {/* 헤더 */}
-      <div className="relative px-4 py-3 bg-gradient-to-br from-[#7C3AED] via-[#A855F7] to-[#EC4899] text-white">
+      <div className="relative px-4 py-4 pr-14 bg-[var(--lu-accent-soft)] text-[var(--lu-ink)]">
         <button
           onClick={dismiss}
-          className="absolute top-2 right-2 w-7 h-7 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors"
+          className="absolute top-2 right-2 w-11 h-11 rounded-[6px] hover:bg-white flex items-center justify-center transition-colors"
           aria-label="닫기"
         >
           <X size={14} strokeWidth={2.5} />
         </button>
         <div className="flex items-center gap-2 mb-1">
-          <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+          <div className="w-7 h-7 rounded-[6px] bg-white text-[var(--lu-accent)] flex items-center justify-center">
             <Sparkles size={13} strokeWidth={2.5} />
           </div>
           <span className="text-xs font-bold uppercase tracking-wide">하랑마케팅 x 로컬루션</span>
@@ -93,9 +94,9 @@ export default function HarangMarketingPopup() {
           <FeatureLine text="월 단위 / 캠페인 단위 유연한 계약" />
         </div>
 
-        <div className="rounded-xl bg-gradient-to-br from-[#FAF5FF] to-[#FCE7F3] border border-[#E9D5FF] p-2.5">
-          <p className="text-[11px] font-bold text-[#7C3AED] mb-0.5">10년차 마케터 직접 운영</p>
-          <p className="text-[10px] text-[#6B21A8] leading-relaxed">
+        <div className="rounded-[6px] bg-[var(--lu-accent-soft)] border border-[var(--lu-line)] p-2.5">
+          <p className="text-xs font-bold text-[var(--lu-accent)] mb-0.5">10년차 마케터 직접 운영</p>
+          <p className="text-xs text-[var(--lu-muted)] leading-relaxed">
             하랑마케팅 대표가 직접 진단 / 전략 수립 / 실행까지 책임집니다.
           </p>
         </div>
@@ -106,7 +107,7 @@ export default function HarangMarketingPopup() {
         <Link
           href="/inquiry?category=마케팅"
           onClick={dismiss}
-          className="flex-1 inline-flex items-center justify-center gap-1.5 px-3 py-2 rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#EC4899] text-white text-xs font-bold hover:opacity-90 shadow-sm"
+          className="flex-1 inline-flex items-center justify-center gap-1.5 min-h-11 px-3 py-2 rounded-[6px] bg-[var(--lu-accent)] text-white text-xs font-semibold hover:bg-[var(--lu-accent-hover)] shadow-none"
         >
           <Megaphone size={12} strokeWidth={2.5} />
           무료 상담 신청
@@ -114,7 +115,7 @@ export default function HarangMarketingPopup() {
         </Link>
         <button
           onClick={dismiss}
-          className="px-3 py-2 rounded-xl border border-[#E5E8EB] text-[11px] font-bold text-[#8B95A1] hover:bg-[#F8F9FA]"
+          className="min-h-11 px-3 py-2 rounded-[6px] border border-[var(--lu-line)] text-xs font-semibold text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)]"
         >
           나중에
         </button>
@@ -133,8 +134,8 @@ export default function HarangMarketingPopup() {
 function FeatureLine({ text }: { text: string }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="w-1 h-1 rounded-full bg-[#7C3AED] flex-shrink-0" />
-      <span className="text-[11px] text-[#4E5968] leading-relaxed">{text}</span>
+      <span className="w-1 h-1 rounded-full bg-[var(--lu-accent)] flex-shrink-0" />
+      <span className="text-xs text-[var(--lu-muted)] leading-relaxed">{text}</span>
     </div>
   )
 }
