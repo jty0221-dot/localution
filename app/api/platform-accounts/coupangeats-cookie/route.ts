@@ -11,13 +11,13 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
  const user = await requireUser()
- if (!user) return NextResponse.json({ ok: false, error: 'unauthenticated' }, { status: 401 })
+ if (!user.ok) return NextResponse.json({ ok: false, error: user.message }, { status: user.status })
 
  const svc = createServiceClient()
  const { data } = await svc
  .from('platform_credentials')
  .select('extra_data')
- .eq('user_id', user.id)
+ .eq('user_id', user.userId)
  .eq('platform', 'coupangeats')
  .maybeSingle()
 
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
  const user = await requireUser()
- if (!user) return NextResponse.json({ ok: false, error: 'unauthenticated' }, { status: 401 })
+ if (!user.ok) return NextResponse.json({ ok: false, error: user.message }, { status: user.status })
 
  const body = await req.json().catch(() => null)
  if (!body) return NextResponse.json({ ok: false, error: 'invalid body' }, { status: 400 })
@@ -61,7 +61,7 @@ export async function POST(req: NextRequest) {
  const { data: existing } = await svc
  .from('platform_credentials')
  .select('extra_data')
- .eq('user_id', user.id)
+ .eq('user_id', user.userId)
  .eq('platform', 'coupangeats')
  .maybeSingle()
 
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
  const { error } = await svc
  .from('platform_credentials')
  .update({ extra_data: extraData, updated_at: new Date().toISOString() })
- .eq('user_id', user.id)
+ .eq('user_id', user.userId)
  .eq('platform', 'coupangeats')
 
  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })

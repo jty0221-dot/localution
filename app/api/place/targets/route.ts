@@ -8,7 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/app/lib/adminAuth'
 import { requireUser } from '@/app/lib/userAuth'
-import { extractPlaceIdAndCategory, lookupPlace, type PlaceInfo } from '@/app/lib/naver-place'
+import { extractPlaceIdAndCategory, lookupPlace, PlaceLookupError, type PlaceInfo } from '@/app/lib/naver-place'
 import { calcStoreScore } from '@/app/lib/place-score'
 
 export const runtime = 'nodejs'
@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
  try {
  info = await lookupPlace(id, category)
  } catch (e) {
- console.warn('[place/targets POST] lookupPlace failed:', e)
+ return NextResponse.json({ ok: false, code: e instanceof PlaceLookupError ? e.code : 'network', error: '네이버 조회가 제한되거나 응답하지 못했어요. 입력값을 유지하고 잠시 후 다시 확인해보세요.' }, { status: e instanceof PlaceLookupError ? e.status : 502 })
  }
  if (!info) {
  return NextResponse.json(

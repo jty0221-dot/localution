@@ -200,12 +200,15 @@ export default function NaverAdsPage() {
  const [bidRows, setBidRows] = useState<BidRow[]>([])
  const [bidLoading, setBidLoading] = useState(false)
  const [bidError, setBidError] = useState<string | null>(null)
+ const [bidNotice, setBidNotice] = useState<string | null>(null)
 
  // 키워드 확장
  const [sugInput, setSugInput] = useState('')
  const [sugData, setSugData] = useState<VolumeKeyword[]>([])
  const [sugLoading, setSugLoading] = useState(false)
  const [sugError, setSugError] = useState<string | null>(null)
+ const [sugWarning, setSugWarning] = useState<string | null>(null)
+ const [sugKeyword, setSugKeyword] = useState('')
  const [sugChecked, setSugChecked] = useState<Set<number>>(new Set())
  const [sugSort, setSugSort] = useState<SortCol>('none')
  const [sugSortDir, setSugSortDir] = useState<SortDir>('desc')
@@ -219,7 +222,7 @@ export default function NaverAdsPage() {
  try {
  const r = await fetch('/api/marketing/naver-keyword-detail?keyword=' + encodeURIComponent(kw))
  const j = await r.json()
- if (!r.ok || j.error) throw new Error(j.error || 'HTTP ' + r.status)
+ if (!r.ok || j.error) throw new Error(j.message || j.error || '정보를 가져오지 못했어요. 다시 조회해보세요.')
  setDetailData(j)
  } catch (e) {
  setVolError(e instanceof Error ? e.message : '오류 발생')
@@ -231,14 +234,15 @@ export default function NaverAdsPage() {
  // ── 입찰가 조회 ──────────────────────────────────────────────
  async function fetchBid() {
  const kw = bidInput.trim()
- if (!kw) return
- setBidLoading(true); setBidError(null); setBidRows([]); setBidKeyword('')
+ if (!kw || bidLoading) return
+ setBidLoading(true); setBidError(null); setBidRows([]); setBidKeyword(''); setBidNotice(null)
  try {
  const r = await fetch('/api/marketing/naver-ads?type=bid&keyword=' + encodeURIComponent(kw))
  const j = await r.json()
- if (!r.ok || j.error) throw new Error(j.error || 'HTTP ' + r.status)
+ if (!r.ok || j.error) throw new Error(j.message || j.error || '정보를 가져오지 못했어요. 다시 조회해보세요.')
  setBidRows(j.rows || [])
  setBidKeyword(j.keyword || kw)
+ setBidNotice(j.unavailable === 'competition_missing' ? '입찰가 추정에 필요한 경쟁도 정보가 없어요. 다른 키워드로 조회해보세요.' : null)
  } catch (e) {
  setBidError(e instanceof Error ? e.message : '오류 발생')
  } finally {
@@ -249,12 +253,12 @@ export default function NaverAdsPage() {
  // ── 키워드 확장 ──────────────────────────────────────────────
  async function fetchSuggest() {
  const kw = sugInput.trim()
- if (!kw) return
- setSugLoading(true); setSugError(null); setSugData([])
+ if (!kw || sugLoading) return
+ setSugLoading(true); setSugError(null); setSugWarning(null); setSugData([]); setSugKeyword(''); setSugChecked(new Set())
  try {
  const r = await fetch('/api/marketing/naver-ads?type=volume&keywords=' + encodeURIComponent(kw))
  const j = await r.json()
- if (!r.ok || j.error) throw new Error(j.error || 'HTTP ' + r.status)
+ if (!r.ok || j.error) throw new Error(j.message || j.error || '정보를 가져오지 못했어요. 다시 조회해보세요.')
  const all: VolumeKeyword[] = j.keywords || []
  const tokens = kw.replace(/\s+/g, '').match(/[가-힣a-z0-9]{2,}/gi) || [kw]
  const related = all.filter(k => {
@@ -269,6 +273,8 @@ export default function NaverAdsPage() {
  )
  .slice(0, 100)
  setSugData(sorted)
+ setSugKeyword(kw)
+ setSugWarning(j.partial ? j.warning || '일부 결과만 가져왔어요. 다시 조회해보세요.' : null)
  } catch (e) {
  setSugError(e instanceof Error ? e.message : '오류 발생')
  } finally {
@@ -477,9 +483,11 @@ export default function NaverAdsPage() {
  </div>
 
  {sugError && (
- <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 text-sm text-[#E11D48]">{sugError}</div>
+ <div role="alert" className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 text-sm text-[#E11D48]">{sugError}<button onClick={fetchSuggest} className="block min-h-[44px] font-semibold underline">다시 조회하기</button></div>
  )}
 
+ {sugWarning && <div role="status" className="rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800">{sugWarning}<button onClick={fetchSuggest} disabled={sugLoading} className="block min-h-[44px] font-semibold underline">전체 다시 조회하기</button></div>}
+ {sugKeyword && <p className="text-xs text-[#8B95A1]">조회한 키워드: {sugKeyword}{sugInput.trim() !== sugKeyword ? ' · 입력한 키워드로 다시 조회하면 결과가 바뀝니다.' : ''}</p>}
  {sugData.length > 0 && (() => {
  const compRank: Record<string, number> = { '높음': 3, '중간': 2, '낮음': 1, '': 0 }
  const sorted = [...sugData].sort((a, b) => {
@@ -554,7 +562,7 @@ export default function NaverAdsPage() {
  })()}
 
  {sugData.length === 0 && !sugLoading && !sugError && (
- <div className="text-center py-10 text-[#B0B8C1] text-sm">주키워드를 입력하면 파생 키워드를 보여줍니다</div>
+ <div className="text-center py-10 text-[#B0B8C1] text-sm">{sugKeyword ? '조회는 끝났지만 표시할 파생 키워드가 없어요. 다른 키워드로 조회해보세요.' : '주키워드를 입력하면 파생 키워드를 보여줍니다'}</div>
  )}
  </div>
  )}
@@ -580,9 +588,10 @@ export default function NaverAdsPage() {
  </div>
 
  {bidError && (
- <div className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 text-sm text-[#E11D48]">{bidError}</div>
+ <div role="alert" className="bg-[#FFF1F2] border border-[#FECDD3] rounded-xl p-3 text-sm text-[#E11D48]">{bidError}<button onClick={fetchBid} className="block min-h-[44px] font-semibold underline">다시 조회하기</button></div>
  )}
 
+ {bidKeyword && <p className="text-xs text-[#8B95A1]">조회한 키워드: {bidKeyword}{bidInput.trim() !== bidKeyword ? ' · 입력한 키워드로 다시 조회하면 결과가 바뀝니다.' : ''}</p>}
  {bidRows.length > 0 && (
  <div>
  <p className="text-sm font-bold text-[#191F28] mb-3"><span className="text-[#3182F6]">[{bidKeyword}]</span> 파워링크 입찰가</p>
@@ -610,7 +619,7 @@ export default function NaverAdsPage() {
  )}
 
  {!bidLoading && bidRows.length === 0 && !bidError && (
- <div className="text-center py-10 text-[#B0B8C1] text-sm">키워드를 입력하고 조회하세요</div>
+ <div className="text-center py-10 text-[#B0B8C1] text-sm">{bidNotice || (bidKeyword ? '조회는 끝났지만 입찰가를 계산할 키워드 정보가 없어요. 다른 키워드로 조회해보세요.' : '키워드를 입력하고 조회하세요')}</div>
  )}
  </div>
  )}

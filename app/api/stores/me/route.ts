@@ -42,6 +42,7 @@ export async function GET() {
 
  const svc = createServiceClient()
  const userId = auth.userId
+ const sourceStates = { credentials: 'unconfirmed', store: 'unconfirmed', reviews: 'unconfirmed' }
 
  // ── 1) platform_credentials: 실제 자격증명 연결 ───────────────────
  let credentials: Array<{
@@ -62,6 +63,7 @@ export async function GET() {
  console.warn('[stores/me] platform_credentials select failed:', error.message)
  }
  if (!error && Array.isArray(data)) {
+ sourceStates.credentials = 'read'
  credentials = data.map((r: any) => ({
  platform: r.platform,
  account_id: r.account_id ?? null,
@@ -146,8 +148,10 @@ export async function GET() {
  error = retry.error
  }
  if (!error && Array.isArray(data) && data.length > 0) {
+ sourceStates.store = 'read'
  store = data[0]
  }
+ if (!error && Array.isArray(data) && data.length === 0) sourceStates.store = 'read'
  } catch (_) {
  // graceful degrade — stores 테이블 컬럼/타입 이슈시 null 반환
  store = null
@@ -169,6 +173,7 @@ export async function GET() {
  if (rvErr) {
  console.warn('[stores/me] platform_reviews agg failed:', rvErr.message)
  } else if (Array.isArray(rv)) {
+ sourceStates.reviews = 'read'
  for (const r of rv as Array<{ platform: string; rating: number | null; has_reply: boolean; reply_status: string | null; collected_at: string | null }>) {
  const key = r.platform
  if (!reviewAgg[key]) {
@@ -258,6 +263,8 @@ export async function GET() {
  return NextResponse.json({
  ok: true,
  user_id: userId,
+ source_states: sourceStates,
+ data_scope: 'user_account',
  store,
  platforms,
  naver_link: naverLink,

@@ -8,6 +8,7 @@ import TopNav from './components/TopNav'
 import HarangMarketingPopup from './components/HarangMarketingPopup'
 import ProductPreview from './components/landing/ProductPreview'
 import HeroVideo from './components/landing/HeroVideo'
+import { parseLandingContent } from './lib/landing-content'
 import JsonLd from './components/seo/JsonLd'
 import { SITE, graphLd, softwareApplicationLd, organizationLd, webSiteLd, faqPageLd, type FaqItem } from './lib/seo'
 import {
@@ -167,6 +168,26 @@ const FEATURES = [
 //     /api/landing-stats 가 실제 값을 반환하면 그것으로 교체된다.
 // ─────────────────────────────────────────────────────────────
 
+const FEATURE_GROUPS = [
+ { id: 'tools-visibility', title: '노출과 키워드 점검', titles: ['네이버 플레이스 SEO', '블로그 순위 추적'] },
+ { id: 'tools-reviews', title: '리뷰와 고객 관리', titles: ['멀티플랫폼 리뷰 관리', '실시간 리뷰 알림', '답글 발행 통계', 'QR 리뷰 자동화', 'CRM 고객관리', '플랫폼 통합 관리'] },
+ { id: 'tools-content', title: '콘텐츠 제작과 발행', titles: ['네이버 블로그 포스팅', '릴스·쇼츠 자동 기획', '스레드(Threads) 자동 발행', '유튜브 커뮤니티 자동', '카드뉴스 자동 제작'] },
+]
+
+const FEATURE_ACTIONS: Record<string, string> = {
+ '/marketing/place': '플레이스 도구 보기',
+ '/marketing/blog-tracking': '추적 도구 보기',
+ '/service-intro': '서비스 소개 보기',
+ '/review-admin/stats': '발행 통계 화면 보기',
+ '/review/demo': '체험 화면 보기',
+ '/pricing': '요금 안내 보기',
+ '/marketing/blog-post': '글 작성 도구 보기',
+ '/marketing/reels': '기획 도구 보기',
+ '/marketing/threads': '발행 도구 보기',
+ '/marketing/youtube-community': '커뮤니티 도구 보기',
+ '/marketing/card-news': '제작 도구 보기',
+}
+
 /**
  * 실데이터 연동 전 표시할 값.
  * 시간이 지나도 변하지 않는다 — 성장 연출을 하지 않기 위함.
@@ -286,16 +307,11 @@ function FaqSlider({ faqs }: { faqs: { q: string; a: string }[] }) {
  const prev = () => setCur(c => (c - 1 + faqs.length) % faqs.length)
  const next = () => setCur(c => (c + 1) % faqs.length)
 
- useEffect(() => {
- const t = setInterval(next, 5000)
- return () => clearInterval(t)
- }, [])
-
  return (
- <section className="py-20 px-4 bg-white">
+ <section id="faq" aria-labelledby="faq-title" className="scroll-mt-24 py-20 px-4 bg-white">
  <div className="max-w-3xl mx-auto">
  <div className="text-center mb-10">
- <h2 className="text-2xl md:text-3xl font-black text-[#191F28] mb-2">
+ <h2 id="faq-title" className="text-2xl md:text-3xl font-black text-[#191F28] mb-2">
  사장님들이 많이 물어보시는 것
  </h2>
  <p className="text-[#8B95A1] text-sm text-left sm:text-center">가입 전 궁금증부터 풀고 가세요</p>
@@ -306,11 +322,11 @@ function FaqSlider({ faqs }: { faqs: { q: string; a: string }[] }) {
  {/* 카드 */}
  <div className="overflow-hidden rounded-2xl">
  <div
- className="flex transition-transform duration-500 ease-in-out"
+ className="flex motion-safe:transition-transform motion-safe:duration-500 motion-safe:ease-in-out"
  style={{ transform: `translateX(-${cur * 100}%)` }}
  >
  {faqs.map((item, i) => (
- <div key={i} className="w-full shrink-0 bg-[#F8FAFC] border border-gray-100 rounded-2xl p-8 md:p-10">
+ <div key={i} id={`faq-panel-${i}`} aria-hidden={i !== cur} className="w-full min-w-0 shrink-0 bg-[#F8F9FA] border border-gray-100 rounded-2xl p-8 md:p-10">
  <div className="text-xs font-bold text-[#3182F6] mb-4 tracking-widest uppercase">
  Q&A {i + 1} / {faqs.length}
  </div>
@@ -327,33 +343,40 @@ function FaqSlider({ faqs }: { faqs: { q: string; a: string }[] }) {
  </div>
 
  {/* 좌우 버튼 */}
+ <div className="mt-3 flex justify-between">
  <button
  onClick={prev}
- className="absolute left-0 top-1/2 -translate-y-1/2 -translate-x-4 md:-translate-x-6 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:border-[#3182F6] hover:text-[#3182F6] transition-all text-[#4E5968]"
- aria-label="이전"
+ className="w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-[#3182F6] hover:text-[#3182F6] transition-all text-[#4E5968]"
+ type="button"
+ aria-label="이전 질문"
  >
  <ArrowRight size={16} strokeWidth={2.5} className="rotate-180" />
  </button>
  <button
  onClick={next}
- className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-4 md:translate-x-6 w-10 h-10 rounded-full bg-white border border-gray-200 shadow-md flex items-center justify-center hover:border-[#3182F6] hover:text-[#3182F6] transition-all text-[#4E5968]"
- aria-label="다음"
+ className="w-11 h-11 rounded-xl bg-white border border-gray-200 shadow-sm flex items-center justify-center hover:border-[#3182F6] hover:text-[#3182F6] transition-all text-[#4E5968]"
+ type="button"
+ aria-label="다음 질문"
  >
  <ArrowRight size={16} strokeWidth={2.5} />
  </button>
  </div>
+ </div>
 
  {/* 진행 점 */}
- <div className="flex justify-center gap-2 mt-6">
+ <div className="flex flex-wrap justify-center gap-0 mt-6">
  {faqs.map((_, i) => (
  <button
  key={i}
  onClick={() => setCur(i)}
- className={`rounded-full transition-all duration-300 ${
- i === cur ? 'w-6 h-2 bg-[#3182F6]' : 'w-2 h-2 bg-gray-200 hover:bg-gray-300'
- }`}
+ type="button"
+ className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]"
  aria-label={`${i + 1}번 질문`}
- />
+ aria-current={i === cur ? 'true' : undefined}
+ aria-controls={`faq-panel-${i}`}
+ >
+ <span aria-hidden="true" className={`h-2 rounded-full ${i === cur ? 'w-6 bg-[#3182F6]' : 'w-2 bg-gray-200'}`} />
+ </button>
  ))}
  </div>
  </div>
@@ -369,7 +392,7 @@ export default function LandingPage() {
  const [stats, setStats] = useState(STATS_DEMO)
  const [hero, setHero] = useState(HERO_DEMO)
  const [testimonials, setTestimonials] = useState<Testimonial[]>(TESTIMONIALS_DEMO)
- const [isDemo, setIsDemo] = useState(true)
+ const [liveSections, setLiveSections] = useState({ stats: false, hero: false, testimonials: false })
  // 25차-1: 쿠키 기반 로그인 여부 감지 → 하단 CTA 분기 (/updates 핸드오버 패턴 재사용)
  const [isLoggedIn, setIsLoggedIn] = useState(false)
  const [dayStep, setDayStep] = useState(0)
@@ -405,20 +428,15 @@ export default function LandingPage() {
  .then(r => (r.ok ? r.json() : null))
  .then(data => {
  if (cancelled || !data) return
- let replaced = false
- if (Array.isArray(data.stats) && data.stats.length === 4) {
- setStats(data.stats)
- replaced = true
- }
- if (data.hero && typeof data.hero === 'object') {
- setHero({ ...HERO_DEMO, ...data.hero })
- replaced = true
- }
- if (Array.isArray(data.testimonials) && data.testimonials.length > 0) {
- setTestimonials(data.testimonials)
- replaced = true
- }
- if (replaced) setIsDemo(false)
+ const content = parseLandingContent(data)
+ if (content.stats) setStats(content.stats)
+ if (content.hero) setHero(content.hero)
+ if (content.testimonials) setTestimonials(content.testimonials)
+ setLiveSections({
+ stats: Boolean(content.stats),
+ hero: Boolean(content.hero),
+ testimonials: Boolean(content.testimonials),
+ })
  })
  .catch(() => {})
  return () => {
@@ -466,6 +484,21 @@ export default function LandingPage() {
  리뷰·QR·블로그·플레이스·CRM · 12개 모듈 중<br className="hidden md:block" />
  내 매장에 필요한 것만 선택. 3개 묶으면 10% 할인.
  </p>
+
+ <p className="mb-5 text-sm leading-6 text-[#4E5968]">플레이스 점검, 리뷰 관리, 콘텐츠 제작 중 필요한 작업부터 찾아보세요.</p>
+ <div className="flex flex-col sm:flex-row gap-3 justify-center">
+ <a href="#tools"
+ className="inline-flex items-center justify-center gap-2 bg-[#3182F6] text-white font-bold text-base px-8 py-4 rounded-xl hover:bg-[#1B64DA] transition-all shadow-sm hover:-translate-y-0.5">
+ 내 매장에 필요한 기능 찾기
+ <ArrowRight size={18} strokeWidth={2.5} />
+ </a>
+ <Link href="/marketing/place"
+ className="inline-flex items-center justify-center gap-2 bg-white text-[#191F28] font-semibold text-base px-8 py-4 rounded-xl border border-gray-200 hover:border-gray-300 transition-all hover:-translate-y-0.5">
+ 플레이스 진단 살펴보기
+ </Link>
+ </div>
+ <p className="mt-4 text-sm text-[#4E5968]">어디서 시작할지 모르겠다면 <Link href="/help#find-tools" className="inline-flex min-h-[44px] items-center font-semibold text-[#3182F6] underline underline-offset-4">필요한 작업 찾기</Link>에서 골라보세요.</p>
+ <p className="text-xs text-[#8B95A1] mt-4 mb-8">회원가입 없이 진단 가능 · 신용카드 불필요 · 월 단위 결제</p>
 
  {/* ── 히어로 공감 카드 (Before / After) ── */}
  <div className="flex flex-col sm:flex-row items-stretch gap-3 max-w-2xl mx-auto mb-10">
@@ -521,19 +554,6 @@ export default function LandingPage() {
  </div>
  </div>
 
- <div className="flex flex-col sm:flex-row gap-3 justify-center">
- <Link href="/pricing"
- className="inline-flex items-center justify-center gap-2 bg-[#3182F6] text-white font-bold text-base px-8 py-4 rounded-2xl hover:bg-[#1B64DA] transition-all shadow-lg shadow-blue-200 hover:shadow-blue-300 hover:-translate-y-0.5">
- 내게 맞는 모듈 둘러보기
- <ArrowRight size={18} strokeWidth={2.5} />
- </Link>
- <Link href="/marketing/place"
- className="inline-flex items-center justify-center gap-2 bg-white text-[#191F28] font-semibold text-base px-8 py-4 rounded-2xl border border-gray-200 hover:border-gray-300 transition-all hover:-translate-y-0.5">
- 1분 무료 진단 체험
- </Link>
- </div>
- <p className="text-xs text-[#8B95A1] mt-4">회원가입 없이 진단 가능 · 신용카드 불필요 · 월 단위 결제</p>
-
  {/* ── 제품 미리보기 ──
       랜딩에 제품 화면이 하나도 없어 "무엇을 사는지" 보이지 않던 문제 해결.
       가짜 스크린샷 대신 실제 UI 를 HTML 로 재현 · 항상 정확하고 선명하다. */}
@@ -553,7 +573,7 @@ export default function LandingPage() {
  {/* ── 통계 ── */}
  <section className="py-12 px-4 bg-white border-b border-gray-100">
  <div className="max-w-4xl mx-auto">
- {isDemo && (
+ {!liveSections.stats && (
  <div className="text-center mb-6">
  <span className="inline-block text-[11px] font-semibold text-[#8B95A1] bg-[#F2F4F6] px-2.5 py-1 rounded-full">
  예시 · 실제 데이터 연동 예정
@@ -730,20 +750,27 @@ export default function LandingPage() {
  </div>
 
  {/* ── 주요 기능 ── */}
- <section className="py-20 px-4 bg-[#F8FAFC]">
+ <section id="tools" aria-labelledby="tools-title" className="scroll-mt-24 py-20 px-4 bg-[#F8F9FA]">
  <div className="max-w-6xl mx-auto">
  <div className="text-center mb-14">
- <h2 className="text-3xl md:text-4xl font-black text-[#191F28] mb-4">
- 필요한 기능만!!<br />
- <span className="text-[#3182F6]">골라쓰는 모듈방식</span>
+ <h2 id="tools-title" className="text-2xl md:text-3xl font-semibold text-[#191F28] mb-4">
+ 지금 필요한 작업을 선택하세요
  </h2>
  <p className="text-[#4E5968] text-sm md:text-base text-left sm:text-center">
  커피 한 잔 값 월 6,900원 · 3개 묶으면 10% · 5개 15% · 8개 20% 추가 할인
  </p>
  </div>
- <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
- {FEATURES.map(f => (
- <Link key={f.title} href={f.href} className="relative bg-white rounded-2xl p-6 border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all group block">
+ <p className="mb-5 text-center text-sm text-[#4E5968]">기능을 살펴본 뒤 필요한 도구로 이동하세요.</p>
+ <nav aria-label="기능 분류" className="mb-8 flex flex-wrap justify-center gap-2">
+ {FEATURE_GROUPS.map(group => <a key={group.id} href={`#${group.id}`} className="inline-flex min-h-[44px] items-center rounded-xl border border-[#E5E8EB] bg-white px-4 py-2 text-sm font-semibold text-[#4E5968] hover:border-[#3182F6] hover:text-[#3182F6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]">{group.title}</a>)}
+ </nav>
+ <div className="space-y-10">
+ {FEATURE_GROUPS.map(group => (
+ <section key={group.id} id={group.id} aria-labelledby={`${group.id}-title`} className="scroll-mt-24">
+ <h3 id={`${group.id}-title`} className="mb-4 text-lg font-semibold text-[#191F28]">{group.title}</h3>
+ <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+ {FEATURES.filter(f => group.titles.includes(f.title)).map(f => (
+ <Link key={f.title} href={f.href} className="relative bg-white rounded-2xl p-6 border border-gray-100 hover:border-blue-200 shadow-sm transition-all group flex h-full min-w-0 flex-col focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]">
  {f.badge && (
  <span className={`absolute top-4 right-4 text-[10px] font-black tracking-wider px-2 py-0.5 rounded-full ${
  f.badge === 'HOT' ? 'bg-red-100 text-red-600'
@@ -756,10 +783,10 @@ export default function LandingPage() {
  <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${f.color} flex items-center justify-center mb-4 shadow-sm group-hover:scale-110 transition-transform`}>
  <f.Icon size={24} strokeWidth={2} className="text-white" />
  </div>
- <h3 className="text-lg font-bold text-[#191F28] mb-2 flex items-center gap-1.5">
+ <h4 className="text-lg font-semibold text-[#191F28] mb-2 flex items-center gap-1.5">
  {f.title}
  <ArrowRight size={14} strokeWidth={2.5} className="text-[#8B95A1] group-hover:text-[#3182F6] group-hover:translate-x-0.5 transition-all" />
- </h3>
+ </h4>
  <p className="text-sm text-[#4E5968] leading-relaxed mb-4">{f.desc}</p>
  <div className="flex flex-wrap gap-2">
  {f.tags.map(tag => (
@@ -768,9 +795,17 @@ export default function LandingPage() {
  </span>
  ))}
  </div>
+ <p className="mt-auto flex items-center gap-2 pt-5 text-sm font-semibold text-[#3182F6]">{FEATURE_ACTIONS[f.href]}<ArrowRight size={16} aria-hidden="true" /></p>
  </Link>
  ))}
  </div>
+ </section>
+ ))}
+ </div>
+ <Link href="/marketing/notice" className="mt-8 flex min-h-[44px] flex-wrap items-center justify-between gap-3 rounded-2xl border border-blue-100 bg-white p-5 shadow-sm focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]">
+ <span className="flex min-w-0 items-center gap-3"><span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-indigo-500 shadow-sm"><FileText size={16} className="text-white" strokeWidth={2.5} /></span><span className="min-w-0"><span className="block font-semibold text-[#191F28]">매장 공지 작성 도우미</span><span className="block text-sm text-[#4E5968]">휴무와 영업시간 변경 안내 문구를 준비해보세요.</span></span></span>
+ <span className="inline-flex items-center gap-2 text-sm font-semibold text-[#3182F6]">공지 준비하기<ArrowRight size={16} aria-hidden="true" /></span>
+ </Link>
  <p className="text-center text-xs text-[#8B95A1] mt-6">
  AI 정산·세금계산서·급여 관리는 곧 추가됩니다
  </p>
@@ -868,7 +903,7 @@ export default function LandingPage() {
  <div className="text-2xl font-black mb-1">{hero.avgRating}</div>
  <div className="text-blue-200 text-xs">{hero.avgRatingLabel}</div>
  </div>
- {isDemo && (
+ {!liveSections.hero && (
  <div className="mt-3 text-[10px] text-blue-200/80 font-medium">
  예시 값
  </div>
@@ -928,10 +963,10 @@ export default function LandingPage() {
  <div className="max-w-5xl mx-auto">
  <div className="text-center mb-12">
  <h2 className="text-3xl font-black text-[#191F28] mb-3">
- {isDemo ? '사용 사례 예시' : '사장님들의 실제 후기'}
+ {!liveSections.testimonials ? '사용 사례 예시' : '사장님들의 실제 후기'}
  </h2>
  <p className="text-[#8B95A1] text-sm text-left sm:text-center">
- {isDemo
+ {!liveSections.testimonials
  ? '실제 사용 후기 수집 중 · 아래는 예시 콘텐츠입니다'
  : '로컬루션을 사용 중인 매장 사장님들의 이야기'}
  </p>
@@ -945,7 +980,7 @@ export default function LandingPage() {
  <svg className="absolute top-4 right-5 opacity-[0.07]" width="36" height="28" viewBox="0 0 36 28" aria-hidden="true">
  <path d="M0 28V17.5C0 7.833 4.5 2.5 13.5 0L15 3C10.5 4.667 8.167 7.833 8 12H14V28H0ZM22 28V17.5C22 7.833 26.5 2.5 35.5 0L37 3C32.5 4.667 30.167 7.833 30 12H36V28H22Z" fill="#3182F6" />
  </svg>
- {isDemo && (
+ {!liveSections.testimonials && (
  <span className="absolute top-4 left-4 text-[10px] font-semibold text-[#8B95A1] bg-[#F2F4F6] px-2 py-0.5 rounded-full">
  예시
  </span>

@@ -1,43 +1,21 @@
 export default function Loading() {
  return (
- <div className="min-h-screen bg-[#F8FAFB] flex items-center justify-center p-4">
- <div className="w-full max-w-md space-y-4">
- {/* Animated Header Skeleton */}
- <div className="bg-white rounded-2xl p-8 shadow-sm">
- <div className="flex justify-center mb-6">
- <div className="bg-[#E8EAF0] rounded-full w-16 h-16 animate-pulse" />
+    <main role="status" aria-live="polite" aria-busy="true" className="flex min-h-screen items-center justify-center bg-[#F8F9FA] px-4 py-8">
+      <span className="sr-only">화면을 불러오고 있어요. 잠시만 기다려주세요.</span>
+      <div aria-hidden="true" className="w-full max-w-md space-y-4 motion-safe:animate-pulse">
+        <div className="rounded-2xl border border-[#E5E8EB] bg-white p-6 shadow-sm md:p-8">
+          <div className="mx-auto mb-6 h-12 w-12 rounded-xl bg-[#E5E8EB]" />
+          <div className="mx-auto mb-4 h-7 w-3/4 rounded-lg bg-[#E5E8EB]" />
+          <div className="mb-2 h-4 rounded-lg bg-[#E5E8EB]" />
+          <div className="mx-auto mb-7 h-4 w-4/5 rounded-lg bg-[#E5E8EB]" />
+          <div className="h-12 rounded-xl bg-[#3182F6]/10" />
  </div>
-
- {/* Title Skeleton */}
- <div className="h-8 bg-[#E8EAF0] rounded-lg mb-4 animate-pulse" />
-
- {/* Description Skeleton Lines */}
- <div className="space-y-2 mb-8">
- <div className="h-4 bg-[#E8EAF0] rounded w-full animate-pulse" />
- <div className="h-4 bg-[#E8EAF0] rounded w-5/6 animate-pulse" />
- </div>
-
- {/* Button Skeleton */}
- <div className="h-12 bg-[#3182F6]/10 rounded-lg animate-pulse" />
- </div>
-
- {/* Additional Content Skeleton */}
- <div className="bg-white rounded-2xl p-6 shadow-sm">
- <div className="space-y-3">
- <div className="h-4 bg-[#E8EAF0] rounded animate-pulse" />
- <div className="h-4 bg-[#E8EAF0] rounded w-4/5 animate-pulse" />
- <div className="h-4 bg-[#E8EAF0] rounded w-3/4 animate-pulse" />
+        <div className="space-y-3 rounded-2xl border border-[#E5E8EB] bg-white p-6 shadow-sm">
+          <div className="h-4 rounded-lg bg-[#E5E8EB]" />
+          <div className="h-4 w-4/5 rounded-lg bg-[#E5E8EB]" />
+          <div className="h-4 w-3/4 rounded-lg bg-[#E5E8EB]" />
  </div>
  </div>
-
- {/* Loading Indicator */}
- <div className="flex justify-center pt-4">
- <div className="relative w-8 h-8">
- <div className="absolute inset-0 rounded-full border-2 border-[#E8EAF0]" />
- <div className="absolute inset-0 rounded-full border-2 border-[#3182F6] border-t-transparent animate-spin" />
- </div>
- </div>
- </div>
- </div>
+    </main>
  );
 }

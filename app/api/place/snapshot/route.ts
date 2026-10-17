@@ -7,7 +7,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/app/lib/adminAuth'
 import { requireUser } from '@/app/lib/userAuth'
-import { lookupPlace } from '@/app/lib/naver-place'
+import { lookupPlace, PlaceLookupError } from '@/app/lib/naver-place'
 import { calcStoreScore } from '@/app/lib/place-score'
 
 export const runtime = 'nodejs'
@@ -19,8 +19,8 @@ export async function POST(req: NextRequest) {
 
  let body: { target_id?: string } = {}
  try { body = await req.json() } catch {}
- const target_id = (body.target_id ?? '').trim()
- if (!target_id) return NextResponse.json({ error: 'target_id 필수' }, { status: 400 })
+ const target_id = typeof body.target_id === 'string' ? body.target_id.trim() : ''
+ if (!target_id) return NextResponse.json({ error: '조회할 매장을 선택해보세요.' }, { status: 400 })
 
  const svc = createServiceClient()
 
@@ -34,7 +34,10 @@ export async function POST(req: NextRequest) {
  if (t.user_id !== auth.userId) return NextResponse.json({ error: '권한 없음' }, { status: 403 })
 
  // 네이버 플레이스 재조회
- const info = await lookupPlace(t.place_id, t.category)
+ let info
+ try { info = await lookupPlace(t.place_id, t.category) } catch (e) {
+ return NextResponse.json({ ok: false, code: e instanceof PlaceLookupError ? e.code : 'network', error: '네이버 조회가 제한되거나 응답하지 못했어요. 기존 스냅샷은 유지했어요. 잠시 후 다시 확인해보세요.' }, { status: e instanceof PlaceLookupError ? e.status : 502 })
+ }
  if (!info) {
  return NextResponse.json(
  { error: '네이버 플레이스 조회 실패. 잠시 후 다시 시도해 주세요.' },

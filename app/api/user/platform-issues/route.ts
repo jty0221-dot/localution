@@ -25,7 +25,7 @@ export async function GET() {
   if (!auth.ok) return NextResponse.json({ ok: false }, { status: auth.status })
 
   const svc = createServiceClient()
-  const { data } = await svc
+  const { data, error } = await svc
     .from('platform_credentials')
     .select('platform, last_login_status, last_login_error_message, last_login_at, platform_store_name, platform_store_id')
     .eq('user_id', auth.userId)
@@ -92,6 +92,9 @@ export async function GET() {
 
   return NextResponse.json({
     ok: true,
+    user_id: auth.userId,
+    data_scope: 'user_account',
+    source_state: error ? 'unconfirmed' : 'read',
     has_issues: issues.length > 0,
     count: issues.length,
     issues,

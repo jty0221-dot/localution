@@ -9,14 +9,14 @@ import { createServerClient } from '@supabase/ssr'
 import { enqueuePlatformJob } from '../../lib/queue'
 import type { Platform } from '../../lib/queue'
 
-function makeSupabase() {
- const cookieStore = cookies()
+async function makeSupabase() {
+ const cookieStore = await cookies()
  return createServerClient(
  process.env.NEXT_PUBLIC_SUPABASE_URL!,
  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
  {
  cookies: {
- get: (name) => cookieStore.get(name)?.value,
+ get: (name: string) => cookieStore.get(name)?.value,
  set: () => {},
  remove: () => {},
  },
@@ -27,7 +27,7 @@ function makeSupabase() {
 // GET: 모든 연결된 플랫폼 상태 반환
 export async function GET() {
  try {
- const svc = makeSupabase()
+ const svc = await makeSupabase()
  const { data: { user } } = await svc.auth.getUser()
  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
@@ -58,7 +58,7 @@ export async function GET() {
 // POST: health_check 잡을 모든 연결 플랫폼에 큐 등록
 export async function POST(req: NextRequest) {
  try {
- const svc = makeSupabase()
+ const svc = await makeSupabase()
  const { data: { user } } = await svc.auth.getUser()
  if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 

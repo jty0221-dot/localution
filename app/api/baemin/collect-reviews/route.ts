@@ -46,7 +46,7 @@ function isValidBaeminPhotoUrl(url: string): boolean {
  } catch { return false }
 }
 
-function corsHeaders(origin: string) {
+function corsHeaders(origin: string): Record<string, string> {
  const allow = origin.endsWith('.baemin.com') || origin.includes('localution')
  if (!allow) return {}
  return {

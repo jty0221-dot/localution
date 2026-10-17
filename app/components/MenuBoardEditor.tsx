@@ -264,7 +264,7 @@ export default function MenuBoardEditor() {
  for (let i = 0; i < items.length; i++) {
  const item = items[i]
  const updates: any = {}
- const targets: { lang: string; papago: string }[] = [
+ const targets: { lang: 'en' | 'ja' | 'zh'; papago: string }[] = [
  { lang: 'en', papago: 'en' },
  { lang: 'ja', papago: 'ja' },
  { lang: 'zh', papago: 'zh-CN' },

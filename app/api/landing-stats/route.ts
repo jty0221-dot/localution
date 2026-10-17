@@ -23,14 +23,15 @@ export const revalidate = 0
  * 프론트엔드 계약(app/page.tsx 참조):
  * {
  * stats: null | Array<{ num: string; label: string }> (길이 4)
- * hero: null | { reviewsPerMonth?: string; reviewsPerMonthLabel?: string;
- * avgRating?: string; avgRatingLabel?: string }
+ * hero: null | { reviewsPerMonth: string; reviewsPerMonthLabel: string;
+ * avgRating: string; avgRatingLabel: string }
  * testimonials: null | Array<{
  * name: string; store: string; text: string; rating: number;
  * iconKey: 'coffee' | 'food' | 'gym'; color: string
  * }>
  * }
- * → 세 값 중 하나라도 비어있지 않으면 프론트가 isDemo=false 로 전환.
+ * 각 영역의 완전한 응답만 해당 영역의 예시 표시를 해제한다.
+ * 일부 영역만 반환하거나 hero 필드가 빠져 있으면 나머지는 예시 표시를 유지한다.
  * ──────────────────────────────────────────────────────────
  */
 export async function GET() {

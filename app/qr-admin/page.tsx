@@ -3,6 +3,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState, useEffect } from 'react'
+import { requestMutation } from '../lib/client-mutations'
 import Sidebar from '../components/Sidebar'
 import Footer from '../components/Footer'
 import AffiliateAdSlots from '../components/AffiliateAdSlots'
@@ -410,6 +411,8 @@ export default function QRAdmin() {
  const [newQR, setNewQR] = useState({ name: '', purpose: 'review' })
  const [creating, setCreating] = useState(false)
  const [created, setCreated] = useState(false)
+ const [qrError, setQrError] = useState<string | null>(null)
+ const [togglingId, setTogglingId] = useState<string | null>(null)
  const [previewQR, setPreviewQR] = useState<QRCode | null>(null)
  const [copiedId, setCopiedId] = useState<string | null>(null)
  const [downloading, setDownloading] = useState<string | null>(null)
@@ -583,55 +586,27 @@ export default function QRAdmin() {
  }
 
  const handleCreateQR = async () => {
- if (!newQR.name) return
+ if (!newQR.name.trim() || creating || created) return
  setCreating(true)
- await new Promise(r => setTimeout(r, 900))
-
- let reviewUrl = ''
- if (newQR.purpose === 'review' && storeInfo.connected) {
- reviewUrl = generateReviewUrl(storeInfo)
- }
-
- const newItem: QRCode = {
- id: Date.now().toString(),
- name: newQR.name,
- purpose: newQR.purpose,
- scans: 0,
- reviews: 0,
- createdAt: new Date().toISOString().slice(0, 10),
- active: true,
- reviewUrl,
- }
- const updated = [newItem, ...qrList]
- setQrList(updated)
- try { localStorage.setItem(LS_QR_LIST, JSON.stringify(updated)) } catch (_) {}
-
- // DB 동기화 (백그라운드)
- fetch('/api/qr-codes', {
- method: 'POST',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- name: newItem.name,
- purpose: newItem.purpose,
- review_url: newItem.reviewUrl || null,
- }),
- })
- .then(r => r.ok ? r.json() : null)
- .then(j => {
- if (j?.ok && j.qr_code) {
- // 서버 발급 id로 교체 (uuid)
- setQrList(prev => prev.map(q => q.id === newItem.id ? { ...q, id: j.qr_code.id } : q))
+ setQrError(null)
  try {
- const refreshed = [...updated]
- refreshed[0] = { ...refreshed[0], id: j.qr_code.id }
- localStorage.setItem(LS_QR_LIST, JSON.stringify(refreshed))
- } catch {}
+ const reviewUrl = newQR.purpose === 'review' && storeInfo.connected ? generateReviewUrl(storeInfo) : ''
+ const result = await requestMutation<{ ok: boolean; qr_code: { id: string; name: string; purpose: string; scans: number; reviews: number; created_at: string; active: boolean; review_url: string | null } }>('/api/qr-codes', 'POST', {
+ name: newQR.name.trim(), purpose: newQR.purpose, review_url: reviewUrl || null,
+ }, 'QR 코드를 저장하지 못했어요. 입력한 내용은 유지되니 다시 시도해주세요.')
+ const savedQR = result.qr_code
+ if (!savedQR?.id) throw new Error('저장 결과를 확인하지 못했어요. QR 목록을 확인해주세요.')
+ const newItem: QRCode = {
+ id: savedQR.id, name: savedQR.name, purpose: savedQR.purpose,
+ scans: savedQR.scans || 0, reviews: savedQR.reviews || 0,
+ createdAt: savedQR.created_at ? savedQR.created_at.slice(0, 10) : new Date().toISOString().slice(0, 10),
+ active: savedQR.active, reviewUrl: savedQR.review_url || '',
  }
+ setQrList(prev => {
+ const updated = [newItem, ...prev]
+ try { localStorage.setItem(LS_QR_LIST, JSON.stringify(updated)) } catch (_) {}
+ return updated
  })
- .catch(() => {})
-
- setCreating(false)
  setCreated(true)
  setTimeout(() => {
  setCreated(false)
@@ -639,24 +614,36 @@ export default function QRAdmin() {
  setNewQR({ name: '', purpose: 'review' })
  setActiveTab('settings')
  }, 1200)
+ } catch (e) {
+ setQrError(e instanceof Error ? e.message : 'QR 코드를 저장하지 못했어요. 다시 시도해주세요.')
+ } finally { setCreating(false) }
  }
 
- const toggleQRActive = (id: string) => {
+ const toggleQRActive = async (id: string) => {
+ if (togglingId) return
  const target = qrList.find(q => q.id === id)
- const newActive = target ? !target.active : true
- const updated = qrList.map(q => q.id === id ? { ...q, active: newActive } : q)
- setQrList(updated)
- try { localStorage.setItem(LS_QR_LIST, JSON.stringify(updated)) } catch (_) {}
-
- // DB 동기화 (id가 uuid 형태면 — 서버 저장된 항목)
- if (id && id.length === 36) { // uuid v4 길이
- fetch('/api/qr-codes', {
- method: 'PUT',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ id, active: newActive }),
- }).catch(() => {})
+ if (!target) return
+ setQrError(null)
+ if (id.length !== 36) {
+ setQrError('서버에 저장된 QR인지 확인한 뒤 다시 시도해주세요.')
+ return
  }
+ const active = !target.active
+ setTogglingId(id)
+ try {
+ await requestMutation('/api/qr-codes', 'PUT', { id, active }, 'QR 상태를 저장하지 못했어요. 다시 시도해주세요.')
+ const response = await fetch('/api/qr-codes', { credentials: 'include', cache: 'no-store' })
+ const result = await response.json().catch(() => null)
+ const confirmed = response.ok && result?.ok && Array.isArray(result.qr_codes) && result.qr_codes.find((q: { id: string; active: boolean }) => q.id === id)
+ if (!confirmed || confirmed.active !== active) throw new Error('변경된 QR 상태를 확인하지 못했어요. 목록을 새로 확인해주세요.')
+ setQrList(prev => {
+ const updated = prev.map(q => q.id === id ? { ...q, active } : q)
+ try { localStorage.setItem(LS_QR_LIST, JSON.stringify(updated)) } catch (_) {}
+ return updated
+ })
+ } catch (e) {
+ setQrError(e instanceof Error ? e.message : 'QR 상태를 저장하지 못했어요. 다시 시도해주세요.')
+ } finally { setTogglingId(null) }
  }
 
  const handleCopy = async (id: string, url: string) => {
@@ -1122,6 +1109,7 @@ export default function QRAdmin() {
  <QrCode size={16} className="text-[#3182F6]" strokeWidth={2.5} />
  <h3 className="font-bold text-[#191F28]">QR 코드 현황</h3>
  </div>
+ {qrError && !showCreate && <p role="alert" className="mb-3 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{qrError}</p>}
  <div className="space-y-3">
  {qrList.length === 0 ? (
  <p className="text-sm text-[#8B95A1] text-center py-6">생성된 QR이 없어요</p>
@@ -1268,6 +1256,7 @@ export default function QRAdmin() {
  </div>
  )}
 
+ {qrError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{qrError}</p>}
  <button
  onClick={handleCreateQR}
  disabled={!newQR.name || creating || created}

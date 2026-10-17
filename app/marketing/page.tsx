@@ -4,11 +4,11 @@ export const dynamic = 'force-dynamic'
 import { useState } from 'react'
 import Sidebar from '../components/Sidebar'
 import PageHeader from '../components/PageHeader'
-import Link from 'next/link'
+import MarketingToolChooser from '../components/marketing/MarketingToolChooser'
 import {
  Search, TrendingUp, ClipboardCheck, Users, Sparkles, ArrowRight, FileText,
  ArrowUp, ArrowDown, Minus, CheckCircle2, AlertTriangle, XCircle,
- Layers, Zap, Rocket,
+ Layers, Zap, Rocket, Calculator,
 } from 'lucide-react'
 import Footer from '../components/Footer'
 import HarangMarketingPopup from '../components/HarangMarketingPopup'
@@ -506,110 +506,9 @@ export default function MarketingPage() {
  variant="accent"
  />
  <div className="max-w-5xl mx-auto p-4 md:p-8">
- <div className="mb-4">
- <p className="text-sm text-[#8B95A1] mt-1">네이버 플레이스 키워드 순위 · 진단 · 유입 분석을 한 곳에서 관리하세요</p>
- </div>
-
- {/* AI 콘텐츠 생성 + 순위 추적 배너 3종 */}
- <div className="grid grid-cols-1 md:grid-cols-3 gap-3 mb-6">
- <Link href="/marketing/reels"
- className="block bg-gradient-to-r from-[#8B5CF6] via-[#A855F7] to-[#EC4899] rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-lg transition-all group">
- <div className="flex items-center gap-4">
- <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
- <Sparkles size={26} strokeWidth={2.25} className="text-white" />
- </div>
- <div className="flex-1 text-white min-w-0">
- <div className="flex items-center gap-2 mb-0.5">
- <span className="text-[10px] font-black bg-white text-[#8B5CF6] px-2 py-0.5 rounded-full">NEW</span>
- <div className="text-sm md:text-base font-black truncate">릴스·쇼츠 자동 기획</div>
- </div>
- <div className="text-xs text-white/80">AI 장면별 촬영 지시서까지 원클릭</div>
- </div>
- <ArrowRight size={18} strokeWidth={2.5}
- className="text-white group-hover:translate-x-1 transition-transform flex-shrink-0" />
- </div>
- </Link>
-
- <Link href="/marketing/blog-post"
- className="block bg-gradient-to-r from-[#03C75A] via-[#00A645] to-[#059669] rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-lg transition-all group">
- <div className="flex items-center gap-4">
- <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
- <FileText size={26} strokeWidth={2.25} className="text-white" />
- </div>
- <div className="flex-1 text-white min-w-0">
- <div className="flex items-center gap-2 mb-0.5">
- <span className="text-[10px] font-black bg-white text-[#03C75A] px-2 py-0.5 rounded-full">NEW</span>
- <div className="text-sm md:text-base font-black truncate">네이버 블로그 포스팅</div>
- </div>
- <div className="text-xs text-white/80">SEO 최적화 + 체류시간 후킹 자동 생성</div>
- </div>
- <ArrowRight size={18} strokeWidth={2.5}
- className="text-white group-hover:translate-x-1 transition-transform flex-shrink-0" />
- </div>
- </Link>
-
- <Link href="/marketing/blog-tracking"
- className="block bg-gradient-to-r from-[#3182F6] via-[#4F46E5] to-[#1B64DA] rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-lg transition-all group">
- <div className="flex items-center gap-4">
- <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
- <TrendingUp size={26} strokeWidth={2.25} className="text-white" />
- </div>
- <div className="flex-1 text-white min-w-0">
- <div className="flex items-center gap-2 mb-0.5 flex-wrap">
- <span className="text-[10px] font-black bg-white text-[#3182F6] px-2 py-0.5 rounded-full">NEW</span>
- <span className="inline-flex items-center gap-1 text-[10px] font-bold bg-[#03C75A] text-white px-2 py-0.5 rounded-full">
- <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
- 매일 자동 체크
- </span>
- <div className="text-sm md:text-base font-black truncate">블로그 순위 추적</div>
- </div>
- <div className="text-xs text-white/80">체험단·내 블로그 글 네이버 인기글 순위 매일 오전 5시 자동 수집</div>
- </div>
- <ArrowRight size={18} strokeWidth={2.5}
- className="text-white group-hover:translate-x-1 transition-transform flex-shrink-0" />
- </div>
- </Link>
- </div>
-
- {/* 25차-4: 카드뉴스 + 플랫폼 허브 배너 2열 */}
- <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-6">
- <Link href="/marketing/card-news"
- className="block bg-gradient-to-r from-[#EC4899] via-[#F43F5E] to-[#F97316] rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-lg transition-all group">
- <div className="flex items-center gap-4">
- <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
- <Layers size={26} strokeWidth={2.25} className="text-white" />
- </div>
- <div className="flex-1 text-white min-w-0">
- <div className="flex items-center gap-2 mb-0.5 flex-wrap">
- <span className="text-[10px] font-black bg-white text-[#EC4899] px-2 py-0.5 rounded-full">NEW</span>
- <div className="text-sm md:text-base font-black truncate">카드뉴스 자동 제작</div>
- </div>
- <div className="text-xs text-white/80">인스타 10장 캐러셀 + Claude AI 카피 · PNG 일괄 저장</div>
- </div>
- <ArrowRight size={18} strokeWidth={2.5}
- className="text-white group-hover:translate-x-1 transition-transform flex-shrink-0" />
- </div>
- </Link>
-
- <Link href="/my/platforms"
- className="block bg-gradient-to-r from-[#6366F1] via-[#7C3AED] to-[#A855F7] rounded-2xl p-4 md:p-5 shadow-sm hover:shadow-lg transition-all group">
- <div className="flex items-center gap-4">
- <div className="w-12 h-12 md:w-14 md:h-14 rounded-2xl bg-white/20 backdrop-blur flex items-center justify-center flex-shrink-0">
- <Zap size={26} strokeWidth={2.25} className="text-white" />
- </div>
- <div className="flex-1 text-white min-w-0">
- <div className="flex items-center gap-2 mb-0.5 flex-wrap">
- <span className="text-[10px] font-black bg-white text-[#6366F1] px-2 py-0.5 rounded-full">NEW</span>
- <div className="text-sm md:text-base font-black truncate">플랫폼 통합 관리</div>
- </div>
- <div className="text-xs text-white/80">네이버·배민·요기요·쿠팡이츠 4곳 한 계정 대리 게시 (AES-256)</div>
- </div>
- <ArrowRight size={18} strokeWidth={2.5}
- className="text-white group-hover:translate-x-1 transition-transform flex-shrink-0" />
- </div>
- </Link>
- </div>
-
+ <MarketingToolChooser />
+ <h2 className="mb-2 text-lg font-bold text-[#191F28]">기존 분석 예시 살펴보기</h2>
+ <p className="mb-4 text-sm leading-6 text-[#4E5968]">아래 예시로 분석 화면을 살펴보세요. 실제 매장 자료와 구분해 확인해 주세요.</p>
  <div className="flex gap-1 bg-white border border-[#E5E8EB] rounded-2xl p-1 mb-6 overflow-x-auto whitespace-nowrap max-w-full md:w-fit -mx-1 px-1 scrollbar-hide">
  {tabs.map(t => {
  const Icon = t.Icon

@@ -21,6 +21,7 @@ import HarangMarketingPopup from '../components/HarangMarketingPopup'
 import NaverLockoutBanner from '../components/NaverLockoutBanner'
 import PlatformIssuesBanner from '../components/PlatformIssuesBanner'
 import UserStatsWidget from '../components/UserStatsWidget'
+import ManagementOverview from '../components/dashboard/ManagementOverview'
 import NegativeReviewsWidget from '../components/NegativeReviewsWidget'
 import { useConnections, setConnection as libSetConnection, removeConnection as libRemoveConnection, PlatformId as CanonicalPlatformId } from '../lib/connections'
 import { toast, confirmDialog } from '../lib/toast'
@@ -132,7 +133,7 @@ interface Platform {
  id: PlatformId
  name: string
  shortName: string
- logo: (size?: number) => JSX.Element
+ logo: (size?: number) => React.JSX.Element
  category: '리뷰·검색' | '지도·리뷰' | '배달'
  connected: boolean
  rating: number | null
@@ -1554,6 +1555,8 @@ export default function Dashboard() {
 
  {/* v38: 모든 플랫폼 자격증명 이슈 통합 알림 */}
  {isLoggedIn && <PlatformIssuesBanner />}
+
+ {isLoggedIn && <ManagementOverview />}
 
  {/* v38: 부정 리뷰 우선순위 위젯 (1~2점 미답변) */}
  {isLoggedIn && <NegativeReviewsWidget />}

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { lookupPlace } from '@/app/lib/naver-place'
+import { lookupPlace, PlaceLookupError } from '@/app/lib/naver-place'
 import { requireUser } from '@/app/lib/userAuth'
 import { rateLimitByIp } from '@/app/lib/rateLimit'
 
@@ -22,7 +22,11 @@ export async function GET(req: NextRequest) {
  return NextResponse.json({ ok: false, error: 'invalid_id' }, { status: 400 })
  }
 
- const info = await lookupPlace(id, hintCategory)
+ let info
+ try { info = await lookupPlace(id, hintCategory) } catch (e) {
+ const code = e instanceof PlaceLookupError ? e.code : 'network'
+ return NextResponse.json({ ok: false, code, error: 'upstream_unavailable', message: '네이버 조회가 제한되거나 응답하지 못했어요. 매장 정보와 연결 상태를 유지하고 잠시 후 다시 확인해보세요.' }, { status: e instanceof PlaceLookupError ? e.status : 502 })
+ }
  if (!info) {
  return NextResponse.json(
  { ok: false, error: 'not_found', message: '네이버 플레이스에서 해당 ID를 찾지 못했습니다. 비공개 업체이거나 ID가 잘못됐을 수 있어요.' },

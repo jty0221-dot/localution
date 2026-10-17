@@ -17,11 +17,10 @@
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.0.0",
-    "jspdf": "^2.5.1",
     "lucide-react": "^0.400.0",
-    "next": "14.0.0",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "next": "15.5.28",
+    "react": "19.2.9",
+    "react-dom": "19.2.9",
     "recharts": "^3.8.1",
     "@supabase/ssr": "^0.4.0",
     "html-to-image": "^1.11.11",
@@ -29,17 +28,17 @@
     "ioredis": "^5.4.1",
     "web-push": "^3.6.7",
     "qrcode": "^1.5.4",
-    "undici": "^5.28.4"
+    "undici": "6.29.1"
   },
   "devDependencies": {
     "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
+    "@types/react": "19.3.0",
+    "@types/react-dom": "19.3.0",
     "@types/web-push": "^3.6.4",
     "@types/qrcode": "^1.5.5",
     "autoprefixer": "^10.0.1",
     "eslint": "^8",
-    "eslint-config-next": "14.0.0",
+    "eslint-config-next": "15.5.28",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"

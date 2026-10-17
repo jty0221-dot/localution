@@ -124,6 +124,6 @@ export async function GET(req: NextRequest) {
  return NextResponse.json({
  ok: true, ts, infra,
  baemin: { total: baeminResults.length, refreshed: baeminResults.filter(r=>r.refreshed).length, collected: baeminResults.filter(r=>r.collected).length, results: baeminResults },
- message: !proxy?.source || proxy.source === 'none' ? 'IPROYAL_USER 또는 WEBSHARE_API_KEY 설정 후 자동 갱신 시작됩니다' : '정상 동작 중',
+ message: !proxy?.source ? 'IPROYAL_USER 또는 WEBSHARE_API_KEY 설정 후 자동 갱신 시작됩니다' : '정상 동작 중',
  })
 }

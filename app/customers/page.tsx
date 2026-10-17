@@ -2,6 +2,7 @@
 export const dynamic = 'force-dynamic'
 
 import { useState } from 'react'
+import { smsBodyForRecipients } from '../lib/client-mutations'
 import Sidebar from '../components/Sidebar'
 import Footer from '../components/Footer'
 import PageHeader from '../components/PageHeader'
@@ -24,7 +25,7 @@ const TAG_COLORS: Record<Tag, { bg: string; text: string }> = {
 const ALL_TAGS: Tag[] = ['VIP', '단골', '신규', '휴면', '블랙리스트']
 
 export default function CustomersPage() {
- const { customers, loading, add } = useCustomers()
+ const { customers, loading, mode, error: customerError, add } = useCustomers()
  const isEmpty = customers.length === 0
 
  const [filterTag, setFilterTag] = useState<FilterTagType>('전체')
@@ -39,6 +40,8 @@ export default function CustomersPage() {
  const [newTag, setNewTag] = useState<Tag>('신규')
  const [newMemo, setNewMemo] = useState('')
  const [submitting, setSubmitting] = useState(false)
+ const [addError, setAddError] = useState<string | null>(null)
+ const [messageResult, setMessageResult] = useState('')
 
  const filtered = customers.filter(c => {
  const matchTag = filterTag === '전체' || c.tags.includes(filterTag)
@@ -82,13 +85,13 @@ export default function CustomersPage() {
  // 비보안 컨텍스트 fallback
  const ta = document.createElement('textarea')
  ta.value = bulk; ta.style.position = 'fixed'; ta.style.opacity = '0'
- document.body.appendChild(ta); ta.select(); try { document.execCommand('copy') } catch (_) {}; document.body.removeChild(ta)
+ document.body.appendChild(ta); ta.select(); const copied = document.execCommand('copy'); document.body.removeChild(ta); if (!copied) throw new Error('클립보드 권한을 확인해주세요.')
  }
  // 2) KakaoTalk PC 실행 시도 (Windows 카톡PC 설치 시 자동 실행)
  // 실패해도 복사는 완료돼 있으므로 사용자가 수동으로 열어 붙여넣을 수 있음
  try { window.open('kakaotalk://', '_self') } catch (_) {}
  setMsgSent(true)
- setTimeout(() => { setMsgOpen(false); setMsgSent(false); setMsgText(''); setSelected([]) }, 2500)
+ setTimeout(() => setMsgSent(false), 4000)
  } catch (e: any) {
  setSendError('클립보드 복사 실패: ' + (e?.message || '브라우저 권한 확인'))
  }
@@ -102,15 +105,17 @@ export default function CustomersPage() {
  // 모바일: sms: URI → 기본 메시지 앱이 열림
  // Windows 데스크톱: sms: URI는 Windows 10+ Your Phone/Phone Link 연동 시에만 동작
  // → 실패 시 클립보드 fallback
- const firstName = pick[0]?.name || '고객'
- const previewBody = msgText.replace(/\{고객명\}/g, firstName)
+ let previewBody: string
+ try { previewBody = smsBodyForRecipients(msgText, pick.map(c => c.name)) }
+ catch (e) { setSendError(e instanceof Error ? e.message : '문자 내용을 확인해주세요.'); return }
  const ua = navigator.userAgent.toLowerCase()
  const isMobile = /android|iphone|ipad|ipod/.test(ua)
  if (isMobile) {
  const sep = /iphone|ipad|ipod/.test(ua) ? '&' : '?' // iOS: ?body, Android: ?body 공용
  window.location.href = 'sms:' + phones + sep + 'body=' + encodeURIComponent(previewBody)
+ setMessageResult('문자 앱 열기를 요청했어요. 앱에서 내용을 확인하고 직접 보내주세요.')
  setMsgSent(true)
- setTimeout(() => { setMsgOpen(false); setMsgSent(false); setMsgText(''); setSelected([]) }, 2500)
+ setTimeout(() => setMsgSent(false), 4000)
  } else {
  // Windows/Mac 데스크톱 → Phone Link 미설치 시 클립보드 복사 후 안내
  setSendError(null)
@@ -121,10 +126,11 @@ export default function CustomersPage() {
  } else {
  const ta = document.createElement('textarea')
  ta.value = bulk; ta.style.position = 'fixed'; ta.style.opacity = '0'
- document.body.appendChild(ta); ta.select(); try { document.execCommand('copy') } catch (_) {}; document.body.removeChild(ta)
+ document.body.appendChild(ta); ta.select(); const copied = document.execCommand('copy'); document.body.removeChild(ta); if (!copied) throw new Error('클립보드 권한을 확인해주세요.')
  }
+ setMessageResult('문자 내용을 복사했어요. 문자 앱에서 수신자와 내용을 확인해주세요.')
  setMsgSent(true)
- setTimeout(() => { setMsgOpen(false); setMsgSent(false); setMsgText(''); setSelected([]) }, 2500)
+ setTimeout(() => setMsgSent(false), 4000)
  }
  // Windows 10+의 Phone Link(휴대폰 연결) 앱 실행 시도
  try {
@@ -139,6 +145,7 @@ export default function CustomersPage() {
  const addCustomer = async () => {
  if (!newName.trim() || submitting) return
  setSubmitting(true)
+ setAddError(null)
  try {
  await add({
  name: newName.trim(),
@@ -148,6 +155,8 @@ export default function CustomersPage() {
  })
  setAddOpen(false)
  setNewName(''); setNewPhone(''); setNewMemo(''); setNewTag('신규')
+ } catch (e) {
+ setAddError(e instanceof Error ? e.message : '고객을 저장하지 못했어요. 다시 시도해주세요.')
  } finally {
  setSubmitting(false)
  }
@@ -172,6 +181,10 @@ export default function CustomersPage() {
  />
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full">
+ <div role="status" className={`mb-4 rounded-xl border p-3 text-sm leading-6 ${mode === 'local' || customerError ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-[#E5E8EB] bg-white text-[#4E5968]'}`}>
+ {loading ? '고객 목록과 저장 위치를 확인하고 있어요.' : mode === 'remote' ? '서버에 연결되어 있어요. 고객을 추가하면 서버에 저장해요.' : '이 기기에 저장하는 모드예요. 서버 저장과 다른 기기 동기화는 확인되지 않았어요.'}
+ {customerError && <p className="mt-1">{customerError}</p>}
+ </div>
  <div className="w-full">
 
  {/* 헤더 */}
@@ -409,12 +422,13 @@ export default function CustomersPage() {
  </div>
  </div>
 
+ {addError && <p role="alert" className="mt-4 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{addError}</p>}
  <div className="flex gap-2 mt-5">
  <button onClick={() => setAddOpen(false)} disabled={submitting}
  className="flex-1 border border-[#E5E8EB] text-[#4E5968] py-3 rounded-xl text-sm font-bold hover:bg-[#F2F4F6] disabled:opacity-50">
  취소
  </button>
- <button onClick={addCustomer} disabled={!newName.trim() || submitting}
+ <button onClick={addCustomer} disabled={!newName.trim() || submitting || loading}
  className="flex-1 bg-[#3182F6] text-white py-3 rounded-xl text-sm font-bold hover:bg-[#1B64DA] disabled:opacity-40 transition-colors">
  {submitting ? '추가 중…' : '추가하기'}
  </button>
@@ -481,7 +495,7 @@ export default function CustomersPage() {
  {msgSent ? (
  <div className="text-center py-3 text-[#16A34A] font-bold text-sm flex items-center justify-center gap-1.5">
  <Check size={14} strokeWidth={3} />
- {sendMode === 'kakao' ? '복사 완료 · 카카오톡에 붙여넣기(Ctrl+V)' : 'SMS 앱 실행 완료'}
+ {sendMode === 'kakao' ? '복사 완료 · 카카오톡에 붙여넣기(Ctrl+V)' : messageResult}
  </div>
  ) : (
  <div className="flex gap-2">

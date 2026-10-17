@@ -28,6 +28,8 @@ export async function loadThreadsToken(
       dek_ciphertext: data.dek_encrypted,
       dek_iv:         data.dek_iv,
       dek_tag:        data.dek_tag,
+      // Legacy platform_credentials has no KEK version column, matching platform-credentials.ts.
+      kek_version:    'v1',
     })
     return { access_token, threads_user_id: data.account_id, username: data.platform_store_name ?? null }
   } catch {
@@ -95,6 +97,8 @@ export async function refreshThreadsTokenIfNeeded(
       dek_ciphertext: data.dek_encrypted,
       dek_iv:         data.dek_iv,
       dek_tag:        data.dek_tag,
+      // Legacy platform_credentials has no KEK version column, matching platform-credentials.ts.
+      kek_version:    'v1',
     })
   } catch { return }
 

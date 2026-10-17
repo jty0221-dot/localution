@@ -217,7 +217,7 @@ async function fetchKakaoReviewsPage(placeId: string, page: number, order: strin
         || data?.kakaomap_review?.reviews
         || (Array.isArray(data) ? data : [])
       if (!Array.isArray(reviews)) continue
-      const hasNext = !!(data?.has_next ?? data?.hasNext ?? data?.is_end === false ?? (reviews.length >= 20))
+      const hasNext = !!(data?.has_next ?? data?.hasNext ?? (typeof data?.is_end === 'boolean' ? !data.is_end : reviews.length >= 20))
       return { reviews, hasNext }
     } catch { /* try next */ }
   }

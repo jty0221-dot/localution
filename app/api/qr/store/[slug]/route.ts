@@ -24,8 +24,8 @@ export async function OPTIONS() {
  return new NextResponse(null, { status: 204, headers: CORS_HEADERS })
 }
 
-export async function GET(_req: NextRequest, ctx: { params: { slug: string } }) {
- const slug = String(ctx.params.slug || '').trim()
+export async function GET(_req: NextRequest, ctx: { params: Promise<{ slug: string }> }) {
+ const slug = String((await ctx.params).slug || '').trim()
  if (!slug) {
  return NextResponse.json({ ok: false, error: 'missing_slug' }, { status: 400, headers: CORS_HEADERS })
  }

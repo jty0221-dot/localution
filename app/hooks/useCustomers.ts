@@ -10,6 +10,7 @@
 // ============================================================
 
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { requestMutation } from '../lib/client-mutations';
 
 export type CustomerTag = 'VIP' | '단골' | '신규' | '휴면' | '블랙리스트';
 
@@ -200,20 +201,20 @@ export function useCustomers(): UseCustomersResult {
 
  // ---------- CRUD ----------
  const add: UseCustomersResult['add'] = async (input) => {
+ if (mode === 'loading') throw new Error('고객 목록을 불러온 뒤 다시 시도해주세요.');
  if (mode === 'remote') {
- const r = await fetch('/api/customers', {
- method: 'POST',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({
- name: input.name,
- phone: input.phone,
- memo: input.memo,
- tags: input.tags,
- }),
- });
- const j = await r.json();
- if (!j.ok) { setError(j.error || 'add failed'); return; }
+ setError(null);
+ let j: { ok: boolean; customer: Customer };
+ try {
+ j = await requestMutation<{ ok: boolean; customer: Customer }>('/api/customers', 'POST', {
+ name: input.name, phone: input.phone, memo: input.memo, tags: input.tags,
+ }, '고객을 저장하지 못했어요. 입력한 내용을 확인한 뒤 다시 시도해주세요.');
+ if (!j.customer?.id) throw new Error('저장 결과를 확인하지 못했어요. 고객 목록을 확인해주세요.');
+ } catch (e) {
+ const message = e instanceof Error ? e.message : '고객을 저장하지 못했어요.';
+ setError(message);
+ throw new Error(message);
+ }
  const next = [j.customer, ...customers];
  setCustomers(next);
  writeCache(next);
@@ -230,8 +231,9 @@ export function useCustomers(): UseCustomersResult {
  memo: input.memo ?? '',
  };
  const nextList = [next, ...customers];
+ try { localStorage.setItem(LS_KEY, JSON.stringify(nextList)); }
+ catch { throw new Error('이 기기에 고객을 저장하지 못했어요. 저장 공간과 브라우저 설정을 확인해주세요.'); }
  setCustomers(nextList);
- writeLocal(nextList);
  };
 
  const update: UseCustomersResult['update'] = async (id, patch) => {

@@ -11,6 +11,7 @@
  */
 
 import { useEffect } from 'react'
+import { AlertCircle } from 'lucide-react'
 import { reportError } from './lib/telemetry'
 
 export default function GlobalError({
@@ -36,21 +37,24 @@ export default function GlobalError({
  <div
  style={{
  minHeight: '100vh',
+ width: '100%',
+ boxSizing: 'border-box',
  display: 'flex',
  alignItems: 'center',
  justifyContent: 'center',
- background: '#F8F9FB',
+ background: '#F8F9FA',
  padding: 24,
  }}
  >
  <div
  style={{
  maxWidth: 480,
+ boxSizing: 'border-box',
  width: '100%',
  background: '#fff',
- borderRadius: 24,
+ borderRadius: 16,
  padding: '40px 28px',
- boxShadow: '0 4px 20px rgba(0,0,0,0.06)',
+ boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
  textAlign: 'center',
  }}
  >
@@ -58,33 +62,34 @@ export default function GlobalError({
  style={{
  width: 72,
  height: 72,
- borderRadius: '50%',
- background: '#FEE2E2',
+ borderRadius: 12,
+ background: 'linear-gradient(135deg, #EF4444, #E11D48)',
  margin: '0 auto 20px',
  display: 'flex',
  alignItems: 'center',
  justifyContent: 'center',
- fontSize: 36,
+ boxShadow: '0 1px 2px rgba(0,0,0,0.05)',
  }}
  aria-hidden="true"
  >
- 
+ <AlertCircle size={28} color="white" strokeWidth={2.5} />
  </div>
  <h1 style={{ fontSize: 22, fontWeight: 900, color: '#191F28', margin: '0 0 8px' }}>
  시스템 오류가 발생했어요
  </h1>
  <p style={{ fontSize: 14, color: '#4E5968', lineHeight: 1.6, margin: '0 0 8px' }}>
- 로컬루션 앱의 최상위 레이아웃에서 문제가 감지되었습니다.
+ 화면을 불러오지 못했어요.
  <br />잠시 후 다시 시도해주세요.
  </p>
  {error.digest && (
- <p style={{ fontSize: 11, color: '#B0B8C1', fontFamily: 'monospace', margin: '0 0 24px' }}>
- ref: {error.digest}
+ <p style={{ fontSize: 12, color: '#8B95A1', overflowWrap: 'anywhere', margin: '0 0 24px' }}>
+ 문의 시 알려주세요: {error.digest}
  </p>
  )}
 
  <div style={{ display: 'flex', gap: 8, flexDirection: 'column' }}>
  <button
+ type="button"
  onClick={() => reset()}
  style={{
  padding: '14px 20px',
@@ -104,7 +109,7 @@ export default function GlobalError({
  style={{
  padding: '14px 20px',
  borderRadius: 12,
- background: '#F2F4F6',
+ background: '#F8F9FA',
  color: '#4E5968',
  textDecoration: 'none',
  fontSize: 14,
@@ -116,7 +121,7 @@ export default function GlobalError({
  </div>
 
  <p style={{ fontSize: 11, color: '#8B95A1', marginTop: 24, lineHeight: 1.6 }}>
- 문제가 계속되면 하단 문의 또는 hello@localution.co.kr로 연락주세요.
+ 문제가 계속되면 <a href="/inquiry" style={{ color: '#3182F6', display: 'inline-flex', alignItems: 'center', minHeight: 44, textDecoration: 'underline' }}>문의하기</a>에서 알려주세요.
  </p>
  </div>
  </div>

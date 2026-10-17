@@ -9,8 +9,8 @@
 // ============================================================
 import { useState, useMemo } from 'react'
 import Link from 'next/link'
-import Sidebar from '../components/Sidebar'
-import PageHeader from '../components/PageHeader'
+import TopNav from '../components/TopNav'
+import TaskFinder from '../components/help/TaskFinder'
 import Footer from '../components/Footer'
 import HarangMarketingPopup from '../components/HarangMarketingPopup'
 import {
@@ -34,48 +34,48 @@ const QUICK_START: Guide[] = [
  {
  id: 'qs-store',
  category: '시작',
- title: '1) 매장 정보 등록 (3분)',
+ title: '1) 매장 정보 등록',
  steps: [
- '사이드바 "매장 관리" 클릭',
- '네이버 플레이스 URL 붙여넣기 → 매장명 / 주소 / 전화 / 키워드 자동 채움',
- '대표 메뉴와 매장 강점 1-2줄 추가',
- '저장 클릭 → 모든 AI 기능이 우리 매장 정보 기반으로 작동',
+ '매장 관리에서 등록할 매장의 기본 정보를 확인하세요.',
+ '네이버 플레이스 주소를 입력했다면 불러온 매장명과 주소를 실제 정보와 대조하세요.',
+ '대표 메뉴나 서비스와 실제 강점을 추가하세요.',
+ '저장 결과를 확인하고 다시 열어 입력 내용이 남아 있는지 확인하세요.',
  ],
  link: { href: '/settings/profile', label: '매장 정보 등록 →' },
  },
  {
  id: 'qs-platform',
  category: '시작',
- title: '2) 플랫폼 연결 (5분)',
+ title: '2) 플랫폼 연결 상태 확인',
  steps: [
- '"플랫폼 통합관리" 메뉴 클릭',
- '네이버·배민·요기요·쿠팡이츠 중 사용 중인 플랫폼 선택',
- '각 플랫폼 사장님 계정 ID/PW 입력 (AES-256 암호화 저장)',
- '연결 즉시 자동으로 리뷰 수집 시작 (15분마다 갱신)',
+ '플랫폼 연결 화면에서 사용 중인 플랫폼을 선택하세요.',
+ '선택한 플랫폼에 표시된 연결 방법과 필요한 관리 권한을 확인하세요.',
+ '연결 결과와 최근 수집 상태를 확인하세요.',
+ '권한이나 세션 만료 안내가 나오면 해당 플랫폼의 다시 연결 절차를 진행하세요.',
  ],
  link: { href: '/my/platforms', label: '플랫폼 연결하기 →' },
  },
  {
  id: 'qs-review',
  category: '시작',
- title: '3) AI 답글 생성 + 자동 발행',
+ title: '3) 리뷰를 확인하고 답글 준비',
  steps: [
- '리뷰 관리 → 플랫폼 선택 (네이버 / 배민 / ...)',
- '톤 11종 (친근 / 전문 / 감사 / 사과 / 미식 / 사장님 맞춤 등) 선택',
- '"AI 초안 만들기" 클릭 → 30초 안에 완성',
- '필요하면 직접 수정 → "발행" 클릭 → 자동 등록',
+ '리뷰 관리에서 연결된 플랫폼과 수집된 리뷰를 확인하세요.',
+ '매장에 맞는 말투를 선택하고 답글 초안을 만드세요.',
+ '고객이 쓴 원문과 사실관계를 대조한 뒤 초안을 수정하세요.',
+ '등록을 진행했다면 도구의 결과와 실제 플랫폼의 답글을 확인하세요.',
  ],
  link: { href: '/review-admin', label: '리뷰 답글 시작 →' },
  },
  {
  id: 'qs-qr',
  category: '시작',
- title: '4) QR 리뷰로 손님이 직접 후기 작성',
+ title: '4) 고객에게 보여줄 QR 안내 준비',
  steps: [
- 'QR 관리 메뉴 → "새 QR 만들기"',
- '제목 / 보상 단계 (예: 5번 방문 시 1잔 무료) 입력',
- 'QR 코드 PNG 다운로드 → 카운터·메뉴판에 비치',
- '손님 스캔 → AI 리뷰 자동 생성 → 네이버·구글 원클릭 등록',
+ 'QR 관리에서 매장 정보와 QR의 용도를 확인하세요.',
+ '안내할 내용과 연결할 주소를 입력하세요.',
+ '저장 성공을 확인한 뒤 QR 이미지를 내려받으세요.',
+ '휴대전화로 직접 스캔해 의도한 매장과 안내 화면으로 이동하는지 확인하세요.',
  ],
  link: { href: '/qr-admin', label: 'QR 만들기 →' },
  },
@@ -197,7 +197,7 @@ const FAQS = [
 
 // 카테고리별 가이드 anchor — Coins(정산) 제거 (settlement 페이지가 redirect-only)
 const SECTIONS = [
- { id: 'quick',     label: '5분 시작 가이드', Icon: Rocket,        color: 'from-[#3182F6] to-[#1B64DA]' },
+ { id: 'quick',     label: '처음 시작 가이드', Icon: Rocket,        color: 'from-[#3182F6] to-[#1B64DA]' },
  { id: 'features',  label: '기능별 사용법',   Icon: MessageSquare, color: 'from-[#F59E0B] to-[#D97706]' },
  { id: 'faq',       label: '자주 묻는 질문',  Icon: Megaphone,     color: 'from-[#EC4899] to-[#BE185D]' },
  { id: 'inquiry',   label: '1:1 문의',        Icon: Users,         color: 'from-[#10B981] to-[#059669]' },
@@ -221,29 +221,32 @@ export default function HelpPage() {
 
  return (
  <div className="min-h-screen bg-[#F8F9FA]">
- <Sidebar />
- <div className="md:ml-[220px] flex flex-col min-h-screen">
- <PageHeader
- icon={<HelpCircle size={28} className="text-white" strokeWidth={2.5} />}
- title="도움말 & 가이드"
- subtitle="처음 시작하시나요? 5분 가이드 + 기능별 사용법 + 자주 묻는 질문"
- variant="primary"
- />
+ <TopNav />
+ <div className="flex min-h-screen flex-col pt-20">
+ <header className="mx-auto w-full max-w-6xl px-4 py-6 md:px-6">
+ <div className="mb-4 flex h-9 w-9 items-center justify-center rounded-xl bg-gradient-to-br from-[#3182F6] to-[#1B64DA] shadow-sm"><HelpCircle size={16} className="text-white" strokeWidth={2.5} aria-hidden="true" /></div>
+ <h1 className="text-xl font-black text-[#191F28] md:text-2xl">가게 운영에 필요한 도구와 사용 안내</h1>
+ <p className="mt-2 text-sm leading-6 text-[#4E5968]">처음 시작하는 분도, 여러 매장을 관리하는 분도 지금 필요한 작업부터 선택하세요.</p>
+ </header>
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full space-y-5 md:space-y-6">
+
+ <TaskFinder />
 
  {/* 검색바 */}
  <div className="bg-white rounded-2xl shadow-sm p-3 md:p-4 flex items-center gap-2">
  <Search size={16} className="text-[#8B95A1] flex-shrink-0" strokeWidth={2.5} />
  <input
- type="text"
+ id="help-guide-search"
+ aria-label="기능별 사용법 검색"
+ type="search"
  value={search}
  onChange={e => setSearch(e.target.value)}
  placeholder="궁금한 기능을 검색하세요 (예: 답글, 키워드, QR)"
- className="flex-1 text-sm bg-transparent focus:outline-none text-[#191F28] placeholder:text-[#8B95A1]"
+ className="min-w-0 flex-1 text-base bg-transparent focus:outline-none text-[#191F28] placeholder:text-[#8B95A1]"
  />
  {search && (
- <button onClick={() => setSearch('')} className="text-xs text-[#8B95A1] hover:text-[#4E5968]">
+ <button onClick={() => setSearch('')} className="min-h-[44px] rounded-xl px-3 text-sm text-[#4E5968] hover:text-[#3182F6]">
  지우기
  </button>
  )}
@@ -270,7 +273,7 @@ export default function HelpPage() {
  <div className="w-7 h-7 rounded-xl bg-gradient-to-br from-[#3182F6] to-[#1B64DA] flex items-center justify-center shadow-sm">
  <Rocket size={14} className="text-white" strokeWidth={2.5} />
  </div>
- <h2 className="text-base md:text-lg font-bold text-[#191F28]">처음이신가요? 5분 시작 가이드</h2>
+ <h2 className="text-base md:text-lg font-bold text-[#191F28]">처음이신가요? 시작 순서부터 확인하세요</h2>
  </div>
  <div className="space-y-2">
  {(search ? filtered : QUICK_START).filter(g => g.category === '시작').map(g => (

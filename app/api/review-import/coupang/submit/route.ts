@@ -8,7 +8,7 @@
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/app/lib/adminAuth'
-import { verifyImportToken } from '../init/route'
+import { verifyImportToken } from '@/app/lib/coupang-import-token'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -34,6 +34,7 @@ function maskAuthor(name: string): string {
 }
 
 export async function POST(req: NextRequest) {
+ if (!process.env.LOCALUTION_COOKIE_SECRET) return NextResponse.json({ ok: false, error: 'not_configured', message: '리뷰 가져오기 인증 설정을 관리자에게 확인해 주세요.' }, { status: 503, headers: CORS })
  let body: any = {}
  try { body = await req.json() } catch {
  return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400, headers: CORS })
@@ -146,8 +147,8 @@ export async function POST(req: NextRequest) {
  if (toInsert.length > 0) {
  const { error: insertError, count } = await svc
  .from('platform_reviews')
- .insert(toInsert)
- .select('id', { count: 'exact', head: true })
+ .insert(toInsert, { count: 'exact' })
+ .select('id')
  if (insertError) {
  errors.push('insert: ' + insertError.message.slice(0, 200))
  } else {

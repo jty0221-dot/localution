@@ -4,6 +4,42 @@ import { requireUser } from '@/app/lib/userAuth'
 import { rateLimitByIp } from '@/app/lib/rateLimit'
 
 const AD_BASE = 'https://api.searchad.naver.com'
+const QUERY_TIMEOUT_MS = 12000
+
+type KeywordItem = Record<string, unknown> & { relKeyword: string }
+type QueryResult = { ok: true; keywords: KeywordItem[] } | { ok: false; timeout: boolean }
+
+async function queryKeywords(hints: string[]): Promise<QueryResult> {
+ const controller = new AbortController()
+ const timer = setTimeout(() => controller.abort(), QUERY_TIMEOUT_MS)
+ try {
+ const path = '/keywordstool'
+ const qs = '?hintKeywords=' + encodeURIComponent(hints.join(',')) + '&showDetail=1'
+ const res = await fetch(AD_BASE + path + qs, {
+ headers: adHeaders('GET', path), signal: controller.signal, cache: 'no-store',
+ })
+ if (!res.ok) return { ok: false, timeout: false }
+ const data = await res.json()
+ if (!Array.isArray(data.keywordList) || data.keywordList.some((item: unknown) =>
+ !item || typeof item !== 'object' || typeof (item as KeywordItem).relKeyword !== 'string'
+ )) return { ok: false, timeout: false }
+ return { ok: true, keywords: data.keywordList }
+ } catch {
+ return { ok: false, timeout: controller.signal.aborted }
+ } finally {
+ clearTimeout(timer)
+ }
+}
+
+function queryFailure(results: QueryResult[]) {
+ const timedOut = results.some(result => !result.ok && result.timeout)
+ return NextResponse.json({
+ ok: false, code: timedOut ? 'upstream_timeout' : 'upstream_unavailable',
+ error: timedOut
+ ? '네이버 키워드 조회 시간이 초과됐어요. 잠시 후 다시 조회해보세요.'
+ : '네이버 키워드 정보를 가져오지 못했어요. 잠시 후 다시 조회해보세요.',
+ }, { status: timedOut ? 504 : 502 })
+}
 
 function sign(timestamp: number, method: string, path: string): string {
  const secret = process.env.NAVER_AD_SECRET_KEY || ''
@@ -83,33 +119,26 @@ export async function GET(req: NextRequest) {
  if (envErr) return NextResponse.json({ error: envErr }, { status: 503 })
 
  const kwList = keywords.split(',').map(k => k.trim()).filter(Boolean).slice(0, 5)
+ if (kwList.length === 0) return NextResponse.json({ error: '키워드를 입력해주세요.' }, { status: 400 })
 
  try {
  // ── 키워드 확장 (힌트 25개 변형 → 배치 5회) ─────────────────────
  if (type === 'volume') {
- const path = '/keywordstool'
  const allHints: string[] = []
  for (const kw of kwList) for (const h of expandHints(kw)) allHints.push(h)
  const uniqueHints = [...new Set(allHints)].slice(0, 25)
  const batches: string[][] = []
  for (let i = 0; i < uniqueHints.length; i += 5) batches.push(uniqueHints.slice(i, i + 5))
 
- const rawResults = await Promise.all(
- batches.slice(0, 5).map(async (batch) => {
- try {
- const qs = '?hintKeywords=' + encodeURIComponent(batch.join(',')) + '&showDetail=1'
- const res = await fetch(AD_BASE + path + qs, { headers: adHeaders('GET', path) })
- if (!res.ok) return []
- const data = await res.json()
- return data.keywordList || []
- } catch { return [] }
- })
- )
+ const rawResults = await Promise.all(batches.slice(0, 5).map(queryKeywords))
+ const successful = rawResults.filter((result): result is Extract<QueryResult, { ok: true }> => result.ok)
+ if (successful.length === 0) return queryFailure(rawResults)
+ const failedBatches = rawResults.length - successful.length
 
  const seen = new Set<string>()
  const merged: Record<string, unknown>[] = []
- for (const list of rawResults) {
- for (const item of list) {
+ for (const result of successful) {
+ for (const item of result.keywords) {
  const key = (item.relKeyword || '').replace(/\s+/g, '')
  if (!key || seen.has(key)) continue
  seen.add(key); merged.push(item)
@@ -119,37 +148,35 @@ export async function GET(req: NextRequest) {
  ((Number(b.monthlyPcQcCnt) || 0) + (Number(b.monthlyMobileQcCnt) || 0)) -
  ((Number(a.monthlyPcQcCnt) || 0) + (Number(a.monthlyMobileQcCnt) || 0))
  )
- return NextResponse.json({ ok: true, type: 'volume', keywords: merged })
+ return NextResponse.json({
+ ok: true, type: 'volume', keywords: merged, partial: failedBatches > 0,
+ successfulBatches: successful.length, failedBatches,
+ warning: failedBatches > 0 ? '일부 키워드를 조회하지 못했어요. 가져온 결과만 표시했으니 다시 조회해보세요.' : null,
+ })
  }
 
  // ── 파워링크 입찰가 (keywordstool compIdx 기반 추정) ──────────────
  if (type === 'bid') {
  const kw = kwList[0]
- const path = '/keywordstool'
- const qs = '?hintKeywords=' + encodeURIComponent(kw) + '&showDetail=1'
- const res = await fetch(AD_BASE + path + qs, { headers: adHeaders('GET', path) })
+ const result = await queryKeywords([kw])
+ if (!result.ok) return queryFailure([result])
+ const item = result.keywords.find(k => k.relKeyword.replace(/\s+/g, '') === kw.replace(/\s+/g, '')) || result.keywords[0]
+ if (!item) return NextResponse.json({
+ ok: true, type: 'bid', keyword: kw, estimated: true, empty: true,
+ compIdx: null, pcVol: null, mobileVol: null, avgPcCtr: null, avgMobileCtr: null, rows: [],
+ })
+ const compIdx = typeof item.compIdx === 'string' && Object.prototype.hasOwnProperty.call(BID_TABLE, item.compIdx) ? item.compIdx : null
+ const metric = (value: unknown) => value === null || value === undefined || value === '' || !Number.isFinite(Number(value)) ? null : Number(value)
+ const pcVol = metric(item.monthlyPcQcCnt)
+ const mobileVol = metric(item.monthlyMobileQcCnt)
+ const avgPcCtr = metric(item.monthlyAvePcCtr)
+ const avgMobileCtr = metric(item.monthlyAveMobileCtr)
 
- let compIdx = '중간'
- let pcVol = 0
- let mobileVol = 0
- let avgPcCtr = 0
- let avgMobileCtr = 0
-
- if (res.ok) {
- const data = await res.json()
- const item = (data.keywordList || []).find(
- (k: Record<string, unknown>) => (k.relKeyword as string)?.replace(/\s+/g,'') === kw.replace(/\s+/g,'')
- ) || data.keywordList?.[0]
- if (item) {
- compIdx = (item.compIdx as string) || '중간'
- pcVol = Number(item.monthlyPcQcCnt) || 0
- mobileVol = Number(item.monthlyMobileQcCnt) || 0
- avgPcCtr = Number(item.monthlyAvePcCtr) || 0
- avgMobileCtr = Number(item.monthlyAveMobileCtr) || 0
- }
- }
-
- const table = BID_TABLE[compIdx] || BID_TABLE['중간']
+ if (!compIdx) return NextResponse.json({
+ ok: true, type: 'bid', keyword: kw, estimated: false, unavailable: 'competition_missing',
+ compIdx: null, pcVol, mobileVol, avgPcCtr, avgMobileCtr, rows: [],
+ })
+ const table = BID_TABLE[compIdx]
  const rows = [1, 2, 3, 4, 5].map((rank, i) => ({
  rank,
  pc: table.pc[i],
@@ -166,8 +193,7 @@ export async function GET(req: NextRequest) {
 
  return NextResponse.json({ error: '잘못된 type.' }, { status: 400 })
 
- } catch (e) {
- const msg = e instanceof Error ? e.message : String(e)
- return NextResponse.json({ error: '서버 오류: ' + msg }, { status: 500 })
+ } catch {
+ return NextResponse.json({ ok: false, error: '키워드 정보를 처리하지 못했어요. 잠시 후 다시 조회해보세요.' }, { status: 500 })
  }
 }

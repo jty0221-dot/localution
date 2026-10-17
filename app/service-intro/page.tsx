@@ -213,11 +213,11 @@ const MORE_FEATURE_GROUPS = [
  color: '#03C75A',
  bg: '#F0FDF4',
  items: [
- { icon: <MapPin size={20} strokeWidth={2} />, title: '플레이스 진단', desc: '매장 플레이스 건강 점수와 개선 포인트를 한 번에 진단해 드려요.' },
- { icon: <TrendingUp size={20} strokeWidth={2} />, title: '플레이스 실시간 순위', desc: '내 키워드가 네이버 지도에서 몇 위인지 실시간으로 확인하세요.' },
- { icon: <BarChart3 size={20} strokeWidth={2} />, title: '플레이스 점수 분석', desc: 'SEO 키워드 점수 분석과 상위 노출을 위한 최적화 인사이트 제공.' },
- { icon: <PenLine size={20} strokeWidth={2} />, title: 'AI 블로그 포스팅', desc: '매장 정보만 입력하면 SEO 최적화 블로그 초안을 자동으로 생성해요.' },
- { icon: <BookOpen size={20} strokeWidth={2} />, title: '블로그 순위 추적', desc: '작성한 블로그 게시글의 키워드 순위를 지속적으로 모니터링.' },
+ { icon: <MapPin size={20} strokeWidth={2} />, title: '플레이스 진단', href: '/marketing/place', action: '플레이스 도구 보기', desc: '매장 플레이스 건강 점수와 개선 포인트를 한 번에 진단해 드려요.' },
+ { icon: <TrendingUp size={20} strokeWidth={2} />, title: '플레이스 실시간 순위', href: '/marketing/place', action: '플레이스 도구 보기', desc: '내 키워드가 네이버 지도에서 몇 위인지 실시간으로 확인하세요.' },
+ { icon: <BarChart3 size={20} strokeWidth={2} />, title: '플레이스 점수 분석', href: '/marketing/place', action: '플레이스 도구 보기', desc: 'SEO 키워드 점수 분석과 상위 노출을 위한 최적화 인사이트 제공.' },
+ { icon: <PenLine size={20} strokeWidth={2} />, title: 'AI 블로그 포스팅', href: '/marketing/blog-post', action: '글 작성 도구 보기', desc: '매장 정보만 입력하면 SEO 최적화 블로그 초안을 자동으로 생성해요.' },
+ { icon: <BookOpen size={20} strokeWidth={2} />, title: '블로그 순위 추적', href: '/marketing/blog-tracking', action: '추적 도구 보기', desc: '작성한 블로그 게시글의 키워드 순위를 지속적으로 모니터링.' },
  ],
  },
  {
@@ -225,8 +225,8 @@ const MORE_FEATURE_GROUPS = [
  color: '#E1306C',
  bg: '#FDF2F8',
  items: [
- { icon: <Video size={20} strokeWidth={2} />, title: '릴스·숏폼 대본 생성', desc: '인스타·틱톡·쇼츠용 영상 대본과 장면 구성을 AI가 자동 작성.' },
- { icon: <LayoutGrid size={20} strokeWidth={2} />, title: '카드뉴스 자동 제작', desc: '매장 정보 입력만으로 인스타용 카드뉴스 10장 자동 제작.' },
+ { icon: <Video size={20} strokeWidth={2} />, title: '릴스·숏폼 대본 생성', href: '/marketing/reels', action: '기획 도구 보기', desc: '인스타·틱톡·쇼츠용 영상 대본과 장면 구성을 AI가 자동 작성.' },
+ { icon: <LayoutGrid size={20} strokeWidth={2} />, title: '카드뉴스 자동 제작', href: '/marketing/card-news', action: '제작 도구 보기', desc: '매장 정보 입력만으로 인스타용 카드뉴스 10장 자동 제작.' },
  ],
  },
  {
@@ -792,6 +792,7 @@ export default function ServiceIntro() {
  </p>
  </div>
 
+ <p className="mb-5 text-center text-sm text-[#4E5968]">설명을 읽었다면 필요한 도구를 선택해 보세요.</p>
  <div className="space-y-6 sm:space-y-8 mb-6 sm:mb-8">
  {MORE_FEATURE_GROUPS.map(group => (
  <div key={group.category}>
@@ -802,11 +803,13 @@ export default function ServiceIntro() {
  <div className="flex-1 h-px bg-[#F2F4F6]" />
  </div>
  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 sm:gap-4">
- {group.items.map(f => (
- <div key={f.title} className="bg-white rounded-2xl p-4 sm:p-5 border border-[#F2F4F6] hover:border-[#E5E8EB] hover:shadow-sm transition-all">
+ {group.items.map(f => {
+ const href = 'href' in f ? f.href : undefined
+ const action = 'action' in f ? f.action : undefined
+ const content = <>
  <div className="flex items-center gap-2.5 mb-3">
- <div className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
- style={{ background: group.bg, color: group.color }}>
+ <div className="w-9 h-9 rounded-xl shadow-sm ring-1 ring-black/5 flex items-center justify-center shrink-0"
+ style={{ background: `linear-gradient(135deg, ${group.color}, ${group.color}CC)`, color: '#fff' }}>
  {f.icon}
  </div>
  {group.badge && (
@@ -815,8 +818,12 @@ export default function ServiceIntro() {
  </div>
  <p className="text-sm font-black text-[#191F28] mb-1 break-keep">{f.title}</p>
  <p className="text-xs text-[#8B95A1] leading-relaxed break-keep">{f.desc}</p>
- </div>
- ))}
+
+ {action && <p className="mt-4 flex items-center gap-2 text-xs font-semibold text-[#3182F6]">{action}<ArrowRight size={14} aria-hidden="true" /></p>}
+ </>
+ const className = "block min-w-0 rounded-2xl border border-[#E5E8EB] bg-white p-4 shadow-sm transition-colors sm:p-5"
+ return href ? <Link key={f.title} href={href} className={`${className} hover:border-[#3182F6] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#3182F6]`}>{content}</Link> : <div key={f.title} className={className}>{content}</div>
+ })}
  </div>
  </div>
  ))}

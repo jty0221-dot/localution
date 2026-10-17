@@ -375,6 +375,10 @@ export function parsePlaceHtml(
   }
 }
 
+export class PlaceLookupError extends Error {
+  constructor(public code: 'access_denied' | 'rate_limited' | 'timeout' | 'network', public status: number) { super(code); this.name = 'PlaceLookupError' }
+}
+
 async function tryFetch(url: string): Promise<string | null> {
   try {
     const res = await fetch(url, {
@@ -388,14 +392,17 @@ async function tryFetch(url: string): Promise<string | null> {
       signal: AbortSignal.timeout(8000),
       cache: 'no-store',
     })
+    if (res.status === 403 || res.status === 401) throw new PlaceLookupError('access_denied', 502)
+    if (res.status === 429) throw new PlaceLookupError('rate_limited', 429)
     if (!res.ok) return null
     const html = await res.text()
     if (html.length < 2000) return null
     if (html.includes('존재하지 않는 업체') || html.includes('서비스 종료')) return null
     return html
   } catch (e) {
-    console.warn('[naver-place] fetch failed for', url, e instanceof Error ? e.message : e)
-    return null
+    if (e instanceof PlaceLookupError) throw e
+    const name = e && typeof e === 'object' && 'name' in e ? String(e.name) : ''
+    throw new PlaceLookupError(['TimeoutError', 'AbortError'].includes(name) ? 'timeout' : 'network', ['TimeoutError', 'AbortError'].includes(name) ? 504 : 502)
   }
 }
 

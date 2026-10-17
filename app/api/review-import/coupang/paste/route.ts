@@ -238,8 +238,8 @@ export async function POST(req: NextRequest) {
  if (toInsert.length > 0) {
  const { error: insertError, count } = await svc
  .from('platform_reviews')
- .insert(toInsert)
- .select('id', { count: 'exact', head: true })
+ .insert(toInsert, { count: 'exact' })
+ .select('id')
  if (insertError) {
  errors.push('insert: ' + insertError.message.slice(0, 200))
  } else {
