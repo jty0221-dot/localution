@@ -37,22 +37,38 @@ type Summary = {
 
 type Resp = { ok: boolean; hasCard?: boolean; available?: boolean; truncated?: boolean; summary: Summary | null }
 
+type LoadState =
+  | { status: 'loading' }
+  | { status: 'unauth' }
+  | { status: 'error'; code: number }
+  | { status: 'done'; data: Resp }
+
 export default function RevisitInsightCard() {
-  const [data, setData] = useState<Resp | null>(null)
+  const [state, setState] = useState<LoadState>({ status: 'loading' })
 
   useEffect(() => {
     let alive = true
     fetch('/api/customers/revisit', { cache: 'no-store' })
-      .then(r => r.json())
-      .then((j: Resp) => { if (alive) setData(j) })
-      .catch(() => { if (alive) setData(null) })
+      .then(async r => {
+        if (!alive) return
+        if (r.status === 401) { setState({ status: 'unauth' }); return }
+        const j = (await r.json().catch(() => null)) as Resp | null
+        if (!alive) return
+        if (!r.ok || !j || !j.ok) { setState({ status: 'error', code: r.status }); return }
+        setState({ status: 'done', data: j })
+      })
+      .catch(() => { if (alive) setState({ status: 'error', code: 0 }) })
     return () => { alive = false }
   }, [])
 
-  if (!data || !data.ok || !data.hasCard) return null
+  // 불러오는 중 · 로그인 전에는 그리지 않는다 (페이지 자체가 로그인으로 넘긴다)
+  if (state.status === 'loading' || state.status === 'unauth') return null
 
-  const s = data.summary
+  const data = state.status === 'done' ? state.data : null
+  const s = data?.summary ?? null
   const delta = s?.revisitRateDelta ?? null
+  // 스탬프카드가 없거나 적립 기록이 0건이면 숫자 대신 시작 안내
+  const needsSetup = !!data && (!data.hasCard || data.available === false || !s || s.totalVisits === 0)
 
   return (
     <div className="bg-white rounded-2xl shadow-sm p-4 md:p-5 mb-6">
@@ -66,15 +82,21 @@ export default function RevisitInsightCard() {
         </div>
       </div>
 
-      {data.available === false || !s || s.totalVisits === 0 ? (
+      {state.status === 'error' ? (
+        <p className="text-sm text-[#DC2626] bg-[#FFF1F2] rounded-xl p-4">
+          재방문 분석을 불러오지 못했어요{state.code ? ` (오류 ${state.code})` : ''}. 잠시 뒤 새로고침해 주세요.
+        </p>
+      ) : needsSetup || !data || !s ? (
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 bg-[#F8F9FA] rounded-xl p-4">
           <p className="text-sm text-[#4E5968] leading-relaxed">
-            아직 QR 스탬프 적립 기록이 없어요. 손님이 매장 QR 로 적립을 시작하면 재방문율 · 단골 주기 · 발길 끊길 단골이 여기 쌓입니다.
+            {data && !data.hasCard
+              ? '아직 스탬프카드가 없어요. 매장 스탬프 QR 을 만들고 손님이 적립을 시작하면 재방문율 · 단골 주기 · 발길 끊길 단골이 여기 쌓입니다.'
+              : '아직 QR 스탬프 적립 기록이 없어요. 손님이 매장 QR 로 적립을 시작하면 재방문율 · 단골 주기 · 발길 끊길 단골이 여기 쌓입니다.'}
           </p>
           <a
             href="/qr-admin"
             className="shrink-0 text-center px-4 py-2.5 rounded-xl text-sm font-bold bg-[#3182F6] text-white hover:bg-[#1B64DA]">
-            스탬프 QR 설정하기
+            {data && !data.hasCard ? '스탬프 QR 만들기' : '스탬프 QR 설정하기'}
           </a>
         </div>
       ) : (
