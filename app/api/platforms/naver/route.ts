@@ -17,7 +17,7 @@ function extractPlaceId(input: string): string | null {
  if (/^\d{5,}$/.test(s)) return s
 
  const patterns = [
- /smartplace\.naver\.com\/bizes\/place\/(\d{5,})/, // 🆕 SmartPlace 사장님센터 URL (가장 정확 — owner 보증)
+ /smartplace\.naver\.com\/bizes\/place\/(\d{5,})/, // SmartPlace 사장님센터 URL (가장 정확 — owner 보증)
  /place\/(\d{5,})/,
  /entry\/place\/(\d{5,})/,
  /placeId=(\d{5,})/,
@@ -166,13 +166,6 @@ export async function GET(req: NextRequest) {
  return NextResponse.json({ error: 'placeId 필요' }, { status: 400 })
  }
 
- // 네이버 플레이스 리뷰는 공식 API 없음 (Business Profile API 승인 필요)
- // mock 리뷰를 반환하면 알림 오탐이 발생하므로 빈 배열 반환
- return NextResponse.json({
- placeId,
- source: 'unavailable',
- reviews: [],
- stats: { total: 0, avg: 0, replied: 0 },
- notice: '네이버 플레이스 리뷰는 공식 API 미지원으로 현재 조회 불가합니다.',
- })
+ // This legacy path has no verified review provider. Do not report zero reviews.
+ return NextResponse.json({ ok: false, code: 'not_configured', placeId, source: 'unavailable', reviews: [], stats: null, notice: '이 경로의 리뷰 수집 연결을 확인해야 해요. 연결된 계정의 리뷰 관리 화면에서 확인해주세요.' }, { status: 503 })
 }

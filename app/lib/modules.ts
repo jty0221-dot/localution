@@ -147,7 +147,7 @@ export const MODULES: readonly Module[] = [
     status: 'live',
     paths: ['/qr-admin'],
     icon: 'QrCode',
-    desc: 'QR 한 번으로 리뷰·스탬프 적립. 재방문율 2배.',
+    desc: 'QR로 리뷰 안내와 스탬프 적립을 준비해요.',
     bullets: [
       '매장별 고유 QR 생성',
       '방문 스탬프 자동 적립',
