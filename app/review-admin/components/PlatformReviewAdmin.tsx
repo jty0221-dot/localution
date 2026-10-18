@@ -27,6 +27,7 @@ import ReplyFeedbackButtons from '../../components/ReplyFeedbackButtons'
 import ReplyTemplatePicker from '../../components/ReplyTemplatePicker'
 import PageHeader from '../../components/PageHeader'
 import { toast } from '../../lib/toast'
+import { copyTextWithFallback } from '../../lib/clipboard'
 import { Heart, Briefcase, Smile, Edit3, Mail, Flame, FileText, AlertTriangle, Sparkles, Star, Shuffle, X, type LucideIcon } from 'lucide-react'
 // 76차: CoupangReviewBookmarkletDialog import 제거 (자동 연결로 대체됨)
 
@@ -1480,11 +1481,13 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  {/* 직접 등록 버튼 — 자동 발행이 실패할 때 대안 (가장 안정적) */}
  {config.reviewAdminUrl && !review.hasReply && !isSubmitted && !isReplyExpired && (
  <button
- onClick={() => {
- try {
- navigator.clipboard.writeText(draftText)
- toast.info(`답글이 복사됐어요! ${config.label}에서 붙여넣기 하세요`)
- } catch {}
+ onClick={async () => {
+ const copied = await copyTextWithFallback(draftText)
+ if (!copied) {
+ toast.warn('자동 복사에 실패했어요. 작성한 답글을 직접 선택해 복사해주세요. 입력한 내용은 그대로 남아 있어요.')
+ return
+ }
+ toast.info(`답글을 복사했어요. ${config.label}에서 직접 등록한 뒤 결과를 확인해주세요. 아직 발행 완료가 아닙니다.`)
  window.open(config.reviewAdminUrl!, '_blank', 'noopener')
  }}
  disabled={!draftText.trim() || submitting}

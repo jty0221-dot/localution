@@ -97,13 +97,16 @@ export async function PUT(req: NextRequest) {
  if (body[k] !== undefined) update[k] = !!body[k]
  }
 
- const { error } = await svc
+ const { data: updated, error } = await svc
  .from('menu_items')
  .update(update)
  .eq('id', body.id)
  .eq('user_id', auth.userId)
+ .select('id')
+ .maybeSingle()
 
  if (error) return NextResponse.json({ ok: false, error: 'update_failed', message: error.message }, { status: 500 })
+ if (!updated) return NextResponse.json({ ok: false, error: 'menu_not_found' }, { status: 404 })
  return NextResponse.json({ ok: true })
 }
 
@@ -115,12 +118,15 @@ export async function DELETE(req: NextRequest) {
  if (!id) return NextResponse.json({ ok: false, error: 'missing_id' }, { status: 400 })
 
  const svc = createServiceClient()
- const { error } = await svc
+ const { data: updated, error } = await svc
  .from('menu_items')
  .update({ active: false, updated_at: new Date().toISOString() })
  .eq('id', id)
  .eq('user_id', auth.userId)
+ .select('id')
+ .maybeSingle()
 
  if (error) return NextResponse.json({ ok: false, error: 'delete_failed' }, { status: 500 })
+ if (!updated) return NextResponse.json({ ok: false, error: 'menu_not_found' }, { status: 404 })
  return NextResponse.json({ ok: true })
 }

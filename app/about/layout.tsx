@@ -5,9 +5,9 @@ import { pageMetadata, PUBLIC_ROUTES, graphLd, webPageLd, breadcrumbLd } from '.
 import JsonLd from '../components/seo/JsonLd'
 
 export const metadata: Metadata = pageMetadata({
-  title: '로컬루션 소개 · 자영업자를 위한 AI 마케팅 OS',
+  title: '로컬루션 소개 · 자영업자를 위한 마케팅 업무 관리',
   description:
-    '리뷰 답글 · SNS 운영 · 광고 집행을 AI 가 자동으로. 500곳 매장 데이터를 학습한 로컬루션, 커피 한 잔 값 월 6,900원으로 모든 플랫폼 리뷰 답글.',
+    '흩어진 매장 마케팅 업무를 한곳에서 확인하고 준비하세요. 리뷰 연결 상태 확인, 매장 공지 초안, 행사 비용 비교, 홍보 링크와 기능별 이용 조건을 안내합니다.',
   path: 'about',
   keywords: [
     '로컬루션 소개',

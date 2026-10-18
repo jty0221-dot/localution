@@ -19,6 +19,7 @@ import {
  TrendingUp, Heart, Award, UtensilsCrossed, Gift, Megaphone,
 } from 'lucide-react'
 import Footer from '../../components/Footer'
+import { copyTextWithFallback } from '../../lib/clipboard'
 
 const LS_KEY = 'localution.naver_blog_post_inputs_v2'
 
@@ -260,20 +261,14 @@ export default function BlogPostGeneratorPage() {
 
  const handleCopy = async () => {
  if (!post) return
- try {
- await navigator.clipboard.writeText(post)
- setCopied(true)
- setTimeout(() => setCopied(false), 2000)
- } catch (_) {
- const ta = document.createElement('textarea')
- ta.value = post
- document.body.appendChild(ta)
- ta.select()
- document.execCommand('copy')
- document.body.removeChild(ta)
- setCopied(true)
- setTimeout(() => setCopied(false), 2000)
+ const copied = await copyTextWithFallback(post)
+ if (!copied) {
+ setCopied(false)
+ setError('자동 복사에 실패했어요. 생성된 원고를 직접 선택해 복사해주세요.')
+ return
  }
+ setCopied(true)
+ setTimeout(() => setCopied(false), 2000)
  }
 
  return (

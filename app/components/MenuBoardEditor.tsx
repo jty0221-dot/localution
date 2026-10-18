@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react'
 import { Plus, Trash2, Edit3, Save, Globe, Download, Image as ImageIcon, Star, Sparkles, Link2, FolderOpen, ClipboardList, Languages, AlertTriangle, MapPin, Check, CheckCircle2, RefreshCw, Clock, ChevronUp, ChevronDown, GripVertical, X } from 'lucide-react'
 import MenuBookmarkletDialog from './MenuBookmarkletDialog'
 import MenuThemeEditor from './MenuThemeEditor'
+import { translateMenuFields, mergeTranslatedInput, saveMenuTranslation } from '../lib/menu-translation'
 
 type MenuItem = {
  id?: string
@@ -54,108 +55,20 @@ export default function MenuBoardEditor() {
  const [translating, setTranslating] = useState(false)
  const [translateMsg, setTranslateMsg] = useState('')
 
- // Papago 자동 번역 — 한국어 → 영/일/중 동시
- async function autoTranslateAll() {
- if (!editing) return
- const koName = (editing as any).name_ko
- const koDesc = (editing as any).desc_ko
- if (!koName) {
- setTranslateMsg('한국어 메뉴 이름을 먼저 입력해주세요')
- setTimeout(() => setTranslateMsg(''), 3000)
- return
- }
- setTranslating(true)
- setTranslateMsg('Papago 번역 중...')
-
- const targets: { lang: 'en' | 'ja' | 'zh'; papago: string }[] = [
- { lang: 'en', papago: 'en' },
- { lang: 'ja', papago: 'ja' },
- { lang: 'zh', papago: 'zh-CN' },
- ]
-
- const updates: any = { ...editing }
- let okCount = 0
-
- for (const t of targets) {
+ // 번역은 저장 전 초안이다. 실패한 필드와 사용자가 수정한 입력은 유지한다.
+ async function translateEditing(languages: string[]) {
+ if (!editing || translating) return
+ if (!editing.name_ko) { setTranslateMsg('한국어 메뉴 이름을 먼저 입력해주세요'); return }
+ const original = { ...editing }
+ setTranslating(true); setTranslateMsg('번역 중...')
  try {
- // 메뉴 이름
- const r1 = await fetch('/api/translate/papago', {
- method: 'POST',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ text: koName, source: 'ko', target: t.papago }),
- })
- const j1 = await r1.json()
- if (j1.ok) {
- updates['name_' + t.lang] = j1.translated
- okCount++
+ const result = await translateMenuFields(original, languages, false)
+ setEditing(current => mergeTranslatedInput(current, original, result.updates))
+ setTranslateMsg(result.failed ? `번역 성공 ${result.succeeded}개, 실패 ${result.failed}개. 입력을 확인한 뒤 저장해주세요.` : '번역 초안을 준비했어요. 입력을 확인한 뒤 저장해주세요.')
+ } finally { setTranslating(false) }
  }
-
- // 설명 (있으면)
- if (koDesc) {
- const r2 = await fetch('/api/translate/papago', {
- method: 'POST',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ text: koDesc, source: 'ko', target: t.papago }),
- })
- const j2 = await r2.json()
- if (j2.ok) {
- updates['desc_' + t.lang] = j2.translated
- }
- }
- } catch (_) {}
- }
-
- setEditing(updates)
- setTranslating(false)
- setTranslateMsg(okCount > 0 ? `번역 완료 (${okCount}/3 언어)` : '번역 실패 · 잠시 후 재시도')
- setTimeout(() => setTranslateMsg(''), 4000)
- }
-
- // 단일 언어 번역
- async function autoTranslateOne(targetLang: 'en' | 'ja' | 'zh') {
- if (!editing) return
- const koName = (editing as any).name_ko
- const koDesc = (editing as any).desc_ko
- if (!koName) {
- setTranslateMsg('한국어 메뉴 이름 먼저 입력')
- setTimeout(() => setTranslateMsg(''), 3000)
- return
- }
- setTranslating(true)
- setTranslateMsg('번역 중...')
- const papagoTarget = targetLang === 'zh' ? 'zh-CN' : targetLang
- const updates: any = { ...editing }
- try {
- const r1 = await fetch('/api/translate/papago', {
- method: 'POST',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ text: koName, source: 'ko', target: papagoTarget }),
- })
- const j1 = await r1.json()
- if (j1.ok) updates['name_' + targetLang] = j1.translated
-
- if (koDesc) {
- const r2 = await fetch('/api/translate/papago', {
- method: 'POST',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ text: koDesc, source: 'ko', target: papagoTarget }),
- })
- const j2 = await r2.json()
- if (j2.ok) updates['desc_' + targetLang] = j2.translated
- }
- setEditing(updates)
- setTranslateMsg('번역 완료')
- } catch (_) {
- setTranslateMsg('번역 실패')
- } finally {
- setTranslating(false)
- setTimeout(() => setTranslateMsg(''), 3000)
- }
- }
+ async function autoTranslateAll() { await translateEditing(['en', 'ja', 'zh']) }
+ async function autoTranslateOne(targetLang: 'en' | 'ja' | 'zh') { await translateEditing([targetLang]) }
 
  // 북마클릿 모드
  const [showBookmarklet, setShowBookmarklet] = useState(false)
@@ -254,63 +167,32 @@ export default function MenuBoardEditor() {
  }
 
  // 전체 메뉴 자동 번역 (en/ja/zh) — Papago 일괄 처리
+ const [bulkPending, setBulkPending] = useState<Record<string, { sourceName: string; sourceDesc: string | null | undefined; updates: Record<string, string> }>>({})
  const [bulkTranslating, setBulkTranslating] = useState(false)
  const [bulkProgress, setBulkProgress] = useState({ done: 0, total: 0 })
  async function translateAllMenus() {
  if (!confirm(`${items.length}개 메뉴를 영어/일본어/중국어로 자동 번역할까요?\n\nPapago API 사용 (메뉴당 약 3초). 빈 번역 필드만 채워집니다.`)) return
  setBulkTranslating(true)
  setBulkProgress({ done: 0, total: items.length })
- let okCount = 0
+ let saved = 0, translationFailures = 0, saveFailures = 0
+ const pending = { ...bulkPending }
+ try {
  for (let i = 0; i < items.length; i++) {
  const item = items[i]
- const updates: any = {}
- const targets: { lang: 'en' | 'ja' | 'zh'; papago: string }[] = [
- { lang: 'en', papago: 'en' },
- { lang: 'ja', papago: 'ja' },
- { lang: 'zh', papago: 'zh-CN' },
- ]
- for (const t of targets) {
- // 이미 번역된 것 skip
- if (item[`name_${t.lang}`]) continue
- try {
- const r = await fetch('/api/translate/papago', {
- method: 'POST',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ text: item.name_ko, source: 'ko', target: t.papago }),
- })
- const j = await r.json()
- if (j.ok) updates[`name_${t.lang}`] = j.translated
- } catch (_) {}
- if (item.desc_ko && !item[`desc_${t.lang}`]) {
- try {
- const r2 = await fetch('/api/translate/papago', {
- method: 'POST',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ text: item.desc_ko, source: 'ko', target: t.papago }),
- })
- const j2 = await r2.json()
- if (j2.ok) updates[`desc_${t.lang}`] = j2.translated
- } catch (_) {}
- }
- }
- if (Object.keys(updates).length > 0) {
- try {
- await fetch('/api/menu', {
- method: 'PUT',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ id: item.id, ...updates }),
- })
- okCount++
- } catch (_) {}
+ const cached = item.id ? pending[item.id] : undefined
+ const prior = cached && cached.sourceName === item.name_ko && cached.sourceDesc === item.desc_ko ? Object.fromEntries(Object.entries(cached.updates).filter(([key]) => !item[key as keyof MenuItem])) : {}
+ const result = await translateMenuFields({ ...item, ...prior }, ['en', 'ja', 'zh'], true)
+ translationFailures += result.failed
+ const updates = { ...prior, ...result.updates }
+ if (Object.keys(updates).length) {
+ if (item.id && await saveMenuTranslation(item.id, updates)) { saved++; delete pending[item.id] }
+ else { saveFailures++; if (item.id) pending[item.id] = { sourceName: item.name_ko, sourceDesc: item.desc_ko, updates } }
  }
  setBulkProgress({ done: i + 1, total: items.length })
  }
- setBulkTranslating(false)
+ } finally { setBulkTranslating(false); setBulkPending(pending) }
  await fetchItems()
- alert(`번역 완료: ${okCount}개 메뉴 업데이트됨`)
+ alert(`번역 처리 결과: 저장 성공 ${saved}개, 번역 실패 ${translationFailures}개, 저장 실패 ${saveFailures}개. 저장 실패 초안은 이 화면에 보관되며 전체 번역을 다시 누르면 재시도합니다.`)
  }
 
  // 메뉴 순서 변경 (카테고리 안에서 위/아래로 이동)

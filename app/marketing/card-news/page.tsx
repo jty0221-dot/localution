@@ -3,6 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { useState, useRef } from 'react'
 import Link from 'next/link'
+import { copyTextWithFallback } from '../../lib/clipboard'
 import Sidebar from '../../components/Sidebar'
 import PageHeader from '../../components/PageHeader'
 import Footer from '../../components/Footer'
@@ -145,7 +146,7 @@ export default function CardNewsPage() {
  window.location.href = `/marketing/threads?${params.toString()}`
  }
 
- const copyCaption = () => {
+ const copyCaption = async () => {
  if (!data) return
  const cover = data.slides[0]
  const bodies = data.slides.filter(s => s.role === 'body').map(s => `• ${s.headline}`)
@@ -155,8 +156,8 @@ export default function CardNewsPage() {
  `${bodies.join('\n')}\n\n` +
  `${cta?.headline || '저장 · 공유로 놓치지 마세요'}\n\n` +
  `${data.hashtags.instagram.map(h => '#' + h).join(' ')}`
- navigator.clipboard.writeText(caption)
- alert('인스타 캡션이 복사되었습니다.')
+ const copied = await copyTextWithFallback(caption)
+ alert(copied ? '인스타 캡션이 복사되었습니다.' : '자동 복사에 실패했어요. 화면의 문구를 직접 선택해 복사해주세요.')
  }
 
  const slideSize = ratio === '1:1' ? { w: 540, h: 540 } : { w: 540, h: 675 }
@@ -444,9 +445,9 @@ function InfoCard({ title, items }: { title: string; items: string[] }) {
 }
 
 function HashtagRow({ label, tags }: { label: string; tags: string[] }) {
- const copy = () => {
- navigator.clipboard.writeText(tags.map(t => '#' + t).join(' '))
- alert(`${label} 복사됨`)
+ const copy = async () => {
+ const copied = await copyTextWithFallback(tags.map(t => '#' + t).join(' '))
+ alert(copied ? `${label} 복사됨` : '자동 복사에 실패했어요. 아래 해시태그를 직접 선택해 복사해주세요.')
  }
  return (
  <div>
