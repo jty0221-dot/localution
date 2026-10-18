@@ -10,19 +10,13 @@
 // ============================================================
 export const dynamic = 'force-dynamic'
 
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useCallback, useRef } from 'react'
 import Link from 'next/link'
 import Sidebar from '../components/Sidebar'
 import Footer from '../components/Footer'
-import SlideAdBanner from '../components/SlideAdBanner'
-import OnboardingChecklist from '../components/OnboardingChecklist'
 import DashboardRightSidebar, { DashboardRightSidebarMobile } from '../components/DashboardRightSidebar'
 import HarangMarketingPopup from '../components/HarangMarketingPopup'
-import NaverLockoutBanner from '../components/NaverLockoutBanner'
-import PlatformIssuesBanner from '../components/PlatformIssuesBanner'
-import UserStatsWidget from '../components/UserStatsWidget'
 import ManagementOverview from '../components/dashboard/ManagementOverview'
-import NegativeReviewsWidget from '../components/NegativeReviewsWidget'
 import { useConnections, setConnection as libSetConnection, removeConnection as libRemoveConnection, PlatformId as CanonicalPlatformId } from '../lib/connections'
 import { toast, confirmDialog } from '../lib/toast'
 import { buildSettingsHref } from '../lib/settings-tabs'
@@ -700,15 +694,24 @@ function ServiceRanking() { return <section className="lu-panel p-5"><h2 classNa
 // ═══════════════════════════════════════════════════════════
 export default function Dashboard() {
  const [isLoggedIn, setIsLoggedIn] = useState(false)
+ const [accountId, setAccountId] = useState<string | null>(null)
+ const accountGeneration = useRef(0)
+ const identityRequest = useRef(0)
  useEffect(() => {
  // v1.6q: localution_user 가 httpOnly 쿠키 → document.cookie 로 못 읽음
  // /api/me 서버 endpoint 호출 (Naver/Kakao OAuth 양쪽 작동)
  const check = async () => {
+ const request = ++identityRequest.current
  try {
  const res = await fetch('/api/me', { credentials: 'include', cache: 'no-store' })
- const has = res.ok
+ const identity = res.ok ? await res.json() : null
+ if (identityRequest.current !== request) return
+ const has = !!identity?.user?.id
+ setAccountId(has ? String(identity.user.id) : null)
  setIsLoggedIn(prev => (prev === has ? prev : has))
  } catch {
+ if (identityRequest.current !== request) return
+ setAccountId(null)
  setIsLoggedIn(false)
  }
  }
@@ -727,6 +730,7 @@ export default function Dashboard() {
  window.addEventListener('storage', onStorage)
  window.addEventListener('focus', onFocus)
  return () => {
+ ++identityRequest.current
  window.clearInterval(interval)
  window.removeEventListener('localution:user-change', onUserChange)
  window.removeEventListener('storage', onStorage)
@@ -756,28 +760,6 @@ export default function Dashboard() {
  // 공통 연동 훅 — /settings, /review-admin 과 동일 소스
  const { connections: canonicalConnections } = useConnections()
 
- // 훅 상태 → 대시보드 platforms 반영
- useEffect(() => {
- setPlatforms(prev => prev.map(p => {
- const canon = TO_CANONICAL[p.id]
- if (!canon) return p
- const c = canonicalConnections[canon]
- if (c?.connected) {
- return {
- ...p,
- connected: true,
- rating: p.rating ?? c.rating ?? null,
- reviews: p.reviews ?? c.reviewCount ?? null,
- }
- }
- // 30차-18: canonical 이 "disconnected" 여도 rating/reviews 는 초기화하지 않는다.
- // · reloadStoresMe 가 이미 set 한 집계(p.reviews=20)를 여기서 덮어쓰면
- // "20건 수집했는데 대시보드에 안 보임" 재현 버그.
- // · connected 플래그만 canonical 기준으로 해제하고, 집계는 /api/stores/me 를 단일 진실원으로.
- return { ...p, connected: false }
- }))
- }, [canonicalConnections])
-
  // 30차-2: 서버 단일 진실원 동기화 (/api/stores/me → platform_credentials)
  // · /my/platforms/[platform]/connect 에서 ID/비번 입력해 저장한 연결은
  // platform_credentials 테이블에 있고 localStorage 에는 없음.
@@ -793,32 +775,35 @@ export default function Dashboard() {
  // · 좌측 "플랫폼별 별점·리뷰 현황" 카드의 플랫폼 행 아래 최신 2건 미니 렌더
  // · 하단 "최근 리뷰" 섹션에 전 플랫폼 통합 정렬
  const [platformReviews, setPlatformReviews] = useState<Record<string, RealReview[]>>({})
+ const [reviewReads, setReviewReads] = useState<Record<string, { state: 'loading' | 'read' | 'error'; readAt: string | null }>>({})
  const loadPlatformReviews = useCallback(async (platformIds: PlatformId[]): Promise<void> => {
- if (platformIds.length === 0) return
- const results: Record<string, RealReview[]> = {}
- await Promise.all(
- platformIds.map(async (pid) => {
+ const generation = accountGeneration.current
+ setReviewReads(prev => ({ ...prev, ...Object.fromEntries(platformIds.map(pid => [pid, { state: 'loading', readAt: null }])) }))
+ await Promise.all(platformIds.map(async pid => {
  try {
  const params = new URLSearchParams({ platform: pid, limit: '30', period: 'all' })
- const res = await fetch(`/api/place/reviews?${params.toString()}`, { cache: 'no-store' })
- if (!res.ok) return
- const j = await res.json().catch(() => null)
- if (!j?.ok || !Array.isArray(j.reviews)) return
- results[pid] = j.reviews as RealReview[]
+ const res = await fetch(`/api/place/reviews?${params}`, { cache: 'no-store', credentials: 'include' })
+ const j = res.ok ? await res.json() : null
+ if (!j?.ok || !Array.isArray(j.reviews)) throw new Error('read failed')
+ if (accountGeneration.current !== generation) return
+ setPlatformReviews(prev => ({ ...prev, [pid]: j.reviews }))
+ setReviewReads(prev => ({ ...prev, [pid]: { state: 'read', readAt: new Date().toISOString() } }))
  } catch {
- // 단일 플랫폼 실패는 다른 플랫폼 결과를 막지 않음
+ if (accountGeneration.current !== generation) return
+ // 조회 실패 자료는 지난 성공 자료처럼 표시하지 않는다.
+ setPlatformReviews(prev => { const next = { ...prev }; delete next[pid]; return next })
+ setReviewReads(prev => ({ ...prev, [pid]: { state: 'error', readAt: null } }))
  }
- }),
- )
- setPlatformReviews((prev) => ({ ...prev, ...results }))
+ }))
  }, [])
 
  const reloadStoresMe = useCallback(async (): Promise<void> => {
+ const generation = accountGeneration.current
  try {
  const res = await fetch('/api/stores/me', { cache: 'no-store' })
  if (!res.ok) return
  const data = await res.json()
- if (!data?.ok) return
+ if (!data?.ok || generation !== accountGeneration.current) return
  const server: Array<{
  platform: string
  connected: boolean
@@ -856,13 +841,13 @@ export default function Dashboard() {
  setPlatforms((prev) =>
  prev.map((p) => {
  const agg = aggMap[p.id]
- const hasAgg = agg && agg.review_count > 0
+ const hasAgg = data.source_states?.reviews === 'read' && agg && Number.isInteger(agg.review_count) && agg.review_count >= 0
  return {
  ...p,
- connected: connectedSet.has(p.id) ? true : p.connected,
+ connected: data.source_states?.credentials === 'read' && connectedSet.has(p.id),
  // 서버 집계가 있으면 실제 값으로 덮어쓰기. 없으면 기존 state 유지 (localStorage 값 포함)
- rating: hasAgg ? agg.rating_avg : p.rating,
- reviews: hasAgg ? agg.review_count : p.reviews,
+ rating: hasAgg ? agg.rating_avg : null,
+ reviews: hasAgg ? agg.review_count : null,
  }
  })
  )
@@ -872,55 +857,16 @@ export default function Dashboard() {
  }, [])
 
  useEffect(() => {
- if (!isLoggedIn) return
+ ++accountGeneration.current
+ setPlatforms(INITIAL_PLATFORMS.map(p => ({ ...p, connected: false, rating: null, reviews: null })))
+ setPlatformReviews({}); setReviewReads({}); setServerPlatformDetails({}); setServerStore(null); setReplyReview(null); setConnectPlatform(null)
+ if (isLoggedIn && accountId) {
  reloadStoresMe()
- }, [isLoggedIn, reloadStoresMe])
-
- // 30차-23 / 77차: 페이지 진입 시 모든 플랫폼 review fetch
- // 기존 버그: platforms state 변경 race condition 으로 쿠팡 connected=true 인데도
- // fetch 가 누락 → 미니 리뷰 + 하단 종합 섹션에 쿠팡 review 안 보임
- // 수정: connected 무관하게 모든 플랫폼 한 번에 fetch. 빈 결과는 빈 배열로 유지.
- // 단, isLoggedIn 만 의존 (한 번만 실행)
- useEffect(() => {
- if (!isLoggedIn) return
  loadPlatformReviews(['naver_place', 'baemin', 'yogiyo', 'coupangeats', 'kakao_map', 'google'] as PlatformId[])
- }, [isLoggedIn, loadPlatformReviews])
-
- // 30차-15-B: 연결된 네이버 플레이스가 있고 리뷰 집계가 0건이면 자동으로 1회 수집 시도
- // · 사용자가 "지금 수집" 을 누르지 않아도 연결 직후 첫 수집을 빠르게 반영해
- // "데이터 수집 중..." 라벨이 저절로 해소되도록 한다.
- // · 중복 호출 방지: reviewsFetchState 로 가드
- useEffect(() => {
- if (!isLoggedIn) return
- if (reviewsFetchState !== 'idle') return
- const nv = platforms.find((p) => p.id === 'naver_place')
- if (!nv?.connected) return
- // 이미 집계가 있으면 (reviews > 0) 수집 스킵
- if (typeof nv.reviews === 'number' && nv.reviews > 0) return
-
- setReviewsFetchState('fetching')
- ;(async () => {
- try {
- const res = await fetch('/api/place/reviews/fetch', {
- method: 'POST',
- credentials: 'include',
- headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({}),
- })
- if (!res.ok) {
- setReviewsFetchState('error')
- return
  }
- const j = await res.json().catch(() => null)
- if (j?.ok && typeof j.total === 'number' && j.total > 0) {
- await reloadStoresMe()
- }
- setReviewsFetchState('done')
- } catch {
- setReviewsFetchState('error')
- }
- })()
- }, [isLoggedIn, platforms, reviewsFetchState, reloadStoresMe])
+ return () => { ++accountGeneration.current }
+ }, [isLoggedIn, accountId, reloadStoresMe, loadPlatformReviews])
+ // 외부 수집은 페이지 진입 시 자동 실행하지 않는다. 명시된 수집 동작만 사용한다.
 
  const handleCollectNaverReviews = async () => {
  setReviewsFetchState('fetching')
@@ -1325,16 +1271,6 @@ export default function Dashboard() {
  } catch {}
  }, [unansweredCount])
 
- // 실 데이터 연결 전 가짜 숫자 노출 금지 — 데이터 없으면 '—'로 표시
- const stats = [
- { label: '이번 달 방문자', value: '-', sub: '데이터 수집 중', up: false, color: 'var(--lu-accent)', ring: 'var(--lu-accent-soft)' },
- { label: '총 리뷰 수', value: totalReviews ? totalReviews + '건' : '-', sub: hasRealReviews ? '수집된 리뷰 기준' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#03C75A', ring: '#E8FFF0' },
- { label: '평균 별점', value: avgRating ? avgRating + '점' : '-', sub: hasRealReviews ? '리뷰 기반 자동 계산' : '플랫폼 연동 시 표시', up: hasRealReviews, color: '#F5A623', ring: '#FFF7E8' },
- { label: '키워드 상위', value: '-', sub: '키워드 추적 시작 시 표시', up: false, color: '#9B5CFB', ring: '#F3ECFF' },
- { label: '이번 주 매출', value: totalWeekSale > 0 ? totalWeekSale + '만원' : '-', sub: '매출 연동 시 표시', up: totalWeekSale > 0, color: '#F04452', ring: '#FFF0F0' },
- { label: '단골 고객', value: '-', sub: '고객 등록 시 자동 집계', up: false, color: '#12B76A', ring: '#E8FFF0' },
- ]
-
  // ─────────────────────────────────────────────────────────
  // 오늘 처리할 작업 — 플랫폼 연동 현황에 따라 동적 렌더
  // 카테고리 기반 판정 (INITIAL_PLATFORMS의 category 필드가 단일 소스)
@@ -1362,614 +1298,31 @@ export default function Dashboard() {
  // 일단 "any 플랫폼 연동됨"을 조건으로 잡는다
  const anyPlatformConnected = connectedCount > 0
 
- const todayTasks = [
- {
- key: 'unanswered-reviews',
- href: '/reviews',
- connectHref: buildSettingsHref('connect'),
- requiredLabel: '리뷰 플랫폼',
- label: '미답변 리뷰',
- count: unansweredCount,
- unit: '건',
- color: '#F04452',
- ready: reviewPlatformConnected,
- },
- {
- key: 'crm-revisit',
- href: '/crm',
- connectHref: '/customers',
- requiredLabel: '고객 DB',
- label: '재방문 유도',
- count: 0,
- unit: '명',
- color: '#F59E0B',
- ready: false,
- },
- {
- key: 'reservations-today',
- href: '/reservations',
- connectHref: buildSettingsHref('connect'),
- requiredLabel: '예약 시스템',
- label: '오늘 예약',
- count: 0,
- unit: '건',
- color: 'var(--lu-accent)',
- ready: false, // 현재 예약 연동 없음
- },
- ]
-
  return (
  <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
  {/* DashboardRightSidebar:
-   · xl+ (1280px+): position:fixed 로 viewport 우측 고정 · 스크롤 무관 항상 보임
-   · main 에 xl:pr-[336px] 로 콘텐츠 우측 여백 확보 (sidebar 320 + 16 margin)
-   · xl 미만: 메인 콘텐츠 하단에 인라인 grid (lg+ 3열, mobile 1열) */}
+   · 2xl+ (1536px+): position:fixed 로 viewport 우측 고정 · 스크롤 무관 항상 보임
+   · main 에 2xl:pr-[296px] 로 콘텐츠 우측 여백 확보 (sidebar 280 + 16 margin)
+   · 2xl 미만: 메인 콘텐츠 하단에 인라인 grid (lg+ 3열, mobile 1열) */}
  <div className="md:ml-[220px] flex flex-col min-h-screen">
- <div className="flex-1 px-4 md:px-6 pt-20 md:pt-6 pb-24 md:pb-6 mx-auto w-full xl:pr-[336px]" style={{ maxWidth: '1600px' }}>
+ <div className="flex-1 px-4 md:px-6 pt-20 md:pt-6 pb-24 md:pb-6 mx-auto w-full 2xl:pr-[296px]" style={{ maxWidth: '1600px' }}>
  <main className="min-w-0">
 
- {/* ── 상단 롤링 공지 배너 ── */}
- <SlideAdBanner />
-
- {/* ── 2-D · 신규 사용자 onboarding checklist (4 step) ── */}
- {/* 4가지 모두 완료하면 자동 숨김 — 신규 사용자에게만 노출 */}
- {isLoggedIn && <OnboardingChecklist />}
-
- {/* v38: 네이버 답글 발행 잠금 알림 (잠금 감지될 때만 표시) */}
- {isLoggedIn && <NaverLockoutBanner />}
-
- {/* v38: 모든 플랫폼 자격증명 이슈 통합 알림 */}
- {isLoggedIn && <PlatformIssuesBanner />}
-
- {isLoggedIn && <ManagementOverview />}
-
- {/* v38: 부정 리뷰 우선순위 위젯 (1~2점 미답변) */}
- {isLoggedIn && <NegativeReviewsWidget />}
-
- {/* v38: 사장님 답글 성과 통계 (오늘/주/월/누적 + 별점 + 미답변) */}
- {isLoggedIn && (
- <div className="mb-5">
- <UserStatsWidget />
- </div>
- )}
-
- {/* ── 부정 리뷰 긴급 알림 (미답변 1~2점 있을 때만) ── */}
- {isLoggedIn && negativeUnansweredCount > 0 && (
- <div className="relative overflow-hidden rounded-[10px] shadow-none mb-5 p-5 border-2 border-[#F04452]"
- style={{ background: 'var(--lu-danger-soft)' }}>
- <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
- <div className="flex items-start gap-3">
- <div className="w-10 h-10 rounded-[6px] bg-[#F04452] flex items-center justify-center text-white shrink-0 animate-pulse">
- <AlertTriangle size={20} strokeWidth={2.5} />
- </div>
- <div>
- <div className="flex items-center gap-2 mb-1 flex-wrap">
- <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#F04452] text-white">긴급</span>
- <h3 className="text-sm md:text-base font-semibold text-[#7F1D1D]">
- 답변이 시급한 부정 리뷰 {negativeUnansweredCount}건
- </h3>
- </div>
- <p className="text-xs text-[#991B1B] leading-relaxed">
- 낮은 별점 리뷰는 첫 24시간 안에 답글을 남기면 고객 신뢰가 회복될 확률이 3배 높아져요.
- </p>
- </div>
- </div>
- <Link href="/reviews?filter=negative-unanswered"
- className="inline-flex items-center justify-center gap-1 px-4 py-2.5 rounded-[6px] bg-[#F04452] text-white text-sm font-bold hover:bg-[#DC2626] transition-colors whitespace-nowrap shrink-0">
- 지금 답변하기
- <ArrowRight size={14} strokeWidth={2.5} />
- </Link>
- </div>
- </div>
- )}
-
- {/* ── 신규 사용자 온보딩 (연결 0개일 때만) ── */}
- {isLoggedIn && connectedCount === 0 && (
- <div id="start-onboarding-card" className="relative overflow-hidden rounded-[10px] shadow-none mb-5 p-5 md:p-6"
- style={{ background: 'var(--lu-accent)' }}>
- <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
- <div className="text-white">
- <div className="flex items-center gap-2 mb-1.5">
- <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-white/20 backdrop-blur">시작하기</span>
- <span className="text-[10px] text-white/70">3분이면 충분해요</span>
- </div>
- <h2 className="text-xl md:text-2xl font-semibold mb-1.5 leading-tight">처음이세요? 여기서부터 시작하세요</h2>
- <p className="text-xs md:text-sm text-white/80 leading-relaxed">
- 우리 가게 정보를 등록하고 네이버·구글·배민·요기요 같은 플랫폼을 연결하면
- <br className="hidden md:block"/>
- 리뷰·예약·매출 데이터가 한 곳에 모입니다.
- </p>
- </div>
- <div className="flex flex-col sm:flex-row gap-2 shrink-0">
- <Link href={buildSettingsHref('connect')}
- className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-[6px] bg-white text-[var(--lu-accent-hover)] text-sm font-bold hover:bg-[var(--lu-canvas)] transition-colors whitespace-nowrap">
- <Rocket size={14} strokeWidth={2.5} />
- 1단계: 플랫폼 연결
- </Link>
- <Link href="/settings"
- className="px-4 py-2.5 rounded-[6px] bg-white/10 backdrop-blur text-white text-sm font-bold hover:bg-white/20 transition-colors text-center whitespace-nowrap border border-white/20">
- 가게 정보 입력
- </Link>
- </div>
- </div>
- <div className="absolute -top-8 -right-8 w-32 h-32 rounded-full bg-white/5 pointer-events-none"/>
- <div className="absolute -bottom-4 -right-12 w-24 h-24 rounded-full bg-white/5 pointer-events-none"/>
- </div>
- )}
-
- {/* ── 오늘 처리할 작업 ── */}
- <div className="bg-white rounded-[10px] shadow-none px-6 py-5 mb-5">
- <div className="mb-4">
- <p className="text-[11px] text-[var(--lu-accent)] font-bold mb-1">로컬루션 대시보드</p>
- <div className="flex items-center justify-between">
- <div>
- <div className="flex items-center gap-2 mb-1">
- <h1 className="text-xl font-semibold text-[var(--lu-ink)]">오늘 처리할 작업</h1>
- {!reviewPlatformConnected && (
- <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">연결 필요</span>
- )}
- </div>
- <p className="text-xs text-[var(--lu-muted)]">
- {!reviewPlatformConnected
- ? '리뷰 플랫폼을 연결하고 실제 수집 결과를 확인해주세요.'
- : new Date().toLocaleDateString('ko-KR', { year:'numeric', month:'long', day:'numeric', weekday:'long' }) + ' · 우선순위가 높은 작업 순으로 표시됩니다'
- }
- </p>
- </div>
- <div className="flex items-center gap-1.5">
- <span className={`w-1.5 h-1.5 rounded-full inline-block ${!reviewPlatformConnected ? 'bg-[#F59E0B]' : 'bg-[#12B76A] animate-pulse'}`}/>
- <span className="text-[10px] text-[var(--lu-muted)] font-medium">{!reviewPlatformConnected ? '연결 필요' : '수집 결과 기준'}</span>
- </div>
- </div>
- </div>
- <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
- {todayTasks.map(t => {
- const ready = t.ready
- const href = ready ? t.href : (t.connectHref || '/settings')
- return (
- <Link
- key={t.key}
- href={href}
- className={[
- 'group flex flex-col p-4 rounded-[6px] border transition-colors cursor-pointer',
- ready
- ? 'border-[var(--lu-canvas)] hover:border-[var(--lu-accent)] hover:shadow-md bg-white'
- : 'border-dashed border-[#E0E0E0] hover:border-[var(--lu-accent)] bg-[#FAFBFF]',
- ].join(' ')}
- title={ready ? '' : `${t.requiredLabel} 연동 후 이용 가능`}
- >
- <div className="flex items-center justify-between gap-2 mb-2">
- <div className="flex items-center gap-2 min-w-0">
- <div className="w-1 h-8 rounded-full" style={{ background: ready ? t.color : '#D1D5DB' }}/>
- <span className="text-xs text-[var(--lu-muted)] font-medium truncate">{t.label}</span>
- </div>
- {!ready && (
- <span className="text-[9px] font-bold px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] flex items-center gap-0.5 flex-shrink-0">
- <Lock size={9} strokeWidth={2.75}/> 연동필요
- </span>
- )}
- </div>
- <span className="text-2xl font-semibold mb-1" style={{ color: ready ? t.color : '#9CA3AF' }}>
- {ready ? t.count : 0}<span className="text-sm font-bold text-[var(--lu-muted)]">{t.unit}</span>
- </span>
- <span className={[
- 'text-[11px] inline-flex items-center gap-1 transition-colors',
- ready ? 'text-[var(--lu-muted)] group-hover:text-[var(--lu-accent)]' : 'text-[#F59E0B] font-semibold',
- ].join(' ')}>
- {ready
- ? <>바로 처리하기 <ArrowRight size={11} strokeWidth={2.5} /></>
- : <><Link2 size={11} strokeWidth={2.5} /> {t.requiredLabel} 연동하기</>}
- </span>
- </Link>
- )
- })}
- </div>
- </div>
-
- {/* 25차-4: 신규 모듈 프로모 스트립 — 사장님 요청으로 비표시 (인스타 카드뉴스/플랫폼 통합/블로그 순위) */}
- {/* 우측 사이드바 빠른 액션에서 동일 기능 접근 가능 */}
-
- {/* ── 플랫폼 연동 현황 — 6칸 카드형 ── */}
- <div className="bg-white rounded-[10px] shadow-none p-4 md:p-5 mb-5">
- <div className="flex items-center justify-between mb-4">
- <div className="flex items-center gap-2">
- <div className="w-7 h-7 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
- <Link2 size={13} className="text-white" strokeWidth={2.5} />
- </div>
- <div>
- <p className="text-sm font-bold text-[var(--lu-ink)]">플랫폼 연동 현황</p>
- <p className="text-[10px] text-[var(--lu-muted)] mt-0.5">
- <span className="text-[var(--lu-accent)] font-bold">{connectedCount}</span> / {platforms.length} 연동됨
- </p>
- </div>
- </div>
- <a href={isLoggedIn ? "/my/platforms" : "/login"} className="inline-flex items-center gap-1 text-[11px] text-[var(--lu-accent)] font-bold hover:underline">
- {isLoggedIn ? <>연동 관리 <ArrowRight size={11} strokeWidth={2.5} /></> : '로그인 후 연동'}
- </a>
- </div>
- <div className="grid grid-cols-3 md:grid-cols-6 gap-2 md:gap-3">
- {platforms.map(p => (
- <button
- key={p.id}
- onClick={() => handlePlatformClick(p)}
- className={[
- 'group relative flex flex-col items-center gap-1.5 p-2.5 md:p-3 rounded-[10px] transition-colors cursor-pointer overflow-hidden',
- p.connected
- ? 'bg-white border-2 border-[var(--lu-line)] hover:border-[var(--lu-accent)] hover:shadow-none hover:-translate-y-0.5'
- : 'bg-[#FAFBFC] border-2 border-dashed border-[var(--lu-line)] hover:border-[var(--lu-accent)] hover:bg-white hover:shadow-md',
- ].join(' ')}
- title={p.connected ? p.name + ' 연동됨 · 클릭하여 정보 수정' : p.name + ' 연동하기'}
- >
- {/* 연동됨 시 좌상단 초록 dot */}
- {p.connected && (
- <span className="absolute top-1.5 right-1.5 w-2 h-2 rounded-full bg-[#10B981] ring-2 ring-white" />
- )}
- {/* 로고 */}
- <div className="relative">
- <span className="block md:hidden">{p.logo(34)}</span>
- <span className="hidden md:block">{p.logo(40)}</span>
- </div>
- {/* 플랫폼명 */}
- <span className="text-[10px] md:text-[11px] font-bold text-[var(--lu-ink)] text-center leading-tight">{p.shortName}</span>
- {/* 상태 뱃지 */}
- <span className={[
- 'text-[9px] md:text-[10px] font-semibold px-2 py-0.5 rounded-full',
- p.connected
- ? 'bg-[var(--lu-accent)] text-[#047857]'
- : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)] group-hover:bg-[var(--lu-accent-soft)] group-hover:text-[var(--lu-accent)]',
- ].join(' ')}>
- {p.connected ? '연동됨' : '+ 연동'}
- </span>
- {/* 연동됨 시 별점/리뷰 표시 (있을 때만) */}
- {p.connected && p.rating != null && (
- <div className="text-[9px] text-[var(--lu-muted)] flex items-center gap-0.5">
- <Star size={8} strokeWidth={0} fill="#F59E0B" className="text-[#F59E0B]" />
- <span className="font-bold text-[var(--lu-ink)]">{p.rating.toFixed(1)}</span>
- {p.reviews != null && <span>· {p.reviews}건</span>}
- </div>
- )}
- </button>
- ))}
- </div>
- </div>
-
- {/* ── 통계 카드 6개 ── */}
- {!reviewPlatformConnected && (
- <div className="mb-2 flex items-center gap-2">
- <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">미집계</span>
- <span className="text-xs text-[var(--lu-muted)]">리뷰 플랫폼(네이버·구글·배민·요기요·쿠팡)을 연동하면 실데이터로 자동 교체됩니다</span>
- </div>
- )}
- <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-2 md:gap-3 mb-5">
- {stats.map((s, i) => (
- <div key={i} className={`bg-white rounded-[10px] shadow-none p-3 md:p-4 min-w-0 ${!reviewPlatformConnected ? 'opacity-75' : ''}`}>
- <div className="flex items-center gap-1.5 mb-1.5">
- <span className="w-1 h-5 rounded-full shrink-0" style={{ background: s.color }}/>
- <span className="text-[10px] md:text-[11px] text-[var(--lu-muted)] font-medium truncate">{s.label}</span>
- </div>
- <p className="text-base md:text-lg font-semibold text-[var(--lu-ink)] truncate">{s.value}</p>
- <p className={`inline-flex items-center gap-0.5 text-[10px] font-bold mt-0.5 ${s.up ? 'text-[#12B76A]' : 'text-[#F04452]'}`}>
- {s.up
- ? <ArrowUp size={10} strokeWidth={2.75} />
- : <ArrowDown size={10} strokeWidth={2.75} />}
- <span className="truncate">{s.sub}</span>
- </p>
- </div>
- ))}
- </div>
-
- {/* ── 메인 2컬럼 (인기 서비스 TOP10 은 우측 사이드바로 이전됨) ── */}
- <div className="grid grid-cols-1 md:grid-cols-[1fr_300px] gap-4 mb-5">
-
- {/* 좌: 연동 플랫폼 별점·리뷰 현황 */}
- <div className="bg-white rounded-[10px] shadow-none overflow-hidden">
- <div className="px-5 py-4 border-b border-[var(--lu-canvas)] flex items-center justify-between">
- <span className="text-sm font-bold text-[var(--lu-ink)]">플랫폼별 별점 · 리뷰 현황</span>
- {/* 30차-15-B: "지금 수집" 버튼 — 네이버 플레이스 연동됐을 때만 노출 */}
- {platforms.find(p => p.id === 'naver_place')?.connected ? (
- <button
- onClick={handleCollectNaverReviews}
- disabled={reviewsFetchState === 'fetching'}
- className="min-h-11 text-[11px] px-2 py-1 rounded-lg bg-[#E8FBF0] text-[#015C2C] font-bold hover:bg-[#D1F7E0] disabled:opacity-50 transition-colors"
- title="네이버 플레이스 공개 리뷰를 지금 불러옵니다"
- >
- {reviewsFetchState === 'fetching' ? '수집 중...' : '↻ 지금 수집'}
- </button>
- ) : (
- <span className="text-[11px] text-[var(--lu-muted)]">연동된 플랫폼만 표시</span>
- )}
- </div>
- <div className="p-5 space-y-4">
- {/* 78차: connected race 회피 — 연결됐거나 실제 리뷰가 있는 플랫폼 모두 표시.
- 쿠팡/배민이 platform_credentials 에는 있지만 platforms state 가 아직
- refresh 안된 타이밍에도 미니 리뷰가 즉시 노출됨. */}
- {(() => {
- const visiblePlatforms = platforms.filter(p =>
- p.connected || (platformReviews[p.id]?.length ?? 0) > 0
- )
- return visiblePlatforms.length === 0 ? (
- <div className="text-center py-8">
- <p className="text-sm text-[var(--lu-muted)] mb-3">아직 연동된 플랫폼이 없습니다</p>
- <p className="text-xs text-[var(--lu-muted)]">상단 로고를 클릭해 연동을 시작하세요</p>
- </div>
- ) : (
- visiblePlatforms.map(p => {
- const isFetchingThis = p.id === 'naver_place' && reviewsFetchState === 'fetching'
- // 30차-23: 이 플랫폼의 최신 리뷰 2건 미니 리스트
- const miniReviews = (platformReviews[p.id] || []).slice(0, 2)
- return (
- <div key={p.id} className="flex flex-col gap-3 pb-4 border-b border-[var(--lu-canvas)] last:border-0 last:pb-0">
- <div className="flex items-center gap-4">
- <div className="flex-shrink-0">{p.logo(36)}</div>
- <div className="flex-1 min-w-0">
- <div className="flex items-center justify-between mb-1.5">
- <span className="text-sm font-semibold text-[var(--lu-ink)]">{p.name}</span>
- {(p.rating !== null || (typeof p.reviews === 'number' && p.reviews > 0)) ? (
- <div className="flex items-center gap-3">
- {p.rating !== null ? (
- <Stars rating={p.rating} />
- ) : (
- <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[var(--lu-canvas)] text-[var(--lu-muted)] font-semibold">
- 키워드 리뷰
- </span>
- )}
- {typeof p.reviews === 'number' && p.reviews > 0 && (
- <span className="text-xs text-[var(--lu-muted)]">리뷰 <strong className="text-[var(--lu-ink)]">{p.reviews}건</strong></span>
- )}
- </div>
- ) : isFetchingThis ? (
- <span className="inline-flex items-center gap-1.5 text-xs text-[var(--lu-accent)] font-semibold">
- <span className="w-2 h-2 rounded-full bg-[var(--lu-accent)] animate-pulse" />
- 리뷰 수집 중...
- </span>
- ) : p.id === 'naver_place' ? (
- <span className="inline-flex items-center gap-1.5 text-xs text-[var(--lu-muted)]">
- <span className="w-1.5 h-1.5 rounded-full bg-[#F59E0B]" />
- 아직 수집 전 · 상단 "지금 수집" 클릭
- </span>
- ) : (
- <button
- onClick={() => handleCollectWorkerPlatform(p.id)}
- disabled={workerCollecting[p.id]}
- className="min-h-11 text-[11px] px-2 py-1 rounded-lg bg-[#F0F4FF] text-[var(--lu-accent)] font-bold hover:bg-[#DBEAFE] disabled:opacity-50 transition-colors"
- >
- {workerCollecting[p.id] ? '요청 중…' : '↻ 지금 수집'}
- </button>
- )}
- </div>
- {p.rating !== null && (
- <div className="w-full bg-[var(--lu-canvas)] rounded-full h-2 overflow-hidden">
- <div
- className="h-full rounded-full transition-colors"
- style={{ width: `${(p.rating / 5) * 100}%`, background: p.color }}
- />
- </div>
- )}
- </div>
- </div>
- {/* 30차-23: 최신 리뷰 2건 미니 카드 */}
- {miniReviews.length > 0 && (
- <div className="pl-[52px] space-y-1.5">
- {miniReviews.map((r) => (
- <button
- key={r.id}
- onClick={() => openAIReplyFromReal(r, p.id)}
- className="min-h-11 w-full text-left flex items-start gap-2 px-2.5 py-2 rounded-lg hover:bg-[#FAFBFF] transition-colors group"
- >
- <div className="flex-1 min-w-0">
- <div className="flex items-center gap-1.5 mb-0.5">
- <span className="text-[11px] font-bold text-[var(--lu-muted)] truncate">
- {r.author_mask || r.author_name || '익명'}
- </span>
- {typeof r.rating === 'number' && <Stars rating={r.rating} />}
- <span className="text-[10px] text-[var(--lu-muted)]">· {timeAgo(r.posted_at)}</span>
- {(r.has_reply || r.reply_status === 'submitted') ? (
- <span className="inline-flex items-center gap-0.5 text-[9px] bg-[#E8FFF0] text-[#12B76A] px-1.5 py-0.5 rounded-full font-semibold">
- <Check size={9} strokeWidth={3} /> 답변완료
- </span>
- ) : (
- <span className="text-[9px] bg-[#FFF0F0] text-[#F04452] px-1.5 py-0.5 rounded-full font-semibold">
- 미답변
- </span>
- )}
- </div>
- <p className="text-xs text-[var(--lu-muted)] line-clamp-1 group-hover:text-[var(--lu-ink)]">
- {r.content || '(내용 없음)'}
- </p>
- </div>
- {!r.has_reply && r.reply_status !== 'submitted' && (
- <span className="text-[10px] text-[var(--lu-accent)] font-bold flex-shrink-0 pt-0.5 group-hover:underline">
- AI 답글 →
- </span>
- )}
- </button>
- ))}
- {(platformReviews[p.id]?.length ?? 0) > 2 && (
- <Link
- href={p.id === 'naver_place' ? '/review-admin/naver' : p.id === 'baemin' ? '/review-admin/baemin' : p.id === 'yogiyo' ? '/review-admin/yogiyo' : p.id === 'coupangeats' ? '/review-admin/coupang' : p.id === 'kakao_map' ? '/review-admin/kakao' : '/reviews'}
- className="block text-center text-[10px] text-[var(--lu-accent)] font-bold py-1 hover:underline"
- >
- {p.name} 리뷰 전체보기 ({platformReviews[p.id]?.length ?? 0}건) →
- </Link>
- )}
- </div>
- )}
- </div>
- )
- })
- )
- })()}
-
- {platforms.filter(p => !p.connected && (platformReviews[p.id]?.length ?? 0) === 0).length > 0 && (
- <div className="mt-4 p-4 bg-[var(--lu-canvas)] rounded-[6px] border border-dashed border-[#E0E0E0]">
- <p className="text-xs text-[var(--lu-muted)] mb-2 font-medium">미연동 플랫폼 · 클릭하여 바로 연동</p>
- <div className="flex flex-wrap gap-2">
- {platforms.filter(p => !p.connected && (platformReviews[p.id]?.length ?? 0) === 0).map(p => (
- <button
- key={p.id}
- onClick={() => handlePlatformClick(p)}
- className="min-h-11 flex items-center gap-1.5 bg-white rounded-lg px-2 py-1 border border-[var(--lu-line)] hover:border-[var(--lu-accent)] transition-colors"
- >
- {p.logo(18)}
- <span className="text-[11px] text-[var(--lu-muted)] font-semibold">{p.shortName}</span>
- </button>
- ))}
- </div>
- </div>
- )}
- </div>
- </div>
-
- {/* 우: 주요 키워드 실시간 순위 */}
- <div className="bg-white rounded-[10px] shadow-none overflow-hidden flex flex-col">
- <div className="px-5 py-4 border-b border-[var(--lu-canvas)] flex items-center justify-between">
- <div>
- <span className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--lu-ink)]">
- <TrendingUp size={14} strokeWidth={2.25} className="text-[var(--lu-accent)]" />
- 주요 키워드 순위
- {!platforms.find(p => p.id === 'naver_place')?.connected && (
- <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">연결 필요</span>
- )}
- </span>
- <div className="flex items-center gap-1.5 mt-0.5">
- <span className={`w-1.5 h-1.5 rounded-full inline-block ${platforms.find(p => p.id === 'naver_place')?.connected ? 'bg-[#12B76A] animate-pulse' : 'bg-[#F59E0B]'}`}/>
- <span className="text-[10px] text-[var(--lu-muted)]">
- {platforms.find(p => p.id === 'naver_place')?.connected ? `조회 상태 · ${lastSync}` : '순위 조회 필요'}
- </span>
- </div>
- </div>
- <button
- onClick={refreshKeywords}
- disabled={isSyncing || !platforms.find(p => p.id === 'naver_place')?.connected}
- className="min-h-11 text-[11px] text-[var(--lu-accent)] font-semibold border border-[var(--lu-accent)] px-2.5 py-1 rounded-lg hover:bg-[var(--lu-accent-soft)] transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
- title={!platforms.find(p => p.id === 'naver_place')?.connected ? '네이버 플레이스 연동 후 가능' : ''}
- >
- 순위 조회 안내
- </button>
- </div>
-
- {!platforms.find(p => p.id === 'naver_place')?.connected && (
- <div className="px-5 py-4 bg-[#FFFBEB] border-b border-[#FEF3C7]">
- <p className="text-[11px] font-semibold text-[#92400E] mb-1 flex items-center gap-1">
- <Lock size={11} strokeWidth={2.5}/> 아직 조회한 순위가 없어요
- {storeRegion && (
- <span className="ml-1 bg-white text-[#92400E] border border-[#FDE68A] px-1.5 py-0.5 rounded-full text-[9px]">
- 내 매장 지역: {storeRegion}
- </span>
- )}
- </p>
- <p className="text-[10px] text-[#92400E] leading-relaxed">
- {storeRegion
- ? `'${storeRegion}' 매장의 순위는 플레이스 순위 조회 화면에서 확인해주세요. `
- : '조회한 순위가 없어요. 플레이스 순위 조회 화면을 이용해주세요. '}
- <button
- onClick={() => handlePlatformClick(platforms.find(p => p.id === 'naver_place')!)}
- className="min-h-11 text-[#92400E] font-bold underline inline-flex items-center gap-0.5"
- >
- 지금 연동하기 <ArrowRight size={9} strokeWidth={3} />
- </button>
- {!storeRegion && (
- <>
- {' · '}
- <Link href="/settings/profile" className="text-[#92400E] font-bold underline">
- 프로필 설정 →
- </Link>
- </>
- )}
- </p>
- </div>
- )}
-
- <div className="flex-1 divide-y divide-[var(--lu-canvas)]">
- {keywords.length === 0 ? (
- <div className="px-5 py-10 flex flex-col items-center text-center">
- <div className="w-10 h-10 rounded-full bg-[var(--lu-canvas)] flex items-center justify-center mb-2">
- <MapPin size={18} strokeWidth={2.25} className="text-[var(--lu-muted)]"/>
- </div>
- <p className="text-sm font-bold text-[var(--lu-ink)] mb-1">아직 추적할 키워드가 없습니다</p>
- <p className="text-[11px] text-[var(--lu-muted)] leading-relaxed mb-3">
- 매장 프로필에 주소를 등록하면<br/>
- 내 지역 기반 키워드가 자동으로 표시됩니다
- </p>
- <Link href="/settings/profile"
- className="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-[var(--lu-accent)] text-white text-[11px] font-bold hover:bg-[var(--lu-accent-hover)] transition-colors">
- 프로필 설정하기 <ArrowRight size={11} strokeWidth={2.5} />
- </Link>
- </div>
- ) : keywords.map((kw) => (
- <div key={kw.keyword} className="px-5 py-3.5 flex items-center gap-3 hover:bg-[#FAFBFF] transition-colors">
- <div className={[
- 'w-8 h-8 rounded-lg flex items-center justify-center text-sm font-semibold flex-shrink-0',
- kw.rank <= 3 ? 'bg-[var(--lu-accent)] text-white'
- : kw.rank <= 10 ? 'bg-[var(--lu-accent-soft)] text-[var(--lu-accent)]'
- : 'bg-[var(--lu-canvas)] text-[var(--lu-muted)]',
- ].join(' ')}>
- {kw.rank}
- </div>
- <div className="flex-1 min-w-0">
- <p className="text-sm font-semibold text-[var(--lu-ink)] truncate">{kw.keyword}</p>
- <p className="text-[10px] text-[var(--lu-muted)]">{kw.area} · {kw.updatedAt}</p>
- </div>
- <RankBadge current={kw.rank} prev={kw.prevRank} />
- </div>
- ))}
- </div>
- </div>
-
- {/* 인기 서비스 랭킹 + QuickNav 모두 우측 사이드바(DashboardRightSidebar)로 이전됨 — DO NOT RE-ADD */}
- </div>
-
+ {isLoggedIn ? <ManagementOverview key={accountId} expectedAccountId={accountId} onRefresh={() => { reloadStoresMe(); loadPlatformReviews(['naver_place', 'baemin', 'yogiyo', 'coupangeats', 'kakao_map', 'google'] as PlatformId[]) }}>
  {/* ── 최근 리뷰 ── */}
  <div className="bg-white rounded-[10px] shadow-none overflow-hidden">
  <div className="px-4 md:px-5 py-4 border-b border-[var(--lu-canvas)] flex items-start md:items-center justify-between gap-2">
  <div className="flex items-center gap-1.5 md:gap-2 flex-wrap min-w-0">
  <span className="text-sm font-bold text-[var(--lu-ink)] shrink-0">최근 리뷰</span>
- {!hasRealReviews && (
- <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[#FEF3C7] text-[#92400E] font-bold">연결 필요</span>
- )}
- {hasRealReviews && (
- <span className="text-[9px] px-1.5 py-0.5 rounded-full bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] font-bold">전 플랫폼 통합</span>
- )}
- <span className="text-[11px] text-[var(--lu-muted)]">
- 미답변 {hasRealReviews ? mergedRealReviews.filter((r) => !r.has_reply && r.reply_status !== 'submitted').length : RECENT_REVIEWS.filter(r => !r.replied).length}건
- </span>
- <span className="flex items-center gap-1 ml-2">
- <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#ECFDF5] text-[10px] font-bold text-[#059669]" title={`긍정 ${sentimentCount.positive}건`}>
- <Smile size={11} strokeWidth={2.5} />
- {sentiment.positive}%
- </span>
- {sentimentCount.neutral > 0 && (
- <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[var(--lu-canvas)] text-[10px] font-bold text-[var(--lu-muted)]" title={`중립 ${sentimentCount.neutral}건`}>
- <Meh size={11} strokeWidth={2.5} />
- {sentiment.neutral}%
- </span>
- )}
- {sentimentCount.negative > 0 && (
- <span className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full bg-[#FEF2F2] text-[10px] font-bold text-[#DC2626]" title={`부정 ${sentimentCount.negative}건`}>
- <Frown size={11} strokeWidth={2.5} />
- {sentiment.negative}%
- </span>
- )}
- </span>
+ <p className="text-xs text-[var(--lu-muted)]">계정 전체 · 매체별 최대 30건의 부분 목록</p>
  </div>
  <Link href="/reviews" className="inline-flex items-center gap-1 text-[11px] text-[var(--lu-accent)] font-semibold hover:underline">
  전체보기 <ArrowRight size={11} strokeWidth={2.5} />
  </Link>
  </div>
- {!hasRealReviews && !reviewPlatformConnected && (
- <div className="px-5 py-4 bg-[#FFFBEB] border-b border-[#FEF3C7]">
- <p className="text-[11px] font-semibold text-[#92400E] mb-1 flex items-center gap-1">
- <Lock size={11} strokeWidth={2.5}/> 수집된 리뷰가 없어요
- </p>
- <p className="text-[10px] text-[#92400E] leading-relaxed">
- 네이버·구글·배민 등 리뷰 플랫폼을 연동하면 실제 리뷰가 이 자리에 자동으로 들어옵니다.{' '}
- <Link href={buildSettingsHref('connect')} className="font-bold underline inline-flex items-center gap-0.5">
- 연동하러 가기 <ArrowRight size={9} strokeWidth={3} />
- </Link>
- </p>
- </div>
- )}
+ {Object.values(reviewReads).some(r => r.state === 'error') && <p role="alert" className="px-5 py-3 text-sm text-red-700">일부 매체의 최근 리뷰 조회에 실패했어요. 실패한 매체의 이전 자료는 표시하지 않았어요. <button type="button" className="min-h-11 underline" onClick={() => loadPlatformReviews(['naver_place', 'baemin', 'yogiyo', 'coupangeats', 'kakao_map', 'google'] as PlatformId[])}>다시 조회</button></p>}
+ <p className="px-5 py-3 text-xs text-[var(--lu-muted)]">목록 조회 시각: {Object.values(reviewReads).filter(r => r.readAt).map(r => r.readAt!).sort().at(-1) ? new Date(Object.values(reviewReads).filter(r => r.readAt).map(r => r.readAt!).sort().at(-1)!).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul' }) : '미확인'} · 외부 수집 시각과 달라요</p>
  {/* 30차-23: 연결된 플랫폼 뱃지 행 — 리뷰가 어느 플랫폼에서 왔는지 한눈에 */}
  {hasRealReviews && (
  <div className="px-5 py-3 bg-[#FAFBFF] border-b border-[var(--lu-canvas)] flex items-center gap-2 flex-wrap">
@@ -1990,14 +1343,14 @@ export default function Dashboard() {
  </div>
  )}
  <div className="divide-y divide-[var(--lu-canvas)]">
- {!hasRealReviews && <p role="status" className="px-5 py-6 text-sm text-[var(--lu-muted)]">아직 표시할 수집 리뷰가 없어요. 연결 상태와 최근 수집 결과를 확인해주세요.</p>}
+ {!hasRealReviews && <p role="status" className="px-5 py-6 text-sm text-[var(--lu-muted)]">{Object.values(reviewReads).some(r => r.state === 'loading') ? '저장된 최근 리뷰를 읽고 있어요.' : Object.values(reviewReads).some(r => r.state === 'error') ? '조회 실패가 있어 리뷰 목록을 모두 확인하지 못했어요.' : Object.values(reviewReads).length > 0 ? '이번 조회에서 표시할 저장 리뷰가 없어요. 외부 매체의 리뷰 0건을 뜻하지 않아요.' : '최근 리뷰 조회 상태는 미확인이에요.'}</p>}
  {hasRealReviews ? (
  mergedRealReviews.slice(0, 10).map((r) => {
  const pf = platforms.find((x) => x.id === r._platformId)
  const displayColor = pf?.color || '#03C75A'
  const shortLabel = pf?.shortName || r._platformId
  return (
- <div key={`${r._platformId}-${r.id}`} className="px-5 py-4 hover:bg-[#FAFBFF] transition-colors flex items-start gap-4">
+ <div key={`${r._platformId}-${r.id}`} className="px-4 py-4 hover:bg-[#FAFBFF] transition-colors flex flex-wrap items-start gap-3 md:px-5">
  <div
  className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-semibold text-white mt-0.5"
  style={{ background: displayColor }}
@@ -2005,7 +1358,7 @@ export default function Dashboard() {
  >
  {shortLabel.slice(0, 2)}
  </div>
- <div className="flex-1 min-w-0">
+ <div className="flex-1 min-w-[150px]">
  <div className="flex items-center gap-2 mb-1 flex-wrap">
  <span className="text-xs font-bold text-[var(--lu-muted)]">{r.author_mask || r.author_name || '익명'}</span>
  {typeof r.rating === 'number' && <Stars rating={r.rating} />}
@@ -2013,7 +1366,7 @@ export default function Dashboard() {
  {(r.has_reply || r.reply_status === 'submitted') && (
  <span className="inline-flex items-center gap-1 text-[10px] bg-[#E8FFF0] text-[#12B76A] px-1.5 py-0.5 rounded-full font-semibold">
  <Check size={10} strokeWidth={3} />
- 답변완료
+ {r.has_reply ? '답변 확인' : '답글 제출 기록'}
  </span>
  )}
  </div>
@@ -2032,14 +1385,14 @@ export default function Dashboard() {
  })
  ) : (
  RECENT_REVIEWS.map((review, i) => (
- <div key={i} className="px-5 py-4 hover:bg-[#FAFBFF] transition-colors flex items-start gap-4">
+ <div key={i} className="px-4 py-4 hover:bg-[#FAFBFF] transition-colors flex flex-wrap items-start gap-3 md:px-5">
  <div
  className="flex-shrink-0 w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-semibold text-white mt-0.5"
  style={{ background: review.color }}
  >
  {review.platform.slice(0, 2)}
  </div>
- <div className="flex-1 min-w-0">
+ <div className="flex-1 min-w-[150px]">
  <div className="flex items-center gap-2 mb-1 flex-wrap">
  <span className="text-xs font-bold text-[var(--lu-muted)]">{review.name}</span>
  <Stars rating={review.rating} />
@@ -2067,13 +1420,14 @@ export default function Dashboard() {
  </div>
  </div>
 
- {/* 모바일/태블릿 (xl 미만): 메인 콘텐츠 하단에 인라인 표시 */}
+ </ManagementOverview> : <section className="rounded-[10px] bg-white p-6"><h1 className="text-2xl font-semibold">대시보드</h1><p className="mt-3 text-sm">로그인한 계정의 저장 자료를 확인하는 화면이에요.</p><Link href="/login?redirect=%2Fdashboard" className="mt-4 inline-flex min-h-11 items-center text-[var(--lu-accent)] underline">로그인하기</Link></section>}
+ {/* 모바일/태블릿 (2xl 미만): 메인 콘텐츠 하단에 인라인 표시 */}
  {isLoggedIn && <DashboardRightSidebarMobile />}
  </main>
  </div>
  <Footer />
  </div>
- {/* xl+ 데스크톱: position:fixed — viewport 우측 항상 고정, 스크롤 따라옴 */}
+ {/* 2xl+ 데스크톱: position:fixed — viewport 우측 항상 고정, 스크롤 따라옴 */}
  {isLoggedIn && <DashboardRightSidebar />}
 
  {/* 하랑마케팅 홍보 팝업 (우측 하단, 5초 후 노출 / 24시간 닫기 기억) */}

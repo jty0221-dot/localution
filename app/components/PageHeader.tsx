@@ -23,12 +23,12 @@ export default function PageHeader({ icon, title, subtitle, right, badge = 'ë¡œì
    : icon
  return (
  <section className={`border-b border-[var(--lu-line)] bg-[var(--lu-surface)] text-[var(--lu-ink)] ${className}`}>
- <div className="mx-auto flex max-w-6xl flex-wrap items-start gap-3 px-4 py-6 md:gap-4 md:px-6 md:py-8">
+ <div className="mx-auto flex max-w-6xl flex-wrap items-start gap-3 px-4 py-4 md:gap-4 md:px-6 md:py-5">
  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] [&_svg]:h-5 [&_svg]:w-5 [&_svg]:text-current">
  {logoNode || safeIcon}
  </div>
  <div className="min-w-0 flex-1 basis-40">
- <h1 className="break-keep text-2xl font-bold leading-8 tracking-tight md:text-[28px] md:leading-9">{title}</h1>
+ <h1 className="break-keep text-xl font-semibold leading-7 tracking-tight md:text-2xl md:leading-8">{title}</h1>
  {subtitle && <p className="mt-2 max-w-[68ch] break-keep text-sm leading-6 text-[var(--lu-muted)]">{subtitle}</p>}
  <FeatureGuideLink />
  </div>
