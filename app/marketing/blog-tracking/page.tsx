@@ -367,14 +367,14 @@ export default function BlogTrackingPage() {
  {/* 상단 타이틀 블록 */}
  <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
  <div>
- <h1 className="text-2xl md:text-3xl font-bold text-[var(--lu-ink)] flex items-center gap-2">
+ <h2 className="text-2xl md:text-3xl font-bold text-[var(--lu-ink)] flex items-center gap-2">
  <span className="inline-flex items-center justify-center w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] text-white">
  <TrendingUp size={18} />
  </span>
  블로그 순위 추적
- </h1>
+ </h2>
  <p className="text-sm text-[var(--lu-muted)] mt-1.5">
- 체험단 글·블로그 포스팅 URL과 검색 키워드를 등록하면, <b>네이버 모바일 인기글 몇 위</b>인지 자동으로 체크합니다.
+ 체험단 글·블로그 포스팅 URL과 검색 키워드를 등록하고, 연결된 조회 기능에서 <b>네이버 모바일 인기글 순위</b>를 확인하세요. 외부 수집 상태에 따라 결과 제공 여부가 달라요.
  </p>
  </div>
  <div className="flex items-center gap-2">

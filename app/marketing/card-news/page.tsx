@@ -183,13 +183,13 @@ export default function CardNewsPage() {
  {/* 상단 타이틀 블록 */}
  <div className="flex items-start justify-between gap-4 flex-wrap mb-6">
  <div>
- <h1 className="text-2xl md:text-3xl font-bold text-[#111827] flex items-center gap-2 flex-wrap">
+ <h2 className="text-2xl md:text-3xl font-bold text-[#111827] flex items-center gap-2 flex-wrap">
  인스타 캐러셀 카드뉴스
  <span className="text-xs font-semibold text-[#6366F1] bg-[#EEF2FF] px-2 py-1 rounded-full align-middle">NEW</span>
  <span className="text-xs font-semibold text-[#EC4899] bg-[#FCE7F3] px-2 py-1 rounded-full align-middle">Carousel</span>
- </h1>
+ </h2>
  <p className="text-sm text-[var(--lu-muted)] mt-1.5">
- 인스타그램 캐러셀 전용 · 최대 10장 슬라이드 · Claude Design(UX Copy · 접근성 · 비평) 자동 내장 · 스와이프 유도 + 진행도 도트 포함.
+ 인스타그램 카드뉴스의 문구와 구성을 준비하세요. 게시 전 내용과 순서를 직접 확인해 주세요.
  </p>
  </div>
  </div>

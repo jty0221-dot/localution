@@ -25,7 +25,7 @@ export default function OwnerStoryPage() {
         },
       ])} />
       <nav aria-label="현재 위치" className="mb-5 flex flex-wrap gap-2 text-sm text-[var(--lu-muted)]"><Link className="inline-flex min-h-11 items-center underline underline-offset-4" href="/">홈</Link><span className="inline-flex min-h-11 items-center" aria-hidden="true">·</span><span className="inline-flex min-h-11 items-center" aria-current="page">브랜드 영상</span></nav>
-      <header className="mb-6 max-w-3xl"><p className="text-sm font-semibold text-[var(--lu-accent)]">로컬루션 브랜드 필름</p><h1 className="mt-3 text-3xl font-semibold leading-tight tracking-tight md:text-4xl">{title}</h1><p className="mt-4 text-base leading-7 text-[var(--lu-muted)]">손님을 맞이하고, 가게를 정리하고, 휴대폰을 켜면 또 다른 일이 시작되죠. 리뷰와 콘텐츠, 내일의 홍보까지 챙겨야 하는 사장님의 하루에서 시작했습니다.</p></header>
+      <header className="mb-6 max-w-3xl"><p className="text-sm font-semibold text-[var(--lu-accent)]">로컬루션 브랜드 필름</p><h1 className="mt-3 text-balance text-3xl font-semibold leading-tight tracking-tight md:text-4xl">{title}</h1><p className="mt-4 text-base leading-7 text-[var(--lu-muted)]">손님을 맞이하고, 가게를 정리하고, 휴대폰을 켜면 또 다른 일이 시작되죠. 리뷰와 콘텐츠, 내일의 홍보까지 챙겨야 하는 사장님의 하루에서 시작했습니다.</p></header>
       <OwnerStoryPlayer />
       <section aria-labelledby="story-about" className="mt-8 max-w-3xl rounded-[10px] border border-[var(--lu-line)] bg-white p-5 md:p-7">
         <h2 id="story-about" className="text-xl font-semibold">사장님의 시간을, 다시 가게로</h2>
