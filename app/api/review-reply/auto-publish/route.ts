@@ -198,21 +198,14 @@ export async function POST(req: NextRequest) {
  ? `https://place.map.kakao.com/${placeId}`
  : 'https://place.map.kakao.com/'
 
- await svc.from('platform_reviews')
- .update({
- reply_status: 'submitted',
- reply_submitted_at: new Date().toISOString(),
- reply_queued_at: new Date().toISOString(),
- has_reply: true,
- reply_content: draft,
- reply_error: null,
- })
- .eq('id', reviewId).eq('user_id', userId)
+ // 외부 등록을 실행하지 않은 수동 안내다. 저장된 초안과 실제 답글 상태를 유지한다.
+ // has_reply, reply_content, 발행/큐 시각은 실제 외부 결과 확인 흐름만 변경한다.
 
  return NextResponse.json({
  ok: true,
  mode: 'manual_paste',
- reply_status: 'submitted',
+ manual_action_required: true,
+ reply_status: row.reply_status,
  reply_text: draft,
  platform_url: kakaoUrl,
  platform_label: '카카오맵',

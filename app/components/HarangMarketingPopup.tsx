@@ -43,7 +43,6 @@ export default function HarangMarketingPopup() {
         onClick={() => setExpanded(true)}
         className="fixed bottom-4 right-4 z-40 inline-flex items-center gap-2 px-4 py-3 min-h-11 rounded-[6px] border border-[var(--lu-line)] bg-white text-[var(--lu-accent)] text-sm font-semibold shadow-sm hover:bg-[var(--lu-accent-soft)] transition-colors"
         style={{ animation: 'harangSlideUp 0.4s ease-out' }}
-        aria-label="하랑마케팅 문의 안내 펼치기"
         aria-expanded={false}
       >
         <Megaphone size={16} strokeWidth={2.5} aria-hidden="true" />

@@ -19,6 +19,7 @@ const ready = ['notice', 'cost-calculator', 'campaign-url']
 
 export default function HomePage() {
   return <div className="min-h-screen bg-[var(--lu-canvas)] text-[var(--lu-ink)]">
+    <link rel="preload" as="image" href="/hero/owner-story-v2-20261018/owner-poster.jpg" fetchPriority="high" />
     <JsonLd data={graphLd([softwareApplicationLd(), organizationLd(), webSiteLd(), faqPageLd(HOME_FAQS, SITE.url + '/#faq')])} />
     <TopNav /><OwnerHero />
     <main>

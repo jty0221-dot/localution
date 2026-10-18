@@ -16,9 +16,9 @@ export const SITE = {
   url: 'https://www.localution.co.kr',
   name: '로컬루션',
   nameEn: 'Localution',
-  tagline: '사장님의 네이버·구글·배민 마케팅, AI가 대신합니다',
+  tagline: '흩어진 매장 마케팅 업무를 한곳에서',
   description:
-    '네이버·구글·카카오맵·배민·요기요·쿠팡이츠 리뷰 자동 답글, 인스타·유튜브 쇼츠 자동화, AI 매장 진단까지. 커피 한 잔 값 월 6,900원으로 모든 플랫폼 리뷰답글 자동.',
+    '소상공인과 자영업자를 위한 매장 마케팅 관리 도구입니다. 가게 공지 작성, 홍보 링크 생성, 원가 계산과 연결된 계정의 리뷰 관리 기능을 확인하고 필요한 업무부터 시작하세요.',
   // 한 문장으로 답할 때 쓰는 정의문 (GEO 인용용 · 두 문장 이내)
   answer:
     '로컬루션은 소상공인·자영업자를 위한 AI 마케팅 자동화 플랫폼입니다. 매장 공지 작성, 비용 계산, 홍보 링크 생성과 연결된 플랫폼의 리뷰 관리를 돕습니다. 외부 데이터 기능은 계정과 수집 상태를 확인한 후 사용합니다.',
@@ -65,11 +65,11 @@ export type PublicRoute = {
   freq: 'daily' | 'weekly' | 'monthly' | 'yearly'
 }
 
-export const PUBLIC_ROUTES: PublicRoute[] = [
+const ROUTE_CATALOG: PublicRoute[] = [
   { path: 'support', title: '소상공인 지원사업', summary: '기업마당 공고 조회와 소상공인24, K-Startup 공식 지원 안내', priority: 0.8, freq: 'daily' },
   { path: 'partners', title: '광고·공공홍보 협업', summary: '민간 광고와 공공기관 홍보 협업 범위를 정리하고 문의 초안 준비', priority: 0.7, freq: 'monthly' },
   { path: '', title: '홈', summary: SITE.answer, priority: 1.0, freq: 'weekly' },
-  { path: 'service-intro', title: '서비스 소개', summary: '리뷰 자동 답글 · SNS 자동 발행 · QR 리뷰 · 플레이스 진단까지 로컬루션이 하는 일 전체', priority: 0.9, freq: 'monthly' },
+  { path: 'service-intro', title: '서비스 소개', summary: '매장 공지, 홍보 링크, 비용 계산과 계정 연결이 필요한 리뷰·콘텐츠 업무의 사용 조건 안내', priority: 0.9, freq: 'monthly' },
   { path: 'pricing', title: '요금제', summary: '월 6,900원부터 필요한 기능만 고르는 선택형 요금제. 신용카드 없이 시작', priority: 0.9, freq: 'monthly' },
   { path: 'about', title: '회사 소개', summary: '로컬루션을 만든 이유와 운영 원칙', priority: 0.8, freq: 'monthly' },
   { path: 'marketing', title: '마케팅 도구', summary: '플레이스 진단 · 키워드 조회 · 블로그 글 작성 · 릴스 대본 등 무료 체험 도구 모음', priority: 0.8, freq: 'weekly' },
@@ -93,6 +93,7 @@ export const PUBLIC_ROUTES: PublicRoute[] = [
   { path: 'marketing/youtube-community', title: '유튜브 커뮤니티 발행', summary: '유튜브 커뮤니티 게시글을 예약 · 자동 발행', priority: 0.5, freq: 'monthly' },
   { path: 'community', title: '사장님 커뮤니티', summary: '지역 사장님들이 정보를 나누는 게시판', priority: 0.6, freq: 'weekly' },
   { path: 'updates', title: '업데이트 소식', summary: '새로 나온 기능과 변경 사항', priority: 0.7, freq: 'weekly' },
+  { path: 'story', title: '사장님의 하루와 로컬루션', summary: '흩어진 매장 마케팅 업무와 로컬루션의 통합 관리 방향을 소개하는 영상', priority: 0.7, freq: 'monthly' },
   { path: 'help/videos', title: '기능별 설명 영상', summary: '기능별 준비물과 사용 순서를 영상과 단계별 안내로 확인', priority: 0.7, freq: 'monthly' },
   { path: 'help', title: '도움말', summary: '연결 · 답글 · 결제에 관한 자주 묻는 질문', priority: 0.6, freq: 'monthly' },
   { path: 'inquiry', title: '문의하기', summary: '도입 · 제휴 · 이용 문의', priority: 0.5, freq: 'monthly' },
@@ -102,6 +103,10 @@ export const PUBLIC_ROUTES: PublicRoute[] = [
   { path: 'privacy', title: '개인정보처리방침', summary: '개인정보 수집 · 이용 · 보관 기준', priority: 0.3, freq: 'yearly' },
   { path: 'legal/platform-consent', title: '플랫폼 위임 동의서', summary: '외부 플랫폼 계정 연결 시 위임 범위', priority: 0.3, freq: 'yearly' },
 ]
+
+// 계정·구독 권한 확인 뒤에만 본문을 제공하는 화면은 공개 검색 목록에서 제외한다.
+export const NON_INDEXABLE_ROUTES = ['login', 'signup', 'marketing/blog-post', 'marketing/reels', 'marketing/keyword-score'] as const
+export const PUBLIC_ROUTES = ROUTE_CATALOG.filter(route => !NON_INDEXABLE_ROUTES.some(path => path === route.path))
 
 export function absUrl(path: string): string {
   if (!path) return SITE.url
@@ -156,7 +161,7 @@ export function pageMetadata({ title, description, path, keywords, noIndex }: Pa
       images: [{ url: absUrl(SITE.ogImage), width: 1200, height: 630, alt: SITE.ogAlt }],
     },
     twitter: { card: 'summary_large_image', title: full, description, images: [absUrl(SITE.ogImage)] },
-    ...(noIndex ? { robots: { index: false, follow: false } } : {}),
+    ...(noIndex ? { robots: { index: false, follow: false } } : NON_INDEXABLE_ROUTES.some(route => route === path.replace(/^\//, '')) ? { robots: { index: false, follow: true } } : {}),
   }
 }
 
@@ -206,7 +211,7 @@ export function softwareApplicationLd() {
     name: SITE.name,
     url: SITE.url,
     applicationCategory: 'BusinessApplication',
-    operatingSystem: 'Web, Android, iOS',
+    operatingSystem: 'Web',
     inLanguage: SITE.lang,
     description: SITE.answer,
     featureList: [

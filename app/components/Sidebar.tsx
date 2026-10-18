@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect, useRef } from 'react'
+import { Suspense, useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { Link2, ClipboardList, Store, Settings, MessageSquare, LogOut, BarChart3, HelpCircle, Shield } from 'lucide-react'
@@ -175,7 +175,7 @@ interface UserInfo {
  provider: string
 }
 
-export default function Sidebar() {
+function SidebarContent() {
  const pathname = usePathname()
  const searchParams = useSearchParams()
  const router = useRouter()
@@ -659,4 +659,9 @@ export default function Sidebar() {
  </aside>
  </>
  )
+}
+
+// Query-string state must suspend only navigation, not the entire public page.
+export default function Sidebar() {
+ return <Suspense fallback={null}><SidebarContent /></Suspense>
 }

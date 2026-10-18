@@ -638,43 +638,30 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  return
  }
 
- // ── 카카오맵 manual_paste 모드 ── 클립보드 복사 + 새 탭 이동
+ // 수동 복사는 발행 완료가 아니다. 편집 초안과 실제 답글 상태를 유지한다.
  if (data.mode === 'manual_paste' && data.reply_text) {
+ let copied = false
  try {
  await navigator.clipboard.writeText(data.reply_text)
- toast.success('답글이 클립보드에 복사됐어요. 새 탭에서 붙여넣기 후 등록해주세요.')
+ copied = true
  } catch {
- // 클립보드 권한 거부 시 fallback
  const ta = document.createElement('textarea')
  ta.value = data.reply_text
  ta.style.position = 'fixed'; ta.style.opacity = '0'
  document.body.appendChild(ta)
  ta.select()
- try { document.execCommand('copy') } catch {}
+ try { copied = document.execCommand('copy') } catch {}
  document.body.removeChild(ta)
- toast.info('답글이 복사됐어요 (수동). 새 탭에서 붙여넣기 해주세요.')
+ }
+ if (copied) {
+ toast.info('답글을 복사했어요. 카카오맵에서 직접 등록한 뒤 리뷰를 다시 확인해주세요. 아직 발행 완료가 아닙니다.')
+ } else {
+ toast.warn('자동 복사에 실패했어요. 작성한 초안을 직접 복사해 카카오맵에 등록해주세요.')
  }
  if (data.platform_url) {
  window.open(data.platform_url, '_blank', 'noopener,noreferrer')
  }
- // DB 는 이미 submitted 처리됨 — UI 도 반영
- setReviews((prev) =>
- prev.map((r) =>
- r.id === review.id
- ? {
- ...r,
- replyStatus: 'submitted',
- replySubmittedAt: new Date().toISOString(),
- draftReply: trimmed,
- replyContent: trimmed,
- hasReply: true,
- replyError: null,
- }
- : r,
- ),
- )
- setEditingId(null)
- setDraftText('')
+ // saveDraftEdit에서 저장한 draft를 유지한다. 등록 확인 전 완료 수와 미답변 수는 바꾸지 않는다.
  return
  }
 

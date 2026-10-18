@@ -5,9 +5,9 @@ import { pageMetadata, PUBLIC_ROUTES, graphLd, webPageLd, breadcrumbLd } from '.
 import JsonLd from '../components/seo/JsonLd'
 
 export const metadata: Metadata = pageMetadata({
-  title: '서비스 소개 · 리뷰 답글부터 SNS 발행까지 AI 가 대신',
+  title: '서비스 소개 · 매장 마케팅 통합 관리',
   description:
-    '네이버 · 구글 · 배민 · 요기요 · 쿠팡이츠 · 카카오 리뷰에 AI 가 답글을 달고, 인스타 · 스레드 · 유튜브 커뮤니티 발행과 QR 리뷰 · 플레이스 진단까지. 로컬루션이 사장님 대신 하는 일 전체를 소개합니다.',
+    '공지 작성, 홍보 링크 생성과 원가 계산부터 연결된 계정의 리뷰·콘텐츠 관리까지. 필요한 자료와 계정 권한, 기능별 이용 조건을 확인하고 내 가게에 필요한 업무를 시작하세요.',
   path: 'service-intro',
   keywords: [
     '로컬루션 서비스 소개',
