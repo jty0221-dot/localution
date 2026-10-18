@@ -2,12 +2,13 @@
 
 // ============================================================
 // /marketing/instagram-feed — 인스타그램 피드 작성 발행
-// · 매장 사진 업로드 → AI 캡션 + 해시태그 자동 생성
-// · 즉시 발행 / 예약 발행
+// · 매장 사진 업로드 → AI 캡션 초안 생성 및 검토
+// · 이 브라우저 초안 저장. 외부 게시 및 예약 실행 없음
 // · 스레드·카드뉴스와 동일 발행 채널 패턴
 // ============================================================
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
+import { readCaptionResult } from '../../lib/instagram-caption'
 import Sidebar from '../../components/Sidebar'
 import PageHeader from '../../components/PageHeader'
 import Footer from '../../components/Footer'
@@ -42,6 +43,19 @@ export default function InstagramFeedPage() {
  const [tone, setTone] = useState<typeof TONE_OPTIONS[number]['id']>('casual')
  const [topic, setTopic] = useState('')
  const [generating, setGenerating] = useState(false)
+ const [generationError, setGenerationError] = useState('')
+ const [generatedDraft, setGeneratedDraft] = useState<{ caption: string; hashtags: string[] } | null>(null)
+ const requestRef = useRef<{ id: number; controller: AbortController } | null>(null)
+ const sequenceRef = useRef(0)
+ useEffect(() => {
+   requestRef.current?.controller.abort()
+   requestRef.current = null
+   sequenceRef.current += 1
+   setGenerating(false)
+   setGeneratedDraft(null)
+   setGenerationError('')
+ }, [topic, tone])
+ useEffect(() => () => { requestRef.current?.controller.abort(); sequenceRef.current += 1 }, [])
  const [scheduledAt, setScheduledAt] = useState('')
  const [drafts, setDrafts] = useState<FeedDraft[]>([])
 
@@ -61,8 +75,31 @@ export default function InstagramFeedPage() {
  setImages(prev => prev.filter((_, i) => i !== idx))
  }
 
- function generateCaption() {
- alert('AI 캡션 연결이 준비되지 않았어요. 실제 매장 소식을 직접 작성해주세요.')
+ async function generateCaption() {
+   if (requestRef.current) return
+   if (!topic.trim()) { setGenerationError('실제로 알릴 매장 소식을 먼저 입력해주세요.'); return }
+   const id = ++sequenceRef.current
+   const controller = new AbortController()
+   requestRef.current = { id, controller }
+   setGenerating(true)
+   setGenerationError('')
+   setGeneratedDraft(null)
+   try {
+     const response = await fetch('/api/marketing/instagram-caption', {
+       method: 'POST', credentials: 'same-origin', signal: controller.signal,
+       headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ topic, tone }),
+     })
+     const data = await response.json()
+     if (sequenceRef.current !== id) return
+     if (!response.ok) throw new Error(typeof data.error === 'string' ? data.error : '초안을 생성하지 못했어요.')
+     const result = readCaptionResult(JSON.stringify(data))
+     if (!result) throw new Error('초안 형식을 확인하지 못했어요. 다시 시도해주세요.')
+     setGeneratedDraft(result)
+   } catch (error) {
+     if (sequenceRef.current === id && !controller.signal.aborted) setGenerationError(error instanceof Error ? error.message : '연결을 확인하고 다시 시도해주세요.')
+   } finally {
+     if (sequenceRef.current === id) { requestRef.current = null; setGenerating(false) }
+   }
  }
 
  function addHashtag(tag: string) {
@@ -80,7 +117,7 @@ export default function InstagramFeedPage() {
  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(next)); setDrafts(next); alert('이 브라우저에 초안을 저장했어요.') } catch { alert('초안을 저장하지 못했어요. 내용을 복사해서 보관해주세요.') }
  }
 
- const charCount = caption.length + hashtags.join(' ').length
+ const charCount = caption.length + (hashtags.length ? 2 + hashtags.join(' ').length : 0)
 
  return (
  <div className="min-h-screen bg-[var(--lu-canvas)]">
@@ -101,7 +138,7 @@ export default function InstagramFeedPage() {
  <div className="flex-1 min-w-0">
  <p className="text-xs md:text-sm font-bold text-[#7C3AED] mb-0.5">인스타그램 피드 작성 발행 베타</p>
  <p className="text-[11px] md:text-xs text-[#7C3AED]/90 leading-relaxed">
- 현재는 직접 작성한 캡션과 사진의 브라우저 초안 저장이 가능합니다. AI 생성과 자동 게시 연결은 준비 중입니다.
+ 입력한 실제 매장 소식으로 AI 초안을 만들고 검토할 수 있습니다. 사진은 AI로 분석하지 않습니다. 초안은 이 브라우저에 저장됩니다.
  자동 게시나 예약은 실행되지 않습니다.
  지금은 초안을 복사 → 인스타그램 앱에서 붙여넣기로 게시하세요.
  </p>
@@ -110,7 +147,7 @@ export default function InstagramFeedPage() {
 
  <div className="grid grid-cols-1 lg:grid-cols-[1fr_360px] gap-4 md:gap-6">
  {/* 메인 작성 영역 */}
- <div className="space-y-4 md:space-y-6">
+ <div className="min-w-0 space-y-4 md:space-y-6">
  {/* 1) 사진 업로드 */}
  <Section
  step="1"
@@ -146,7 +183,7 @@ export default function InstagramFeedPage() {
  <Section
  step="2"
  title="AI 캡션 + 해시태그"
- desc="톤을 선택하고 주제를 1줄로 입력하세요"
+ desc="확인된 매장 소식만 입력하세요"
  >
  <div className="space-y-3">
  <div>
@@ -163,12 +200,12 @@ export default function InstagramFeedPage() {
  </div>
  </div>
  <div>
- <label className="text-[11px] font-bold text-[var(--lu-muted)] mb-1 block">주제 (선택)</label>
- <input type="text" value={topic} onChange={e => setTopic(e.target.value)}
+ <label htmlFor="instagram-caption-topic" className="text-[11px] font-bold text-[var(--lu-muted)] mb-1 block">실제 매장 소식 (필수)</label>
+ <input id="instagram-caption-topic" type="text" maxLength={2000} value={topic} onChange={e => setTopic(e.target.value)}
  placeholder="예: 신메뉴 출시, 단골 감사 이벤트, 매장 인테리어 리뉴얼"
  className="min-h-11 w-full px-2.5 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:border-[#EC4899]" />
  </div>
- <button onClick={generateCaption} disabled={generating}
+ <button onClick={generateCaption} disabled={generating || !topic.trim()}
  className="min-h-11 w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-[var(--lu-accent)] text-white rounded-[6px] text-sm font-bold hover:opacity-90 disabled:opacity-50 shadow-none">
  {generating ? (
  <>
@@ -182,16 +219,28 @@ export default function InstagramFeedPage() {
  </>
  )}
  </button>
+ <p className="text-xs text-[var(--lu-muted)]">입력 내용이 AI 서비스로 전달됩니다. 고객 개인정보는 넣지 마세요. 생성 후 사실을 확인하고 적용하세요.</p>
+ {generationError && <p role="alert" className="text-sm text-red-700">{generationError}</p>}
+ <div aria-live="polite">{generating ? '초안을 만들고 있어요. 기존 편집 내용은 유지됩니다.' : ''}</div>
+ {generatedDraft && <div className="min-w-0 break-words [overflow-wrap:anywhere] border border-[var(--lu-line)] rounded-[6px] p-3 space-y-3">
+   <p className="text-sm font-semibold">검토할 AI 초안</p>
+   <p className="text-sm whitespace-pre-wrap">{generatedDraft.caption}</p>
+   <p className="text-xs text-[var(--lu-muted)]">{generatedDraft.hashtags.join(' ')}</p>
+   <p className="text-xs text-[var(--lu-muted)]">적용하면 아래 편집 내용과 해시태그가 이 초안으로 바뀝니다. 실제 게시나 예약은 실행되지 않습니다.</p>
+   <button type="button" className="min-h-11 px-3 rounded-[6px] bg-[var(--lu-accent)] text-white text-sm" onClick={() => { setCaption(generatedDraft.caption); setHashtags(generatedDraft.hashtags); setGeneratedDraft(null) }}>검토한 초안을 편집에 적용</button>
+ </div>}
+
  </div>
  </Section>
 
  {/* 3) 캡션 / 해시태그 편집 */}
  <Section step="3" title="편집" desc={`${charCount} / ${MAX_CAPTION}자`}>
- <textarea value={caption} onChange={e => setCaption(e.target.value)}
- placeholder="여기에 캡션이 자동 생성됩니다..."
+ <label htmlFor="instagram-caption-editor" className="sr-only">게시할 캡션 편집</label>
+ <textarea id="instagram-caption-editor" value={caption} onChange={e => setCaption(e.target.value)}
+ placeholder="직접 작성하거나 검토한 AI 초안을 적용하세요."
  className="w-full px-3 py-2.5 border border-[var(--lu-line)] rounded-[6px] text-base focus:outline-none focus:border-[#EC4899] resize-y min-h-[140px] leading-relaxed" />
  <div className="mt-3">
- <label className="text-[11px] font-bold text-[var(--lu-muted)] mb-1.5 block flex items-center gap-1">
+ <label htmlFor="instagram-caption-hashtag" className="text-[11px] font-bold text-[var(--lu-muted)] mb-1.5 block flex items-center gap-1">
  <Hash size={11} strokeWidth={2.5} /> 해시태그 ({hashtags.length}개)
  </label>
  <div className="flex flex-wrap gap-1.5 mb-2">
@@ -204,7 +253,7 @@ export default function InstagramFeedPage() {
  </span>
  ))}
  </div>
- <input type="text"
+ <input id="instagram-caption-hashtag" type="text"
  placeholder="태그 직접 추가 (Enter)"
  onKeyDown={(e) => {
  if (e.key === 'Enter') {
@@ -228,7 +277,7 @@ export default function InstagramFeedPage() {
  className="min-h-11 w-full px-2.5 py-2 border border-[var(--lu-line)] rounded-lg text-base focus:outline-none focus:border-[#EC4899]" />
  </div>
  <div className="flex flex-col sm:flex-row gap-2">
- <button onClick={saveDraft} disabled={!caption.trim()}
+ <button onClick={saveDraft} disabled={!caption.trim() || charCount > MAX_CAPTION}
  className="min-h-11 flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-[var(--lu-line)] text-[var(--lu-muted)] rounded-[6px] text-sm font-bold hover:bg-[var(--lu-canvas)] disabled:opacity-40">
  초안 저장
  </button>

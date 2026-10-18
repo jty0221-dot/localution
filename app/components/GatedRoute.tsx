@@ -38,7 +38,7 @@ export default function GatedRoute({
  loadingFallback,
  children,
 }: GatedRouteProps) {
- const { has, hasAll, hasAny, loading } = useEntitlements()
+ const { has, hasAll, hasAny, loading, error } = useEntitlements()
 
  if (loading) {
  return (
@@ -58,6 +58,16 @@ export default function GatedRoute({
  return <>{children}</>
  }
 
+ if (error) {
+ return (
+ <div role="alert" className="rounded-[10px] border border-[var(--lu-line)] bg-white p-6 text-sm text-[var(--lu-ink)]">
+ <p>{error}</p>
+ <p className="mt-2 text-[var(--lu-muted)]">로그인 상태와 연결을 확인한 후 다시 조회해주세요.</p>
+ <button type="button" onClick={() => window.dispatchEvent(new Event('localution:auth-changed'))}
+ className="mt-4 min-h-11 rounded-[6px] bg-[var(--lu-accent)] px-4 text-white">권한 다시 확인</button>
+ </div>
+ )
+ }
  const allowed = mode === 'all' ? hasAll(ids) : hasAny(ids)
 
  if (allowed) {
@@ -69,3 +79,4 @@ export default function GatedRoute({
 
  return <LockedBanner moduleId={ids[0]} additionalIds={ids.slice(1)} />
 }
+

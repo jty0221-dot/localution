@@ -1,0 +1,14 @@
+const fs=require('fs'),vm=require('vm'),ts=require('typescript'),a=require('assert/strict'),path=require('path');
+const events={},docEvents={},requests=[],states=[];let interval,timeout;const effects=[];
+const window={addEventListener:(k,f)=>events[k]=f,removeEventListener(){},setInterval:f=>(interval=f,2),clearInterval(){},setTimeout:f=>(timeout=f,1),clearTimeout(){}};
+const document={visibilityState:'visible',addEventListener:(k,f)=>docEvents[k]=f,removeEventListener(){}};
+const react={useCallback:f=>f,useRef:()=>({current:0}),useEffect:f=>effects.push(f),useState:value=>[value,next=>states.push(next)]};
+const mod={exports:{}};const code=ts.transpileModule(fs.readFileSync(path.resolve(__dirname,'../app/lib/entitlements.ts'),'utf8'),{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
+vm.runInNewContext(code,{module:mod,exports:mod.exports,require:n=>n==='react'?react:n==='./modules'?{MODULES:[{id:'ai-review'}],getModule:()=>null}:require(n),Date,Set,AbortController,window,document,clearInterval(){},fetch:(_u,o)=>new Promise((resolve,reject)=>requests.push({resolve,reject,signal:o.signal}))});
+const flush=()=>new Promise(r=>setImmediate(r));const ok=()=>({ok:true,json:async()=>({ok:true,userId:'self',entitlements:[{moduleId:'ai-review',status:'active',renewsAt:new Date(Date.now()+86400000).toISOString()}]})});
+(async()=>{mod.exports.useEntitlements();effects[0]();requests[0].resolve(ok());await flush();a.equal(states.at(-1).verified,true);let count=states.length;
+interval();a.equal(states.length,count);requests.at(-1).resolve(ok());await flush();count=states.length;
+events.focus();a.equal(states.length,count);document.visibilityState='hidden';docEvents.visibilitychange();a.equal(states.length,count);requests.at(-1).resolve(ok());await flush();a.equal(states.length,count);
+document.visibilityState='visible';docEvents.visibilitychange();a.equal(states.length,count);requests.at(-1).resolve(ok());await flush();
+events['localution:auth-changed']();a.equal(states.at(-1).loading,true);a.equal(states.at(-1).entitlements.length,0);const stale=requests.at(-1);events.storage();const current=requests.at(-1);stale.resolve(ok());await flush();a.equal(states.at(-1).verified,false);timeout();a.equal(current.signal.aborted,true);current.reject(Error('fixture timeout'));await flush();a.equal(states.at(-1).loading,false);a.equal(states.at(-1).verified,false);
+console.log('PASS hook: periodic/focus/hidden/visible preserve state; hidden response discarded; auth/storage clear; late response discarded; failure failclosed; timeout installed')})().catch(e=>{console.error(e);process.exitCode=1});
