@@ -20,7 +20,6 @@ const LINKS = [
 
 export default function QuickSlot() {
  const pathname = usePathname()
- if (pathname === '/login' || pathname === '/dashboard') return null
 
 
  const [open, setOpen] = useState(false)
@@ -42,6 +41,10 @@ export default function QuickSlot() {
  }
  }, [])
 
+ useEffect(() => { setOpen(false) }, [pathname])
+
+ if (pathname === '/login' || pathname === '/dashboard') return null
+
  return (
  // 2026-04-19 모바일 우측 터치 불가 수정
  // 부모 컨테이너는 pointer-events:none → 패널/버튼만 auto 로 이벤트 수신
@@ -54,7 +57,11 @@ export default function QuickSlot() {
 
  {/* 링크 패널 — 토글 버튼 위에 배치 */}
  <div
+ id="quick-slot-panel"
+ aria-hidden={!open}
+ inert={!open}
  style={{
+ visibility: open ? 'visible' : 'hidden',
  opacity: open ? 1 : 0,
  transform: open ? 'translateX(0) scale(1)' : 'translateX(16px) scale(0.92)',
  transition: 'opacity 0.22s ease, transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1)',
@@ -99,6 +106,8 @@ export default function QuickSlot() {
  <button
  onClick={() => setOpen(v => !v)}
  title="빠른 이동"
+ aria-expanded={open}
+ aria-controls="quick-slot-panel"
  aria-label={open ? '빠른 이동 닫기' : '빠른 이동 열기'}
  style={{
  transform: open ? 'rotate(45deg)' : 'rotate(0deg)',
