@@ -3,13 +3,12 @@
 // /signup — 회원가입 전용 랜딩. 내부적으로는 /login?mode=signup 으로 rewrite.
 // (OAuth 플로우는 동일하지만 URL 을 분리해 광고 전환/GA 추적을 구분한다)
 import { useEffect } from 'react'
+import { signupDestination } from '../lib/signup-destination'
 
 export default function SignupPage() {
  useEffect(() => {
  // 쿼리·해시 보존하면서 전환
- const qs = typeof window !== 'undefined' ? window.location.search : ''
- const sep = qs ? '&' : '?'
- window.location.replace(`/login${qs}${sep}mode=signup`)
+ window.location.replace(signupDestination(window.location.search, window.location.hash))
  }, [])
 
  return (

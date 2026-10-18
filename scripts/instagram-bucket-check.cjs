@@ -1,0 +1,9 @@
+const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),assert=require('node:assert/strict'),ts=require('typescript'),crypto=require('node:crypto')
+const source=fs.readFileSync(path.join(__dirname,'../app/api/instagram/upload/route.ts'),'utf8')
+class InstagramError extends Error{constructor(code,status=400){super(code);this.code=code;this.status=status}}
+;(async()=>{let count=0;for(const mode of ['unconnected','missing','unbounded','wildcard','oversize','valid']){
+let signs=0;const exports={};const bucket={public:true,file_size_limit:mode==='unbounded'?null:104857600,allowed_mime_types:mode==='wildcard'?['*/*']:['image/jpeg','video/mp4']};
+const imports={'next/server':{NextResponse:{json:(body,options)=>({body,...options})}},'@/app/lib/userAuth':{requireUser:async()=>({ok:true,userId:'owner'})},'@/app/lib/rateLimit':{rateLimitByIp:()=>({ok:true})},'@/app/lib/instagram-api':{InstagramError,sameOrigin:()=>{},instagramAccount:async()=>{if(mode==='unconnected')throw new InstagramError('account_not_connected',409)}},'@/app/lib/adminAuth':{createServiceClient:()=>({storage:{getBucket:async()=>({data:mode==='missing'?null:bucket}),from:()=>({createSignedUploadUrl:async()=>{signs++;return {data:{signedUrl:'mock'}}}})}})}};
+vm.runInNewContext(ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2022}}).outputText,{exports,require:n=>n==='crypto'?crypto:imports[n]});
+const result=await exports.POST(new Request('https://www.localution.co.kr/api/instagram/upload',{method:'POST',body:JSON.stringify({action:'sign',publicStorageConsent:true,type:'video/mp4',size:mode==='oversize'?104857601:1024})}));assert.equal(signs,mode==='valid'?1:0);assert.equal(result.body.ok,mode==='valid');count++;
+}console.log(count+' bucket issuance guards passed; no network/storage writes')})().catch(e=>{console.error(e);process.exitCode=1})

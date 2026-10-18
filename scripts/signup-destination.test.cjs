@@ -1,0 +1,21 @@
+const assert = require('node:assert/strict')
+const fs = require('node:fs')
+const path = require('node:path')
+const vm = require('node:vm')
+const ts = require('typescript')
+const source = fs.readFileSync(path.join(__dirname, '../app/lib/signup-destination.ts'), 'utf8')
+const output = ts.transpileModule(source, { compilerOptions: { module: ts.ModuleKind.CommonJS } }).outputText
+const context = { exports: {}, URLSearchParams }
+vm.runInNewContext(output, context)
+const target = context.exports.signupDestination
+assert.equal(target(''), '/login?mode=signup')
+assert.equal(target('?mode=login&mode=other'), '/login?mode=signup')
+const result = new URL(target('?utm_source=harang&utm_campaign=localution&oppref=sample-click', '#details'), 'https://example.test')
+assert.equal(result.pathname, '/login')
+assert.equal(result.searchParams.get('utm_source'), 'harang')
+assert.equal(result.searchParams.get('utm_campaign'), 'localution')
+assert.equal(result.searchParams.get('oppref'), 'sample-click')
+assert.equal(result.hash, '#details')
+assert.equal(new URL(target('?next=https%3A%2F%2Fevil.example'), 'https://example.test').origin, 'https://example.test')
+assert.equal(target('', 'https://evil.example'), '/login?mode=signup')
+console.log('signup destination: 9 assertions passed; no network, account, or billing writes')

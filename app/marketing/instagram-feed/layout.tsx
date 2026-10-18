@@ -4,9 +4,9 @@ import type { Metadata } from 'next'
 import { pageMetadata } from '../../lib/seo'
 
 export const metadata: Metadata = pageMetadata({
-  title: '인스타 피드 캡션 생성',
+  title: '인스타그램 연결과 사진·릴스 게시',
   description:
-    '매장 사진과 한 줄 설명만 넣으면 인스타그램 피드 캡션과 해시태그를 AI 가 씁니다. 톤을 고르고 바로 복사해 올리세요.',
+    '실제 매장 소식으로 캡션 초안을 작성하고 프로페셔널 계정을 연결하세요. 사진 한 장이나 릴스를 준비하고 직접 게시한 뒤 결과를 확인합니다.',
   path: 'marketing/instagram-feed',
   keywords: [
     '인스타 캡션 생성',

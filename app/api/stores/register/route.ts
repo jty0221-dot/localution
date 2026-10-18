@@ -77,7 +77,12 @@ export async function POST(req: NextRequest) {
  const userId = auth.userId
 
  try {
- const body = await req.json()
+ let body: any
+ try {
+ body = await req.json()
+ } catch {
+ return NextResponse.json({ ok: false, error: '입력 형식을 확인해 주세요.' }, { status: 400 })
+ }
  const {
  slug: slugIn,
  name,
@@ -95,7 +100,7 @@ export async function POST(req: NextRequest) {
  reward_value,
  } = body || {}
 
- if (!name) {
+ if (typeof name !== 'string' || !name.trim()) {
  return NextResponse.json({ ok: false, error: 'name 필수' }, { status: 400 })
  }
 
@@ -108,7 +113,7 @@ export async function POST(req: NextRequest) {
  const svc = createServiceClient()
 
  // ── 기존 레코드 조회: user_id 단독 조회 (slug 변경 시에도 기존 레코드 갱신)
- const { data: existing } = await svc
+ const { data: existing, error: lookupError } = await svc
  .from('stores')
  .select('id, slug')
  .eq('user_id', userId)
@@ -116,8 +121,13 @@ export async function POST(req: NextRequest) {
  .limit(1)
  .maybeSingle()
 
+ // A failed lookup does not prove this user has no store. Do not insert on failure.
+ if (lookupError) {
+ return NextResponse.json({ ok: false, error: '기존 매장 정보를 확인하지 못했습니다. 잠시 후 다시 시도해 주세요.' }, { status: 503 })
+ }
+
  // ── payload: undefined 필드는 포함하지 않음 (키워드 등 미전송 필드 보존)
- const payload: Record<string, any> = { slug, name, user_id: userId }
+ const payload: Record<string, any> = { slug, name: name.trim(), user_id: userId }
  if (category !== undefined) payload.category = category || null
  if (location !== undefined) payload.location = location || null
  if (address !== undefined) payload.address = address || null

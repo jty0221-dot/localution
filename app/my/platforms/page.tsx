@@ -19,6 +19,7 @@ import Sidebar from '../../components/Sidebar'
 import Footer from '../../components/Footer'
 import PageHeader from '../../components/PageHeader'
 import PlatformLogo from '../../components/PlatformLogo'
+import ChannelTaskLinks from '../../components/marketing/ChannelTaskLinks'
 import { Link2 } from 'lucide-react'
 
 type PlatformSlug = 'naver_place' | 'baemin' | 'yogiyo' | 'coupangeats' | 'kakao_map'
@@ -194,11 +195,12 @@ export default function MyPlatformsPage() {
  <PageHeader
  icon={<Link2 size={28} className="text-white" strokeWidth={2.5} />}
  title="플랫폼 연결 관리"
- subtitle="네이버·배민·요기요·쿠팡이츠·카카오 · 본인 계정 연결로 리뷰·순위 자동화"
+ subtitle="리뷰 플랫폼과 마케팅 채널의 연결 상태와 이용 조건을 확인하세요."
  variant="primary"
  />
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full">
  <div className="w-full">
+ <ChannelTaskLinks />
 
  {/* 현재 로컬루션 로그인 계정 — 모바일에서 OAuth 로그인 변경 후 헷갈리는 문제 해결 */}
  {me && (

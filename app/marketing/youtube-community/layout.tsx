@@ -4,9 +4,9 @@ import type { Metadata } from 'next'
 import { pageMetadata } from '../../lib/seo'
 
 export const metadata: Metadata = pageMetadata({
-  title: '유튜브 커뮤니티 자동 발행',
+  title: '유튜브 채널 연결과 모바일 영상 업로드',
   description:
-    '유튜브 채널의 커뮤니티 탭 게시글을 예약하고 자동으로 올립니다. 영상이 없는 날에도 채널이 살아 있게 유지하세요.',
+    'Google 계정으로 내 채널을 연결하고 휴대전화와 PC에서 영상을 업로드하세요. 공개 범위를 선택하고 실제 업로드 결과를 확인합니다.',
   path: 'marketing/youtube-community',
   keywords: [
     '유튜브 커뮤니티 발행',

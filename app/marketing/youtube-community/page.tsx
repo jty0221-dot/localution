@@ -25,11 +25,92 @@ import Link from 'next/link'
 
 const AGENT_URL = 'http://127.0.0.1:7777'
 
+function YoutubeOfficialPanel() {
+ const [account,setAccount]=useState<{configured?:boolean;connected?:boolean;channel?:{id:string;title:string;videoCount?:string}}|null>(null)
+ const [error,setError]=useState(''),[busy,setBusy]=useState(false),[progress,setProgress]=useState(0)
+ const [title,setTitle]=useState(''),[description,setDescription]=useState(''),[privacy,setPrivacy]=useState('private'),[kids,setKids]=useState('')
+ const [file,setFile]=useState<File|null>(null),[confirmed,setConfirmed]=useState(false)
+ const [receipt,setReceipt]=useState<{id:string;title:string;privacy:string;uploadStatus:string;processingStatus?:string;url:string}|null>(null)
+ const [pendingId,setPendingId]=useState('')
+ const sessionRef=useRef<{token:string;size:number}|null>(null)
+ const [hasSession,setHasSession]=useState(false)
+ async function load(){
+  setError('')
+  try{const r=await fetch('/api/youtube/channel',{cache:'no-store'}),j=await r.json();if(!r.ok)throw new Error(j.error||'연결 상태를 확인하지 못했습니다.');setAccount(j)}catch(e){setError(e instanceof Error?e.message:'연결 확인 실패')}
+ }
+ useEffect(()=>{
+  void load().then(()=>{
+   const result=new URLSearchParams(window.location.search).get('youtube')
+   if(result&&result!=='connected')setError(result==='permission_required'?'채널 조회와 영상 업로드 권한을 모두 허용해 주세요.':result==='channel_required'?'선택한 Google 계정에 YouTube 채널이 없습니다.':'YouTube 연결이 완료되지 않았습니다. 로그인 상태와 연결 설정을 확인한 뒤 다시 연결해 주세요.')
+  })
+ },[])
+ async function verify(id:string){
+  const r=await fetch('/api/youtube/receipt?id='+encodeURIComponent(id),{cache:'no-store'}),j=await r.json()
+  if(!r.ok)throw new Error(j.error||'접수 결과 확인 실패')
+  setReceipt(j);setPendingId('')
+ }
+ async function disconnect(){
+  if(!window.confirm('로컬루션에 저장된 YouTube 연결을 해제할까요? Google 계정 권한은 Google 설정에서 별도로 관리할 수 있습니다.'))return
+  try{const r=await fetch('/api/youtube/channel',{method:'DELETE'}),j=await r.json();if(!r.ok)throw new Error(j.error);setAccount({configured:true,connected:false});sessionRef.current=null;setHasSession(false)}catch(e){setError(e instanceof Error?e.message:'연결 해제 실패')}
+ }
+ async function upload(){
+  if(!file||!confirmed||!kids)return
+  setBusy(true);setError('');setReceipt(null);setProgress(0)
+  try{
+   if(!sessionRef.current){
+    const r=await fetch('/api/youtube/upload',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({title,description,privacy,madeForKids:kids==='yes',confirm:true,size:file.size,mime:file.type})}),j=await r.json()
+    if(!r.ok)throw new Error(j.error||'업로드 준비 실패')
+    sessionRef.current={token:j.session,size:j.chunkSize};setHasSession(true)
+   }
+   const session=sessionRef.current
+   async function transfer(offset:number,probe=false):Promise<{complete:boolean;offset:number;id?:string}>{
+    const r=await fetch('/api/youtube/upload/chunk'+(probe?'?probe=1':''),{method:'POST',headers:{'Content-Type':'application/octet-stream','x-upload-session':session!.token,'x-upload-offset':String(offset)},body:probe?new Blob([]):file!.slice(offset,Math.min(offset+session!.size,file!.size))})
+    const j=await r.json();if(!r.ok)throw new Error(j.error||'전송 결과를 확인하지 못했습니다.')
+    return j
+   }
+   let result=await transfer(0,true)
+   while(!result.complete){
+    const previous=result.offset
+    result=await transfer(previous)
+    if(!result.complete&&result.offset<=previous)throw new Error('전송 진행을 확인하지 못했습니다. 이어서 전송을 눌러 주세요.')
+    setProgress(Math.round(result.offset/file.size*100))
+   }
+   if(!result.id)throw new Error('영상 식별자가 반환되지 않았습니다. YouTube Studio에서 확인해 주세요.')
+   setPendingId(result.id);await verify(result.id)
+  }catch(e){setError(e instanceof Error?e.message:'업로드 실패')}finally{setBusy(false)}
+ }
+ const input='w-full min-h-11 rounded-lg border border-[var(--lu-line)] bg-white p-3 text-base'
+ return <section className="rounded-xl border border-[var(--lu-line)] bg-white p-4 sm:p-6 space-y-4">
+  <div><h2 className="font-semibold text-lg">휴대폰에서 영상 올리기</h2><p className="text-sm text-[var(--lu-muted)] mt-1">내 YouTube 채널을 연결하고 영상 파일을 선택하세요. PC 프로그램 없이 안전하게 나누어 전송합니다.</p></div>
+  {error&&<p role="alert" className="text-sm text-red-700 bg-red-50 rounded-lg p-3">{error}</p>}
+  {!account&&<button type="button" onClick={load} className={input}>연결 상태 다시 확인</button>}
+  {account?.configured===false&&<p className="text-sm">관리자의 YouTube 연결 설정이 필요합니다. 설정 후 이 화면에서 채널을 연결할 수 있습니다.</p>}
+  {account?.configured&&<div className="flex flex-wrap items-center gap-3"><p className="text-sm">{account.connected?account.channel?.title:'연결된 채널이 없습니다.'}</p><a href="/api/oauth/youtube" className="inline-flex min-h-11 items-center rounded-lg border px-4 text-sm">{account.connected?'채널 다시 연결':'Google로 채널 연결'}</a><button type="button" onClick={load} className="min-h-11 px-3 text-sm">새로고침</button></div>}
+  {account?.connected&&!busy&&!hasSession&&<button type="button" onClick={disconnect} className="min-h-11 text-sm underline">로컬루션 연결 해제</button>}
+  {account?.connected&&<fieldset disabled={busy||hasSession} className="space-y-4 disabled:opacity-70">
+   <label className="block text-sm">영상 파일<input type="file" accept="video/*" className={input+' mt-1'} onChange={e=>{setFile(e.target.files?.[0]||null);setReceipt(null);setConfirmed(false)}} /></label>
+   <label className="block text-sm">영상 제목<input value={title} maxLength={100} onChange={e=>setTitle(e.target.value)} className={input+' mt-1'} /></label>
+   <label className="block text-sm">영상 설명<textarea value={description} maxLength={5000} rows={4} onChange={e=>setDescription(e.target.value)} className={input+' mt-1'} /></label>
+   <div className="grid sm:grid-cols-2 gap-3"><label className="block text-sm">공개 범위<select value={privacy} onChange={e=>{setPrivacy(e.target.value);setConfirmed(false)}} className={input+' mt-1'}><option value="private">비공개</option><option value="unlisted">일부 공개 · 링크가 있는 사람</option><option value="public">전체 공개</option></select></label><label className="block text-sm">아동용 영상 여부<select value={kids} onChange={e=>setKids(e.target.value)} className={input+' mt-1'}><option value="">직접 선택해 주세요</option><option value="no">아동용이 아닙니다</option><option value="yes">아동용입니다</option></select></label></div>
+   <p className="text-xs text-[var(--lu-muted)]">업로드 완료 후 실제 공개 상태를 확인하세요. 업로드 중 화면을 유지해 주세요.</p>
+   <label className="flex items-start gap-3 text-sm"><input type="checkbox" checked={confirmed} onChange={e=>setConfirmed(e.target.checked)} className="mt-1" />내가 사용할 권한이 있는 영상이며 선택한 채널과 공개 범위로 업로드합니다.</label>
+  </fieldset>}
+  {account?.connected&&!receipt&&<button type="button" disabled={!file||!title.trim()||!kids||!confirmed||busy||Boolean(pendingId)} onClick={upload} className="w-full min-h-12 rounded-lg bg-[var(--lu-accent)] text-white font-semibold disabled:opacity-40">{busy?`전송 중 ${progress}%`:hasSession?'기존 영상 이어서 전송':'선택한 공개 범위로 업로드'}</button>}
+  {hasSession&&!receipt&&<p className="text-xs text-[var(--lu-muted)]">이어서는 기존 접수 상태를 먼저 조회합니다. 화면을 닫으면 이어서 전송할 수 없으므로 YouTube Studio에서 접수 여부를 확인해 주세요.</p>}
+  {busy&&<progress aria-label="영상 전송 진행률" value={progress} max={100} className="w-full" />}
+  {pendingId&&!busy&&<button onClick={()=>verify(pendingId).catch(e=>setError(e.message))} className={input}>이미 전송한 영상의 접수 결과 다시 확인</button>}
+  {receipt&&<div role="status" className="rounded-lg bg-[var(--lu-accent-soft)] p-4 text-sm space-y-2"><p className="font-semibold">{['failed','rejected','deleted'].includes(receipt.uploadStatus)||['failed','terminated'].includes(receipt.processingStatus||'')?'YouTube에서 영상 처리를 완료하지 못했습니다. Studio에서 사유를 확인해 주세요.':'내 채널의 영상 접수를 확인했습니다.'}</p><p>{receipt.title}</p><p>실제 공개 상태: {receipt.privacy==='private'?'비공개':receipt.privacy==='public'?'전체 공개':'일부 공개'}</p><p>업로드 상태: {receipt.uploadStatus} · 처리 상태: {receipt.processingStatus||'확인 중'}</p><a href={receipt.url} target="_blank" rel="noopener noreferrer" className="underline">YouTube에서 확인</a></div>}
+  {receipt&&<button type="button" onClick={()=>{sessionRef.current=null;setHasSession(false);setFile(null);setTitle('');setDescription('');setReceipt(null);setConfirmed(false);setProgress(0)}} className={input}>새 영상 준비</button>}
+  <a href="https://studio.youtube.com/" target="_blank" rel="noopener noreferrer" className="inline-block text-sm underline">YouTube Studio 열기</a>
+ </section>
+}
+
 type AgentStatus = 'checking' | 'connected' | 'disconnected'
 type UploadState = 'idle' | 'running' | 'success' | 'error'
 
 export default function YoutubeCommunityPage() {
- const [agentStatus, setAgentStatus] = useState<AgentStatus>('checking')
+ const [agentStatus, setAgentStatus] = useState<AgentStatus>('disconnected')
+ const [pcEnabled, setPcEnabled] = useState(false)
  const [channelUrl, setChannelUrl] = useState('')
  const [profileName, setProfileName] = useState('Default')
  const [postText, setPostText] = useState('')
@@ -46,16 +127,18 @@ export default function YoutubeCommunityPage() {
  const fileInputRef = useRef<HTMLInputElement>(null)
 
  useEffect(() => {
+ if (!pcEnabled) return
  checkAgent()
  const id = setInterval(checkAgent, 10_000)
  return () => clearInterval(id)
- }, [])
+ }, [pcEnabled])
 
  useEffect(() => {
  logsEndRef.current?.scrollIntoView({ behavior: 'smooth' })
  }, [logs])
 
  async function checkAgent() {
+ if (!pcEnabled) return
  try {
  const res = await fetch(`${AGENT_URL}/health`, { signal: AbortSignal.timeout(2500) })
  setAgentStatus(res.ok ? 'connected' : 'disconnected')
@@ -162,12 +245,19 @@ export default function YoutubeCommunityPage() {
  <PageHeader
  variant="youtube"
  icon={<Youtube size={28} className="text-white" strokeWidth={2.5} />}
- title="유튜브 커뮤니티 업로드"
- subtitle="로컬 에이전트를 통해 커뮤니티 탭에 자동 게시 · 댓글 작성 · 고정"
+ title="YouTube 채널 관리"
+ subtitle="휴대폰과 PC에서 채널을 연결하고 영상을 업로드하세요"
  />
 
  <main className="flex-1 px-4 md:px-6 py-6 max-w-5xl mx-auto w-full space-y-4">
 
+ <YoutubeOfficialPanel />
+ <section className="rounded-xl border border-[var(--lu-line)] bg-white p-4">
+ <h2 className="font-semibold">PC 커뮤니티 도구</h2>
+ <p className="text-sm text-[var(--lu-muted)] mt-2">커뮤니티 게시물 작성은 공식 YouTube API에서 지원하지 않습니다. 기존 PC 도구는 해당 PC에서 직접 실행해 사용하는 별도 기능입니다.</p>
+ <button type="button" onClick={() => setPcEnabled(v => !v)} className="mt-3 min-h-11 rounded-lg border px-4">{pcEnabled ? 'PC 도구 닫기' : '이 PC의 에이전트 사용'}</button>
+ </section>
+ {pcEnabled && <>
  {/* 에이전트 연결 상태 */}
  <div className={
  'flex items-center justify-between px-4 py-3 rounded-[10px] border ' +
@@ -482,6 +572,7 @@ export default function YoutubeCommunityPage() {
  </div>
  </div>
  </div>
+ </>}
  </main>
 
  <Footer />

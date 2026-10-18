@@ -3,7 +3,7 @@
 // ============================================================
 // /marketing/instagram-feed — 인스타그램 피드 작성 발행
 // · 매장 사진 업로드 → AI 캡션 초안 생성 및 검토
-// · 이 브라우저 초안 저장. 외부 게시 및 예약 실행 없음
+// · 브라우저 초안과 계정 연결 후 명시적 게시
 // · 스레드·카드뉴스와 동일 발행 채널 패턴
 // ============================================================
 import { useState, useEffect, useRef } from 'react'
@@ -139,8 +139,7 @@ export default function InstagramFeedPage() {
  <p className="text-sm font-bold text-white mb-0.5">인스타그램 피드 작성 발행 베타</p>
  <p className="text-xs md:text-sm text-white/90 leading-relaxed">
  입력한 실제 매장 소식으로 AI 초안을 만들고 검토할 수 있습니다. 사진은 AI로 분석하지 않습니다. 초안은 이 브라우저에 저장됩니다.
- 자동 게시나 예약은 실행되지 않습니다.
- 지금은 초안을 복사 → 인스타그램 앱에서 붙여넣기로 게시하세요.
+ 아래에서 계정을 연결하면 사진 한 장 또는 릴스를 확인 후 게시할 수 있습니다. 예약 시간은 초안 메모이며 자동 예약은 실행되지 않습니다.
  </p>
  </div>
  </div>
@@ -281,17 +280,18 @@ export default function InstagramFeedPage() {
  className="min-h-11 flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 border border-[var(--lu-line)] text-[var(--lu-muted)] rounded-[6px] text-sm font-bold hover:bg-[var(--lu-canvas)] disabled:opacity-40">
  초안 저장
  </button>
- <button disabled
- className="min-h-11 flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[var(--lu-accent)] text-white rounded-[6px] text-sm font-bold opacity-60 cursor-not-allowed">
+ <a href="#instagram-publish"
+ className="min-h-11 flex-1 inline-flex items-center justify-center gap-1.5 px-4 py-2.5 bg-[var(--lu-accent)] text-white rounded-[6px] text-sm font-bold">
  <Send size={14} strokeWidth={2.5} />
- 바로 발행 (준비중)
- </button>
+ 계정 연결하고 게시
+ </a>
  </div>
  <p className="text-[10px] text-[var(--lu-muted)] leading-relaxed">
- 바로 발행은 메타 비즈니스 API 연동 후 활성화됩니다. 지금은 캡션 복사 → 인스타 앱에서 붙여넣기로 사용하세요.
+ 초안 사진과 실제 게시할 미디어를 확인한 뒤 아래 게시 영역에서 진행해주세요.
  </p>
  </div>
  </Section>
+ <InstagramPublisher caption={caption + (hashtags.length ? '\n\n' + hashtags.join(' ') : '')} />
  </div>
 
  {/* 우측 사이드 */}
@@ -369,6 +369,91 @@ export default function InstagramFeedPage() {
  </div>
  </div>
  )
+}
+
+type InstagramPublication = { id: string; status: string; caption?: string; media_url?: string; containerStatus?: string; media_id?: string; permalink?: string; verified?: boolean }
+function InstagramPublisher({ caption }: { caption: string }) {
+ const [account, setAccount] = useState<{ id: string; username: string } | null>(null)
+ const [message, setMessage] = useState('계정 연결 상태를 확인하고 있어요.')
+ const [mediaUrl, setMediaUrl] = useState('')
+ const [mediaType, setMediaType] = useState('IMAGE')
+ const [publication, setPublication] = useState<InstagramPublication | null>(null)
+ const [busy, setBusy] = useState(false)
+ const [confirmed, setConfirmed] = useState(false)
+ const [preparedText, setPreparedText] = useState('')
+ const [publicConsent, setPublicConsent] = useState(false)
+ const requestId = useRef<string | null>(null)
+ const busyRef = useRef(false)
+ async function loadAccount() {
+  try {
+   const response = await fetch('/api/instagram/account', { cache: 'no-store' })
+   const data = await response.json()
+   setAccount(response.ok && data.connected ? data.account : null)
+   setMessage(response.ok && data.connected ? `@${data.account.username} 계정 조회를 확인했어요. 게시 권한은 게시 준비 응답에서 확인하세요.` : data.error || '로그인한 뒤 계정을 연결해주세요.')
+  } catch { setAccount(null); setMessage('연결 상태를 확인하지 못했어요. 다시 확인해주세요.') }
+ }
+ useEffect(() => { void loadAccount(); const query = new URLSearchParams(window.location.search); if (query.has('instagram_error')) setMessage('계정 연결을 마치지 못했어요. 연결 상태를 확인하고 다시 진행해주세요.') }, [])
+ useEffect(() => { setConfirmed(false) }, [caption, mediaUrl, mediaType])
+ useEffect(() => {
+  if (!account) return
+  try {
+   const saved = localStorage.getItem(`localution.instagram.publication.${account.id}`)
+   if (saved) { requestId.current = saved; setPublication({ id: saved, status: 'check_required' }); setMessage('이전 게시 요청이 있어요. 새로 게시하기 전에 상태와 실제 게시물을 확인해주세요.') }
+  } catch { setMessage('이 브라우저에서 게시 요청을 복구하지 못했어요. 기존 게시물을 확인해주세요.') }
+ }, [account?.id])
+ async function uploadMedia(file: File | undefined) {
+  if (!file || busyRef.current || !publicConsent) return
+  const limit = file.type === 'image/jpeg' ? 8 * 1024 * 1024 : 100 * 1024 * 1024
+  if (!['image/jpeg', 'video/mp4'].includes(file.type) || file.size > limit) { setMessage('JPEG 8MB 또는 MP4 100MB까지 업로드할 수 있어요.'); return }
+  busyRef.current = true; setBusy(true)
+  try {
+   const signedResponse = await fetch('/api/instagram/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'sign', type: file.type, size: file.size, publicStorageConsent: true }) })
+   const signed = await signedResponse.json()
+   if (!signedResponse.ok || !signed.ok) throw new Error(signed.error || '업로드를 준비하지 못했어요.')
+   const uploaded = await fetch(signed.signedUrl, { method: 'PUT', headers: { 'Content-Type': file.type, 'x-upsert': 'false' }, body: file })
+   if (!uploaded.ok) throw new Error('파일 업로드에 실패했어요. 연결을 확인해주세요.')
+   const checkedResponse = await fetch('/api/instagram/upload', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ action: 'verify', path: signed.path, publicStorageConsent: true }) })
+   const checked = await checkedResponse.json()
+   if (!checkedResponse.ok || !checked.ok) throw new Error(checked.error || '업로드한 파일을 확인하지 못했어요.')
+   setMediaUrl(checked.url); setMediaType(checked.type === 'image/jpeg' ? 'IMAGE' : 'REELS'); setMessage('업로드한 파일의 저장 결과를 확인했어요. 미디어 준비를 눌러주세요.')
+  } catch (error) { setMessage(error instanceof Error ? error.message : '파일을 업로드하지 못했어요.') }
+  finally { busyRef.current = false; setBusy(false) }
+ }
+ async function act(action: 'prepare' | 'publish' | 'verify') {
+  if (busyRef.current) return
+  busyRef.current = true; setBusy(true)
+  try {
+   if (action === 'prepare') {
+    requestId.current ||= crypto.randomUUID()
+    localStorage.setItem(`localution.instagram.publication.${account?.id}`, requestId.current)
+   }
+   const response = await fetch(action === 'verify' ? `/api/instagram/publications?id=${encodeURIComponent(publication?.id || requestId.current || '')}` : '/api/instagram/publications', action === 'verify' ? { cache: 'no-store' } : { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(action === 'prepare' ? { action, requestId: requestId.current, mediaType, mediaUrl, caption } : { action, id: publication?.id, confirm: confirmed }) })
+   const data = await response.json()
+   if (!response.ok || !data.ok) { if (action === 'verify' && response.status === 404) setPublication(null); throw new Error(data.error || '요청 결과를 확인하지 못했어요.') }
+   setPublication(data.publication)
+   if (data.publication.caption !== undefined) setPreparedText(data.publication.caption)
+   setMessage(data.publication.status === 'verified' ? 'Instagram 게시물을 다시 조회해 확인했어요.' : data.publication.status === 'reconciliation_required' || data.publication.status === 'publishing' ? '게시 결과를 확인해야 해요. 중복 게시하지 말고 상태를 조회해주세요.' : data.publication.media_id ? '게시 응답을 받았어요. 실제 게시물 확인을 눌러 최종 확인해주세요.' : `미디어 상태: ${data.publication.containerStatus || data.publication.status}. 내용을 확인한 뒤 게시해주세요.`)
+  } catch (error) { setMessage(error instanceof Error ? error.message : '연결을 확인해주세요.') }
+  finally { busyRef.current = false; setBusy(false) }
+ }
+ const locked = !!publication
+ return <section id="instagram-publish" className="scroll-mt-20 rounded-2xl border border-[var(--lu-line)] bg-white p-4 md:p-5 space-y-4">
+  <h2 className="text-lg font-semibold text-[var(--lu-ink)]">Instagram 계정 연결과 실제 게시</h2>
+  <p className="text-sm text-[var(--lu-muted)]">비즈니스 또는 크리에이터 계정을 연결해주세요. 준비 단계에서는 공개 게시되지 않습니다. 마지막 게시 버튼을 누르면 연결한 계정에 게시됩니다.</p>
+  <p role="status" className="text-sm break-words">{message}</p>
+  <div className="flex flex-wrap gap-2"><a className="min-h-11 rounded-xl bg-[var(--lu-accent)] text-white px-4 py-3 text-sm" href="/api/oauth/instagram">{account ? '계정 다시 연결' : 'Instagram 연결'}</a><button type="button" onClick={loadAccount} disabled={busy} className="min-h-11 rounded-xl border px-4 text-sm">연결 상태 확인</button></div>
+  <label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={publicConsent} disabled={busy || locked} onChange={e => setPublicConsent(e.target.checked)} className="mt-1 h-5 w-5" /><span>게시할 파일을 공개 미디어 저장소에 업로드합니다. 링크를 아는 사람은 파일을 열 수 있습니다.</span></label>
+  <label className="block text-sm font-semibold">휴대폰 또는 PC에서 게시 파일 선택<input type="file" accept="image/jpeg,video/mp4" disabled={!account || !publicConsent || busy || locked} onChange={e => { void uploadMedia(e.target.files?.[0]); e.target.value = '' }} className="block w-full mt-2 min-h-11 text-base" /></label>
+  <label className="block text-sm font-semibold">게시 형식<select value={mediaType} disabled={busy || locked} onChange={e => setMediaType(e.target.value)} className="block mt-2 w-full min-h-11 rounded-xl border px-3 text-base"><option value="IMAGE">사진 한 장</option><option value="REELS">릴스 동영상</option></select></label>
+  <label className="block text-sm font-semibold">게시할 미디어의 공개 HTTPS 주소<input type="url" value={mediaUrl} disabled={busy || locked} onChange={e => setMediaUrl(e.target.value)} placeholder="https://..." className="block mt-2 w-full min-h-11 rounded-xl border px-3 text-base" /></label>
+  <p className="text-sm text-[var(--lu-muted)]">사진은 JPEG, 릴스는 Instagram 규격의 동영상 주소를 사용해주세요. 위 초안의 사진 파일은 자동 업로드되지 않습니다. 비공개 링크나 로그인해야 열리는 주소는 처리할 수 없습니다.</p>
+  {preparedText && <div className="rounded-xl bg-[var(--lu-canvas)] p-3 whitespace-pre-wrap break-words text-sm"><p className="font-semibold mb-2">준비된 게시 문구</p>{preparedText}</div>}
+  {publication?.media_url && <a href={publication.media_url} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center underline">준비된 실제 미디어 열기</a>}
+  <div className="flex flex-wrap gap-2"><button disabled={busy || !account || locked || !mediaUrl || !caption.trim() || caption.length > 2200} onClick={() => act('prepare')} className="min-h-11 rounded-xl border px-4 disabled:opacity-40">미디어 준비</button><button disabled={busy || (!publication && !requestId.current)} onClick={() => act('verify')} className="min-h-11 rounded-xl border px-4 disabled:opacity-40">상태와 실제 게시물 확인</button></div>
+  {publication?.status === 'prepared' && <><label className="flex items-start gap-2 text-sm"><input type="checkbox" checked={confirmed} disabled={busy} onChange={e => setConfirmed(e.target.checked)} className="mt-1 h-5 w-5" /><span>@{account?.username}에 위 준비된 문구와 미디어를 지금 공개 게시합니다.</span></label><button disabled={busy || !confirmed} onClick={() => act('publish')} className="min-h-11 w-full rounded-xl bg-[var(--lu-accent)] text-white font-semibold disabled:opacity-40">확인한 콘텐츠 지금 게시</button></>}
+  {publication?.verified && publication.permalink && <a href={publication.permalink} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-11 items-center underline font-semibold">확인된 Instagram 게시물 열기</a>}
+  {['verified', 'prepare_failed'].includes(publication?.status || '') && <button className="block min-h-11 underline" onClick={() => { localStorage.removeItem(`localution.instagram.publication.${account?.id}`); setPublication(null); setPreparedText(''); requestId.current = null; setConfirmed(false); setMediaUrl('') }}>다음 게시물 작성</button>}
+ </section>
 }
 
 function Section({ step, title, desc, children }: { step: string; title: string; desc?: string; children: React.ReactNode }) {

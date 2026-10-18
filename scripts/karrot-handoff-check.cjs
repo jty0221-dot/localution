@@ -1,0 +1,23 @@
+const fs = require('fs'), vm = require('vm'), ts = require('typescript'), assert = require('assert/strict'), path = require('path');
+const mod = { exports: {} };
+vm.runInNewContext(ts.transpileModule(fs.readFileSync(path.resolve(__dirname, '../app/lib/karrot-handoff.ts'), 'utf8'), { compilerOptions: { module: ts.ModuleKind.CommonJS, target: ts.ScriptTarget.ES2020 } }).outputText, { module: mod, exports: mod.exports, Error });
+const { buildKarrotText, validateKarrotImages, shareKarrotDraft } = mod.exports;
+(async () => {
+  assert.equal(buildKarrotText(' ', 'body'), null);
+  assert.equal(buildKarrotText(' title ', ' body '), 'title\n\nbody');
+  assert.ok(validateKarrotImages(Array(11).fill({ type: 'image/jpeg', size: 1 })));
+  assert.ok(validateKarrotImages([{ type: 'image/svg+xml', size: 1 }]));
+  assert.ok(validateKarrotImages([{ type: 'image/png', size: 11 * 1024 * 1024 }]));
+  assert.equal(validateKarrotImages([{ type: 'image/jpeg', size: 100 }]), null);
+  assert.equal(await shareKarrotDraft('', 'body', [], {}), 'empty');
+  assert.equal(await shareKarrotDraft('title', 'body', [], {}), 'unsupported');
+  let calls = 0;
+  assert.equal(await shareKarrotDraft('title', 'body', [{}], { share: async () => { calls++ }, canShare: () => false }), 'files-unsupported');
+  assert.equal(calls, 0);
+  assert.equal(await shareKarrotDraft('title', 'body', [], { share: async () => { const e = new Error('cancel'); e.name = 'AbortError'; throw e } }), 'cancelled');
+  assert.equal(await shareKarrotDraft('title', 'body', [], { share: async () => { throw new Error('failed') } }), 'failed');
+  assert.equal(await shareKarrotDraft('title', 'body', [{}], { canShare: () => { throw new Error('unsupported runtime') }, share: async () => {} }), 'failed');
+  assert.equal(await shareKarrotDraft('title', 'body', [], { share: async data => { assert.equal(data.text, 'title\n\nbody') } }), 'shared');
+  assert.equal(await shareKarrotDraft('title', 'body', [{}], { canShare: () => true, share: async data => { assert.equal(data.files.length, 1) } }), 'shared');
+  console.log('PASS 14 karrot handoff checks; live posts 0; DB writes 0');
+})().catch(error => { console.error(error); process.exitCode = 1 });

@@ -46,7 +46,7 @@ const MARKETING_GROUPS = [
  platform: '인스타',
  color: '#E1306C',
  items: [
- { href: '/marketing/instagram-feed', label: '피드 자동 발행' },
+ { href: '/marketing/instagram-feed', label: '계정 연결·피드 게시' },
  { href: '/marketing/reels', label: '릴스·숏폼' },
  { href: '/marketing/card-news', label: '카드뉴스' },
  ],
@@ -69,8 +69,13 @@ const MARKETING_GROUPS = [
  platform: '유튜브',
  color: '#FF0000',
  items: [
- { href: '/marketing/youtube-community', label: '커뮤니티 업로드' },
+ { href: '/marketing/youtube-community', label: '영상·커뮤니티 작업' },
  ],
+ },
+ {
+ platform: '당근',
+ color: '#FF6F0F',
+ items: [{ href: '/marketing/karrot', label: '소식·광고 연계' }],
  },
  {
  platform: '구글',
