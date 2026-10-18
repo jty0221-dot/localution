@@ -7,6 +7,7 @@ import { ArrowRight, Pause, Play } from 'lucide-react'
 export default function OwnerHero() {
   const video = useRef<HTMLVideoElement>(null)
   const [motionAllowed, setMotionAllowed] = useState(false)
+  const [mediaReady, setMediaReady] = useState(false)
   const [pauseChoice, setPauseChoice] = useState<boolean | null>(null)
   const [failed, setFailed] = useState(false)
   const [playing, setPlaying] = useState(false)
@@ -21,16 +22,52 @@ export default function OwnerHero() {
   }, [])
 
   useEffect(() => {
+    if (!motionAllowed || mediaReady) return
+    let cancelled = false
+    let frame = 0
+    let paintFrame = 0
+    let idle = 0
+    let timer = 0
+    let loaded = () => {}
+    const pageLoaded = document.readyState === 'complete' ? Promise.resolve() : new Promise<void>(resolve => {
+      loaded = () => resolve()
+      window.addEventListener('load', loaded, { once: true })
+    })
+    const poster = new window.Image()
+    poster.src = '/hero/owner-story-v2-20261018/owner-poster.jpg'
+    const start = () => { if (!cancelled) setMediaReady(true) }
+    // Paint the lightweight first screen before a decorative movie competes for bandwidth.
+    void Promise.all([poster.decode().catch(() => undefined), pageLoaded]).then(() => {
+      if (cancelled) return
+      frame = requestAnimationFrame(() => {
+        paintFrame = requestAnimationFrame(() => {
+          if (cancelled) return
+          if (typeof window.requestIdleCallback === 'function') idle = window.requestIdleCallback(start, { timeout: 1200 })
+          else timer = window.setTimeout(start, 150)
+        })
+      })
+    })
+    return () => {
+      cancelled = true
+      window.removeEventListener('load', loaded)
+      cancelAnimationFrame(frame)
+      cancelAnimationFrame(paintFrame)
+      if (idle) window.cancelIdleCallback(idle)
+      if (timer) window.clearTimeout(timer)
+    }
+  }, [motionAllowed, mediaReady])
+
+  useEffect(() => {
     const element = video.current
     if (!element) return
     const sync = () => {
-      if (paused || document.hidden || failed) element.pause()
+      if (!mediaReady || paused || document.hidden || failed) element.pause()
       else void element.play().catch(() => setPlaying(false))
     }
     sync()
     document.addEventListener('visibilitychange', sync)
     return () => document.removeEventListener('visibilitychange', sync)
-  }, [paused, failed])
+  }, [paused, failed, mediaReady])
 
   function togglePlayback() {
     const element = video.current
@@ -38,12 +75,13 @@ export default function OwnerHero() {
     if (playing) { setPauseChoice(true); element.pause(); return }
     setPauseChoice(false)
     setFailed(false)
+    if (!mediaReady) { setMediaReady(true); return }
     if (element.error) element.load()
     void element.play().catch(() => setPlaying(false))
   }
 
   return <section className="lu-owner-hero" aria-labelledby="home-title">
-    <video ref={video} className="lu-owner-film" muted loop playsInline preload={motionAllowed ? 'metadata' : 'none'} poster="/hero/owner-story-v2-20261018/owner-poster.jpg" onError={() => { setFailed(true); setPlaying(false) }} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-hidden="true"><source src="/hero/owner-story-v2-20261018/owner-hero.mp4" type="video/mp4" /></video>
+    <video ref={video} className="lu-owner-film" src={mediaReady ? '/hero/owner-story-v2-20261018/owner-hero.mp4' : undefined} muted loop playsInline preload={motionAllowed ? 'metadata' : 'none'} poster="/hero/owner-story-v2-20261018/owner-poster.jpg" onError={() => { setFailed(true); setPlaying(false) }} onPlay={() => setPlaying(true)} onPause={() => setPlaying(false)} aria-hidden="true" />
     <div className="lu-owner-shade" aria-hidden="true" />
     <button type="button" onClick={togglePlayback} aria-label={playing ? '히어로 영상 일시정지' : '히어로 영상 재생'} className="lu-owner-play">{!playing ? <Play size={16} aria-hidden="true" /> : <Pause size={16} aria-hidden="true" />}<span>{playing ? '일시정지' : '영상 재생'}</span></button>
     <div className="lu-owner-copy"><p className="lu-owner-eyebrow">장사가 끝나도, 할 일은 남으니까</p><h1 id="home-title">가게 문을 닫아도,<br />일이 끝나지 않나요?</h1><p className="lu-owner-description">리뷰, 콘텐츠, 내일의 홍보까지. <br className="hidden sm:block" />흩어진 마케팅 업무를 로컬루션 한곳에서 확인하고 준비하세요.</p><div className="lu-owner-actions"><Link href="/dashboard" className="lu-owner-primary">우리 가게 관리 시작하기<ArrowRight size={18} aria-hidden="true" /></Link><Link href="/story" className="lu-owner-secondary"><Play size={16} aria-hidden="true" />사장님의 하루, 전체 영상 보기</Link></div><p className="lu-owner-access">매장 관리는 로그인 후 이용해요. 공지·계산·홍보 링크는 로그인 없이 사용할 수 있어요.</p></div>
