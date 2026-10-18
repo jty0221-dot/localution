@@ -2,7 +2,7 @@
 // ============================================================
 // Threads 자동발행 어댑터 — REST API 전용 (Playwright 불필요)
 //   · 2단계 발행: container 생성 → publish
-//   · container_id DB 저장으로 중간 실패 시 재시도 안전
+//   · container_id 저장으로 생성 단계를 재사용. 외부 발행 후 영수증 오류는 수동 대조 필요
 // ============================================================
 import type { Logger } from 'pino'
 import type { JobResult } from '../jobs'
@@ -62,7 +62,7 @@ export async function runThreadsPublish(
   if (fetchErr || !post) {
     return { status: 'failed', message: `post not found: ${postId}` }
   }
-  if (post.status === 'published') {
+  if (post.status === 'published' || post.threads_post_id) {
     return { status: 'skipped', message: 'already published' }
   }
 
@@ -86,6 +86,15 @@ export async function runThreadsPublish(
     : ''
   const fullText = post.text_content + hashtags
 
+  let publishedId: string | undefined
+  const reconciliationRequired = (): JobResult => {
+    log.error({ postId, threadId: publishedId, code: 'receipt_reconciliation_required' }, '[threads] external publication confirmed; stop and reconcile receipt, do not republish')
+    return {
+      status: 'skipped',
+      message: 'receipt_reconciliation_required: external publication confirmed; do not republish',
+      data: { code: 'receipt_reconciliation_required', postId, threadsPostId: publishedId, externalPublished: true, retryAllowed: false },
+    }
+  }
   try {
     let containerId = post.container_id as string | null
 
@@ -162,14 +171,16 @@ export async function runThreadsPublish(
       return { status: 'failed', message: errMsg }
     }
 
-    // 6. 성공 — 메인 포스트 상태 업데이트
-    await svc.from('threads_posts').update({
+    publishedId = publishData.id
+    // The external side effect is irreversible. Never route receipt failures to failed/retry.
+    const { data: savedReceipt, error: receiptError } = await svc.from('threads_posts').update({
       status: 'published',
       threads_post_id: publishData.id,
       published_at: new Date().toISOString(),
       error_message: null,
       updated_at: new Date().toISOString(),
-    }).eq('id', postId)
+    }).eq('id', postId).eq('user_id', userId).select('id').maybeSingle()
+    if (receiptError || !savedReceipt) return reconciliationRequired()
 
     log.info({ postId, threadId: publishData.id }, '[threads] published successfully')
 
@@ -227,6 +238,7 @@ export async function runThreadsPublish(
     return { status: 'ok', message: `published: ${publishData.id}` }
 
   } catch (e: any) {
+    if (publishedId) return reconciliationRequired()
     const errMsg = e?.message || String(e)
     log.error({ postId, err: errMsg }, '[threads] unexpected error')
     await svc.from('threads_posts').update({
