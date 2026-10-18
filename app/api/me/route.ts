@@ -1,24 +1,36 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { signCookie, verifyCookie } from '@/app/lib/cookieSigning'
+import { requireUser } from '@/app/lib/userAuth'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
 
 // 30일 = 2,592,000초
 const COOKIE_MAX_AGE = 30 * 24 * 60 * 60
+const PRIVATE_HEADERS = { 'Cache-Control': 'private, no-store, max-age=0', Vary: 'Cookie, Authorization' }
+function respond(body: unknown, options?: { status: number }) {
+ return NextResponse.json(body, { ...options, headers: PRIVATE_HEADERS })
+}
 
+async function fallbackIdentity(hint?: string) {
+ try {
+ const auth = await requireUser()
+ if (auth.ok) return respond({ user: { id: auth.userId, email: auth.email }, source: auth.source })
+ } catch { /* fail closed */ }
+ return respond({ user: null, ...(hint ? { hint } : {}) }, { status: 401 })
+}
 export async function GET(req: NextRequest) {
  const userCookie = req.cookies.get('localution_user')?.value
  const sessionCookie = req.cookies.get('localution_session')?.value
 
  // 둘 다 없으면 진짜 로그아웃 상태 → 401
  if (!userCookie && !sessionCookie) {
- return NextResponse.json({ user: null }, { status: 401 })
+ return fallbackIdentity()
  }
 
  // user 쿠키 없지만 session 있으면 (시그너처 손상 등) → 401 + reset 안내
  if (!userCookie && sessionCookie) {
- return NextResponse.json({ user: null, hint: 'session_only' }, { status: 401 })
+ return fallbackIdentity('session_only')
  }
 
  // 1차: signed cookie verify
@@ -26,7 +38,7 @@ export async function GET(req: NextRequest) {
  if (verified) {
  // Sliding session: 정상 검증되면 쿠키 만료 갱신 (방문할 때마다 +30일)
  //   → 매월 1번 이상 방문 사장님은 사실상 영구 로그인
- const res = NextResponse.json({ user: verified })
+ const res = respond({ user: verified })
  try {
  const renewed = signCookie({
  id: verified.id,
@@ -48,18 +60,12 @@ export async function GET(req: NextRequest) {
  return res
  }
 
- // 2차: legacy 평문 JSON (예전 시스템 호환)
- try {
- const user = JSON.parse(userCookie!)
- return NextResponse.json({ user })
- } catch {
- // 3차: 시그너처 검증은 실패했지만 session 쿠키는 있음 → graceful 401 (재로그인 유도)
- return NextResponse.json({ user: null, hint: 'verify_failed' }, { status: 401 })
- }
+ // 서명이 검증되지 않은 평문 쿠키는 사용자 표시의 근거로도 사용하지 않는다.
+ return fallbackIdentity('verify_failed')
 }
 
 export async function DELETE(_req: NextRequest) {
- const res = NextResponse.json({ ok: true })
+ const res = respond({ ok: true })
  res.cookies.delete('localution_session')
  res.cookies.delete('localution_user')
  return res

@@ -133,11 +133,11 @@ export default function InstagramFeedPage() {
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full space-y-4 md:space-y-6">
 
  {/* 베타 안내 */}
- <div className="rounded-[10px] border border-[#E9D5FF] bg-[var(--lu-accent)] p-3 md:p-4 flex items-start gap-2.5">
- <AlertCircle size={14} className="text-[#7C3AED] flex-shrink-0 mt-0.5" strokeWidth={2.5} />
+ <div className="rounded-[10px] border border-[var(--lu-accent)] bg-[var(--lu-accent)] p-3 md:p-4 flex items-start gap-2.5">
+ <AlertCircle size={14} className="text-white flex-shrink-0 mt-0.5" strokeWidth={2.5} />
  <div className="flex-1 min-w-0">
- <p className="text-xs md:text-sm font-bold text-[#7C3AED] mb-0.5">인스타그램 피드 작성 발행 베타</p>
- <p className="text-[11px] md:text-xs text-[#7C3AED]/90 leading-relaxed">
+ <p className="text-sm font-bold text-white mb-0.5">인스타그램 피드 작성 발행 베타</p>
+ <p className="text-xs md:text-sm text-white/90 leading-relaxed">
  입력한 실제 매장 소식으로 AI 초안을 만들고 검토할 수 있습니다. 사진은 AI로 분석하지 않습니다. 초안은 이 브라우저에 저장됩니다.
  자동 게시나 예약은 실행되지 않습니다.
  지금은 초안을 복사 → 인스타그램 앱에서 붙여넣기로 게시하세요.
@@ -383,3 +383,4 @@ function Section({ step, title, desc, children }: { step: string; title: string;
  </section>
  )
 }
+
