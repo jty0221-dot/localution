@@ -1,7 +1,7 @@
 'use client'
 export const dynamic = 'force-dynamic'
 
-import { useState, useMemo, useEffect, useCallback } from 'react'
+import { useState, useMemo, useEffect, useCallback, Suspense } from 'react'
 import Sidebar from '../../components/Sidebar'
 import PageHeader from '../../components/PageHeader'
 import Footer from '../../components/Footer'
@@ -557,7 +557,7 @@ export default function PlaceDiagnosisPage() {
 
  return (
  <div className="min-h-screen bg-[#F8F9FA]">
- <Sidebar />
+ <Suspense fallback={<aside aria-hidden="true" className="hidden md:block fixed inset-y-0 left-0 w-[220px] border-r border-[var(--lu-line)] bg-white" />}><Sidebar /></Suspense>
  <main className="flex-1 ml-0 md:ml-[220px] pt-4 md:pt-0 min-w-0">
  <PageHeader
  icon={<MapPin size={28} className="text-white" strokeWidth={2.5} />}
