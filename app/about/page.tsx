@@ -425,7 +425,7 @@ export default function AboutPage() {
  <section className="px-5 py-10 md:py-12 border-t border-gray-100">
  <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4 text-xs md:text-sm text-[var(--lu-muted)]">
  <div className="flex items-center gap-3">
- <Image src="/logo.svg" alt="로컬루션 로고" width={28} height={28} className="select-none" />
+ <Image src="/brand/localution-mark-20261018.png" alt="로컬루션 로고" width={28} height={28} className="select-none" />
  <div className="text-[var(--lu-ink)] font-bold">LOCALUTION</div>
  </div>
  <div className="flex items-center gap-4">

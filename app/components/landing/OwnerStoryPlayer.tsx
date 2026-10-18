@@ -2,14 +2,14 @@
 
 import { useRef, useState } from 'react'
 
-const MEDIA = '/hero/owner-story-v2-20261018'
+const MEDIA = '/hero/owner-story-v3-20261018'
 
 export default function OwnerStoryPlayer() {
   const video = useRef<HTMLVideoElement>(null)
   const [failed, setFailed] = useState(false)
 
   return <div>
-    <video ref={video} controls playsInline preload="metadata" poster={`${MEDIA}/owner-poster.jpg`} aria-label="가게 문을 닫아도 끝나지 않는 하루, 로컬루션 브랜드 영상" aria-describedby="story-caption" className="aspect-video w-full rounded-[10px] bg-black" onError={() => setFailed(true)} onLoadedData={() => setFailed(false)}>
+    <video ref={video} controls playsInline preload="metadata" poster={`${MEDIA}/owner-poster.jpg`} aria-label="가게 문을 닫아도 끝나지 않는 하루, 로컬루션 브랜드 영상" aria-describedby="story-caption" className="lu-owner-player aspect-video w-full rounded-[10px] bg-black" onError={() => setFailed(true)} onLoadedData={() => setFailed(false)}>
       <source src={`${MEDIA}/owner-story.mp4`} type="video/mp4" />
       <track kind="captions" src={`${MEDIA}/owner-story.vtt`} srcLang="ko" label="한국어" />
       브라우저에서 영상을 재생할 수 없어요. 아래 영상 파일을 열거나 설명을 읽어 주세요.

@@ -578,7 +578,7 @@ function SidebarContent() {
  <Link href="/" className="block">
  <div className="flex items-center gap-2.5">
  <div className="w-8 h-8 rounded-lg bg-white ring-1 ring-[#D5DEDC] flex items-center justify-center overflow-hidden flex-shrink-0">
- <img src="/logo-icon.svg" alt="로컬루션" width={32} height={32} />
+ <img src="/brand/localution-mark-20261018.png" alt="로컬루션" width={32} height={32} />
  </div>
  <div>
  <p className="font-semibold text-[#172B2F] text-sm tracking-tight leading-none">Localution</p>

@@ -33,7 +33,7 @@ export default function AdminShell({ children, pathname, items }: { children: Re
   const active = pathname === item.href || pathname.startsWith(item.href + '/')
   return <Link key={item.href} href={item.href} aria-current={active ? 'page' : undefined} onClick={() => setOpen(false)} className={active ? styles.active : ''}><item.Icon size={18} strokeWidth={1.8} aria-hidden="true" /><span>{item.label}</span></Link>
  })}</nav>
- const brand = <Link href="/admin/dashboard" className={styles.brand}><img src="/logo-icon.svg" width={32} height={32} alt="" /><span>로컬루션<strong>관리자</strong></span></Link>
+ const brand = <Link href="/admin/dashboard" className={styles.brand}><img src="/brand/localution-mark-20261018.png" width={32} height={32} alt="" /><span>로컬루션<strong>관리자</strong></span></Link>
  return <div className={styles.shell}>
   <a href="#admin-content" className={styles.skip}>본문으로 이동</a>
   <aside className={styles.desktop}>{brand}{links}<Link className={styles.back} href="/dashboard"><ArrowLeft size={16} />서비스로 돌아가기</Link></aside>

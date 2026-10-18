@@ -256,7 +256,7 @@ export default function LoginPage() {
  <div className='row'>
  <div className='brand'>
  <div className='brandLogo'>
- <Image src="/logo-icon.svg" alt="로컬루션" width={32} height={32} priority />
+ <Image src="/brand/localution-mark-20261018.png" alt="로컬루션" width={32} height={32} priority />
  </div>
  <div>
  <div className='brandText'>로컬루션</div>
@@ -284,7 +284,7 @@ export default function LoginPage() {
  <div className='rightArea'>
  <div className='loginCard' ref={cardRef}>
  <div className='logoSection'>
- <Image src="/logo.png" alt="로컬루션" width={52} height={52} className='logoImg' priority />
+ <Image src="/brand/localution-original-20261018.png" alt="로컬루션" width={52} height={52} className='logoImg' priority />
  <div className='brandName'>Localution</div>
  <div className='tagline'>AI가 사장님의 비즈니스를 성장시킵니다</div>
  </div>

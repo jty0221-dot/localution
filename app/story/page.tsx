@@ -19,8 +19,8 @@ export default function OwnerStoryPage() {
         breadcrumbLd([{ name: '홈', path: '/' }, { name: '브랜드 영상', path: '/story' }]),
         {
           '@type': 'VideoObject', '@id': absUrl('/story#film'), name: title, description,
-          thumbnailUrl: absUrl('/hero/owner-story-v2-20261018/owner-poster.jpg'),
-          contentUrl: absUrl('/hero/owner-story-v2-20261018/owner-story.mp4'),
+          thumbnailUrl: absUrl('/hero/owner-story-v3-20261018/owner-poster.jpg'),
+          contentUrl: absUrl('/hero/owner-story-v3-20261018/owner-story.mp4'),
           uploadDate: '2026-10-18', duration: 'PT45S', inLanguage: 'ko',
         },
       ])} />
@@ -31,7 +31,6 @@ export default function OwnerStoryPage() {
         <h2 id="story-about" className="text-xl font-semibold">사장님의 시간을, 다시 가게로</h2>
         <p className="mt-4 leading-7 text-[var(--lu-muted)]">로컬루션은 여러 곳에 흩어진 마케팅 업무를 한곳에서 관리하도록 돕는 서비스입니다. 연결된 매장의 리뷰와 처리 상태를 확인하고, 공지 문안과 홍보 링크를 준비하고, 행사 비용을 비교할 수 있어요.</p>
         <p className="mt-3 leading-7 text-[var(--lu-muted)]">외부 플랫폼의 데이터 조회와 발행은 계정 권한과 연결 상태에 따라 달라요. 먼저 연결과 실제 조회 결과를 확인한 뒤 사용해 주세요.</p>
-        <p className="mt-4 text-sm leading-6 text-[var(--lu-muted)]">영상 속 인물과 가게는 AI로 연출한 상황이며 실제 고객 사례가 아닙니다. 기능 화면은 공개된 서비스의 사용 흐름을 소개합니다.</p>
       </section>
       <div className="mt-6 flex flex-wrap gap-3"><Link href="/dashboard" className="inline-flex min-h-11 items-center rounded-md bg-[var(--lu-accent)] px-5 font-semibold text-white">우리 가게 관리 시작하기</Link><Link href="/help/videos" className="inline-flex min-h-11 items-center rounded-md border border-[var(--lu-line)] px-5 font-semibold">기능별 사용 영상 보기</Link></div>
     </main>

@@ -26,7 +26,7 @@ export const SITE = {
   lang: 'ko',
   themeColor: '#16685D',
   backgroundColor: '#F3F5F4',
-  logo: '/logo.png', // 512x512
+  logo: '/brand/localution-original-20261018.png', // 512x512
   ogImage: '/opengraph-image', // app/opengraph-image.tsx 자동 생성 1200x630
   ogAlt: '로컬루션 · 사장님 마케팅 플랫폼',
   launchYear: 2026,

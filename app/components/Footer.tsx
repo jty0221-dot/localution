@@ -18,8 +18,8 @@ export default function Footer() {
  {/* 브랜드 */}
  <div className="flex-shrink-0">
  <div className="flex items-center gap-3 mb-3">
- {/* 로고는 public/logo.svg 로 분리 — 번들 크기 및 캐싱 최적화 */}
- <Image src="/logo.svg" alt={`${COMPANY.BRAND} 로고`} width={36} height={36} className="select-none" />
+ {/* 로고는 public/brand/localution-mark-20261018.png 로 분리 — 번들 크기 및 캐싱 최적화 */}
+ <Image src="/brand/localution-mark-20261018.png" alt={`${COMPANY.BRAND} 로고`} width={36} height={36} className="select-none" />
  <div>
  <span className="text-lg font-semibold text-white">{COMPANY.BRAND}</span>
  <span className="text-[10px] text-[#BDDAD1] font-bold block tracking-widest">{COMPANY.BRAND_EN.toUpperCase()}</span>

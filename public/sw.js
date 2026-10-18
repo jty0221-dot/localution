@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1.3.0';
+const CACHE_VERSION = 'v1.3.1-brand-20261018';
 
 // v38: 푸시 알림 핸들러 - sound + badge + click action
 self.addEventListener('push', (event) => {
@@ -12,8 +12,8 @@ self.addEventListener('push', (event) => {
   const title = data.title || '로컬루션'
   const options = {
     body: data.body || '',
-    icon: data.icon || '/icons/icon-192.png',
-    badge: data.badge || '/icons/icon-192.png',
+    icon: data.icon || '/icons/localution-192-20261018.png',
+    badge: data.badge || '/icons/localution-192-20261018.png',
     image: data.image,
     tag: data.tag || 'localution-notification',
     requireInteraction: data.priority === 'high',  // 부정 리뷰 등 중요 알림은 자동 안 사라짐
@@ -62,8 +62,8 @@ const PRECACHE_URLS = [
   '/',
   '/offline.html',
   '/manifest.webmanifest',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png',
+  '/icons/localution-192-20261018.png',
+  '/icons/localution-512-20261018.png',
 ];
 
 // 로그인해야 보이는 화면 · 로그인 흐름. 캐시에 남기지 않는다 (공용 기기에서 남의 화면이 남는다)
