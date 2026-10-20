@@ -22,7 +22,7 @@ export default function PageHeader({ icon, title, subtitle, right, badge = 'ë¡œì
    ? <LayoutDashboard size={20} strokeWidth={1.8} aria-hidden="true" />
    : icon
  return (
- <section className={`border-b border-[var(--lu-line)] bg-[var(--lu-surface)] text-[var(--lu-ink)] ${className}`}>
+ <section data-lu-page-header className={`border-b border-[var(--lu-line)] bg-[var(--lu-surface)] text-[var(--lu-ink)] ${className}`}>
  <div className="mx-auto flex max-w-6xl flex-wrap items-start gap-3 px-4 py-4 md:gap-4 md:px-6 md:py-5">
  <div className="mt-0.5 flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-md bg-[var(--lu-accent-soft)] text-[var(--lu-accent)] [&_svg]:h-5 [&_svg]:w-5 [&_svg]:text-current">
  {logoNode || safeIcon}

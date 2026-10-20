@@ -552,7 +552,7 @@ function SidebarContent() {
  return (
  <>
  {/* 모바일 상단 바 */}
- <div className="md:hidden fixed top-0 left-0 right-0 pt-safe bg-white border-b border-[#D5DEDC] z-50 flex items-center justify-between px-4 [&>*]:h-14">
+ <div data-lu-mobile-navigation className="md:hidden fixed top-0 left-0 right-0 pt-safe bg-white border-b border-[#D5DEDC] z-50 flex items-center justify-between px-4 [&>*]:h-14">
  <button
  onClick={() => {
  setMobileOpen(false)

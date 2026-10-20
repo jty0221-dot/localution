@@ -8,6 +8,7 @@
 // · 추후 네이버 예약 / 카카오 예약 연동 예정
 // ============================================================
 import { useState, useMemo, useEffect } from 'react'
+import { useAccountLocalList, koreaDate } from '../lib/local-account-storage'
 import Sidebar from '../components/Sidebar'
 import PageHeader from '../components/PageHeader'
 import Footer from '../components/Footer'
@@ -29,7 +30,6 @@ type Reservation = {
  status: 'confirmed' | 'pending' | 'completed' | 'cancelled'
 }
 
-const STORAGE_KEY = 'localution.reservations'
 
 const STATUS_LABEL: Record<Reservation['status'], { label: string; bg: string; color: string }> = {
  confirmed: { label: '확정', bg: '#D1FAE5', color: '#059669' },
@@ -38,28 +38,14 @@ const STATUS_LABEL: Record<Reservation['status'], { label: string; bg: string; c
  cancelled: { label: '취소', bg: '#FEE2E2', color: '#DC2626' },
 }
 
-function loadResv(): Reservation[] {
- try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') } catch { return [] }
-}
-function saveResv(list: Reservation[]) {
- localStorage.setItem(STORAGE_KEY, JSON.stringify(list))
-}
-
 export default function ReservationsPage() {
  const today = new Date()
- const [yr, setYr] = useState(today.getFullYear())
- const [mo, setMo] = useState(today.getMonth())
- const [resv, setResv] = useState<Reservation[]>([])
+ const [yr, setYr] = useState(Number(koreaDate(today).slice(0, 4)))
+ const [mo, setMo] = useState(Number(koreaDate(today).slice(5, 7)) - 1)
+ const { list: resv, owner, ready, saving, error: saveError, save, authMessage } = useAccountLocalList<Reservation>('reservations')
  const [selectedDate, setSelectedDate] = useState<string | null>(null)
  const [addOpen, setAddOpen] = useState(false)
- const [saveError, setSaveError] = useState<string | null>(null)
-
-  // 마운트 시 로드 (useMemo 안에서 setState 호출은 React 규칙 위반 — useEffect 로 수정)
- useEffect(() => {
- if (typeof window !== 'undefined') {
- setResv(loadResv())
- }
- }, [])
+ useEffect(() => { setAddOpen(false); setSelectedDate(null) }, [owner])
 
  const daysInMonth = new Date(yr, mo + 1, 0).getDate()
  const firstDow = new Date(yr, mo, 1).getDay()
@@ -79,7 +65,7 @@ export default function ReservationsPage() {
  }, [resv])
 
  const upcoming = useMemo(() => {
- const todayStr = today.toISOString().slice(0, 10)
+ const todayStr = koreaDate(today)
  return resv
  .filter(r => r.date >= todayStr && r.status !== 'cancelled' && r.status !== 'completed')
  .sort((a, b) => (a.date + a.time).localeCompare(b.date + b.time))
@@ -91,15 +77,11 @@ export default function ReservationsPage() {
  const prevMonth = () => { if (mo === 0) { setMo(11); setYr(y => y - 1) } else setMo(m => m - 1) }
  const nextMonth = () => { if (mo === 11) { setMo(0); setYr(y => y + 1) } else setMo(m => m + 1) }
 
- function addReservation(r: Omit<Reservation, 'id'>) {
- const next = [...resv, { ...r, id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6) }]
- try { saveResv(next); setResv(next); setSaveError(null); return true }
- catch { setSaveError('예약을 이 기기에 저장하지 못했어요. 저장 공간과 브라우저 설정을 확인한 뒤 다시 시도해주세요.'); return false }
+ async function addReservation(r: Omit<Reservation, 'id'>) {
+ return save([...resv, { ...r, id: crypto.randomUUID() }])
  }
- function cancelReservation(id: string) {
- const next = resv.map(r => r.id === id ? { ...r, status: 'cancelled' as const } : r)
- try { saveResv(next); setResv(next); setSaveError(null); return true }
- catch { setSaveError('예약을 이 기기에 저장하지 못했어요. 저장 공간과 브라우저 설정을 확인한 뒤 다시 시도해주세요.'); return false }
+ async function cancelReservation(id: string) {
+ return save(resv.map(r => r.id === id ? { ...r, status: 'cancelled' as const } : r))
  }
 
  return (
@@ -115,6 +97,7 @@ export default function ReservationsPage() {
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full space-y-4 md:space-y-6">
 
+ {authMessage && <p role="status">{authMessage}</p>}
  {saveError && <p role="alert" className="rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">{saveError}</p>}
  {/* 베타 안내 */}
  <div className="rounded-2xl border border-[#FDE68A] bg-[#FFFBEB] p-3 md:p-4 flex items-start gap-2.5">
@@ -122,7 +105,7 @@ export default function ReservationsPage() {
  <div className="flex-1 min-w-0">
  <p className="text-xs md:text-sm font-bold text-[#92400E] mb-0.5">초기 버전</p>
  <p className="text-[11px] md:text-xs text-[#92400E] leading-relaxed">
- 현재는 로컬 저장 방식입니다 (이 기기에만 저장).
+ 로그인한 계정별로 이 브라우저에만 저장해요. PC와 휴대전화 사이에는 동기화되지 않아요. 이전 공용 저장 자료는 자동으로 옮기지 않아요.
  네이버 예약 / 카카오 예약 자동 연동, 노쇼 방지 카톡 알림은 곧 추가됩니다.
  </p>
  </div>
@@ -137,7 +120,7 @@ export default function ReservationsPage() {
  다가오는 예약 <span className="text-[#3182F6]">{upcoming.length}건</span>
  </h2>
  </div>
- <button onClick={() => setAddOpen(true)}
+ <button disabled={!ready || saving} onClick={() => setAddOpen(true)}
  className="inline-flex items-center gap-1 px-2.5 py-1.5 bg-[#3182F6] text-white rounded-lg text-xs font-bold hover:bg-[#1B64DA]">
  <Plus size={12} strokeWidth={2.5} /> 예약 추가
  </button>
@@ -165,7 +148,7 @@ export default function ReservationsPage() {
  <button onClick={prevMonth} className="p-1.5 rounded-lg hover:bg-[#F2F4F6]" aria-label="이전 달">
  <ChevronLeft size={16} className="text-[#4E5968]" strokeWidth={2.5} />
  </button>
- <button onClick={() => { const d = new Date(); setYr(d.getFullYear()); setMo(d.getMonth()) }}
+ <button onClick={() => { const d = koreaDate(); setYr(Number(d.slice(0, 4))); setMo(Number(d.slice(5, 7)) - 1) }}
  className="px-2.5 py-1 rounded-lg text-[11px] font-bold text-[#3182F6] bg-[#EFF6FF] hover:bg-[#DBEAFE]">
  오늘
  </button>
@@ -187,7 +170,7 @@ export default function ReservationsPage() {
  const dt = cell as string
  const day = parseInt(dt.slice(8), 10)
  const dow = new Date(dt).getDay()
- const isToday = dt === today.toISOString().slice(0, 10)
+ const isToday = dt === koreaDate(today)
  const isSelected = dt === selectedDate
  const list = resvByDate[dt] || []
  const activeCount = list.filter(r => r.status !== 'cancelled').length
@@ -239,10 +222,11 @@ export default function ReservationsPage() {
 
  {addOpen && (
  <AddModal
- defaultDate={selectedDate || today.toISOString().slice(0, 10)}
+ defaultDate={selectedDate || koreaDate(today)}
  onClose={() => setAddOpen(false)}
- onAdd={(r) => { if (addReservation(r)) setAddOpen(false) }}
+ onAdd={async (r) => { if (await addReservation(r)) setAddOpen(false) }}
  saveError={saveError}
+ saving={saving || !ready}
  />
  )}
  </div>
@@ -280,11 +264,12 @@ function ResvRow({ r, compact, onCancel }: { r: Reservation; compact?: boolean; 
  )
 }
 
-function AddModal({ defaultDate, onClose, onAdd, saveError }: {
+function AddModal({ defaultDate, onClose, onAdd, saveError, saving }: {
  saveError?: string | null;
  defaultDate: string;
  onClose: () => void;
- onAdd: (r: Omit<Reservation, 'id'>) => void;
+ onAdd: (r: Omit<Reservation, 'id'>) => void | Promise<void>;
+ saving: boolean;
 }) {
  const [date, setDate] = useState(defaultDate)
  const [time, setTime] = useState('19:00')
@@ -293,7 +278,7 @@ function AddModal({ defaultDate, onClose, onAdd, saveError }: {
  const [partySize, setPartySize] = useState(2)
  const [note, setNote] = useState('')
 
- const canSubmit = name.trim() && date && time
+ const canSubmit = !saving && name.trim() && date && time
 
  return (
  <div className="fixed inset-0 z-50 bg-black/50 flex items-end md:items-center justify-center p-0 md:p-4" onClick={onClose}>

@@ -1233,3 +1233,13 @@ html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 @media (max-width: 767px) {
   body:has([data-onboarding-banner]) .lu-channel-shell { padding-top: 0; }
 }
+
+/* Existing app shells reserve the fixed mobile navigation once, including custom padding shells. */
+@media (max-width: 767px) {
+  body:has([data-lu-mobile-navigation]) [class~="md:ml-[220px]"]:has(> [data-lu-page-header]) {
+    padding-top: 57px;
+  }
+  body:has([data-onboarding-banner]) [class~="md:ml-[220px]"]:has(> [data-lu-page-header]) {
+    padding-top: 0;
+  }
+}

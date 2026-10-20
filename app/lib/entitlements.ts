@@ -2,7 +2,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import type { ModuleId } from './modules'
 import { getModule, MODULES } from './modules'
-import type { VerifiedEntitlement } from './entitlement-policy'
+import { entitlementFailureMessage, type VerifiedEntitlement } from './entitlement-policy'
 export type Entitlement = VerifiedEntitlement
 // Synchronous callers have no authenticated response context and must fail closed.
 export function getActiveModuleIds(): ModuleId[] { return [] }
@@ -28,13 +28,13 @@ export function useEntitlements(): UseEntitlementsResult {
  const res = await fetch('/api/entitlements', { credentials: 'include', cache: 'no-store', signal: controller.signal })
  const data = await res.json()
  if (disposed || sequence !== generation.current) return
- if (!res.ok || !data.ok || typeof data.userId !== 'string' || !Array.isArray(data.entitlements)) throw new Error('unverified')
+ if (!res.ok || !data.ok || typeof data.userId !== 'string' || !Array.isArray(data.entitlements)) throw new Error(data.code === 'identity_mapping_required' ? 'identity_mapping_required' : 'unverified')
  const allowed = new Set<string>(MODULES.map(m => m.id))
  const entitlements = data.entitlements.filter((e: Entitlement) => allowed.has(e.moduleId) && ['active', 'past_due'].includes(e.status) && Date.parse(e.renewsAt) > Date.now())
  setState({ entitlements, loading: false, verified: true, error: null })
- } catch {
+ } catch (error) {
  if (disposed || sequence !== generation.current) return
- setState({ entitlements: [], loading: false, verified: false, error: '구독 권한을 확인하지 못했어요. 다시 확인해주세요.' })
+ setState({ entitlements: [], loading: false, verified: false, error: entitlementFailureMessage(error instanceof Error ? error.message : undefined) })
  } finally { window.clearTimeout(timeout) }
  }
  function visibility() { if (document.visibilityState === 'visible') void refresh(false); else { ++generation.current; controller?.abort() } }

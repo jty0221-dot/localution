@@ -8,6 +8,7 @@
 // ============================================================
 import { useState, useMemo, useEffect } from 'react'
 import Link from 'next/link'
+import { useAccountLocalList, koreaDate, addCalendarDays } from '../../lib/local-account-storage'
 import Sidebar from '../../components/Sidebar'
 import PageHeader from '../../components/PageHeader'
 import Footer from '../../components/Footer'
@@ -35,7 +36,6 @@ type StoreEvent = {
  createdAt: string
 }
 
-const STORAGE_KEY = 'localution.events'
 
 const EVENT_TYPES: Record<EventType, { label: string; Icon: typeof Sparkles; color: string; bg: string }> = {
  open: { label: '오픈/리뉴얼', Icon: PartyPopper, color: '#16685D', bg: '#EFF6FF' },
@@ -53,12 +53,6 @@ const TEMPLATE_PRESETS = [
  { type: 'collab' as EventType, title: '인근 매장 협업 쿠폰', description: '근처 매장과 함께 진행하는 크로스 쿠폰', reward: '10% 상호 할인', target: '신규·재방문' },
 ]
 
-function loadEvents(): StoreEvent[] {
- try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]') } catch { return [] }
-}
-function saveEvents(list: StoreEvent[]) {
- try { localStorage.setItem(STORAGE_KEY, JSON.stringify(list)) } catch {}
-}
 function eventStatus(e: StoreEvent, today: string): EventStatus {
  if (today < e.startDate) return 'scheduled'
  if (today > e.endDate) return 'ended'
@@ -66,15 +60,13 @@ function eventStatus(e: StoreEvent, today: string): EventStatus {
 }
 
 export default function EventsPage() {
- const [events, setEvents] = useState<StoreEvent[]>([])
+ const { list: events, owner, ready, saving, error: saveError, save, authMessage } = useAccountLocalList<StoreEvent>('events')
  const [filter, setFilter] = useState<'all' | EventStatus>('all')
  const [editOpen, setEditOpen] = useState<StoreEvent | 'new' | null>(null)
 
- useEffect(() => {
- if (typeof window !== 'undefined') setEvents(loadEvents())
- }, [])
+ useEffect(() => { setEditOpen(null) }, [owner])
 
- const today = new Date().toISOString().slice(0, 10)
+ const today = koreaDate()
  const enriched = useMemo(() => events.map(e => ({ ...e, status: eventStatus(e, today) })), [events, today])
  const filtered = filter === 'all' ? enriched : enriched.filter(e => e.status === filter)
  const sorted = [...filtered].sort((a, b) => b.startDate.localeCompare(a.startDate))
@@ -86,15 +78,15 @@ export default function EventsPage() {
  ended: enriched.filter(e => e.status === 'ended').length,
  }), [enriched])
 
- function saveEvent(e: StoreEvent) {
+ async function saveEvent(e: StoreEvent) {
  const exists = events.find(x => x.id === e.id)
  const next = exists ? events.map(x => x.id === e.id ? e : x) : [...events, e]
- setEvents(next); saveEvents(next); setEditOpen(null)
+ if (await save(next)) setEditOpen(null)
  }
- function deleteEvent(id: string) {
+ async function deleteEvent(id: string) {
  if (!confirm('정말 삭제하시겠어요?')) return
  const next = events.filter(e => e.id !== id)
- setEvents(next); saveEvents(next)
+ await save(next)
  }
 
  return (
@@ -110,6 +102,8 @@ export default function EventsPage() {
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full space-y-4 md:space-y-6">
 
+ {authMessage && <p role="status">{authMessage}</p>}
+ {saveError && <p role="alert" className="text-sm text-red-700">{saveError}</p>}
  {/* 안내 */}
  <div className="rounded-[10px] border border-[#E9D5FF] bg-[var(--lu-accent)] p-3 md:p-4 flex items-start gap-2.5">
  <Sparkles size={14} className="text-[#7C3AED] flex-shrink-0 mt-0.5" strokeWidth={2.5} />
@@ -117,7 +111,7 @@ export default function EventsPage() {
  <p className="text-xs md:text-sm font-bold text-[#7C3AED] mb-0.5">이벤트 매니저 베타</p>
  <p className="text-[11px] md:text-xs text-[#7C3AED]/90 leading-relaxed">
  이벤트 등록 → 카드뉴스·스레드·유튜브 커뮤니티 자동 발행 연동 (곧 추가).
- 지금은 등록·일정 관리만 지원하며, 로컬 저장 방식입니다.
+ 지금은 등록·일정 관리만 지원해요. 로그인한 계정별로 이 브라우저에만 저장하며 PC와 휴대전화 사이에 동기화되지 않아요. 이전 공용 저장 자료는 자동으로 옮기지 않아요.
  </p>
  </div>
  </div>
@@ -144,7 +138,7 @@ export default function EventsPage() {
  {f.label}
  </button>
  ))}
- <button onClick={() => setEditOpen('new')}
+ <button disabled={!ready || saving} onClick={() => setEditOpen('new')}
  className="min-h-11 ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 bg-[var(--lu-accent)] text-white rounded-lg text-xs font-bold hover:opacity-90 shadow-none">
  <Plus size={12} strokeWidth={2.5} /> 이벤트 추가
  </button>
@@ -164,7 +158,7 @@ export default function EventsPage() {
  {TEMPLATE_PRESETS.map((tp, i) => {
  const cfg = EVENT_TYPES[tp.type]
  return (
- <button key={i}
+ <button disabled={!ready || saving} key={i}
  onClick={() => setEditOpen({
  id: 'new-' + i, type: tp.type, title: tp.title, description: tp.description,
  startDate: today, endDate: addDays(today, 14), reward: tp.reward,
@@ -218,7 +212,7 @@ export default function EventsPage() {
  </div>
  </div>
  <div className="flex items-center gap-1 pt-2 border-t border-[var(--lu-canvas)]">
- <button onClick={() => setEditOpen(e)}
+ <button disabled={!ready || saving} onClick={() => setEditOpen(e)}
  className="min-h-11 flex-1 inline-flex items-center justify-center gap-1 px-2 py-1.5 rounded-lg border border-[var(--lu-line)] text-[11px] font-bold text-[var(--lu-muted)] hover:bg-[var(--lu-canvas)]">
  <Edit3 size={11} strokeWidth={2.5} /> 편집
  </button>
@@ -276,6 +270,8 @@ export default function EventsPage() {
  initial={editOpen === 'new' ? null : editOpen}
  onClose={() => setEditOpen(null)}
  onSave={saveEvent}
+ saving={saving || !ready}
+ saveError={saveError}
  />
  )}
  </div>
@@ -296,27 +292,25 @@ function StatCard({ color, label, value, icon }: { color: string; label: string;
  )
 }
 
-function addDays(date: string, n: number): string {
- const d = new Date(date)
- d.setDate(d.getDate() + n)
- return d.toISOString().slice(0, 10)
-}
+const addDays = addCalendarDays
 
-function EditModal({ initial, onClose, onSave }: {
+function EditModal({ initial, onClose, onSave, saving, saveError }: {
  initial: StoreEvent | null;
  onClose: () => void;
- onSave: (e: StoreEvent) => void;
+ onSave: (e: StoreEvent) => void | Promise<void>;
+ saving: boolean;
+ saveError: string | null;
 }) {
  const [type, setType] = useState<EventType>(initial?.type || 'open')
  const [title, setTitle] = useState(initial?.title || '')
  const [description, setDescription] = useState(initial?.description || '')
- const today = new Date().toISOString().slice(0, 10)
+ const today = koreaDate()
  const [startDate, setStartDate] = useState(initial?.startDate || today)
  const [endDate, setEndDate] = useState(initial?.endDate || addDays(today, 14))
  const [reward, setReward] = useState(initial?.reward || '')
  const [targetAudience, setTargetAudience] = useState(initial?.targetAudience || '전체 고객')
 
- const canSubmit = title.trim() && reward.trim() && startDate && endDate
+ const canSubmit = !saving && title.trim() && reward.trim() && startDate && endDate && endDate >= startDate
 
  function submit() {
  const id = initial?.id?.startsWith('new-') || !initial?.id
@@ -339,6 +333,7 @@ function EditModal({ initial, onClose, onSave }: {
  <X size={18} strokeWidth={2.5} />
  </button>
  </div>
+ {saveError && <p role="alert" className="mb-3 text-sm text-red-700">{saveError}</p>}
  <div className="space-y-3">
  {/* 타입 선택 */}
  <div>
