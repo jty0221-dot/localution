@@ -1228,3 +1228,8 @@ main textarea{resize:vertical}
 html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
 
 .lu-owner-player::cue{font-family:"Pretendard Variable",Pretendard,system-ui,sans-serif;font-weight:600;color:#fff;background:rgba(8,20,22,.88)}
+
+/* The in-flow onboarding notice already reserves the mobile navigation height. */
+@media (max-width: 767px) {
+  body:has([data-onboarding-banner]) .lu-channel-shell { padding-top: 0; }
+}

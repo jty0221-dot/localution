@@ -17,7 +17,6 @@ const HIDE_PATHS = ['/', '/pricing', '/about', '/customers', '/login', '/signup'
 
 export default function OnboardingBanner() {
  const [needsOnboarding, setNeedsOnboarding] = useState<boolean | null>(null)
- const [hasNaver, setHasNaver] = useState<boolean>(false)
  const [dismissed, setDismissed] = useState(false)
  const pathname = usePathname()
 
@@ -38,9 +37,7 @@ export default function OnboardingBanner() {
  .then(j => {
  if (cancelled || !j?.ok) return
  const hasStore = !!(j.store && j.store.name)
- const naverConnected = (j.platforms || []).some((p: any) => p.platform === 'naver_place' && p.connected)
  setNeedsOnboarding(!hasStore)
- setHasNaver(naverConnected)
  })
  .catch(() => null)
  return () => { cancelled = true }
@@ -52,25 +49,25 @@ export default function OnboardingBanner() {
  if (needsOnboarding !== true) return null
 
  return (
- <div className="fixed left-0 right-0 z-[40] top-0 px-4 py-2 bg-[var(--lu-accent)] text-white shadow-none">
- <div className="max-w-6xl mx-auto flex items-center justify-between gap-3">
+ <div data-onboarding-banner role="region" aria-label="매장 등록 안내" className="relative mt-[57px] md:mt-0 md:ml-[220px] px-4 py-3 bg-[var(--lu-accent)] text-white shadow-none">
+ <div className="max-w-6xl mx-auto flex flex-wrap items-center justify-between gap-3">
  <div className="flex items-center gap-3 min-w-0 flex-1">
  <div className="w-9 h-9 rounded-[6px] bg-white/20 flex items-center justify-center flex-shrink-0">
  <Rocket size={18} className="text-white" strokeWidth={2.5} />
  </div>
  <div className="min-w-0">
- <p className="text-sm font-bold truncate">시작 전 매장 정보 등록 · 1번이면 모든 기능 이용 가능</p>
+ <p className="text-sm font-bold break-keep">기본 매장 정보를 먼저 등록해주세요</p>
  <p className="text-[11px] opacity-90 truncate hidden sm:block">
- 네이버 플레이스 연결하면 매장 정보 자동 채움 + 답글 자동등록 + QR 리뷰 + 알림 모두 작동
+ 업체 정보를 저장한 뒤 필요한 플랫폼을 별도로 연결할 수 있어요.
  </p>
  </div>
  </div>
  <div className="flex items-center gap-2 flex-shrink-0">
  <Link
- href="/my/platforms/naver_place/connect"
- className="px-3 py-1.5 rounded-lg bg-white text-[#16685D] text-xs font-bold hover:bg-[#F0F9FF] active:scale-95 transition-all whitespace-nowrap"
+ href="/settings?tab=store"
+ className="inline-flex min-h-11 items-center px-3 py-1.5 rounded-lg bg-white text-[#16685D] text-xs font-bold hover:bg-[#F0F9FF] active:scale-95 transition-all whitespace-nowrap"
  >
- 매장 연결하기 →
+ 매장 정보 등록 →
  </Link>
  <button
  type="button"
@@ -79,7 +76,7 @@ export default function OnboardingBanner() {
  try { sessionStorage.setItem('localution.onboarding_dismissed', '1') } catch {}
  }}
  aria-label="닫기"
- className="min-h-11 w-7 h-7 flex items-center justify-center text-white/70 hover:text-white text-lg leading-none"
+ className="min-h-11 w-11 h-11 flex items-center justify-center text-white/70 hover:text-white text-lg leading-none"
  >×</button>
  </div>
  </div>

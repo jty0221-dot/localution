@@ -241,7 +241,7 @@ export default function YoutubeCommunityPage() {
  <div className="min-h-screen bg-[var(--lu-canvas)]">
  <Sidebar />
 
- <div className="md:ml-[220px] flex flex-col min-h-screen">
+ <div className="lu-channel-shell pt-[57px] md:pt-0 md:ml-[220px] flex flex-col min-h-screen">
  <PageHeader
  variant="youtube"
  icon={<Youtube size={28} className="text-white" strokeWidth={2.5} />}

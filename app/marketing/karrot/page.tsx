@@ -45,7 +45,7 @@ export default function KarrotPage() {
   }
   return <div className="min-h-screen bg-[#F3F5F4] text-[#172B2F]">
     <Sidebar />
-    <div className="flex min-h-screen flex-col md:ml-[220px]">
+    <div className="lu-channel-shell pt-[57px] md:pt-0 flex min-h-screen flex-col md:ml-[220px]">
       <PageHeader title="당근 소식·광고 관리" icon={<Store size={20} />} subtitle="소식을 준비하고 당근 광고 계정을 연결해 성과를 확인하세요." />
       <main className="mx-auto w-full max-w-6xl flex-1 space-y-6 px-4 py-6 md:px-6">
         <p className="rounded-lg border border-[#D5DEDC] bg-white p-4 text-sm leading-6">현재 제공: 원고 작성·복사·파일 저장·기기 공유. 비즈프로필 소식 자동 게시·반응 수집은 아직 제공하지 않아요. 광고 계정 연결과 성과 조회는 아래에서 이용하세요. 작성한 내용은 이 화면에만 유지되며, 새로고침하거나 페이지를 나가면 사라져요.</p>
