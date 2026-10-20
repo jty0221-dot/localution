@@ -43,7 +43,7 @@ export async function GET(req: Request) {
  const claimTime = new Date().toISOString()
  const { data: claimedPosts, error: claimError } = await svc
  .from('threads_posts')
- .update({ status: 'publishing', updated_at: claimTime })
+ .update({ status: 'publishing', error_message: null, updated_at: claimTime })
  .in('id', duePosts.map(p => p.id))
  .eq('status', 'scheduled')
  .lte('scheduled_at', claimTime)
@@ -86,6 +86,7 @@ export async function GET(req: Request) {
  .eq('id', post.id)
  .eq('status', 'publishing')
  .eq('updated_at', post.updated_at)
+ .is('error_message', null)
  .select('id')
  if (recoveryError || !recovered?.length) recoveryFailed++
  }

@@ -4,6 +4,7 @@
 //   · 2단계 발행: container 생성 → publish
 //   · container_id 저장으로 생성 단계를 재사용. 외부 발행 후 영수증 오류는 수동 대조 필요
 // ============================================================
+import { randomUUID } from 'node:crypto'
 import type { Logger } from 'pino'
 import type { JobResult } from '../jobs'
 import { getServiceClient } from '../lib/supabase'
@@ -57,6 +58,7 @@ export async function runThreadsPublish(
     .from('threads_posts')
     .select('*')
     .eq('id', postId)
+    .eq('user_id', userId)
     .maybeSingle()
 
   if (fetchErr || !post) {
@@ -66,6 +68,23 @@ export async function runThreadsPublish(
     return { status: 'skipped', message: 'already published' }
   }
 
+  if (post.user_id !== userId || post.status !== 'publishing') {
+    return { status: 'skipped', message: 'post is not owned or not queued for publication' }
+  }
+  if (String(post.error_message || '').startsWith('publication_attempt_in_flight')) {
+    return { status: 'skipped', message: 'publication_reconciliation_required: previous execution must be checked', data: { retryAllowed: false } }
+  }
+  // Durable execution claim. A process crash or timeout must not start another publication.
+  const executionMarker = `publication_attempt_in_flight:${randomUUID()}: 발행 결과 확인 필요. 자동 재발행 금지`
+  let claimQuery = svc.from('threads_posts').update({
+    error_message: executionMarker,
+    updated_at: new Date().toISOString(),
+  }).eq('id', postId).eq('user_id', userId).eq('status', 'publishing')
+    .eq('updated_at', post.updated_at)
+  claimQuery = post.error_message == null ? claimQuery.is('error_message', null) : claimQuery.eq('error_message', post.error_message)
+  const { data: claimed, error: claimError } = await claimQuery.select('id').maybeSingle()
+  if (claimError || !claimed) return { status: 'skipped', message: 'publication claim unavailable', data: { retryAllowed: false } }
+
   // 2. 토큰 로드 + 갱신 체크
   await refreshThreadsTokenIfNeeded(svc, userId)
   const tokenData = await loadThreadsToken(svc, userId)
@@ -74,7 +93,7 @@ export async function runThreadsPublish(
       status: 'failed',
       error_message: 'token_missing: Threads 계정 연결 필요',
       updated_at: new Date().toISOString(),
-    }).eq('id', postId)
+    }).eq('id', postId).eq('user_id', userId).eq('error_message', executionMarker)
     return { status: 'failed', message: 'threads token missing' }
   }
 
@@ -87,12 +106,13 @@ export async function runThreadsPublish(
   const fullText = post.text_content + hashtags
 
   let publishedId: string | undefined
+  let publicationAttempted = false
   const reconciliationRequired = (): JobResult => {
-    log.error({ postId, threadId: publishedId, code: 'receipt_reconciliation_required' }, '[threads] external publication confirmed; stop and reconcile receipt, do not republish')
+    log.error({ postId, threadId: publishedId, code: 'receipt_reconciliation_required' }, '[threads] publication outcome requires reconciliation; do not republish')
     return {
       status: 'skipped',
-      message: 'receipt_reconciliation_required: external publication confirmed; do not republish',
-      data: { code: 'receipt_reconciliation_required', postId, threadsPostId: publishedId, externalPublished: true, retryAllowed: false },
+      message: 'receipt_reconciliation_required: verify publication outcome; do not republish',
+      data: { code: 'receipt_reconciliation_required', postId, threadsPostId: publishedId, externalPublished: !!publishedId, retryAllowed: false },
     }
   }
   try {
@@ -122,7 +142,7 @@ export async function runThreadsPublish(
           error_message: errMsg,
           retry_count: (post.retry_count ?? 0) + 1,
           updated_at: new Date().toISOString(),
-        }).eq('id', postId)
+        }).eq('id', postId).eq('user_id', userId).eq('error_message', executionMarker)
         return { status: 'failed', message: errMsg }
       }
 
@@ -131,7 +151,7 @@ export async function runThreadsPublish(
       await svc.from('threads_posts').update({
         container_id: containerId,
         updated_at: new Date().toISOString(),
-      }).eq('id', postId)
+      }).eq('id', postId).eq('user_id', userId).eq('error_message', executionMarker)
 
       log.info({ postId, containerId }, '[threads] container created')
     }
@@ -144,7 +164,7 @@ export async function runThreadsPublish(
         error_message: 'container not ready (timeout or error)',
         retry_count: (post.retry_count ?? 0) + 1,
         updated_at: new Date().toISOString(),
-      }).eq('id', postId)
+      }).eq('id', postId).eq('user_id', userId).eq('error_message', executionMarker)
       return { status: 'failed', message: 'container not ready' }
     }
 
@@ -153,6 +173,7 @@ export async function runThreadsPublish(
     publishParams.set('creation_id', containerId)
     publishParams.set('access_token', token)
 
+    publicationAttempted = true
     const publishRes = await fetch(
       `${THREADS_API}/${threadsUserId}/threads_publish`,
       { method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' }, body: publishParams.toString() }
@@ -160,15 +181,8 @@ export async function runThreadsPublish(
     const publishData = await publishRes.json() as { id?: string; error?: { message: string } }
 
     if (!publishData.id) {
-      const errMsg = publishData.error?.message || 'publish failed'
-      log.error({ postId, containerId, err: errMsg }, '[threads] publish failed')
-      await svc.from('threads_posts').update({
-        status: 'failed',
-        error_message: errMsg,
-        retry_count: (post.retry_count ?? 0) + 1,
-        updated_at: new Date().toISOString(),
-      }).eq('id', postId)
-      return { status: 'failed', message: errMsg }
+      // Even an error response may follow an accepted request. Keep the durable claim.
+      return reconciliationRequired()
     }
 
     publishedId = publishData.id
@@ -179,7 +193,7 @@ export async function runThreadsPublish(
       published_at: new Date().toISOString(),
       error_message: null,
       updated_at: new Date().toISOString(),
-    }).eq('id', postId).eq('user_id', userId).select('id').maybeSingle()
+    }).eq('id', postId).eq('user_id', userId).eq('error_message', executionMarker).select('id').maybeSingle()
     if (receiptError || !savedReceipt) return reconciliationRequired()
 
     log.info({ postId, threadId: publishData.id }, '[threads] published successfully')
@@ -238,7 +252,7 @@ export async function runThreadsPublish(
     return { status: 'ok', message: `published: ${publishData.id}` }
 
   } catch (e: any) {
-    if (publishedId) return reconciliationRequired()
+    if (publicationAttempted || publishedId) return reconciliationRequired()
     const errMsg = e?.message || String(e)
     log.error({ postId, err: errMsg }, '[threads] unexpected error')
     await svc.from('threads_posts').update({
@@ -246,7 +260,7 @@ export async function runThreadsPublish(
       error_message: errMsg,
       retry_count: (post.retry_count ?? 0) + 1,
       updated_at: new Date().toISOString(),
-    }).eq('id', postId)
+    }).eq('id', postId).eq('user_id', userId).eq('error_message', executionMarker)
     return { status: 'failed', message: errMsg }
   }
 }

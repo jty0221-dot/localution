@@ -3,7 +3,7 @@
 // v38: 큐 자동 유지보수 — 매 15분 자동 실행
 //   1) prioritized 중복 dedup
 //   2) waiting 의 fetch_reviews 적체 청소 (200건 초과 시)
-//   3) 3시간+ 묵은 stale priority 1 잡 제거
+//   3) 3시간+ 묵은 수집 작업만 제거 (게시 작업 보존)
 //   4) 5분+ active hang 잡 강제 해제 (fetch_reviews 만)
 //
 // 사장님이 admin/queue-control 에서 수동으로 안 누르도록 자동화
@@ -24,7 +24,11 @@ export async function GET(req: NextRequest) {
   const a = verifyCronAuth(req.headers.get('authorization'))
   if (!a.ok) return NextResponse.json({ error: a.message }, { status: a.status })
 
-  const q = getPlatformQueue() as any
+  let q: any
+  try { q = getPlatformQueue() } catch {
+    return NextResponse.json({ ok: false, error: 'queue_unavailable' }, { status: 503 })
+  }
+  const stageErrors: string[] = []
   const startedAt = Date.now()
   const result = {
     dedup: 0,
@@ -45,7 +49,8 @@ export async function GET(req: NextRequest) {
       if (j.data?.action !== 'post_reply') continue
       const rid = j.data?.payload?.platform_review_id || j.data?.payload?.review_id
       if (!rid) continue
-      const key = `${j.data?.platform}|${rid}`
+      if (!j.data?.userId || !j.data?.storeId) continue
+      const key = JSON.stringify([j.data.platform, j.data.userId, j.data.storeId, rid])
       const existing = latestByKey.get(key)
       if (!existing) latestByKey.set(key, j)
       else if ((j.timestamp || 0) > (existing.timestamp || 0)) {
@@ -57,18 +62,18 @@ export async function GET(req: NextRequest) {
     }
     const removed = await Promise.allSettled(toRemove.map(j => j.remove()))
     result.dedup = removed.filter(r => r.status === 'fulfilled').length
-  } catch (e) { /* skip on error */ }
+  } catch { stageErrors.push('dedup') }
 
-  // 2) 3h+ stale priority 1 잡 제거
+  // 2) 오래된 읽기 수집만 제거. 게시 작업과 실패 영수증은 보존한다.
   try {
     const prioritized = typeof q.getPrioritized === 'function'
       ? await q.getPrioritized(0, 500)
       : []
     const cutoff = Date.now() - STALE_HOURS * 3600 * 1000
-    const stale = prioritized.filter((j: any) => (j.timestamp || 0) < cutoff)
+    const stale = prioritized.filter((j: any) => j.data?.action === 'fetch_reviews' && (j.timestamp || 0) < cutoff)
     const removed = await Promise.allSettled(stale.map((j: any) => j.remove()))
     result.stale = removed.filter(r => r.status === 'fulfilled').length
-  } catch (e) { /* skip */ }
+  } catch { stageErrors.push('stale') }
 
   // 3) hang 된 active fetch_reviews 강제 해제 (5분+ active)
   try {
@@ -86,7 +91,7 @@ export async function GET(req: NextRequest) {
       }
     }))
     result.hang_released = released.filter(r => r.status === 'fulfilled').length
-  } catch (e) { /* skip */ }
+  } catch { stageErrors.push('active') }
 
   // 4) waiting fetch_reviews 적체 청소 (waiting > 200 일 때만)
   try {
@@ -97,16 +102,16 @@ export async function GET(req: NextRequest) {
       const removed = await Promise.allSettled(toRemove.map((j: any) => j.remove()))
       result.fetch_cleaned = removed.filter(r => r.status === 'fulfilled').length
     }
-  } catch (e) { /* skip */ }
+  } catch { stageErrors.push('waiting') }
 
   // 5) 24h+ 묵은 failed 잡 자동 제거 (UI 어지럽게 안 함)
   try {
     const failed = await q.getFailed(0, 200)
     const cutoff = Date.now() - 24 * 3600 * 1000
-    const oldFailed = failed.filter((j: any) => (j.finishedOn || j.processedOn || j.timestamp || 0) < cutoff)
+    const oldFailed = failed.filter((j: any) => j.data?.action === 'fetch_reviews' && (j.finishedOn || j.processedOn || j.timestamp || 0) < cutoff)
     const removed = await Promise.allSettled(oldFailed.map((j: any) => j.remove()))
     ;(result as any).old_failed_cleaned = removed.filter(r => r.status === 'fulfilled').length
-  } catch (e) { /* skip */ }
+  } catch { stageErrors.push('failed_history') }
 
   // 6) v38c: DB stuck queued > 1h 자동 재 enqueue (admin 수동 retry 없이 자동 복구)
   //    enqueuePlatformJob 의 deterministic jobId 가 중복 차단해서 안전
@@ -115,13 +120,14 @@ export async function GET(req: NextRequest) {
     const { enqueuePlatformJob } = await import('@/app/lib/queue')
     const svc = createServiceClient()
     const cutoff = new Date(Date.now() - 60 * 60 * 1000).toISOString()
-    const { data: stuck } = await svc
+    const { data: stuck, error: stuckError } = await svc
       .from('platform_reviews')
       .select('id, user_id, platform, platform_store_id, platform_review_id, draft_reply, has_reply')
       .eq('reply_status', 'queued')
       .lte('reply_queued_at', cutoff)
       .limit(50)
 
+    if (stuckError) throw new Error('recovery query failed')
     let requeued = 0
     let markedSubmitted = 0
     let markedFailed = 0
@@ -168,13 +174,14 @@ export async function GET(req: NextRequest) {
     ;(result as any).db_stuck_requeued = requeued
     ;(result as any).db_marked_submitted = markedSubmitted
     ;(result as any).db_marked_failed = markedFailed
-  } catch (e) { /* skip */ }
+  } catch { stageErrors.push('db_recovery') }
 
   result.elapsed_ms = Date.now() - startedAt
   return NextResponse.json({
-    ok: true,
+    ok: stageErrors.length === 0,
+    stage_errors: stageErrors,
     mode: 'cron_queue_maintenance',
     ...result,
     triggered_at: new Date().toISOString(),
-  })
+  }, { status: stageErrors.length ? 503 : 200 })
 }

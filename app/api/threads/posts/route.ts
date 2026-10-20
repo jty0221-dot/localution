@@ -69,6 +69,9 @@ export async function POST(request: Request) {
 
  const mediaType = body.image_url ? 'IMAGE' : 'TEXT'
  const scheduledAt = body.scheduled_at ? new Date(body.scheduled_at) : null
+ if (scheduledAt && !Number.isFinite(scheduledAt.getTime())) {
+ return NextResponse.json({ error: '올바른 예약 시간을 입력해 주세요.' }, { status: 400 })
+ }
  const isImmediate = !scheduledAt || scheduledAt <= new Date()
 
  const { data: post, error: insertErr } = await svc
@@ -85,7 +88,7 @@ export async function POST(request: Request) {
  card_news_topic: body.card_news_topic ?? null,
  thread_replies: body.thread_replies?.length ? body.thread_replies : null,
  })
- .select('id')
+.select('id, updated_at')
  .single()
 
  if (insertErr || !post) {
@@ -93,13 +96,20 @@ export async function POST(request: Request) {
  }
 
  if (isImmediate) {
- await enqueuePlatformJob({
+ const queued = await enqueuePlatformJob({
  platform: 'threads',
  action: 'threads_publish',
  userId: auth.userId,
  storeId: auth.userId,
  payload: { post_id: post.id },
- }, { priority: 1 })
+ }, { priority: 1 }).catch(() => ({ ok: false as const, error: 'queue unavailable' }))
+ if (!queued.ok) {
+ const { data: recovered, error: recoveryError } = await svc.from('threads_posts')
+ .update({ status: 'failed', error_message: 'queue unavailable', updated_at: new Date().toISOString() })
+ .eq('id', post.id).eq('user_id', auth.userId).eq('status', 'publishing')
+ .eq('updated_at', post.updated_at).is('error_message', null).select('id').maybeSingle()
+ return NextResponse.json({ ok: false, post_id: post.id, error: '게시물은 저장됐지만 발행 큐 등록에 실패했습니다.', recovery_required: !!recoveryError || !recovered }, { status: 503 })
+ }
  }
 
  return NextResponse.json({ ok: true, post_id: post.id, immediate: isImmediate })

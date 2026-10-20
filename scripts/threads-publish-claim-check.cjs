@@ -2,8 +2,8 @@ const fs=require('node:fs'),path=require('node:path'),vm=require('node:vm'),asse
 const source=fs.readFileSync(path.resolve(__dirname,'../app/api/cron/threads-publish/route.ts'),'utf8');
 const compiled=ts.transpileModule(source,{compilerOptions:{module:ts.ModuleKind.CommonJS,target:ts.ScriptTarget.ES2020}}).outputText;
 async function scenario({concurrent=false,claimError=false,emptyClaim=false,queueFail=false,queueThrow=false,otherOwner=false,recoveryError=false,authorized=true}={}) {
- const row={id:'post-fixture',user_id:'user-fixture',status:'scheduled',updated_at:'old',scheduled_at:'2000-01-01',retry_count:0};let jobs=0,reads=0,release;const barrier=new Promise(r=>release=r);
- const svc={from(){let patch=null,filters=[];const q={select(){return q},update(v){patch=v;return q},in(k,v){filters.push(r=>v.includes(r[k]));return q},eq(k,v){filters.push(r=>r[k]===v);return q},lte(k,v){filters.push(r=>r[k]<=v);return q},lt(k,v){filters.push(r=>r[k]<v);return q},limit(){return q},async then(resolve,reject){try{
+ const row={id:'post-fixture',user_id:'user-fixture',status:'scheduled',updated_at:'old',error_message:null,scheduled_at:'2000-01-01',retry_count:0};let jobs=0,reads=0,release;const barrier=new Promise(r=>release=r);
+ const svc={from(){let patch=null,filters=[];const q={is(k,v){filters.push(r=>r[k]===v);return q},select(){return q},update(v){patch=v;return q},in(k,v){filters.push(r=>v.includes(r[k]));return q},eq(k,v){filters.push(r=>r[k]===v);return q},lte(k,v){filters.push(r=>r[k]<=v);return q},lt(k,v){filters.push(r=>r[k]<v);return q},limit(){return q},async then(resolve,reject){try{
  if(!patch){const snapshot=filters.every(f=>f(row))?[{...row}]:[];if(concurrent){if(++reads===2)release();await barrier}return resolve({data:snapshot,error:null})}
  if(patch.status==='publishing'&&claimError)return resolve({data:null,error:{message:'fixture error'}});
  if(patch.status==='publishing'&&emptyClaim)return resolve({data:[],error:null});
