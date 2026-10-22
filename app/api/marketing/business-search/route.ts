@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/app/lib/userAuth'
 import { rateLimitByIp } from '@/app/lib/rateLimit'
-import { hasNaverOpenApiCredentials, naverOpenHeaders } from '@/app/lib/naverOpenApi'
+import { hasNaverOpenApiCredentials, naverSearchRequest, naverSearchDiagnostics, naverSearchErrorCode } from '@/app/lib/naverOpenApi'
 import { BUSINESS_INDUSTRIES, BUSINESS_SEARCH_MODES, searchText, safeSearchUrl, type BusinessSearchItem } from '@/app/lib/business-search'
 
 export const dynamic = 'force-dynamic'
@@ -9,7 +9,8 @@ const ready = () => ({ naver: { local: hasNaverOpenApiCredentials(), blog: hasNa
 const fail = (status: number, code: string, error: string) => NextResponse.json({ ok: false, code, error }, { status, headers: { 'Cache-Control': 'no-store' } })
 
 export async function GET() {
- return NextResponse.json({ ok: true, providers: ready(), verified: false }, { headers: { 'Cache-Control': 'no-store' } })
+ const auth = await requireUser()
+ return NextResponse.json({ ok: true, providers: ready(), verified: false, ...(auth.ok ? { diagnostics: { naver: naverSearchDiagnostics() } } : {}) }, { headers: { 'Cache-Control': 'no-store' } })
 }
 
 export async function POST(req: NextRequest) {
@@ -44,17 +45,18 @@ export async function POST(req: NextRequest) {
  const sourceUrl = provider === 'google'
  ? 'https://developers.google.com/maps/documentation/places/web-service/legacy/search-text'
  : `https://developers.naver.com/docs/serviceapi/search/${naverType}/${naverType}.md`
- const ncp = Boolean(process.env.NCP_API_KEY_ID && process.env.NCP_API_KEY)
- const useNcp = provider === 'naver' && ncp
- const naverBase = useNcp ? `https://naverapihub.apigw.ntruss.com/search/v1/${naverType}` : `https://openapi.naver.com/v1/search/${naverType}.json`
- const naverHeaders = naverOpenHeaders()
- if (provider === 'naver' && !hasNaverOpenApiCredentials()) return fail(503, 'provider_not_configured', '검색 연결 준비가 필요해요.')
+ const naverRequest = provider === 'naver' ? naverSearchRequest(naverType as 'local' | 'blog' | 'cafearticle') : null
+ if (provider === 'naver' && !naverRequest) return fail(503, 'provider_not_configured', '검색 연결 준비가 필요해요.')
  const url = provider === 'google'
  ? 'https://maps.googleapis.com/maps/api/place/textsearch/json?' + new URLSearchParams({ query, language: 'ko', key: process.env.GOOGLE_PLACES_API_KEY || '' })
- : naverBase + '?' + new URLSearchParams({ query, display: mode === 'local' ? '5' : '10', sort: mode === 'local' ? 'random' : 'sim' })
- const response = await fetch(url, { headers: provider === 'naver' ? naverHeaders : undefined, signal: controller.signal, cache: 'no-store' })
+ : naverRequest!.url + '?' + new URLSearchParams({ query, display: mode === 'local' ? '5' : '10', sort: mode === 'local' ? 'random' : 'sim' })
+ const response = await fetch(url, { headers: naverRequest?.headers, signal: controller.signal, cache: 'no-store', redirect: 'error' })
  if (response.status === 429) return fail(429, 'provider_rate_limited', '검색 서비스의 요청 한도에 도달했어요. 잠시 후 다시 검색해보세요.')
- if (response.status === 401 || response.status === 403) return fail(502, 'provider_auth_failed', '검색 서비스 인증이나 이용 권한을 확인해야 해요. 관리자에게 API 키와 검색 서비스 사용 설정 확인을 요청해 주세요.')
+ if (response.status === 401 || response.status === 403) {
+  if (provider !== 'naver') return fail(502, 'provider_auth_failed', '검색 서비스 인증이나 이용 권한을 확인해야 해요. 관리자에게 API 키와 검색 서비스 사용 설정 확인을 요청해 주세요.')
+  const upstreamCode = await naverSearchErrorCode(response)
+  return NextResponse.json({ ok: false, code: 'provider_auth_failed', error: '네이버 검색 인증이나 API 사용 권한을 확인해야 해요. 관리자가 선택된 연결의 Client ID와 Secret 조합 및 검색 API 사용 설정을 확인해야 합니다.', diagnostics: { naver: { ...naverSearchDiagnostics(), capabilityVerification: 'request_failed', requestedCapability: mode, upstreamStatus: response.status, upstreamCode } } }, { status: 502, headers: { 'Cache-Control': 'no-store' } })
+ }
  if (!response.ok) return fail(502, 'provider_failed', '검색 서비스가 응답하지 못했어요. 잠시 후 다시 검색해보세요.')
  const data = await response.json()
  if (!data || typeof data !== 'object' || data._mock) return fail(502, 'invalid_provider_response', '확인할 수 있는 검색 결과를 받지 못했어요. 다시 검색해보세요.')

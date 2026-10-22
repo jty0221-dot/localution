@@ -11,6 +11,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/app/lib/userAuth'
 import { createServiceClient } from '@/app/lib/adminAuth'
 
+import { resolveVerifiedIdentity } from '@/app/lib/verified-identity'
+
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
@@ -42,12 +44,14 @@ function rowToCustomer(r: CustomerRow) {
 export async function GET() {
  const auth = await requireUser()
  if (!auth.ok) return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status })
+ const identity = await resolveVerifiedIdentity(auth)
+ if (!identity.ok) return NextResponse.json({ ok: false, code: identity.code, error: identity.error }, { status: identity.status, headers: { 'Cache-Control': 'private, no-store' } })
 
  const svc = createServiceClient()
  const { data, error } = await svc
  .from('customers')
  .select('id, legacy_id, name, phone, memo, tags, visits_count, total_spend_krw, last_visit_at')
- .eq('user_id', auth.userId)
+ .eq('user_id', identity.userId)
  .order('updated_at', { ascending: false })
 
  if (error) {
@@ -64,6 +68,8 @@ export async function GET() {
 export async function POST(req: NextRequest) {
  const auth = await requireUser()
  if (!auth.ok) return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status })
+ const identity = await resolveVerifiedIdentity(auth)
+ if (!identity.ok) return NextResponse.json({ ok: false, code: identity.code, error: identity.error }, { status: identity.status, headers: { 'Cache-Control': 'private, no-store' } })
 
  const body = await req.json().catch(() => ({}))
  const name = String(body?.name || '').trim().slice(0, 60)
@@ -77,7 +83,7 @@ export async function POST(req: NextRequest) {
  const { data, error } = await svc
  .from('customers')
  .insert({
- user_id: auth.userId,
+ user_id: identity.userId,
  name,
  phone,
  memo,
@@ -96,6 +102,8 @@ export async function POST(req: NextRequest) {
 export async function PUT(req: NextRequest) {
  const auth = await requireUser()
  if (!auth.ok) return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status })
+ const identity = await resolveVerifiedIdentity(auth)
+ if (!identity.ok) return NextResponse.json({ ok: false, code: identity.code, error: identity.error }, { status: identity.status, headers: { 'Cache-Control': 'private, no-store' } })
 
  const body = await req.json().catch(() => ({}))
  const id = String(body?.id || '')
@@ -115,7 +123,7 @@ export async function PUT(req: NextRequest) {
  .from('customers')
  .update(patch)
  .eq('id', id)
- .eq('user_id', auth.userId)
+ .eq('user_id', identity.userId)
 
  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
 
@@ -125,6 +133,8 @@ export async function PUT(req: NextRequest) {
 export async function DELETE(req: NextRequest) {
  const auth = await requireUser()
  if (!auth.ok) return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status })
+ const identity = await resolveVerifiedIdentity(auth)
+ if (!identity.ok) return NextResponse.json({ ok: false, code: identity.code, error: identity.error }, { status: identity.status, headers: { 'Cache-Control': 'private, no-store' } })
 
  const id = req.nextUrl.searchParams.get('id') || ''
  if (!id) return NextResponse.json({ ok: false, error: 'missing_id' }, { status: 400 })
@@ -134,7 +144,7 @@ export async function DELETE(req: NextRequest) {
  .from('customers')
  .delete()
  .eq('id', id)
- .eq('user_id', auth.userId)
+ .eq('user_id', identity.userId)
 
  if (error) return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
 
