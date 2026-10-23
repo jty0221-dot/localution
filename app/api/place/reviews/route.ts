@@ -6,7 +6,7 @@
 // · 본인 소유 platform_reviews 반환 (posted_at DESC)
 // · 평점 필터 지원 (min_rating / max_rating)
 // · 기간 필터 (30차-23): period=7/30/all (posted_at 기준, all = 전체)
-// · 미답변만 (30차-23): unreplied_only=1 → has_reply=false
+// · 미답변만 (30차-23 · LU-018 W2-9): unreplied_only=1 → has_reply=false AND reply_status<>'submitted'
 // · 집계 요약: { count, avg_rating, negative_count, unreplied_count }
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
@@ -65,7 +65,8 @@ export async function GET(req: NextRequest) {
  q = q.gte('posted_at', since)
  }
  if (unrepliedOnly) {
- q = q.eq('has_reply', false)
+ // LU-018 W2-9: stores/me 와 같은 기준 — has_reply=false AND reply_status<>'submitted' (null 포함)
+ q = q.eq('has_reply', false).or('reply_status.is.null,reply_status.neq.submitted')
  }
  const { data, error } = await q
  if (error) {
