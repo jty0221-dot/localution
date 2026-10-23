@@ -75,7 +75,7 @@ export async function runNaverAutoreplyForUser(
         continue
       }
 
-      const newStatus = autoApprove ? 'queued' : 'pending'
+      const newStatus = autoApprove ? 'queued' : 'draft'
       const nowIso = new Date().toISOString()
 
       // 4. draft 저장 (user_id 조건을 같이 걸어 다른 계정 행을 건드리지 않는다)
@@ -117,7 +117,7 @@ export async function runNaverAutoreplyForUser(
           // 큐 투입 실패 → pending으로 롤백
           await svc
             .from('platform_reviews')
-            .update({ reply_status: 'pending', reply_queued_at: null })
+            .update({ reply_status: 'draft', reply_queued_at: null })
             .eq('id', rev.id)
             .eq('user_id', userId)
         }

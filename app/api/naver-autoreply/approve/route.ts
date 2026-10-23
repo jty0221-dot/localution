@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
  // 롤백
  await svc
  .from('platform_reviews')
- .update({ reply_status: 'pending', reply_queued_at: null })
+ .update({ reply_status: 'draft', reply_queued_at: null })
  .eq('id', reviewId)
  return NextResponse.json({ error: `큐 투입 실패: ${enqResult.error}` }, { status: 500 })
  }

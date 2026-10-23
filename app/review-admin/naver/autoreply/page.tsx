@@ -39,7 +39,7 @@ const TONES = [
 ]
 
 const STATUS_LABEL: Record<string, { text: string; color: string }> = {
- pending: { text: '승인 대기', color: 'bg-amber-100 text-amber-700' },
+  draft:   { text: '승인 대기', color: 'bg-amber-100 text-amber-700' },
  queued: { text: '게시 대기', color: 'bg-blue-100 text-blue-700' },
  submitted:{ text: '게시 완료', color: 'bg-green-100 text-green-700' },
  failed: { text: '실패', color: 'bg-red-100 text-red-600' },
@@ -96,7 +96,7 @@ export default function NaverAutoReplyPage() {
  try {
  const url = all
  ? '/api/platform-reviews?platform=naver_place&has_reply=false&limit=50'
- : '/api/platform-reviews?platform=naver_place&has_reply=false&reply_status=pending&limit=30'
+ : '/api/platform-reviews?platform=naver_place&has_reply=false&reply_status=draft&limit=30'
  const res = await fetch(url)
  if (!res.ok) { setLoading(false); return }
  const data = await res.json()
@@ -213,7 +213,7 @@ export default function NaverAutoReplyPage() {
  setLoading(false)
  }
 
- const pendingCount = reviews.filter(r => r.reply_status === 'pending').length
+ const pendingCount = reviews.filter(r => r.reply_status === 'draft').length
 
  // ── 리뷰 카드 ────────────────────────────────────────────
  const ReviewCard = ({ rev }: { rev: Review }) => {
