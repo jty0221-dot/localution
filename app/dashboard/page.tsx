@@ -17,6 +17,7 @@ import Footer from '../components/Footer'
 import DashboardRightSidebar, { DashboardRightSidebarMobile } from '../components/DashboardRightSidebar'
 import HarangMarketingPopup from '../components/HarangMarketingPopup'
 import ManagementOverview from '../components/dashboard/ManagementOverview'
+import StoreStatusCard from './StoreStatusCard'
 import { useConnections, setConnection as libSetConnection, removeConnection as libRemoveConnection, PlatformId as CanonicalPlatformId } from '../lib/connections'
 import { toast, confirmDialog } from '../lib/toast'
 import { buildSettingsHref } from '../lib/settings-tabs'
@@ -1310,6 +1311,7 @@ export default function Dashboard() {
  <main className="min-w-0">
 
  {isLoggedIn ? <ManagementOverview key={accountId} expectedAccountId={accountId} onRefresh={() => { reloadStoresMe(); loadPlatformReviews(['naver_place', 'baemin', 'yogiyo', 'coupangeats', 'kakao_map', 'google'] as PlatformId[]) }}>
+ <StoreStatusCard key={accountId ?? 'anon'} expectedAccountId={accountId} />
  {/* ── 최근 리뷰 ── */}
  <div className="bg-white rounded-[10px] shadow-none overflow-hidden">
  <div className="px-4 md:px-5 py-4 border-b border-[var(--lu-canvas)] flex items-start md:items-center justify-between gap-2">
