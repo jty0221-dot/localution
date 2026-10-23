@@ -73,7 +73,7 @@ export async function GET() {
  ? 'NAVER_CLIENT_ID 미설정'
  : 'NAVER_CLIENT_SECRET 미설정',
  detail: hasOpenApi
- ? `Client ID: ${process.env.NAVER_CLIENT_ID!.slice(0, 6)}***`
+ ? 'Client ID 설정됨'
  : '.env.local 또는 Vercel 환경변수에 추가 필요',
  action_url: hasOpenApi ? null : 'https://developers.naver.com/apps/#/list',
  })
@@ -405,7 +405,7 @@ export async function GET() {
  id: 'claude_api', label: 'Claude AI API (AI 답글 생성)', category: 'AI 상태',
  status: 'ok',
  message: `정상 응답 (${latency}ms) — ${testModel}`,
- detail: `사용 가능 모델 ${allIds.length}개 | 키: ${anthropicKey.slice(0, 8)}***`,
+ detail: `사용 가능 모델 ${allIds.length}개 | 키 설정됨`,
  })
  } else {
  const errText = (await r.text()).slice(0, 150)

@@ -40,31 +40,23 @@ function isAdminPath(pathname: string): boolean {
   )
 }
 
-// 세션 쿠키 존재 판단 — 듀얼 모드
-//   1) localution_session  : 네이버/카카오/구글 OAuth
-//   2) sb-*-auth-token     : Supabase Auth (브라우저 SDK)
-function hasAnySession(request: NextRequest): boolean {
-  if (request.cookies.get('localution_session')?.value) return true
-
-  // Supabase 클라이언트가 심는 쿠키는 sb-<projectref>-auth-token 형식
-  // Next.js RequestCookies 는 getAll() 지원
-  const all = request.cookies.getAll()
-  if (all.some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token') && c.value)) {
-    return true
-  }
-  return false
+// 세션 판단 — 듀얼 모드 (LU-018 · SEC-L01 연장)
+//   1) localution_user : 네이버/카카오/구글 OAuth — signCookie() 의 "<base64url payload>.<sig>" 를
+//      Edge 에서 Web Crypto HMAC 으로 검증한다 (cookieSigningEdge.ts).
+//      예전에는 localution_session(공급자 access_token · 서명 없음)이 '있는지만' 봐서
+//      아무 값이나 심으면 보호 경로 미들웨어를 통과했다. /api/me 도 session 만 있고 user 가 없으면
+//      로그아웃으로 보므로 같은 기준으로 맞췄다.
+//      예전 코드는 localution_user 를 JSON.parse 해서 항상 실패 → 관리자 검사도 통째로 건너뛰었다.
+//   2) sb-*-auth-token : Supabase Auth (브라우저 SDK) — Edge 에서 JWT 를 검증할 비밀값이 없어
+//      존재만 본다. 데이터는 각 API 의 requireUser · requireAdmin 이 토큰을 검증해 막는다.
+function hasSupabaseSessionCookie(request: NextRequest): boolean {
+  return request.cookies.getAll().some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token') && !!c.value)
 }
 
-// localution_user 쿠키 서명 검증 (LU-018)
-//   · 쿠키는 OAuth 콜백에서 signCookie() 로 "<base64url payload>.<sig>" 형식으로 발급된다.
-//   · 예전 코드는 이 값을 JSON.parse 해서 항상 실패 → null → 관리자 검사가 통째로 건너뛰어졌다.
-//   · Edge 런타임이라 node crypto 대신 Web Crypto 로 같은 HMAC 을 검증한다 (cookieSigningEdge.ts).
-//   · Supabase 세션만 있는 경우는 여기서 판단하지 않고(defer) /admin 레이아웃과
-//     /api/admin/** 의 requireAdmin() 이 막는다.
-async function adminGateFromCookie(request: NextRequest) {
+async function readVerifiedLocalutionUser(request: NextRequest) {
   const raw = request.cookies.get('localution_user')?.value
   const user = raw ? await verifyCookieEdge(raw, process.env.LOCALUTION_COOKIE_SECRET) : null
-  return decideAdminGate(!!raw, user, isAdminEmail)
+  return { hasCookie: !!raw, user }
 }
 
 export async function middleware(request: NextRequest) {
@@ -74,7 +66,8 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next({ request })
   }
 
-  if (!hasAnySession(request)) {
+  const lu = await readVerifiedLocalutionUser(request)
+  if (!lu.user && !hasSupabaseSessionCookie(request)) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
     loginUrl.search = ''
@@ -86,7 +79,8 @@ export async function middleware(request: NextRequest) {
   //   OAuth 로그인의 경우: 서명 검증한 쿠키의 email 로 즉시 차단 (위조·옛 형식 쿠키도 차단)
   //   Supabase 로그인의 경우: layout 검사 + API requireAdmin 으로 폴백
   if (isAdminPath(pathname)) {
-    const decision = await adminGateFromCookie(request)
+    //   Supabase 세션만 있는 경우는 여기서 판단하지 않고(defer) /admin 레이아웃과 API requireAdmin 이 막는다.
+    const decision = decideAdminGate(lu.hasCookie, lu.user, isAdminEmail)
     if (decision === 'deny') {
       const homeUrl = request.nextUrl.clone()
       homeUrl.pathname = '/'

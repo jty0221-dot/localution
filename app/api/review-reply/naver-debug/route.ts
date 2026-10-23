@@ -1,15 +1,20 @@
 // app/api/review-reply/naver-debug/route.ts
 import { NextRequest, NextResponse } from 'next/server'
-import { requireUser } from '@/app/lib/userAuth'
-import { createServiceClient } from '@/app/lib/adminAuth'
+import { createServiceClient, requireAdmin } from '@/app/lib/adminAuth'
+import { isProductionRuntime } from '@/app/lib/runtime-env'
 import { enqueuePlatformJob } from '@/app/lib/queue'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
- const auth = await requireUser()
- if (!auth.ok) return NextResponse.json({ ok: false, error: 'not logged in' }, { status: 401 })
+ // LU-018 · SEC-L15 · 디버그 라우트 — 운영에서는 410, 그 외에도 관리자만 · 자기 리뷰만 · env 값 일부도 응답 금지
+ if (isProductionRuntime()) {
+ return NextResponse.json({ ok: false, error: 'debug_route_disabled' }, { status: 410, headers: { 'Cache-Control': 'no-store' } })
+ }
+ const auth = await requireAdmin()
+ if (!auth.ok) return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status })
+ if (!auth.userId) return NextResponse.json({ ok: false, error: 'userId 없음' }, { status: 401 })
 
  const reviewId = req.nextUrl.searchParams.get('review_id') || 'e9d5e346-f82f-4e57-ba5f-f67e4ad022eb'
  const dryRun = req.nextUrl.searchParams.get('dry_run') !== '0'
@@ -22,6 +27,7 @@ export async function GET(req: NextRequest) {
  .from('platform_reviews')
  .select('id, user_id, platform, platform_store_id, platform_review_id, draft_reply, has_reply, reply_status, reply_error')
  .eq('id', reviewId)
+ .eq('user_id', auth.userId)
  .maybeSingle()
 
  const { data: cred } = await svc
@@ -65,7 +71,7 @@ export async function GET(req: NextRequest) {
  return NextResponse.json({
  ok: true,
  userId: auth.userId,
- redis: { available: !!redisUrl, url_prefix: redisUrl ? redisUrl.slice(0, 20) + '...' : null },
+ redis: { available: !!redisUrl },
  review: row ? { id: row.id, status: row.reply_status, platform_review_id: row.platform_review_id, reply_error: (row as any).reply_error || null, draft_reply_len: String(row.draft_reply || '').length } : null,
  credentials: { storeId: cred?.platform_store_id, bizId },
  dbTest: dbTestResult,
