@@ -58,4 +58,9 @@ check('세션 쿠키를 심는 곳에 Domain 없는 고정 옵션이 남지 않�
     assert.ok(!/cookies\.delete\('localution_(user|session)'\)/.test(src), f)
   }
 })
+check('cookies() 를 쓰는 처리기(임시 로그인)는 Set-Cookie 원문을 덧붙이지 않는다 (Next 가 같은 이름을 덮어씀)', () => {
+  const src = readFileSync(new URL('../app/api/admin/impersonate/route.ts', import.meta.url), 'utf8')
+  assert.ok(!/append(HostOnlyDuplicate|Session)Cookie/.test(src))
+  assert.ok(!/headers\.append\('Set-Cookie'/.test(src))
+})
 console.log(`${count} checks passed`)

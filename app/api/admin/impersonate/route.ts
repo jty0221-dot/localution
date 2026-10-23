@@ -20,7 +20,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { requireAdmin, createServiceClient } from '@/app/lib/adminAuth'
 import { signCookie, verifyCookie } from '@/app/lib/cookieSigning'
-import { sessionCookieSetOpts, appendHostOnlyDuplicateClears, SESSION_COOKIE_NAMES } from '@/app/lib/session-cookies'
+import { sessionCookieSetOpts } from '@/app/lib/session-cookies'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -102,7 +102,7 @@ export async function POST(req: NextRequest) {
 
   console.log(`[admin-impersonate] ${admin.email} → ${targetUserId} (${targetEmail || 'no-email'})`)
 
-  const res = NextResponse.json({
+  return NextResponse.json({
     ok: true,
     impersonating: {
       user_id: targetUserId,
@@ -113,8 +113,6 @@ export async function POST(req: NextRequest) {
     expires_in_sec: COOKIE_OPTS.maxAge,
     message: '임시 로그인 활성화 (1시간) — 사장님 화면 동일하게 사용 가능',
   })
-  appendHostOnlyDuplicateClears(res.headers, req.url, SESSION_COOKIE_NAMES)
-  return res
 }
 
 export async function GET() {
@@ -157,7 +155,8 @@ export async function DELETE(req: NextRequest) {
 
   console.log(`[admin-impersonate] revert by ${admin.ok ? admin.email : 'unknown'}`)
 
-  const res = NextResponse.json({ ok: true, message: '관리자 계정으로 복귀' })
-  appendHostOnlyDuplicateClears(res.headers, req.url, SESSION_COOKIE_NAMES)
-  return res
+  // 주의: 여기서 Set-Cookie 원문(호스트 전용 지우기)을 덧붙이면 안 된다. Next 는 cookies() 값을 먼저 쓰고
+  //   응답 헤더의 같은 이름 쿠키로 덮어써서, 방금 심은 Domain 쿠키가 지우기로 바뀐다(리뷰 지적).
+  //   호스트 전용 옛 쿠키 정리는 /api/me 갱신이 맡는다.
+  return NextResponse.json({ ok: true, message: '관리자 계정으로 복귀' })
 }

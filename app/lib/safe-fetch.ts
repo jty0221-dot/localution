@@ -78,7 +78,9 @@ export function isBlockedIp(ip: string): boolean {
   if (allZeroPrefix(7) && w[7] === 1) return true                    // ::1
   if (allZeroPrefix(5) && w[5] === 0xffff) return isBlockedIp(embeddedV4(w[6], w[7])) // ::ffff:a.b.c.d
   if (allZeroPrefix(6)) return true                                  // ::a.b.c.d (폐기된 호환 주소)
+  if (w[0] === 0x64 && w[1] === 0xff9b && w[2] === 1) return true                     // NAT64 로컬용 64:ff9b:1::/48
   if (w[0] === 0x64 && w[1] === 0xff9b) return isBlockedIp(embeddedV4(w[6], w[7]))   // NAT64
+  if (w[0] === 0x2001 && w[1] === 0) return true                                     // Teredo 2001::/32
   if (w[0] === 0x2002) return isBlockedIp(embeddedV4(w[1], w[2]))    // 6to4
   if ((w[0] & 0xfe00) === 0xfc00) return true                        // fc00::/7 고유 로컬
   if ((w[0] & 0xffc0) === 0xfe80) return true                        // fe80::/10 링크로컬
