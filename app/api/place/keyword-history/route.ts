@@ -9,15 +9,16 @@
 //     · 한 매장의 전체 키워드를 한 번에 (모니터링 카드 그리드용)
 //
 // 응답의 rows 는 ts 오름차순 — 차트가 그대로 그릴 수 있는 순서
+// 조회는 최근 쪽부터(ts 내림차순) 넉넉한 상한까지 받아 뒤집는다 (R-03).
+// 오름차순 + 500행 상한이면 키워드가 많을 때 최근 날짜가 잘렸다. days 는 최대 31.
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/app/lib/userAuth'
 import { createServiceClient } from '@/app/lib/adminAuth'
+import { collectRecentRows, historyDays } from '@/app/lib/keyword-history-window'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
-
-const MAX_ROWS = 500
 
 export async function GET(req: NextRequest) {
   const auth = await requireUser()
@@ -36,29 +37,26 @@ export async function GET(req: NextRequest) {
     )
   }
 
-  const daysRaw = Number(sp.get('days') || 30)
-  const days = Number.isFinite(daysRaw) ? Math.min(365, Math.max(1, Math.floor(daysRaw))) : 30
+  const days = historyDays(sp.get('days'))
   const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
 
   const svc = createServiceClient()
 
-  let q = svc
-    .from('place_keyword_ranks')
-    .select('id, keyword_target_id, keyword, rank, total, score, visitor_review_count, blog_review_count, rating, method, source, ts')
-    .eq('user_id', auth.userId) // 소유권을 where 로 강제
-    .gte('ts', since)
-    .order('ts', { ascending: true })
-    .limit(MAX_ROWS)
-
-  if (keywordTargetId) q = q.eq('keyword_target_id', keywordTargetId)
-  else if (targetId) q = q.eq('target_id', targetId)
-
-  const { data, error } = await q
-  if (error) {
-    return NextResponse.json({ ok: false, error: error.message }, { status: 500 })
+  const page = (from: number, to: number) => {
+    let q = svc
+      .from('place_keyword_ranks')
+      .select('id, keyword_target_id, keyword, rank, total, score, visitor_review_count, blog_review_count, rating, method, source, ts')
+      .eq('user_id', auth.userId) // 소유권을 where 로 강제
+      .gte('ts', since)
+    if (keywordTargetId) q = q.eq('keyword_target_id', keywordTargetId)
+    else if (targetId) q = q.eq('target_id', targetId)
+    return q.order('ts', { ascending: false }).order('id', { ascending: false }).range(from, to)
   }
 
-  const rows = data ?? []
+  const { rows, truncated, error } = await collectRecentRows(page)
+  if (error) {
+    return NextResponse.json({ ok: false, error }, { status: 500 })
+  }
 
   // 키워드별로 묶어서 반환 — 카드 그리드가 그대로 렌더 가능
   const byKeyword: Record<string, typeof rows> = {}
@@ -72,6 +70,7 @@ export async function GET(req: NextRequest) {
     ok: true,
     days,
     count: rows.length,
+    truncated, // true 면 가장 오래된 날짜 쪽이 일부 빠짐
     rows,
     by_keyword: byKeyword,
   })
