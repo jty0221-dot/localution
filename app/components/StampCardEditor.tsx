@@ -166,7 +166,10 @@ export default function StampCardEditor() {
  setManualErr(j.message || j.error || '추가 실패')
  return
  }
- setShowManualAdd(false)
+ // 적립은 됐지만 /customers 고객 목록 반영이 실패한 경우 — 창을 닫지 않고 그대로 알린다 (LU-018 W2-4)
+ const syncFailed = j.customer_synced === false
+ if (syncFailed) setManualErr((j.customer_sync_error || '고객 목록에는 저장하지 못했어요.') + ' 고객 관리 화면에서 직접 추가해주세요.')
+ else setShowManualAdd(false)
  setManualName('')
  setManualPhone('')
  setManualStamps(1)

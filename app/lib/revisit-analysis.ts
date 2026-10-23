@@ -40,7 +40,9 @@ const DAY_MS = 24 * 60 * 60 * 1000
 const KST_OFFSET_MS = 9 * 60 * 60 * 1000
 const MIN_VISITS_FOR_TRUST = 20
 const MIN_AT_RISK_DAYS = 14
-const DORMANT_DAYS = 90
+// 고객 자동 태그(app/lib/customer-lifecycle.ts)도 같은 기준을 쓴다
+export const DORMANT_DAYS = 90
+export const REGULAR_MIN_VISITS = 2
 
 export function toKstDate(iso: string): string {
   return new Date(new Date(iso).getTime() + KST_OFFSET_MS).toISOString().slice(0, 10)
@@ -112,7 +114,7 @@ export function analyzeRevisits(events: StampVisitEvent[], now: Date = new Date(
 
   for (const [id, days] of visitDaysByCustomer) {
     totalVisits += days.length
-    if (days.length < 2) continue
+    if (days.length < REGULAR_MIN_VISITS) continue
     regulars++
     const gaps: number[] = []
     for (let i = 1; i < days.length; i++) gaps.push(dayIndex(days[i]) - dayIndex(days[i - 1]))

@@ -10,6 +10,7 @@ import { createServiceClient } from '@/app/lib/adminAuth'
 import { rateLimit, getClientIp } from '@/app/lib/rate-limit'
 import { checkRate } from '@/app/lib/rateLimit'
 import { publicStampCard, publicStampCollection } from '@/app/lib/stamp-public'
+import { syncStampCustomer } from '@/app/lib/stamp-customer-sync'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -187,40 +188,21 @@ export async function POST(req: NextRequest) {
  })
  } catch (_) {}
 
- // 6) /customers CRM 자동 동기화 — 사장님 user_id 매칭
- // · 신규 손님: customers insert (단골 태그)
- // · 기존 손님: visits_count 증분 + last_visit_at 갱신
- try {
+ // 6) /customers CRM 자동 동기화 — 사장님 user_id 매칭 (LU-018 W2-4)
+ // · 신규 손님: '신규' 태그로 등록 (예전에는 첫 방문부터 '단골' 이라 신규/단골 숫자가 틀렸다)
+ // · 기존 손님: 방문 +1 · 2회부터 '단골' · 실패는 서버 로그 + stamp_events(crm_sync_failed) 에 남긴다
  if (card.user_id && phone) {
- const { data: existingCustomer } = await svc
- .from('customers')
- .select('id, visits_count, tags')
- .eq('user_id', card.user_id)
- .eq('phone', phone)
- .maybeSingle()
-
- if (existingCustomer) {
- const tags = existingCustomer.tags || []
- if (!tags.includes('단골')) tags.push('단골')
- await svc.from('customers').update({
- visits_count: (existingCustomer.visits_count || 0) + 1,
- last_visit_at: new Date().toISOString(),
- tags,
- name: name || undefined,
- }).eq('id', existingCustomer.id)
- } else {
- await svc.from('customers').insert({
- user_id: card.user_id,
- name: name || ('손님 ' + phone.slice(-4)),
+ await syncStampCustomer(svc, {
+ ownerId: String(card.user_id),
  phone,
+ name,
+ addVisits: 1,
  memo: '스탬프 카드 자동 등록',
- tags: ['단골'],
- visits_count: 1,
- last_visit_at: new Date().toISOString(),
+ source: 'qr_stamp',
+ stampCardId: card.id ?? null,
+ collectionId: collectionId ?? null,
  })
  }
- }
- } catch (_) {}
 
  // 6) 응답
  const { data: updated } = await svc

@@ -26,7 +26,7 @@ const TAG_COLORS: Record<Tag, { bg: string; text: string }> = {
 const ALL_TAGS: Tag[] = ['VIP', '단골', '신규', '휴면', '블랙리스트']
 
 export default function CustomersPage() {
- const { customers, loading, mode, error: customerError, add } = useCustomers()
+ const { customers, loading, mode, error: customerError, saveBlocked, add } = useCustomers()
  const isEmpty = customers.length === 0
 
  const [filterTag, setFilterTag] = useState<FilterTagType>('전체')
@@ -184,9 +184,9 @@ export default function CustomersPage() {
  />
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full">
- <div role="status" className={`mb-4 rounded-xl border p-3 text-sm leading-6 ${mode === 'local' || customerError ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-[#E5E8EB] bg-white text-[#4E5968]'}`}>
- {loading ? '고객 목록과 저장 위치를 확인하고 있어요.' : mode === 'remote' ? '서버에 연결되어 있어요. 고객을 추가하면 서버에 저장해요.' : '이 기기에 저장하는 모드예요. 서버 저장과 다른 기기 동기화는 확인되지 않았어요.'}
- {customerError && <p className="mt-1">{customerError}</p>}
+ <div role={saveBlocked ? 'alert' : 'status'} className={`mb-4 rounded-xl border p-3 text-sm leading-6 ${saveBlocked ? 'border-red-200 bg-red-50 text-red-700' : mode === 'local' || customerError ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-[#E5E8EB] bg-white text-[#4E5968]'}`}>
+ {loading ? '고객 목록과 저장 위치를 확인하고 있어요.' : saveBlocked ? '서버에 저장 못 함 · 지금 추가하는 고객은 이 기기에만 남고 다른 기기에서는 보이지 않아요.' : mode === 'remote' ? '서버에 연결되어 있어요. 고객을 추가하면 서버에 저장해요.' : '이 기기에 저장하는 모드예요. 서버 저장과 다른 기기 동기화는 확인되지 않았어요.'}
+ {customerError && <p className="mt-1 font-semibold">{customerError}</p>}
  </div>
  <div className="w-full">
 
