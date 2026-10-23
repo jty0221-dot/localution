@@ -5,6 +5,7 @@ import Sidebar from '../../components/Sidebar'
 import PageHeader from '../../components/PageHeader'
 import Footer from '../../components/Footer'
 import { TrendingUp, ExternalLink } from 'lucide-react'
+import KeywordRankTracker from '../../components/marketing/KeywordRankTracker'
 type Result = { keyword: string; placeId: string; rank: number | null; scannedCount: number; checkedAt: string; matchedTitle: string | null; note: string }
 export default function KeywordRankPage() {
   const [keyword, setKeyword] = useState('')
@@ -32,8 +33,10 @@ export default function KeywordRankPage() {
     } finally { clearTimeout(timer); if (request === generation.current) setLoading(false) }
 }
   const field = 'mt-2 min-h-[44px] w-full rounded-[6px] border border-[var(--lu-line)] px-3 py-2.5 text-base focus:outline-[var(--lu-accent)]'
-  return <div className="min-h-screen bg-[var(--lu-canvas)] text-[var(--lu-ink)]"><Sidebar /><div className="md:ml-[220px] flex min-h-screen flex-col"><PageHeader icon={<TrendingUp size={28} />} title="플레이스 키워드 순위 확인" subtitle="순서가 확인되는 지도 검색 자료를 받아 내 플레이스 ID와 비교해요" /><main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-6 md:px-6">
+  return <div className="min-h-screen bg-[var(--lu-canvas)] text-[var(--lu-ink)]"><Sidebar /><div className="md:ml-[220px] flex min-h-screen flex-col"><PageHeader icon={<TrendingUp size={28} />} title="플레이스 키워드 순위 확인" subtitle="내 플레이스 키워드를 등록하면 매일 측정한 순위와 30일 추이를 보여드려요" /><main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-6 md:px-6">
     <Link href="/marketing" className="inline-flex min-h-[44px] items-center font-semibold text-[var(--lu-accent)] underline">마케팅 도구로 돌아가기</Link>
+    <KeywordRankTracker />
+    <h2 className="max-w-4xl pt-4 text-lg font-bold">등록 없이 한 번만 확인하기</h2>
     <div className="max-w-4xl rounded-[10px] border border-blue-100 bg-blue-50 p-4 text-sm leading-relaxed">공식 매장 검색 API의 목록은 플레이스 순위를 뜻하지 않아요. 이 도구는 지도 검색의 구조화된 목록을 받을 때만 순서를 표시해요. 네이버가 서버 접근을 제한하면 순위를 계산하지 않으며, 검색 목록 밖의 순위는 알 수 없어요.</div>
     <form onSubmit={search} className="max-w-4xl space-y-4 rounded-[10px] border border-[var(--lu-line)] bg-white p-4 shadow-none md:p-6"><div className="grid grid-cols-1 gap-4 md:grid-cols-2"><label className="text-sm font-semibold">확인할 검색어<input required maxLength={80} value={keyword} onChange={e => setKeyword(e.target.value)} placeholder="예: 부천 카페" className={field} /></label><label className="text-base font-semibold">플레이스 ID<input required inputMode="numeric" pattern="[0-9]{1,30}" maxLength={30} value={placeId} onChange={e => setPlaceId(e.target.value)} placeholder="네이버 매장 주소의 숫자 ID" className={field} /><span className="mt-2 block text-base font-normal text-[var(--lu-muted)]">상호명이 같은 다른 매장과 섞이지 않도록 ID로 확인해요.</span></label></div><button disabled={loading} className="min-h-[44px] rounded-[6px] bg-[var(--lu-accent)] px-4 py-3 font-semibold text-white disabled:opacity-50">{loading ? '검색 자료 확인 중' : '순위 확인하기'}</button><p className="text-xs leading-relaxed text-[var(--lu-muted)]">조회 성공 시각만 결과에 표시해요. 오류가 나면 입력값과 마지막 성공 결과를 유지해요.</p></form>
     {loading && <div role="status" className="max-w-4xl animate-pulse rounded-[10px] bg-white p-6 text-sm motion-reduce:animate-none">지도 검색 자료를 확인하고 있어요.</div>}
