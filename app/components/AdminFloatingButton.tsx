@@ -2,8 +2,8 @@
 
 // ============================================================
 // 관리자 전용 floating 버튼 — 좌측 하단
-//   · isAdminEmail() 검증 통과한 사용자만 표시
-//   · /api/me 호출로 email 확인 (httpOnly 쿠키 호환)
+//   · /api/me 가 서버에서 판정한 user.isAdmin 이 true 인 사용자만 표시
+//     (관리자 이메일 목록을 화면 번들에 싣지 않는다 · LU-018 SEC-L01)
 //   · 클릭 → /admin/users
 //   · Harang 팝업 (우측 하단) 반대편 — 충돌 없음
 // ============================================================
@@ -11,7 +11,6 @@ import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Shield } from 'lucide-react'
-import { isAdminEmail } from '@/app/lib/admin-emails'
 
 const HIDE_PREFIXES = ['/admin', '/login', '/signup', '/review/']
 const HIDE_EXACT = ['/', '/pricing', '/about', '/terms', '/privacy']
@@ -28,8 +27,7 @@ export default function AdminFloatingButton() {
         const r = await fetch('/api/me', { cache: 'no-store', credentials: 'include' })
         if (!r.ok) return
         const j = await r.json()
-        const email = String(j?.user?.email || '').toLowerCase().trim()
-        if (!cancelled && isAdminEmail(email)) setIsAdmin(true)
+        if (!cancelled && j?.user?.isAdmin === true) setIsAdmin(true)
       } catch {}
     })()
     return () => { cancelled = true }
