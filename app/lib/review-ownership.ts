@@ -23,7 +23,7 @@ export function filterOwnReviewRows<T extends ReviewKeyRow>(rows: T[], existing:
   return { kept, dropped: rows.length - kept.length }
 }
 
-/** DB 조회 + 필터. 조회 실패 시에는 안전하게 아무것도 저장하지 않는다(빈 배열). */
+/** DB 조회 + 필터. 조회가 실패하면 예전 동작(그대로 저장)으로 두고 로그만 남긴다 — 수집 결과를 조용히 버리지 않기 위해. */
 export async function keepOwnReviewRows<T extends ReviewKeyRow>(svc: SupabaseClient, rows: T[], userId: string): Promise<T[]> {
   if (rows.length === 0) return rows
   const existing: ExistingOwner[] = []
@@ -42,8 +42,8 @@ export async function keepOwnReviewRows<T extends ReviewKeyRow>(svc: SupabaseCli
         .eq('platform', platform)
         .in('platform_review_id', ids.slice(i, i + CHUNK))
       if (error) {
-        console.error('[review-ownership] 기존 행 조회 실패 — 저장 보류', error.message)
-        return []
+        console.error('[review-ownership] 기존 행 조회 실패 — 소유 검사 없이 저장', error.message)
+        return rows
       }
       for (const d of (data || []) as ExistingOwner[]) existing.push(d)
     }
