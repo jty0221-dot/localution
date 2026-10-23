@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requirePaidQuota } from '@/app/lib/paid-quota'
 
 export const dynamic = 'force-dynamic'
 
@@ -186,6 +187,9 @@ async function textSearch(query: string, apiKey: string) {
 // POST /api/platforms/google
 // ═══════════════════════════════════════════════════════════
 export async function POST(req: NextRequest) {
+ // LU-018 · SEC-L09 · Google Places 유료 호출 — 로그인 필수 · 사용자당 분당 20회 · 1일 200회
+ const gate = await requirePaidQuota('google-places', { perMinute: 20, perDay: 200 })
+ if (!gate.ok) return gate.response
  try {
  const apiKey = process.env.GOOGLE_PLACES_API_KEY
  if (!apiKey) {
@@ -278,6 +282,9 @@ export async function POST(req: NextRequest) {
 // GET /api/platforms/google?placeId=xxx → 리뷰 5개
 // ═══════════════════════════════════════════════════════════
 export async function GET(req: NextRequest) {
+ // LU-018 · SEC-L09 · Google Places 유료 호출 — 로그인 필수 · 사용자당 분당 20회 · 1일 200회
+ const gate = await requirePaidQuota('google-places', { perMinute: 20, perDay: 200 })
+ if (!gate.ok) return gate.response
  const apiKey = process.env.GOOGLE_PLACES_API_KEY
  if (!apiKey) {
  return NextResponse.json(

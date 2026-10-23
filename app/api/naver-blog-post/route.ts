@@ -7,8 +7,7 @@
 // · 제목 25자 이내, 특수문자/이모지 금지
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
-import { requireUser } from '@/app/lib/userAuth'
-import { rateLimit, getClientIp } from '@/app/lib/rate-limit'
+import { requirePaidQuota } from '@/app/lib/paid-quota'
 
 export const dynamic = 'force-dynamic'
 export const maxDuration = 300  // Vercel Pro 최대 — 긴 블로그 글 생성 60~120초 소요
@@ -133,15 +132,10 @@ const AGE_GUIDE: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
  try {
- const auth = await requireUser()
- const limitId = auth.ok ? auth.userId : `ip:${getClientIp(req)}`
- const rl = await rateLimit({ bucket: 'naver-blog-post', id: limitId, limit: 10, windowSec: 60 })
- if (!rl.ok) {
- return NextResponse.json(
- { ok: false, error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.', retryAfter: rl.retryAfter },
- { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
- )
- }
+ // LU-018 · SEC-L08 · 로그인 필수 (예전에는 비로그인도 IP 로 통과) · 사용자당 분당 10회 · 1일 100회
+ const gate = await requirePaidQuota('naver-blog-post', { perMinute: 10, perDay: 100 })
+ if (!gate.ok) return gate.response
+ const auth = { ok: true as const, userId: gate.userId }
 
  const body = await req.json()
  const {

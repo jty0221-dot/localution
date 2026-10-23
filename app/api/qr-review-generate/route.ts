@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { rateLimitByIp } from '@/app/lib/rateLimit'
+import { getClientIp } from '@/app/lib/rate-limit'
+import { enforceQuota } from '@/app/lib/paid-quota'
+
+// 요청 본문 상한 (사진 3장 base64 기준 여유 · Vercel 본문 한도 4.5MB 안쪽)
+const MAX_BODY_CHARS = 4_000_000
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -62,18 +66,35 @@ const TONE_PROMPTS: Record<string, string> = {
 }
 
 export async function POST(req: NextRequest) {
- // Rate limit: IP당 분당 5회 (Vision/Haiku 유료 API 보호)
- const rl = rateLimitByIp(req, 'qr-review-generate', 5, 60)
- if (!rl.ok) {
- return NextResponse.json(
- { ok: false, error: 'rate_limited', message: `너무 많은 요청. ${rl.resetIn}초 후 다시 시도해주세요.` },
- { status: 429 }
- )
- }
+ // LU-018 · SEC-L08 · QR 손님용 공개 경로라 로그인 대신 IP · 매장 기준 한도 + 입력 상한
+ //   · IP: 분당 10회 · 1일 150회 (손님 1명이 OCR + 생성 2~3회 · 매장 와이파이 공유 고려) (Redis + 인스턴스 메모리) · 매장(매장명): 분당 30회 · 1일 600회
+ const ip = getClientIp(req)
+ const ipLimited = await enforceQuota('qr-review-ip', ip, { perMinute: 10, perDay: 150 }, '요청이 너무 많아요. 잠시 후 다시 시도해주세요.')
+ if (ipLimited) return ipLimited
 
  try {
- const body = await req.json()
+ const rawText = await req.text()
+ if (rawText.length > MAX_BODY_CHARS) {
+ return NextResponse.json({ ok: false, error: 'payload_too_large', message: '사진 용량이 너무 커요. 사진 수를 줄여 다시 시도해주세요.' }, { status: 413 })
+ }
+ let body: any
+ try { body = JSON.parse(rawText) } catch {
+ return NextResponse.json({ ok: false, error: 'invalid_json' }, { status: 400 })
+ }
  const { action = 'generate' } = body
+ const storeKey = String(body?.storeName || body?.expectedStoreName || 'unknown').slice(0, 80)
+ const storeLimited = await enforceQuota('qr-review-store', storeKey, { perMinute: 30, perDay: 600 }, '이 매장의 요청이 너무 많아요. 잠시 후 다시 시도해주세요.')
+ if (storeLimited) return storeLimited
+ // 텍스트 입력 상한
+ for (const k of ['storeName', 'expectedStoreName', 'storeType', 'mainKeyword']) {
+ if (typeof body[k] === 'string') body[k] = body[k].slice(0, 100)
+ }
+ if (typeof body.comment === 'string') body.comment = body.comment.slice(0, 1000)
+ if (Array.isArray(body.storeMenu)) body.storeMenu = body.storeMenu.slice(0, 50)
+ if (Array.isArray(body.receiptItems)) body.receiptItems = body.receiptItems.slice(0, 30).map((x: unknown) => String(x).slice(0, 60))
+ if (Array.isArray(body.images)) body.images = body.images.filter((x: unknown) => typeof x === 'string').slice(0, 3)
+ if (body.receiptImage != null && typeof body.receiptImage !== 'string') body.receiptImage = ''
+ { const r = Math.round(Number(body.rating ?? 5)); body.rating = r >= 1 && r <= 5 ? r : 5 }
 
  // ── OCR: 영수증 분석 ─────────────────────────────────────
  if (action === 'ocr') {

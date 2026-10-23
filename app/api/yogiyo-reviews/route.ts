@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requirePartnerAccess } from '@/app/lib/partner-gate'
 
 /**
  * GET /api/yogiyo-reviews?storeId=...&token=...
@@ -11,6 +12,9 @@ export const dynamic = 'force-dynamic'
 
 export async function GET(req: NextRequest) {
  const { searchParams } = req.nextUrl
+ // LU-018 · SEC-L10 · 로그인 필수 · 회사 env 자격 사용은 관리자만
+ const gate = await requirePartnerAccess(Boolean(searchParams.get('token')))
+ if (!gate.ok) return gate.response
  const storeId = searchParams.get('storeId') || process.env.YOGIYO_STORE_ID || ''
  const token = searchParams.get('token') || process.env.YOGIYO_API_KEY || ''
  const isTest = searchParams.get('test') === 'true'

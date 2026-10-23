@@ -140,6 +140,10 @@ function AIDraftPanel({
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ topic: topic.trim(), persona }),
  })
+ if (res.status === 401) {
+ setError('로그인하면 쓸 수 있어요.')
+ return
+ }
  const data = await res.json()
  if (data.ok) {
  onApply(data.text, data.hashtags)
@@ -392,6 +396,10 @@ function ReviewDraftPanel({
  persona,
  }),
  })
+ if (res.status === 401) {
+ setError('로그인하면 쓸 수 있어요.')
+ return
+ }
  const data = await res.json()
  if (data.ok) {
  onApply(data.text, data.hashtags)

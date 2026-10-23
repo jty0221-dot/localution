@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { requirePartnerAccess } from '@/app/lib/partner-gate'
 
 /**
  * POST /api/yogiyo-reply
@@ -6,6 +7,9 @@ import { NextRequest, NextResponse } from 'next/server'
  */
 export async function POST(req: NextRequest) {
  const { storeId, token, reviewId, reply } = await req.json()
+ // LU-018 · SEC-L10 · 로그인 필수 · 회사 env 자격 사용은 관리자만
+ const gate = await requirePartnerAccess(Boolean(token))
+ if (!gate.ok) return gate.response
 
  if (!storeId || !reviewId || !reply) {
  return NextResponse.json({ ok: false, error: 'storeId, reviewId, reply 필수' }, { status: 400 })

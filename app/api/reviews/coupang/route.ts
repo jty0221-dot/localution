@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { requirePartnerAccess } from '@/app/lib/partner-gate'
 import crypto from 'crypto'
 
 // 쿠팡이츠 EatApp Partner API
@@ -16,6 +17,9 @@ function generateHmacSignature(method: string, path: string, secretKey: string) 
 }
 
 export async function GET() {
+ // LU-018 · SEC-L10 · 로그인 필수 · 회사 env 자격 사용은 관리자만
+ const gate = await requirePartnerAccess(false)
+ if (!gate.ok) return gate.response
  const vendorId = process.env.COUPANG_VENDOR_ID
  const accessKey = process.env.COUPANG_ACCESS_KEY
  const secretKey = process.env.COUPANG_SECRET_KEY
@@ -75,6 +79,9 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+ // LU-018 · SEC-L10 · 로그인 필수 · 회사 env 자격 사용은 관리자만
+ const gate = await requirePartnerAccess(false)
+ if (!gate.ok) return gate.response
  const { reviewId, content } = await request.json()
  const vendorId = process.env.COUPANG_VENDOR_ID
  const accessKey = process.env.COUPANG_ACCESS_KEY
