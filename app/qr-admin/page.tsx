@@ -196,9 +196,9 @@ function QRStatsPanel() {
  if (e === 'receipt_verified') return { Icon: CheckCircle2, txt: '영수증 매장 일치', color: '#059669' }
  if (e === 'photo_uploaded') return { Icon: Camera, txt: '사진 업로드', color: '#7C3AED' }
  if (e === 'ai_generated') return { Icon: Sparkles, txt: 'AI 리뷰 생성', color: '#7C3AED' }
- if (e === 'submitted_naver') return { Icon: Send, txt: '네이버 등록', color: '#03C75A' }
- if (e === 'submitted_google') return { Icon: Send, txt: '구글 등록', color: '#4285F4' }
- if (e === 'submitted_kakao') return { Icon: Send, txt: '카카오 등록', color: '#A16207' }
+ if (e === 'submitted_naver') return { Icon: Send, txt: '네이버 등록 버튼 누름', color: '#03C75A' }
+ if (e === 'submitted_google') return { Icon: Send, txt: '구글 등록 버튼 누름', color: '#4285F4' }
+ if (e === 'submitted_kakao') return { Icon: Send, txt: '카카오 등록 버튼 누름', color: '#A16207' }
  return { Icon: Eye, txt: e, color: '#8B95A1' }
  }
  const timeAgo = (iso: string) => {
@@ -240,14 +240,14 @@ function QRStatsPanel() {
  <p className="text-[10px] text-[var(--lu-muted)] mt-1">전환율 {funnel.scan_to_ai_rate}%</p>
  </div>
  <div className="bg-white rounded-[10px] p-4 shadow-none">
- <p className="text-[11px] text-[var(--lu-muted)] mb-1">실제 등록</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mb-1">등록 버튼 누름</p>
  <p className="text-2xl font-semibold text-[#059669]">{funnel.submitted}</p>
- <p className="text-[10px] text-[var(--lu-muted)] mt-1">전환율 {funnel.ai_to_submit_rate}%</p>
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1">AI 생성 대비 {funnel.ai_to_submit_rate}%</p>
  </div>
  <div className="bg-white rounded-[10px] p-4 shadow-none">
- <p className="text-[11px] text-[var(--lu-muted)] mb-1">전체 전환율</p>
+ <p className="text-[11px] text-[var(--lu-muted)] mb-1">등록 버튼 누름 비율</p>
  <p className="text-2xl font-semibold text-[var(--lu-ink)]">{funnel.overall_rate}%</p>
- <p className="text-[10px] text-[var(--lu-muted)] mt-1">스캔 → 등록</p>
+ <p className="text-[10px] text-[var(--lu-muted)] mt-1">스캔 대비 · 실제 게시는 확인 불가</p>
  </div>
  </div>
 
@@ -261,7 +261,7 @@ function QRStatsPanel() {
  {[
  { Icon: Eye, label: 'QR 스캔', value: funnel.scan, max: funnel.scan, color: '#16685D' },
  { Icon: Sparkles, label: 'AI 리뷰 생성', value: funnel.ai_generated, max: funnel.scan, color: '#7C3AED' },
- { Icon: CheckCircle2, label: '실제 등록', value: funnel.submitted, max: funnel.scan, color: '#059669' },
+ { Icon: CheckCircle2, label: '등록 버튼 누름', value: funnel.submitted, max: funnel.scan, color: '#059669' },
  ].map(s => {
  const pct = s.max > 0 ? Math.round((s.value / s.max) * 100) : 0
  const Icon = s.Icon

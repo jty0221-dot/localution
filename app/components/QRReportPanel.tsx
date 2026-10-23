@@ -102,9 +102,9 @@ export default function QRReportPanel({ storeName }: { storeName?: string }) {
  list.push({ Icon: Sparkles, text: '아직 스캔 활동이 없어요. QR을 매장에 비치하고 손님께 안내해보세요', tone: 'info' })
  return list
  }
- if (m.overall_rate >= 30) list.push({ Icon: Flame, text: `전체 전환율 ${m.overall_rate}% · 우수해요 (업계 평균 15-20%)`, tone: 'good' })
- else if (m.overall_rate >= 15) list.push({ Icon: ThumbsUp, text: `전체 전환율 ${m.overall_rate}% · 양호한 수준입니다`, tone: 'good' })
- else list.push({ Icon: Lightbulb, text: `전체 전환율 ${m.overall_rate}% · 리워드 강화 또는 QR 위치 개선을 고려해보세요`, tone: 'warn' })
+ if (m.overall_rate >= 30) list.push({ Icon: Flame, text: `스캔 대비 등록 버튼 누름 ${m.overall_rate}% · 높은 편이에요`, tone: 'good' })
+ else if (m.overall_rate >= 15) list.push({ Icon: ThumbsUp, text: `스캔 대비 등록 버튼 누름 ${m.overall_rate}% · 양호한 수준입니다`, tone: 'good' })
+ else list.push({ Icon: Lightbulb, text: `스캔 대비 등록 버튼 누름 ${m.overall_rate}% · 리워드 강화 또는 QR 위치 개선을 고려해보세요`, tone: 'warn' })
 
  if (m.trend > 10) list.push({ Icon: TrendingUp, text: `최근 활동이 ${m.trend}% 증가하고 있어요`, tone: 'good' })
  else if (m.trend < -10) list.push({ Icon: TrendingDown, text: `최근 활동이 ${Math.abs(m.trend)}% 감소했어요. 재방문 이벤트를 진행해보세요`, tone: 'warn' })
@@ -184,8 +184,8 @@ export default function QRReportPanel({ storeName }: { storeName?: string }) {
  <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
  <KpiCard icon={Eye} label="총 스캔" value={metrics.scan} sub={`고유 방문자 ${stats.unique_visitors}명`} color={COLOR.primary} trend={metrics.trend} />
  <KpiCard icon={Sparkles} label="AI 리뷰 생성" value={metrics.ai_generated} sub={`전환율 ${metrics.scan_to_ai_rate}%`} color={COLOR.purple} />
- <KpiCard icon={CheckCircle2} label="실제 등록" value={metrics.submitted} sub={`전환율 ${metrics.ai_to_submit_rate}%`} color={COLOR.green} />
- <KpiCard icon={Target} label="전체 전환율" value={metrics.overall_rate + '%'} sub="스캔 → 등록" color={COLOR.amber} />
+ <KpiCard icon={CheckCircle2} label="등록 버튼 누름" value={metrics.submitted} sub={`AI 생성 대비 ${metrics.ai_to_submit_rate}%`} color={COLOR.green} />
+ <KpiCard icon={Target} label="등록 버튼 누름 비율" value={metrics.overall_rate + '%'} sub="스캔 대비 · 실제 게시는 확인 불가" color={COLOR.amber} />
  </div>
 
  {/* ── 자동 인사이트 ──────────────────────────── */}
@@ -237,7 +237,7 @@ export default function QRReportPanel({ storeName }: { storeName?: string }) {
  <Legend wrapperStyle={{ fontSize: 11 }} />
  <Area type="monotone" dataKey="scan" name="스캔" stroke={COLOR.primary} strokeWidth={2} fill="url(#gradScan)" />
  <Area type="monotone" dataKey="ai" name="AI 생성" stroke={COLOR.purple} strokeWidth={2} fill="transparent" />
- <Area type="monotone" dataKey="submit" name="등록" stroke={COLOR.green} strokeWidth={2} fill="url(#gradSubmit)" />
+ <Area type="monotone" dataKey="submit" name="등록 버튼 누름" stroke={COLOR.green} strokeWidth={2} fill="url(#gradSubmit)" />
  </AreaChart>
  </ResponsiveContainer>
  </div>
@@ -322,7 +322,7 @@ export default function QRReportPanel({ storeName }: { storeName?: string }) {
  {[
  { label: 'QR 스캔', value: metrics.scan, max: metrics.scan, color: COLOR.primary, icon: Eye },
  { label: 'AI 리뷰 생성', value: metrics.ai_generated, max: metrics.scan, color: COLOR.purple, icon: Sparkles, dropRate: metrics.scan - metrics.ai_generated },
- { label: '실제 등록', value: metrics.submitted, max: metrics.scan, color: COLOR.green, icon: CheckCircle2, dropRate: metrics.ai_generated - metrics.submitted },
+ { label: '등록 버튼 누름', value: metrics.submitted, max: metrics.scan, color: COLOR.green, icon: CheckCircle2, dropRate: metrics.ai_generated - metrics.submitted },
  ].map((step, i) => {
  const pct = step.max > 0 ? Math.round((step.value / step.max) * 100) : 0
  const Icon = step.icon
@@ -356,7 +356,7 @@ export default function QRReportPanel({ storeName }: { storeName?: string }) {
  <div className="bg-white rounded-2xl p-5 shadow-sm">
  <div className="flex items-center gap-2 mb-4">
  <CheckCircle2 size={16} className="text-[#059669]" strokeWidth={2.5} />
- <h3 className="font-black text-[#191F28]">플랫폼별 리뷰 등록</h3>
+ <h3 className="font-black text-[#191F28]">플랫폼별 등록 버튼 누름</h3>
  </div>
  <div className="grid grid-cols-3 gap-3">
  {[
