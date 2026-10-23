@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/app/lib/userAuth'
 import { createServiceClient } from '@/app/lib/adminAuth'
+import { keepOwnReviewRows } from '@/app/lib/review-ownership'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -83,9 +84,11 @@ export async function POST(req: NextRequest) {
  raw_snapshot: r,
  }))
 
+ // LU-018 · SEC-L14 · 다른 사용자가 이미 가진 리뷰 행은 덮어쓰지 않는다
+ const ownRows = await keepOwnReviewRows(svc, rows, userId)
  const { data, error } = await svc
  .from('platform_reviews')
- .upsert(rows, { onConflict: 'platform,platform_review_id', ignoreDuplicates: false })
+ .upsert(ownRows, { onConflict: 'platform,platform_review_id', ignoreDuplicates: false })
  .select('platform_review_id')
 
  if (error) {

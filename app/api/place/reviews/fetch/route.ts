@@ -17,6 +17,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/app/lib/userAuth'
 import { createServiceClient } from '@/app/lib/adminAuth'
+import { keepOwnReviewRows } from '@/app/lib/review-ownership'
 import { fetchVisitorReviews } from '@/app/lib/naver-place'
 
 export const runtime = 'nodejs'
@@ -228,7 +229,8 @@ export async function POST(req: NextRequest) {
  raw_snapshot: r,
  })
  }
- const rows = Array.from(seen.values())
+ // LU-018 · SEC-L14 · 다른 사용자가 이미 가진 리뷰 행은 덮어쓰지 않는다
+ const rows = await keepOwnReviewRows(svc, Array.from(seen.values()), userId)
  const CHUNK = 200
  for (let i = 0; i < rows.length && !upsertErr; i += CHUNK) {
  const { error } = await svc.from('platform_reviews').upsert(rows.slice(i, i + CHUNK), {
@@ -294,7 +296,8 @@ export async function POST(req: NextRequest) {
  raw_snapshot: r,
  })
  }
- const rows = Array.from(seen.values())
+ // LU-018 · SEC-L14 · 다른 사용자가 이미 가진 리뷰 행은 덮어쓰지 않는다
+ const rows = await keepOwnReviewRows(svc, Array.from(seen.values()), userId)
  try {
  const { data, error } = await svc
  .from('platform_reviews')
@@ -433,7 +436,8 @@ export async function POST(req: NextRequest) {
  // 중복 reviewId가 있으면 PostgreSQL upsert 오류 발생 → 마지막 항목만 유지
  const seen = new Map<string, UpsertRow>()
  for (const row of rowsRaw) seen.set(row.platform_review_id, row)
- const rows = Array.from(seen.values())
+ // LU-018 · SEC-L14 · 다른 사용자가 이미 가진 리뷰 행은 덮어쓰지 않는다
+ const rows = await keepOwnReviewRows(svc, Array.from(seen.values()), userId)
 
  let inserted = 0
  let updated = 0

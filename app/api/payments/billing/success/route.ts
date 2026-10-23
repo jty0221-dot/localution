@@ -7,6 +7,7 @@
 // · 보안: 시크릿 키는 환경변수에서만 사용
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
+import { safeReturnTo } from '@/app/lib/safe-return-to'
 import { requireUser } from '@/app/lib/userAuth'
 import { createServiceClient } from '@/app/lib/adminAuth'
 
@@ -30,7 +31,8 @@ export async function GET(req: NextRequest) {
  const url = new URL(req.url)
  const authKey = url.searchParams.get('authKey')
  const customerKey = url.searchParams.get('customerKey')
- const returnTo = url.searchParams.get('returnTo') || '/settings?tab=plan&billing=ok'
+ // LU-018 · SEC-L13 · 같은 출처 경로만
+ const returnTo = safeReturnTo(url.searchParams.get('returnTo'), url.origin, '/settings?tab=plan&billing=ok')
 
  if (!authKey || !customerKey) {
  const fail = new URL(returnTo.replace('billing=ok', 'billing=fail'), url.origin)

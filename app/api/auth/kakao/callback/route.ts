@@ -7,6 +7,7 @@
 // · 실패: returnTo?connected=error&reason=... 로 302
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
+import { safeReturnTo as safeReturnToShared } from '@/app/lib/safe-return-to'
 import { cookies } from 'next/headers'
 import { createServiceClient } from '@/app/lib/adminAuth'
 import { requireUser } from '@/app/lib/userAuth'
@@ -33,12 +34,9 @@ function decodeState(state: string): { uid?: string; returnTo?: string; nonce?: 
 
 // SEC-001 · returnTo 는 같은 출처 상대경로만 허용한다.
 // state 가 위조 가능하므로 여기서 거르지 않으면 new URL(returnTo, origin) 이 외부로 나간다.
+// LU-018 · SEC-L13 · 탭 · 줄바꿈('/ + 탭 + /evil.com' 꼴)을 거르지 않던 것을 공용 함수로 교체
 function safeReturnTo(raw: string | null | undefined): string {
- const v = (raw || '').trim()
- if (!v.startsWith('/')) return DEFAULT_RETURN_TO
- if (v.startsWith('//')) return DEFAULT_RETURN_TO
- if (v.includes('\\')) return DEFAULT_RETURN_TO
- return v
+ return safeReturnToShared(raw, 'https://localution.invalid', DEFAULT_RETURN_TO)
 }
 
 function errRedirect(req: NextRequest, returnTo: string, reason: string) {
