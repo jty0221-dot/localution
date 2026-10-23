@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin, createServiceClient } from '@/app/lib/adminAuth'
 import { rateLimit, getClientIp } from '@/app/lib/rate-limit'
+import { hasPrivacyConsent } from '@/app/lib/inquiry-consent'
 
 export const dynamic = 'force-dynamic'
 export const runtime = 'nodejs'
@@ -51,8 +52,13 @@ export async function POST(req: NextRequest) {
  }
 
  const body = await req.json().catch(() => ({}))
- const { name, contact, category, message } = body as {
- name?: string; contact?: string; category?: string; message?: string
+ const { name, contact, category, message, privacyConsent } = body as {
+ name?: string; contact?: string; category?: string; message?: string; privacyConsent?: unknown
+ }
+
+ // 개인정보 수집 · 이용 동의 — 화면 체크만으로는 API 직접 호출을 못 막는다 (LU-018 문구 남은 일)
+ if (!hasPrivacyConsent(privacyConsent)) {
+ return NextResponse.json({ error: '개인정보 수집 · 이용에 동의해 주세요.' }, { status: 400 })
  }
 
  if (!name?.trim() || !message?.trim()) {
