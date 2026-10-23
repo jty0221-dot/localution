@@ -6,7 +6,7 @@ import { pageMetadata } from '../../lib/seo'
 export const metadata: Metadata = pageMetadata({
   title: '키워드 순위 확인 · 내 매장은 몇 위인가',
   description:
-    '키워드를 넣으면 네이버 플레이스에서 내 매장이 몇 위에 있는지 확인하고 저장합니다. 매일 재면 오르내림이 보입니다.',
+    '키워드와 플레이스 ID를 넣으면 네이버 지도 검색 목록에서 내 매장이 몇 번째에 있는지 그때그때 확인합니다. 검색 목록 밖의 순위는 표시하지 않습니다.',
   path: 'marketing/keyword-rank',
   keywords: [
     '플레이스 순위 확인',

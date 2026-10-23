@@ -28,7 +28,7 @@ import ReplyTemplatePicker from '../../components/ReplyTemplatePicker'
 import PageHeader from '../../components/PageHeader'
 import { toast } from '../../lib/toast'
 import { copyTextWithFallback } from '../../lib/clipboard'
-import { Heart, Briefcase, Smile, Edit3, Mail, Flame, FileText, AlertTriangle, Sparkles, Star, Shuffle, X, type LucideIcon } from 'lucide-react'
+import { Heart, Briefcase, Smile, Edit3, Mail, Flame, FileText, AlertTriangle, Sparkles, Star, Shuffle, X, Hourglass, Clock, type LucideIcon } from 'lucide-react'
 // 76차: CoupangReviewBookmarkletDialog import 제거 (자동 연결로 대체됨)
 
 type PlatformSlug = 'naver_place' | 'baemin' | 'yogiyo' | 'coupangeats' | 'kakao_map'
@@ -631,10 +631,10 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  if (data?.code === 'NO_CREDENTIALS') {
  setNoCredentialsHref(data?.connect_href || null)
  toast.warn(data?.error || '계정을 연결해야 자동 발행이 가능해요')
- alert(`자동 발행 불가\n\n${data?.error || '계정 미연결'}\n\nconnect_href: ${data?.connect_href || '(없음)'}\n\nplatform: ${config.platform}\nreview_id: ${review.id}`)
+ console.warn('[handleSubmit] 자동 발행 불가', { error: data?.error, connect_href: data?.connect_href, platform: config.platform, review_id: review.id })
  } else {
- toast.error('발행 실패: ' + (data?.error || ''))
- alert(`발행 실패\n\nstatus: ${res.status}\nerror: ${data?.error || '(없음)'}\ncode: ${data?.code || '(없음)'}\n\nplatform: ${config.platform}\nreview_id: ${review.id}`)
+ toast.error('답글을 등록하지 못했어요. 잠시 후 다시 시도해 주세요.')
+ console.warn('[handleSubmit] 발행 실패', { status: res.status, error: data?.error, code: data?.code, platform: config.platform, review_id: review.id })
  }
  return
  }
@@ -1553,7 +1553,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  return (
  <div className="mt-2 rounded-lg px-3 py-2 bg-[#FFF7ED] border border-[#FED7AA]">
  <p className="text-[12px] text-[#9A3412] leading-relaxed">
- ⏳ {fe.msg}
+ <Hourglass size={12} strokeWidth={2.5} className="inline-block align-[-2px] mr-1" aria-hidden="true" />{fe.msg}
  </p>
  <div className="mt-1.5 flex gap-2 flex-wrap">
  {fe.action === 'reconnect' && noCredentialsHref && (
@@ -1698,7 +1698,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  <div className="px-5 py-4 border-b border-[var(--lu-canvas)] flex items-center justify-between">
  <div className="flex items-center gap-2">
  <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] flex items-center justify-center shadow-none">
- <span className="text-white text-lg">⏰</span>
+ <Clock size={16} className="text-white" strokeWidth={2.5} aria-hidden="true" />
  </div>
  <span className="text-base font-bold text-[var(--lu-ink)]">답글 등록 불가 안내</span>
  </div>

@@ -1688,7 +1688,7 @@ function PlanTab() {
  const [cart, setCart] = useState<string[]>([])
  const [filter, setFilter] = useState<CategoryFilter>('전체')
  const [showCancelModal, setShowCancelModal] = useState(false)
- const [cancelled, setCancelled] = useState(false)
+ const [cancelled] = useState(false) // 해지는 1:1 문의로 접수 (화면 상태만 바꾸던 가짜 해지 제거)
  const [paymentMethod, setPaymentMethod] = useState<{ cardName: string; last4: string } | null>(null)
  const [customerKey, setCustomerKey] = useState<string>('') // 서버에서 받음 (deterministic)
  const [tossReady, setTossReady] = useState(false)
@@ -1825,7 +1825,7 @@ function PlanTab() {
  {cancelled && (
  <div className="bg-red-50 rounded-[6px] p-4 mb-4 text-sm">
  <p className="font-semibold text-red-700 mb-1">해지가 예약되었습니다</p>
- <p className="text-red-600 text-xs">베타 기간 종료 후 자동 종료 · 해지 후 7일 재가입 제한</p>
+ <p className="text-red-600 text-xs">해지는 1:1 문의로 접수해 처리해요</p>
  </div>
  )}
  <div className="bg-blue-50 rounded-[6px] p-3 mb-4 text-xs text-[var(--lu-accent)] leading-relaxed">
@@ -2008,16 +2008,15 @@ function PlanTab() {
  {showCancelModal && (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4">
  <div className="bg-white rounded-[10px] p-6 max-w-sm w-full">
- <h3 className="font-bold text-[var(--lu-ink)] text-lg mb-4">정말 해지하시겠어요?</h3>
+ <h3 className="font-bold text-[var(--lu-ink)] text-lg mb-4">해지 신청 안내</h3>
  <div className="bg-red-50 rounded-[6px] p-4 mb-5 space-y-2 text-sm text-[var(--lu-muted)]">
- <p><strong>베타 기간 종료일</strong>까지 서비스 이용 가능</p>
- <p>해지 후 <strong>7일간</strong> 재가입 불가</p>
- <p>정식 요금제 전환 시 결제 없이 종료</p>
- <p>데이터 30일간 보관 후 삭제</p>
+ <p>이 화면에서는 해지가 바로 처리되지 않아요.</p>
+ <p>1:1 문의에서 <strong>요금 · 결제</strong>를 고르고 해지를 남겨 주시면 확인 후 처리하고 답변드려요.</p>
+ <p>데이터 보관 기간은 <a href="/privacy" target="_blank" rel="noopener noreferrer" className="underline">개인정보처리방침</a>을 따릅니다.</p>
  </div>
  <div className="flex gap-3">
- <button onClick={() => setShowCancelModal(false)} className="min-h-11 flex-1 py-3 rounded-[6px] border border-[var(--lu-line)] text-sm font-semibold text-[var(--lu-muted)]">취소</button>
- <button onClick={() => { setCancelled(true); setShowCancelModal(false) }} className="min-h-11 flex-1 py-3 rounded-[6px] bg-red-500 text-white text-sm font-semibold">해지 확인</button>
+ <button onClick={() => setShowCancelModal(false)} className="min-h-11 flex-1 py-3 rounded-[6px] border border-[var(--lu-line)] text-sm font-semibold text-[var(--lu-muted)]">닫기</button>
+ <Link href="/inquiry" onClick={() => setShowCancelModal(false)} className="min-h-11 flex-1 py-3 rounded-[6px] bg-red-500 text-white text-sm font-semibold inline-flex items-center justify-center">1:1 문의로 해지 신청</Link>
  </div>
  </div>
  </div>

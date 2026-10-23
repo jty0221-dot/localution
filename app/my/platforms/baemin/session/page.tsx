@@ -155,7 +155,7 @@ export default function BaeminSessionPage() {
  <p className="text-xs font-semibold text-blue-700 mb-2 flex items-center gap-1"><Lock size={11} strokeWidth={2.5} /> 보안 안내</p>
  <ul className="text-xs text-blue-600 space-y-1">
  <li>• 로그인 정보는 AES-256-GCM으로 암호화해 저장돼요</li>
- <li>• 비밀번호는 복호화 불가 형태로만 보관해요</li>
+ <li>• 저장한 비밀번호는 배민 자동 로그인에만 풀어서 사용해요</li>
  <li>• 쿠키가 만료되면 자동으로 재로그인해요</li>
  </ul>
  </div>

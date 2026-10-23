@@ -11,7 +11,7 @@ import {
  MessageCircle, Wrench, CreditCard, Sparkles, FileText,
  CheckCircle2, ShoppingCart, Mail, Inbox, Plus, LucideIcon,
  Clock, MessageSquare, X, RefreshCw, ArrowRight,
- Headphones, Send, Zap,
+ Headphones, Send,
 } from 'lucide-react'
 
 // ── 전역 keyframe ────────────────────────────────────────────
@@ -143,6 +143,7 @@ export default function InquiryPage() {
  const [tab, setTab] = useState<'new' | 'history'>('new')
  const [form, setForm] = useState({ name: '', contact: '', category: '서비스문의', message: '' })
  const [submitting, setSubmitting] = useState(false)
+ const [agreed, setAgreed] = useState(false)
  const [submitted, setSubmitted] = useState(false)
  const [error, setError] = useState('')
  const [myInquiries, setMyInquiries] = useState<MyInquiry[]>([])
@@ -231,6 +232,7 @@ ${lines.join('\n')}
 
  const handleSubmit = async () => {
  if (!form.name || !form.message) { setError('이름과 문의 내용을 입력해 주세요.'); return }
+ if (!agreed) { setError('개인정보 수집 · 이용에 동의해 주세요.'); return }
  setError(''); setSubmitting(true)
  try {
  const res = await fetch('/api/inquiry', {
@@ -250,6 +252,7 @@ ${lines.join('\n')}
  setMyInquiries(next); saveMine(next)
  setSubmitted(true)
  setForm({ name: '', contact: '', category: '서비스문의', message: '' })
+ setAgreed(false)
  } else { setError('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.') }
  } catch { setError('네트워크 오류가 발생했습니다.') }
  setSubmitting(false)
@@ -266,28 +269,11 @@ ${lines.join('\n')}
  <PageHeader
  icon={<MessageCircle size={28} className="text-white" strokeWidth={2.5} />}
  title="1:1 문의"
- subtitle="궁금하신 내용을 편하게 남겨주세요 · 영업일 기준 1~2일 내 답변 보장"
+ subtitle="궁금하신 내용을 편하게 남겨주세요 · 영업일에 접수 순서대로 답변드려요"
  variant="primary"
  />
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full">
- {/* 응답 보장 통계 3종 — 본문 상단 카드 */}
- <div className="grid grid-cols-3 gap-2.5 md:gap-3 mb-5">
- {[
- { icon: <Clock size={14} strokeWidth={2.5} className="text-[var(--lu-accent)]" />, value: '1~2일', label: '평균 답변 시간' },
- { icon: <Zap size={14} strokeWidth={2.5} className="text-[#F59E0B]" />, value: '카카오', label: '실시간 채널 운영' },
- { icon: <CheckCircle2 size={14} strokeWidth={2.5} className="text-[#10B981]" />, value: '100%', label: '모든 문의 답변' },
- ].map(s => (
- <div key={s.label} className="bg-white rounded-[10px] shadow-none p-3 md:p-4">
- <div className="flex items-center gap-1.5 mb-1.5">
- {s.icon}
- <span className="text-[10px] md:text-[11px] text-[var(--lu-muted)] font-medium">{s.label}</span>
- </div>
- <p className="text-base md:text-xl font-semibold text-[var(--lu-ink)]">{s.value}</p>
- </div>
- ))}
- </div>
-
  {/* ── 본문 ────────────────────────────────────── */}
  <div className="">
 
@@ -314,7 +300,7 @@ ${lines.join('\n')}
  </div>
  <div className="flex-1 min-w-0">
  <p className="font-semibold text-[var(--lu-ink)] text-sm">카카오톡 채널 상담</p>
- <p className="text-[11px] text-[#78350F] mt-0.5">가장 빠른 답변 · 실시간 채팅</p>
+ <p className="text-[11px] text-[#78350F] mt-0.5">카카오톡 채팅으로 문의</p>
  </div>
  <ArrowRight size={15} strokeWidth={2.5} className="text-[#78350F] shrink-0 group-hover:translate-x-1 transition-transform" />
  </a>
@@ -363,7 +349,7 @@ ${lines.join('\n')}
  </div>
  <h2 className="text-lg sm:text-xl font-semibold text-[var(--lu-ink)] mb-2">문의가 접수되었습니다!</h2>
  <p className="text-[var(--lu-muted)] text-sm leading-relaxed mb-6 break-keep">
- 영업일 기준 1~2일 내로 답변드립니다.<br/>
+ 영업일에 접수 순서대로 답변드립니다.<br/>
  답변이 달리면 내 문의 내역에 자동으로 표시돼요.
  </p>
  <div className="flex gap-2.5 justify-center flex-col sm:flex-row">
@@ -434,9 +420,21 @@ ${lines.join('\n')}
  </p>
  )}
 
- <button onClick={handleSubmit} disabled={submitting}
+ {/* 개인정보 수집 · 이용 동의 (필수) */}
+ <div className="rounded-[6px] border border-[var(--lu-line)] bg-[var(--lu-canvas)] px-4 py-3">
+ <label className="flex items-start gap-2.5 text-xs sm:text-sm text-[var(--lu-ink)] cursor-pointer">
+ <input type="checkbox" checked={agreed} onChange={e => setAgreed(e.target.checked)} required aria-required="true" className="mt-0.5 h-4 w-4 shrink-0 accent-[var(--lu-accent)]" />
+ <span className="font-semibold break-keep">[필수] 개인정보 수집 · 이용에 동의합니다</span>
+ </label>
+ <p className="mt-2 pl-[26px] text-[11px] leading-relaxed text-[var(--lu-muted)] break-keep">
+ 수집 항목: 이름, 연락처(입력한 경우), 문의 내용 · 목적: 문의 확인과 답변 · 보유 기간: 문의 처리 완료 후 3년(전자상거래법상 소비자 불만 · 분쟁 처리 기록). 동의하지 않으면 이 화면에서 접수할 수 없으며, 카카오톡 채널이나 이메일로 문의할 수 있어요.{' '}
+ <a href="/privacy" target="_blank" rel="noopener noreferrer" className="font-semibold text-[var(--lu-accent)] underline">개인정보처리방침</a>
+ </p>
+ </div>
+
+ <button onClick={handleSubmit} disabled={submitting || !agreed}
  className={`w-full py-3.5 rounded-[6px] font-semibold text-sm transition-all flex items-center justify-center gap-2 ${
- submitting
+ submitting || !agreed
  ? 'bg-[#93C5FD] cursor-not-allowed text-white'
  : 'bg-[var(--lu-accent)] text-white hover:bg-[var(--lu-accent-hover)] shadow-[0_4px_16px_rgba(49,130,246,0.28)] active:scale-[0.99]'
  }`}>
@@ -483,7 +481,7 @@ ${lines.join('\n')}
  <path d="M49 20h10M54 15v10" stroke="#16685D" strokeWidth="2" strokeLinecap="round" />
  </svg>
  <p className="font-bold text-[var(--lu-ink)] text-sm mb-1">문의 내역이 없습니다</p>
- <p className="text-xs text-[var(--lu-muted)] mb-4 break-keep">궁금한 점이 있으시면 언제든 문의해 주세요.<br/>평균 1~2일 내 답변드립니다.</p>
+ <p className="text-xs text-[var(--lu-muted)] mb-4 break-keep">궁금한 점이 있으시면 언제든 문의해 주세요.<br/>영업일에 접수 순서대로 답변드립니다.</p>
  <button onClick={() => setTab('new')}
  className="min-h-11 px-5 py-2.5 bg-[var(--lu-accent)] text-white font-bold rounded-[6px] text-sm hover:bg-[var(--lu-accent-hover)] transition-colors">
  첫 문의 남기기
@@ -574,7 +572,7 @@ ${lines.join('\n')}
  ) : (
  <div className="text-sm text-[var(--lu-muted)] bg-[var(--lu-canvas)] rounded-[6px] p-4 text-center leading-relaxed break-keep">
  아직 답변이 작성되지 않았습니다.<br />
- 영업일 기준 1~2일 내로 답변드릴게요.
+ 영업일에 접수 순서대로 답변드릴게요.
  </div>
  )}
  </div>

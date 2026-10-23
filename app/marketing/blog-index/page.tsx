@@ -175,11 +175,11 @@ export default function BlogIndexPage() {
  <Zap size={16} className="text-[#92400E]" strokeWidth={2.5} />
  </div>
  <div className="flex-1">
- <p className="text-xs font-bold text-[#92400E]">더 정확한 데이터: 블라이(BLAI) API 연동</p>
- <p className="text-[11px] text-[#B45309] mt-0.5">blai.co.kr에서 API Key 발급 후 .env.local에 BLAI_API_KEY 추가하면 공식 지수·일일방문자 데이터로 전환됩니다</p>
+ <p className="text-xs font-bold text-[#92400E]">지금 보이는 값은 네이버 공개 자료 기준이에요</p>
+ <p className="text-[11px] text-[#B45309] mt-0.5">블로그 메인 · RSS · 방문자 수 공개 자료로 계산했어요. 블라이(BLAI) 공식 지수 연동은 로컬루션에서 준비 중이라 사장님이 따로 설정할 것은 없어요.</p>
  </div>
  <a href="https://blai.co.kr" target="_blank" rel="noopener noreferrer"
- className="shrink-0 text-[11px] text-[#D97706] font-semibold hover:underline">발급 →</a>
+ className="shrink-0 text-[11px] text-[#D97706] font-semibold hover:underline">블라이 →</a>
  </div>
  )}
 
