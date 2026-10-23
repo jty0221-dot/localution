@@ -11,6 +11,7 @@
 import { useEffect, useState } from 'react'
 import { Star, ExternalLink, Tag, Sparkles, ShoppingCart } from 'lucide-react'
 import { AFFILIATE_PRODUCTS, type AffiliateProduct } from '../lib/affiliate-config'
+import { adminFetch } from '../lib/adminFetch'
 
 type Preview = {
  url?: string
@@ -76,7 +77,8 @@ function AdCard({ product }: { product: AffiliateProduct }) {
  if (fullyOverridden) { setPreview({ loading: false }); return }
  const sourceUrl = product.previewSourceUrl || product.url
  let cancelled = false
- fetch('/api/affiliate/preview?url=' + encodeURIComponent(sourceUrl))
+ // 로그인 필수 API (SEC-L12) → 쿠키 + Supabase 토큰을 같이 보내는 래퍼
+ adminFetch('/api/affiliate/preview?url=' + encodeURIComponent(sourceUrl))
  .then(r => r.json())
  .then(j => {
  if (cancelled) return

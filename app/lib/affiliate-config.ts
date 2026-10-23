@@ -28,6 +28,12 @@ export type AffiliateProduct = {
   badgeColor?: string           // hex 색상
 }
 
+// /api/affiliate/preview 가 서버에서 읽어도 되는 호스트 (SEC-L12 · SSRF 방지)
+//   · 아래 AFFILIATE_PRODUCTS 의 previewSourceUrl(smartstore) 과 url(naver.me) 호스트만 둔다
+//   · 새 상품의 호스트가 다르면 여기에 더해야 미리보기가 된다 (scripts/safe-fetch.test.mjs 가 대조)
+//   · 리다이렉트는 따라가지 않으므로 naver.me 단축 주소는 미리보기가 실패하고 override* 로 보인다
+export const AFFILIATE_PREVIEW_HOSTS: readonly string[] = ['smartstore.naver.com', 'naver.me']
+
 // 5개 affiliate (네이버 쇼핑 커넥트) — 사용자가 클릭하면 CPS 수익 발생
 // 미리보기는 previewSourceUrl 에서 시도하되 SPA/봇탐지로 실패 가능 → override* 사용
 export const AFFILIATE_PRODUCTS: AffiliateProduct[] = [
