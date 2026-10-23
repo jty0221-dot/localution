@@ -2,12 +2,13 @@ import Link from 'next/link'
 import FeatureGuideLink from '../help/FeatureGuideLink'
 import { ArrowLeft, ArrowRight } from 'lucide-react'
 
-type ToolId = 'cost-calculator' | 'notice' | 'business-search' | 'campaign-url' | 'promotion-profit'
+type ToolId = 'cost-calculator' | 'notice' | 'business-search' | 'campaign-url' | 'promotion-profit' | 'rank-history'
 const tools: Record<ToolId, { href: string; label: string }> = {
   'campaign-url': { href: '/marketing/campaign-url', label: '홍보 링크 만들기' },
   'promotion-profit': { href: '/marketing/promotion-profit', label: '할인 조건 비교하기' },
   'cost-calculator': { href: '/marketing/cost-calculator', label: '원가와 비용 조건 확인하기' },
   notice: { href: '/marketing/notice', label: '공지 문안 준비하기' },
+  'rank-history': { href: '/marketing/rank-history', label: '순위 이력 파일 살펴보기' },
   'business-search': { href: '/marketing/business-search', label: '관련 매장·게시글 살펴보기' },
 }
 const descriptions: Record<ToolId, string> = {
@@ -15,6 +16,7 @@ const descriptions: Record<ToolId, string> = {
   'promotion-profit': '실제 비용과 할인 부담 주체를 확인한 뒤 공지 내용을 준비하세요.',
   'cost-calculator': '입력 조건을 확인했다면 실제 판매가와 안내 내용을 정리해보세요.',
   notice: '날짜와 연락 방법을 확인한 뒤 필요한 채널에 직접 붙여넣으세요.',
+  'rank-history': '측정된 날짜와 순위만 비교했어요. 순위가 바뀐 이유는 파일만으로 알 수 없으니 매장 정보와 게시글을 직접 확인해 보세요.',
   'business-search': '출처에서 확인한 내용과 우리 매장의 실제 정보를 구분하고 다음 작업을 준비해보세요.',
 }
 const related: Record<ToolId, ToolId[]> = {
@@ -23,6 +25,7 @@ const related: Record<ToolId, ToolId[]> = {
   notice: ['campaign-url', 'business-search'],
   'business-search': ['notice', 'campaign-url'],
   'campaign-url': ['notice', 'business-search'],
+  'rank-history': ['business-search', 'campaign-url'],
 }
 const linkClass = 'inline-flex min-h-[44px] items-center gap-2 rounded-[6px] px-3 py-2 text-sm font-semibold text-[var(--lu-accent)] hover:bg-[var(--lu-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lu-accent)]'
 

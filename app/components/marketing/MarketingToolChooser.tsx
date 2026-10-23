@@ -2,7 +2,7 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { Calculator, Megaphone, Search, ArrowRight, Link2 } from 'lucide-react'
+import { Calculator, Megaphone, Search, ArrowRight, Link2, TrendingUp } from 'lucide-react'
 import { BUSINESS_AUDIENCES, BUSINESS_STARTS, BUSINESS_TASKS, TASK_ACTIONS, type BusinessAudience } from '../../lib/tool-catalog'
 
 const primaryTools = [
@@ -13,6 +13,7 @@ const primaryTools = [
 const secondaryTools = [
   { id: 'promotion-profit', Icon: Calculator, title: '할인·행사 수익 비교', badge: '로그인 없이 계산', preparation: '판매가·할인 조건·비용·예상 판매량·홍보비', result: '같은 한 달 가정의 행사 전후 예상 이익과 필요 판매량', action: '할인 조건 비교하기', note: '수수료는 할인 후 판매가 기준이며 할인액은 매장이 전액 부담하는 가정이에요.' },
   { id: 'campaign-url', Icon: Link2, title: 'UTM 홍보 링크 만들기', badge: '로그인 없이 링크 작성', preparation: '도착 주소·유입 출처·홍보 방식·캠페인 이름', result: '게시처를 구분하는 UTM 주소', action: '홍보 링크 만들기', note: '방문·문의 집계에는 도착 사이트의 별도 측정 설정이 필요해요.' },
+  { id: 'rank-history', Icon: TrendingUp, title: '순위 이력 분석기', badge: '로그인 없이 파일 분석', preparation: '날짜와 순위가 담긴 JSON·TSV 이력 파일', result: '측정된 날짜 기준의 순위 그래프와 리뷰 증감 표', action: '이력 파일 살펴보기', note: '파일은 이 브라우저에서만 읽어요. 지금 순위를 새로 재지 않고, 점수는 만들지 않아요.' },
 ] as const
 const primaryIds = new Set<string>([...primaryTools, ...secondaryTools].map(tool => tool.id))
 const linkClass = 'inline-flex min-h-[44px] items-center justify-between gap-2 rounded-[6px] px-3 py-2 text-sm font-semibold text-[var(--lu-accent)] hover:bg-[var(--lu-accent-soft)] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[var(--lu-accent)]'
