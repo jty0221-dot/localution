@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { isAdminEmail } from '@/app/lib/admin-emails'
+import { verifyCookieEdge, decideAdminGate } from '@/app/lib/cookieSigningEdge'
 
 // 로그인 필수 경로 (prefix 매칭)
 // ⚠️ 공개 페이지 절대 추가 금지:
@@ -21,10 +22,11 @@ const PROTECTED_PREFIXES = [
   '/my',
   '/reservations',
   '/partner-points',
+  '/whoami',
 ]
 
 // 관리자 전용 경로 (prefix 매칭) — 로그인 + 관리자 화이트리스트 모두 통과해야 함
-const ADMIN_PREFIXES = ['/admin']
+const ADMIN_PREFIXES = ['/admin', '/whoami']
 
 function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(prefix =>
@@ -53,21 +55,16 @@ function hasAnySession(request: NextRequest): boolean {
   return false
 }
 
-// localution_user 쿠키에서 email 추출
-//   · 43차-1: 관리자 영역 진입 차단을 위해 미들웨어에서 화이트리스트 검사
-//   · OAuth 사용자만 여기서 거른다. Supabase 세션 사용자는 토큰 검증이 무거우므로
-//     /admin/layout.tsx 의 클라 사이드 isAdminEmail 검사에 위임한다.
-function readLocalutionUserEmail(request: NextRequest): string | null {
+// localution_user 쿠키 서명 검증 (LU-018)
+//   · 쿠키는 OAuth 콜백에서 signCookie() 로 "<base64url payload>.<sig>" 형식으로 발급된다.
+//   · 예전 코드는 이 값을 JSON.parse 해서 항상 실패 → null → 관리자 검사가 통째로 건너뛰어졌다.
+//   · Edge 런타임이라 node crypto 대신 Web Crypto 로 같은 HMAC 을 검증한다 (cookieSigningEdge.ts).
+//   · Supabase 세션만 있는 경우는 여기서 판단하지 않고(defer) /admin 레이아웃과
+//     /api/admin/** 의 requireAdmin() 이 막는다.
+async function adminGateFromCookie(request: NextRequest) {
   const raw = request.cookies.get('localution_user')?.value
-  if (!raw) return null
-  try {
-    const decoded = decodeURIComponent(raw)
-    const parsed = JSON.parse(decoded) as { email?: string }
-    const email = (parsed?.email || '').toString().toLowerCase().trim()
-    return email || null
-  } catch {
-    return null
-  }
+  const user = raw ? await verifyCookieEdge(raw, process.env.LOCALUTION_COOKIE_SECRET) : null
+  return decideAdminGate(!!raw, user, isAdminEmail)
 }
 
 export async function middleware(request: NextRequest) {
@@ -86,11 +83,11 @@ export async function middleware(request: NextRequest) {
   }
 
   // /admin* 은 관리자 화이트리스트 추가 검증
-  //   OAuth 로그인의 경우: 쿠키에서 email 직접 읽어 즉시 차단
-  //   Supabase 로그인의 경우: 클라 사이드 layout 검사로 폴백
+  //   OAuth 로그인의 경우: 서명 검증한 쿠키의 email 로 즉시 차단 (위조·옛 형식 쿠키도 차단)
+  //   Supabase 로그인의 경우: layout 검사 + API requireAdmin 으로 폴백
   if (isAdminPath(pathname)) {
-    const luEmail = readLocalutionUserEmail(request)
-    if (luEmail && !isAdminEmail(luEmail)) {
+    const decision = await adminGateFromCookie(request)
+    if (decision === 'deny') {
       const homeUrl = request.nextUrl.clone()
       homeUrl.pathname = '/'
       homeUrl.search = ''

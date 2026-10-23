@@ -1,6 +1,7 @@
 // app/api/admin/seed-baemin-reviews/route.ts
 import { NextResponse } from 'next/server'
-import { requireUser } from '@/app/lib/userAuth'
+import { requireAdmin } from '@/app/lib/adminAuth'
+import { isProductionRuntime } from '@/app/lib/runtime-env'
 import { createServiceClient } from '@/app/lib/adminAuth'
 
 export const runtime = 'nodejs'
@@ -116,9 +117,14 @@ const SEED_REVIEWS = [
 ]
 
 export async function POST() {
- const auth = await requireUser()
+ // LU-018 · 가짜 리뷰를 넣는 seed — 운영에서는 410, 그 외에도 관리자만
+ if (isProductionRuntime()) {
+ return NextResponse.json({ ok: false, error: 'demo_seed_disabled' }, { status: 410, headers: { 'Cache-Control': 'no-store' } })
+ }
+ const auth = await requireAdmin()
  if (!auth.ok) return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status })
  const userId = auth.userId
+ if (!userId) return NextResponse.json({ ok: false, error: 'userId 없음' }, { status: 401 })
  const svc = createServiceClient()
 
  const rows = SEED_REVIEWS.map(r => ({
