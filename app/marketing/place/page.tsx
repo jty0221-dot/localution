@@ -594,11 +594,11 @@ export default function PlaceDiagnosisPage() {
  <AnswerBlock
   className="mb-5"
   question="네이버 플레이스 진단은 무엇을 확인하나요?"
-  answer="매장 플레이스 주소만 넣으면 키워드 · 리뷰수 · 답글률을 읽어 34항목 체크리스트로 상위노출 상태를 점검합니다. 결과는 항목별 점수와 바로 고칠 수 있는 순서로 정리됩니다."
+  answer="매장 플레이스 주소를 넣으면 매장 정보와 방문자 · 블로그 리뷰 수를 불러오고, 사장님이 34항목 체크리스트를 직접 체크하며 상태를 점검합니다. 결과는 34개 중 점검을 마친 항목 수와 항목별 해설로 정리됩니다."
   facts={[
-   '34항목 체크리스트 · 항목마다 가중치와 해설',
+   '34항목 체크리스트 · 항목마다 해설',
    '방문자 리뷰 · 블로그 리뷰 수를 추적해 추이로 확인',
-   '로그인 없이 무료로 진단',
+   '매장 조회와 추적은 로그인 후 이용',
   ]}
  />
 
@@ -724,7 +724,7 @@ export default function PlaceDiagnosisPage() {
  {/* 좌: 점수 카드 */}
  <div className="bg-white rounded-2xl shadow-sm p-5">
  <div className="flex items-center justify-between mb-3">
- <p className="text-sm font-bold text-[#191F28]">종합 점검 점수</p>
+ <p className="text-sm font-bold text-[#191F28]">점검 완료 항목</p>
  <div className="flex gap-2">
  <button onClick={checkAll} className="text-[11px] font-semibold text-[#3182F6] px-2 py-1 rounded-lg hover:bg-[#EFF6FF]">전체 체크</button>
  <button onClick={resetAll} className="text-[11px] font-semibold text-[#8B95A1] px-2 py-1 rounded-lg hover:bg-[#F2F4F6]">초기화</button>
@@ -732,7 +732,7 @@ export default function PlaceDiagnosisPage() {
  </div>
  <div className="flex items-end gap-3 mb-3">
  <span className="text-5xl font-black" style={{ color: interp.color }}>{score}</span>
- <span className="text-sm font-bold text-[#8B95A1] mb-2">/ {TOTAL_ITEMS}점 ({ratio}%)</span>
+ <span className="text-sm font-bold text-[#8B95A1] mb-2">/ {TOTAL_ITEMS}개 중 ({ratio}%)</span>
  </div>
  <div className="w-full bg-[#F2F4F6] rounded-full h-3 overflow-hidden mb-3">
  <div className="h-full rounded-full transition-all" style={{ width: `${ratio}%`, background: interp.color }}/>

@@ -96,7 +96,7 @@ export default function EventsPage() {
  <PageHeader
  icon={<Megaphone size={28} className="text-white" strokeWidth={2.5} />}
  title="매장 이벤트·프로모션"
- subtitle="단속 이벤트·시즌 프로모션·단골 보상 · 카드뉴스·스레드 자동 발행 연동"
+ subtitle="단속 이벤트·시즌 프로모션·단골 보상 · 등록과 일정 관리"
  variant="pink"
  />
 
@@ -110,7 +110,7 @@ export default function EventsPage() {
  <div className="flex-1 min-w-0">
  <p className="text-xs md:text-sm font-bold text-[#7C3AED] mb-0.5">이벤트 매니저 베타</p>
  <p className="text-[11px] md:text-xs text-[#7C3AED]/90 leading-relaxed">
- 이벤트 등록 → 카드뉴스·스레드·유튜브 커뮤니티 자동 발행 연동 (곧 추가).
+ 카드뉴스·스레드·유튜브 커뮤니티 자동 발행 연동은 아직 준비 중이에요.
  지금은 등록·일정 관리만 지원해요. 로그인한 계정별로 이 브라우저에만 저장하며 PC와 휴대전화 사이에 동기화되지 않아요. 이전 공용 저장 자료는 자동으로 옮기지 않아요.
  </p>
  </div>
@@ -231,10 +231,10 @@ export default function EventsPage() {
  <div className="bg-white rounded-[10px] shadow-none p-4">
  <h2 className="text-sm md:text-base font-bold text-[var(--lu-ink)] mb-3 flex items-center gap-2">
  <Sparkles size={14} className="text-[#7C3AED]" strokeWidth={2.5} />
- 이벤트 자동 발행 연동 (곧 추가)
+ 이벤트 자동 발행 연동 (준비 중)
  </h2>
  <p className="text-xs text-[var(--lu-muted)] mb-3 leading-relaxed">
- 이벤트 등록 → 자동으로 카드뉴스 슬라이드 + 스레드 글 + 유튜브 커뮤니티 게시글이 만들어져요.
+ 아직 자동으로 만들어지지 않아요. 지금은 아래 도구에서 카드뉴스 · 스레드 글 · 유튜브 커뮤니티 게시글을 직접 만들어 주세요.
  </p>
  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
  <Link href="/marketing/card-news" className="p-3 rounded-[6px] border border-[var(--lu-canvas)] hover:border-[#EC4899] hover:bg-[#FCE7F3]/30 transition-all flex items-center gap-2">
