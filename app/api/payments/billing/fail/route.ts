@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
+import { safeReturnTo } from '@/app/lib/safe-return-to'
 
 /**
  * Toss Payments 빌링 인증 실패 콜백
@@ -10,7 +11,8 @@ export async function GET(req: NextRequest) {
  const url = new URL(req.url)
  const code = url.searchParams.get('code') || 'unknown'
  const message = url.searchParams.get('message') || ''
- const returnTo = url.searchParams.get('returnTo') || '/settings?tab=plan&billing=fail'
+ // LU-018 · SEC-L13 · 같은 출처 경로만 (예전에는 절대 URL 이면 외부로 302)
+ const returnTo = safeReturnTo(url.searchParams.get('returnTo'), url.origin, '/settings?tab=plan&billing=fail')
 
  const target = new URL(returnTo, url.origin)
  target.searchParams.set('reason', code)

@@ -1,6 +1,7 @@
 'use client'
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
+import { safeReturnTo } from '@/app/lib/safe-return-to'
 
 export default function LoginPage() {
  const cardRef = useRef<HTMLDivElement>(null)
@@ -30,7 +31,8 @@ export default function LoginPage() {
  const params = new URLSearchParams(window.location.search)
  const redirect = params.get('redirect')
  // 보안: open redirect 방지 · 같은 출처 path 만 허용
- const safe = redirect && redirect.startsWith('/') && !redirect.startsWith('//') ? redirect : '/dashboard'
+ // LU-018 · SEC-L13 · '/\evil.com' · 제어문자 우회까지 막는 공용 함수
+ const safe = safeReturnTo(redirect, window.location.origin, '/dashboard')
  window.location.href = safe
  }
  }, [])

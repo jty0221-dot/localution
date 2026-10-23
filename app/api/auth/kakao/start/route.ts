@@ -8,6 +8,7 @@
 // 비로그인 시: JSON 대신 /login 으로 302 리다이렉트
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
+import { safeReturnTo as safeReturnToShared } from '@/app/lib/safe-return-to'
 import { cookies } from 'next/headers'
 import { requireUser } from '@/app/lib/userAuth'
 import { buildAuthorizeUrl } from '@/app/lib/kakao-api'
@@ -21,12 +22,9 @@ const STATE_COOKIE = 'kakao_connect_state'
 
 // SEC-001 · returnTo 는 같은 출처 상대경로만 허용한다.
 // 절대 URL(https://evil...) 과 프로토콜 상대 URL(//evil) 은 오픈 리다이렉트가 된다.
+// LU-018 · SEC-L13 · 제어문자 우회까지 막는 공용 함수로 교체
 function safeReturnTo(raw: string | null | undefined): string {
- const v = (raw || '').trim()
- if (!v.startsWith('/')) return DEFAULT_RETURN_TO
- if (v.startsWith('//')) return DEFAULT_RETURN_TO
- if (v.includes('\\')) return DEFAULT_RETURN_TO
- return v
+ return safeReturnToShared(raw, 'https://localution.invalid', DEFAULT_RETURN_TO)
 }
 
 export async function GET(req: NextRequest) {
