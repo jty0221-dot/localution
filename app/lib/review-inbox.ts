@@ -94,3 +94,39 @@ export function filterFeed<T extends { replied: boolean; platform: string }>(
     return true
   })
 }
+
+// ============================================================
+// LU-018 W2-12 · 대시보드 'AI 답글' → 리뷰 편집기로 이어 쓰기
+// 대시보드 모달에서 만든 초안을 해당 리뷰의 draft_reply 로 저장한 뒤
+// /review-admin/<매체>?review=<id> 로 보내 편집기가 그 리뷰를 열어 둔다.
+// ============================================================
+
+/** platform_reviews.platform 값 → 매체별 리뷰 관리 화면 */
+const EDITOR_PATH: Record<string, string> = {
+  naver_place: '/review-admin/naver',
+  naver: '/review-admin/naver',
+  kakao_map: '/review-admin/kakao',
+  kakao: '/review-admin/kakao',
+  coupangeats: '/review-admin/coupang',
+  coupang: '/review-admin/coupang',
+  baemin: '/review-admin/baemin',
+  yogiyo: '/review-admin/yogiyo',
+  google: '/review-admin/google',
+}
+
+export function reviewEditorPath(platform: string | null | undefined): string {
+  return EDITOR_PATH[String(platform || '').toLowerCase()] || '/review-admin'
+}
+
+/** 리뷰 id 정리 — 주소에 실어도 안전한 글자만 (uuid · 숫자 · 영문 · - _ : .) */
+export function sanitizeReviewId(raw: string | null | undefined): string | null {
+  const v = String(raw || '').trim()
+  return /^[A-Za-z0-9_\-:.]{1,120}$/.test(v) ? v : null
+}
+
+export function buildEditorHandoffUrl(platform: string | null | undefined, reviewId: string | null | undefined): string {
+  const path = reviewEditorPath(platform)
+  const id = sanitizeReviewId(reviewId)
+  if (!id || path === '/review-admin') return path
+  return `${path}?review=${encodeURIComponent(id)}`
+}

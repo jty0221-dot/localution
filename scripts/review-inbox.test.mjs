@@ -70,3 +70,28 @@ check('피드 필터 — 답글 상태 × 매체', () => {
 })
 
 console.log(`review-inbox: ${count} checks passed`)
+
+// ── W2-12 · 대시보드 → 편집기 이어 쓰기 ──
+const { reviewEditorPath, sanitizeReviewId, buildEditorHandoffUrl } = await import('../app/lib/review-inbox.ts')
+check('매체 → 편집기 경로', () => {
+  assert.equal(reviewEditorPath('naver_place'), '/review-admin/naver')
+  assert.equal(reviewEditorPath('kakao_map'), '/review-admin/kakao')
+  assert.equal(reviewEditorPath('coupangeats'), '/review-admin/coupang')
+  assert.equal(reviewEditorPath('BAEMIN'), '/review-admin/baemin')
+  assert.equal(reviewEditorPath('unknown'), '/review-admin')
+  assert.equal(reviewEditorPath(null), '/review-admin')
+})
+check('리뷰 id 정리 — 주소 주입 차단', () => {
+  assert.equal(sanitizeReviewId('3f2a9c1e-0b7d-4c1a-9e2f-1234567890ab'), '3f2a9c1e-0b7d-4c1a-9e2f-1234567890ab')
+  assert.equal(sanitizeReviewId('../../admin'), null)
+  assert.equal(sanitizeReviewId('a b'), null)
+  assert.equal(sanitizeReviewId('x&review=y'), null)
+  assert.equal(sanitizeReviewId(''), null)
+  assert.equal(sanitizeReviewId('a'.repeat(121)), null)
+})
+check('이어 쓰기 주소', () => {
+  assert.equal(buildEditorHandoffUrl('naver_place', 'r1'), '/review-admin/naver?review=r1')
+  assert.equal(buildEditorHandoffUrl('weird', 'r1'), '/review-admin')
+  assert.equal(buildEditorHandoffUrl('baemin', '<script>'), '/review-admin/baemin')
+})
+console.log(`review-inbox (handoff): ${count} checks passed total`)

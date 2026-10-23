@@ -21,6 +21,8 @@ import StoreStatusCard from './StoreStatusCard'
 import { useConnections, setConnection as libSetConnection, removeConnection as libRemoveConnection, PlatformId as CanonicalPlatformId } from '../lib/connections'
 import { toast, confirmDialog } from '../lib/toast'
 import { buildSettingsHref } from '../lib/settings-tabs'
+import { DEFAULT_REPLY_VOICE, normalizeReplyVoice, toAiRequest, type ReplyVoice } from '../lib/reply-voice'
+import { buildEditorHandoffUrl } from '../lib/review-inbox'
 import {
  Star, ArrowRight, ArrowUp, ArrowDown, Minus, X, Check, CheckCircle2,
  AlertTriangle, Rocket, TrendingUp,
@@ -210,7 +212,8 @@ function inferCategoryFromStore(name: string): string | null {
  return null
 }
 
-type ReviewPreview = { platform: string; name: string; rating: number; text: string; time: string; replied: boolean; color: string };
+// LU-018 W2-12: reviewId · platformSlug — 모달 초안을 그 리뷰의 draft 로 저장하고 편집기로 이어 쓰기
+type ReviewPreview = { platform: string; name: string; rating: number; text: string; time: string; replied: boolean; color: string; reviewId?: string; platformSlug?: string };
 const RECENT_REVIEWS: ReviewPreview[] = []
 
 // 30차-23: 실제 platform_reviews 레코드 (요약 카드·하단 최근 리뷰 용)
@@ -528,31 +531,25 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
  setLoading(true)
  setError('')
  try {
- let storeCtx: any = {}
+ // LU-018 W2-12: 매장 맥락은 서버가 로그인 계정 매장에서 채운다 (예전 localStorage 매장값은 기기마다 달랐다)
+ // 말투는 계정 하나의 서버 설정(/api/reply-voice · W2-10). 못 읽으면 기본값.
+ let voice: ReplyVoice = DEFAULT_REPLY_VOICE
  try {
- const raw = localStorage.getItem(LS_STORE)
- if (raw) storeCtx = JSON.parse(raw)
- } catch {}
+ const vr = await fetch('/api/reply-voice', { credentials: 'include', cache: 'no-store' })
+ const vj = vr.ok ? await vr.json() : null
+ if (vj?.ok) voice = normalizeReplyVoice(vj.voice)
+ } catch { /* 기본 말투로 생성 */ }
 
  const res = await fetch('/api/ai-review-reply', {
  method: 'POST',
+ credentials: 'include',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({
+ review_id: review.reviewId,
  review: review.text,
- platform: review.platform,
- bizType: storeCtx.bizType || '',
- storeName: storeCtx.name || '',
- region: storeCtx.region || (storeCtx.address ? storeCtx.address.split(' ').slice(0, 2).join(' ') : ''),
- mainKeyword: storeCtx.mainKeyword || '',
- subKeywords: storeCtx.subKeywords || '',
- storeDesc: storeCtx.desc || '',
- aiSettings: {
- tone: 'friendly',
- length: 'medium',
- includes: { thanks: true, revisit: true, mention: true, personalize: false, improve: true, keyword: true },
- closing: '',
- excludes: '',
- },
+ rating: review.rating,
+ platform: review.platformSlug || review.platform,
+ ...toAiRequest(voice),
  }),
  })
  const data = await res.json()
@@ -570,7 +567,41 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
 
  useEffect(() => { generate() }, [generate])
 
- const post = () => { window.location.assign('/review-admin') }
+ // LU-018 W2-12: 만든 초안을 버리지 않는다 — 그 리뷰의 draft 로 저장하고 편집기에서 이어 쓰기
+ const [saving, setSaving] = useState(false)
+ const [saveError, setSaveError] = useState('')
+ const post = async () => {
+ const text = reply.trim()
+ if (!text) return
+ if (!review.reviewId) {
+ // 저장할 리뷰 id 가 없으면(옛 미리보기 자료) 초안을 클립보드에 남기고 이동
+ try { await navigator.clipboard.writeText(text) } catch {}
+ window.location.assign('/review-admin')
+ return
+ }
+ setSaving(true)
+ setSaveError('')
+ try {
+ const res = await fetch('/api/review-reply/draft', {
+ method: 'POST',
+ credentials: 'include',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ review_id: review.reviewId, draft: text }),
+ })
+ const j = await res.json().catch(() => null)
+ if (!res.ok || !j?.ok) {
+ setSaveError(res.status === 409
+ ? '이 리뷰는 지금 답글을 올리는 중이에요. 잠시 후 리뷰 관리에서 확인해주세요.'
+ : '초안을 저장하지 못했어요. 다시 눌러주세요.')
+ return
+ }
+ window.location.assign(buildEditorHandoffUrl(review.platformSlug, review.reviewId))
+ } catch {
+ setSaveError('인터넷 연결을 확인하고 다시 눌러주세요.')
+ } finally {
+ setSaving(false)
+ }
+ }
 
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="ai-reply-modal-title">
@@ -615,6 +646,7 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
  />
  )}
 
+ {saveError && <p role="alert" className="mt-3 rounded-[6px] bg-[#FFF0F0] p-3 text-sm text-[#B42318]">{saveError}</p>}
  {posted && (
  <div className="bg-[#E8FFF0] text-[#12B76A] rounded-[6px] p-3 text-sm font-bold text-center mt-3 inline-flex items-center justify-center gap-1.5 w-full">
  <CheckCircle2 size={16} strokeWidth={2.5} />
@@ -632,10 +664,10 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
  </button>
  <button
  onClick={post}
- disabled={loading || !reply.trim() || posted}
+ disabled={loading || saving || !reply.trim() || posted}
  className="min-h-11 flex-1 bg-[var(--lu-accent)] text-white py-2.5 rounded-[6px] text-sm font-bold hover:bg-[var(--lu-accent-hover)] disabled:opacity-40"
  >
- 리뷰 관리에서 답글 확인하기
+ {saving ? '초안 저장 중' : '초안 저장하고 이어 쓰기'}
  </button>
  </div>
  </div>
@@ -1289,6 +1321,8 @@ export default function Dashboard() {
  time: timeAgo(r.posted_at) || (r.collected_at ? timeAgo(r.collected_at) : ''),
  replied: !!r.has_reply,
  color: pf?.color || '#03C75A',
+ reviewId: r.id,
+ platformSlug: r.platform,
  })
  },
  [platforms],

@@ -29,6 +29,7 @@ import PageHeader from '../../components/PageHeader'
 import { toast } from '../../lib/toast'
 import { copyTextWithFallback } from '../../lib/clipboard'
 import { DEFAULT_REPLY_VOICE, normalizeReplyVoice, voiceFromLegacyEditor, shouldMigrateLegacy, toAiRequest, type ReplyVoice } from '../../lib/reply-voice'
+import { sanitizeReviewId } from '../../lib/review-inbox'
 import { Heart, Briefcase, Smile, Edit3, Mail, Flame, FileText, AlertTriangle, Sparkles, Star, Shuffle, X, Hourglass, Clock, type LucideIcon } from 'lucide-react'
 // 76차: CoupangReviewBookmarkletDialog import 제거 (자동 연결로 대체됨)
 
@@ -633,6 +634,28 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  }
  }
  }
+
+ // LU-018 W2-12: 대시보드 'AI 답글' 에서 저장한 초안을 이어 쓰기 — ?review=<id> 리뷰를 열어 둔다
+ const handoffDoneRef = useRef(false)
+ useEffect(() => {
+ if (handoffDoneRef.current || loadingReviews || reviews.length === 0) return
+ handoffDoneRef.current = true
+ let target: string | null = null
+ try { target = sanitizeReviewId(new URLSearchParams(window.location.search).get('review')) } catch {}
+ if (!target) return
+ const found = reviews.find((r) => r.id === target)
+ if (!found) {
+ toast.error('넘겨받은 리뷰를 이 목록에서 찾지 못했어요. 기간을 전체로 바꿔 확인해주세요.')
+ return
+ }
+ openEditor(found)
+ window.setTimeout(() => {
+ try {
+ document.querySelector(`[data-review-id="${CSS.escape(found.id)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+ } catch {}
+ }, 80)
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [loadingReviews, reviews])
 
  // ── 7) 수정된 초안 저장 ─────────────────────
  const saveDraftEdit = async (review: Review, text: string) => {
@@ -1295,6 +1318,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  return (
  <div
  key={review.id}
+ data-review-id={review.id}
  className={`bg-white rounded-[10px] border p-4 md:p-5 ${isNegative ? 'border-[#FCA5A5]' : 'border-[var(--lu-line)]'} ${isBulkTarget ? 'ring-2' : ''}`}
  style={isBulkTarget ? { ['--tw-ring-color' as any]: config.color } : {}}
  >
