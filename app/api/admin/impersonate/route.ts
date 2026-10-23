@@ -20,7 +20,8 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { requireAdmin, createServiceClient } from '@/app/lib/adminAuth'
 import { signCookie, verifyCookie } from '@/app/lib/cookieSigning'
-import { sessionCookieSetOpts } from '@/app/lib/session-cookies'
+import { sessionCookieSetOpts, sessionCookieDeleteOpts } from '@/app/lib/session-cookies'
+import { isAdminEmail } from '@/app/lib/admin-emails'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -35,6 +36,8 @@ const COOKIE_OPTS = {
 
 const BACKUP_COOKIE = 'localution_admin_orig'
 const BACKUP_SESSION = 'localution_admin_orig_session'
+// 이메일(Supabase) 로그인 관리자의 복귀 표식 — 복귀 때 임시 쿠키만 지우면 Supabase 세션이 다시 쓰인다
+const SUPABASE_ADMIN_MARKER = 'supabase_admin_return'
 
 export async function POST(req: NextRequest) {
   const admin = await requireAdmin()
@@ -80,8 +83,15 @@ export async function POST(req: NextRequest) {
   const originalSession = cookieStore.get('localution_session')?.value || ''
 
   // 원본 백업 (이미 백업되어 있으면 그대로 — 중첩 임시로그인 방지)
-  if (!cookieStore.get(BACKUP_COOKIE)?.value && originalUser) {
-    cookieStore.set(BACKUP_COOKIE, originalUser, COOKIE_OPTS)
+  //   이메일(Supabase)로 로그인한 관리자는 localution_user 가 없다 → 복귀 표식을 서명해 둔다.
+  //   표식이 없으면 배너가 안 뜨고 복귀(DELETE)도 '임시 로그인 상태 아님' 으로 실패해 1시간 갇힌다.
+  if (!cookieStore.get(BACKUP_COOKIE)?.value) {
+    if (originalUser) {
+      cookieStore.set(BACKUP_COOKIE, originalUser, COOKIE_OPTS)
+    } else {
+      const marker = signCookie({ id: SUPABASE_ADMIN_MARKER, email: admin.email, name: '', provider: SUPABASE_ADMIN_MARKER })
+      cookieStore.set(BACKUP_COOKIE, marker, COOKIE_OPTS)
+    }
   }
   if (!cookieStore.get(BACKUP_SESSION)?.value && originalSession) {
     cookieStore.set(BACKUP_SESSION, originalSession, COOKIE_OPTS)
@@ -143,10 +153,24 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ ok: false, error: '임시 로그인 상태 아님' }, { status: 400 })
   }
 
-  // 원본 복원
-  cookieStore.set('localution_user', backup, sessionCookieSetOpts(req.url))
-  if (backupSession) {
-    cookieStore.set('localution_session', backupSession, sessionCookieSetOpts(req.url))
+  // 백업이 관리자 본인 것인지 서명 · 화이트리스트로 확인 (임시 로그인 중엔 requireAdmin 이 대상 사장님으로 판정된다)
+  const backupUser = verifyCookie(backup)
+  if (!backupUser || !isAdminEmail(backupUser.email)) {
+    cookieStore.delete(BACKUP_COOKIE)
+    cookieStore.delete(BACKUP_SESSION)
+    return NextResponse.json({ ok: false, error: '복귀 정보가 올바르지 않아요. 다시 로그인해 주세요.' }, { status: 403 })
+  }
+
+  if (backupUser.provider === SUPABASE_ADMIN_MARKER) {
+    // 이메일 로그인 관리자: 임시 쿠키만 지우면 원래 Supabase 세션으로 돌아간다
+    cookieStore.set('localution_user', '', sessionCookieDeleteOpts(req.url))
+    cookieStore.set('localution_session', '', sessionCookieDeleteOpts(req.url))
+  } else {
+    // 원본 복원
+    cookieStore.set('localution_user', backup, sessionCookieSetOpts(req.url))
+    if (backupSession) {
+      cookieStore.set('localution_session', backupSession, sessionCookieSetOpts(req.url))
+    }
   }
 
   // 백업 쿠키 삭제
