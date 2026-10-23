@@ -1,7 +1,8 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { isAdminEmail } from '@/app/lib/admin-emails'
 import { verifyCookieEdge, decideAdminGate } from '@/app/lib/cookieSigningEdge'
-import { detectApexDomain } from '@/app/lib/session-cookies'
+import { hasPlausibleSupabaseSession } from '@/app/lib/supabase-cookie-shape'
+import { appendSessionCookieClears } from '@/app/lib/session-cookies'
 
 // 로그인 필수 경로 (prefix 매칭)
 // ⚠️ 공개 페이지 절대 추가 금지:
@@ -48,10 +49,12 @@ function isAdminPath(pathname: string): boolean {
 //      아무 값이나 심으면 보호 경로 미들웨어를 통과했다. /api/me 도 session 만 있고 user 가 없으면
 //      로그아웃으로 보므로 같은 기준으로 맞췄다.
 //      예전 코드는 localution_user 를 JSON.parse 해서 항상 실패 → 관리자 검사도 통째로 건너뛰었다.
-//   2) sb-*-auth-token : Supabase Auth (브라우저 SDK) — Edge 에서 JWT 를 검증할 비밀값이 없어
-//      존재만 본다. 데이터는 각 API 의 requireUser · requireAdmin 이 토큰을 검증해 막는다.
+//   2) sb-*-auth-token : Supabase Auth (브라우저 SDK) — Edge 에서 JWT 서명을 검증할 비밀값이 없어
+//      형식만 본다: 쿠키에서 access_token 을 꺼내 JWT 3조각 · JSON 헤더 · 미래 exp 인지 (SEC-L01 잔여).
+//      'sb-아무거나-auth-token=1' 같은 값은 여기서 걸러진다. 서명 위조 토큰은 형식이 맞으면 통과하지만
+//      실제 권한은 각 API 의 requireUser · requireAdmin 이 Supabase 에 토큰을 다시 검증해 막는다.
 function hasSupabaseSessionCookie(request: NextRequest): boolean {
-  return request.cookies.getAll().some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token') && !!c.value)
+  return hasPlausibleSupabaseSession(request.cookies.getAll())
 }
 
 async function readVerifiedLocalutionUser(request: NextRequest) {
@@ -77,12 +80,9 @@ export async function middleware(request: NextRequest) {
     const res = NextResponse.redirect(loginUrl)
     // 서명 무효 localution_user · 짝 없는 localution_session 이 남아 있으면 지운다
     // (남겨 두면 /login 과 보호 경로 사이를 오가며 '로그인된 것처럼 보이는' 상태가 계속된다)
-    const domain = detectApexDomain(request.headers.get('host'))
-    for (const name of ['localution_user', 'localution_session']) {
-      if (request.cookies.get(name)?.value) {
-        res.cookies.set(name, '', { path: '/', maxAge: 0, expires: new Date(0), ...(domain ? { domain } : {}) })
-      }
-    }
+    // R-07: 호스트 전용 · Domain 지정 두 벌 모두 지운다 (한 벌만 지우면 남은 옛 쿠키로 /login 이 반복된다)
+    const stale = ['localution_user', 'localution_session'].filter(name => !!request.cookies.get(name)?.value)
+    if (stale.length) appendSessionCookieClears(res.headers, request.url, stale)
     return res
   }
 

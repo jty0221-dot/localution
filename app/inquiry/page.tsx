@@ -238,7 +238,8 @@ ${lines.join('\n')}
  const res = await fetch('/api/inquiry', {
  method: 'POST',
  headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify(form),
+ // 서버도 동의 여부를 검사한다 (없으면 400)
+ body: JSON.stringify({ ...form, privacyConsent: agreed === true }),
  })
  if (res.ok) {
  const data = await res.json()
@@ -253,6 +254,9 @@ ${lines.join('\n')}
  setSubmitted(true)
  setForm({ name: '', contact: '', category: '서비스문의', message: '' })
  setAgreed(false)
+ } else if (res.status === 400) {
+ const j = await res.json().catch(() => null)
+ setError(j?.error || '입력 내용을 확인해 주세요.')
  } else { setError('접수 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요.') }
  } catch { setError('네트워크 오류가 발생했습니다.') }
  setSubmitting(false)

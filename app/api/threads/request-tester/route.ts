@@ -7,40 +7,18 @@ import { requireUser } from '@/app/lib/userAuth'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
-async function ensureTable(svc: ReturnType<typeof createServiceClient>) {
+// 테이블 존재 확인만 한다 (LU-018)
+//   · 예전에는 테이블이 없으면 서비스 키를 Authorization 헤더에 직접 붙여 Supabase 관리 API 에 DDL 을 보냈다.
+//     관리 API 는 서비스 키(JWT 든 새 sb_secret_ 키든)를 받지 않아 동작한 적이 없고, 운영 코드가 실행 중 DDL 을
+//     시도하는 것 자체를 막는다. 테이블은 migrations/threads_tester_requests.sql 로 만든다(운영 적용은 결재).
+//   · Supabase 접근은 supabase-js 서비스 클라이언트(createServiceClient)만 쓴다 → 키 형식이 바뀌어도 동작.
+async function tableReady(svc: ReturnType<typeof createServiceClient>): Promise<boolean> {
  const { error } = await svc.from('threads_tester_requests').select('id').limit(1)
- if (!error) return
-
- const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
- const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY!
- const projectRef = supabaseUrl.match(/https:\/\/([^.]+)\./)?.[1]
- if (!projectRef) return
-
- const sql = `
- CREATE TABLE IF NOT EXISTS public.threads_tester_requests (
- id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
- user_id TEXT NOT NULL,
- instagram_id TEXT NOT NULL,
- store_name TEXT,
- contact TEXT,
- status TEXT NOT NULL DEFAULT 'pending'
- CHECK (status IN ('pending','processing','done','rejected')),
- memo TEXT,
- created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
- updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
- );
- ALTER TABLE public.threads_tester_requests ENABLE ROW LEVEL SECURITY;
- DO $$ BEGIN
- CREATE POLICY "service_full_tester_req" ON public.threads_tester_requests
- FOR ALL TO service_role USING (true) WITH CHECK (true);
- EXCEPTION WHEN duplicate_object THEN NULL; END $$;
- `
- await fetch(`https://api.supabase.com/v1/projects/${projectRef}/database/query`, {
- method: 'POST',
- headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${serviceKey}` },
- body: JSON.stringify({ query: sql }),
- }).catch(() => {})
+ if (error) console.error('[threads/request-tester] threads_tester_requests 사용 불가 · migrations/threads_tester_requests.sql 적용 필요:', error.message)
+ return !error
 }
+
+const NOT_READY = { ok: false, error: '테스터 신청 기능을 준비하고 있어요. 잠시 뒤 다시 시도해 주세요.' }
 
 export async function POST(req: NextRequest) {
  const auth = await requireUser()
@@ -58,7 +36,7 @@ export async function POST(req: NextRequest) {
  }
 
  const svc = createServiceClient()
- await ensureTable(svc)
+ if (!(await tableReady(svc))) return NextResponse.json(NOT_READY, { status: 503 })
 
  // 이미 신청한 경우 중복 방지
  const { data: existing } = await svc
@@ -97,7 +75,7 @@ export async function GET() {
  if (!auth.ok) return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status })
 
  const svc = createServiceClient()
- await ensureTable(svc)
+ if (!(await tableReady(svc))) return NextResponse.json({ ...NOT_READY, request: null }, { status: 503 })
 
  const { data } = await svc
  .from('threads_tester_requests')

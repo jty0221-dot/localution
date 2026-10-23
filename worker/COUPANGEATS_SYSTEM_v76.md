@@ -117,8 +117,8 @@
 | 73 | auto-publish 의 has_reply 차단 제거 (워커 pre-check 위임) | app/api/review-reply/auto-publish/route.ts |
 | **74** | **page.evaluate → APIRequestContext (navigation 영향 없음 — 핵심)** | worker/adapters/coupangeats.ts |
 | **75** | **트래픽 절감 — cron 1일 1번 + DAYS_BACK 14 + 리소스 차단** | vercel.json, worker/adapters/coupangeats.ts |
-| 75-2 | manual-fetch endpoint (수동 풀 fetch) | app/api/admin/manual-fetch/route.ts |
-| 75-3 | cleanup ?force=1 옵션 (active job 강제 제거) | app/api/admin/queue-cleanup/route.ts |
+| 75-2 | manual-fetch endpoint (수동 풀 fetch) | app/api/me/manual-fetch/route.ts |
+| 75-3 | cleanup ?force=1 옵션 (active job 강제 제거) | app/api/me/queue-cleanup/route.ts |
 | 76 | 직접 가져오기 UI 제거 (자동 연결로 대체) | PlatformReviewAdmin.tsx |
 
 ---
@@ -270,10 +270,10 @@ hasReply: !!r.has_reply
 
 | URL | 용도 |
 |---|---|
-| `/api/admin/queue-status` | 큐 상태 진단 (대기/active/failed) |
-| `/api/admin/queue-cleanup` | 큐 정리 (waiting fetch_reviews 만, post_reply 보존) |
-| `/api/admin/queue-cleanup?force=1` | 강제 정리 (active 도 제거) |
-| `/api/admin/manual-fetch?days=90&platform=coupangeats` | 수동 풀 fetch (90일 등) |
+| `/api/me/queue-status` | 큐 상태 진단 (대기/active/failed) |
+| `/api/me/queue-cleanup` | 큐 정리 (waiting fetch_reviews 만, post_reply 보존) |
+| `/api/me/queue-cleanup?force=1 (POST)` | 강제 정리 (active 도 제거) |
+| `/api/me/manual-fetch?days=90&platform=coupangeats` | 수동 풀 fetch (90일 등) |
 
 ### 자동 cron (Vercel)
 
@@ -309,7 +309,7 @@ hasReply: !!r.has_reply
 
 ## 11. 사용자 신고 시 진단 순서
 
-1. `https://www.localution.co.kr/api/admin/queue-status` 응답 캡처
+1. `https://www.localution.co.kr/api/me/queue-status` 응답 캡처
 2. 사장님이 클릭한 review의 platform_review_id 확인
 3. Railway worker 로그 (Logs 탭) 에서 해당 review_id 검색
 4. 흔한 케이스:

@@ -36,20 +36,16 @@ const UPDATES = [
   { title: '대시보드', summary: '매장의 리뷰·키워드·활동 현황을 한 화면에서 한눈에 볼 수 있습니다.', category: 'feature', released_at: '2026-03-01', sort_order: 1 },
 ]
 
+// Supabase 새 키(sb_secret_ · JWT 아님)에서도 동작하도록 서비스 키를 Authorization 헤더에 직접 붙이지 않고
+// supabase-js 클라이언트를 쓴다 (LU-018). 클라이언트가 키 형식에 맞춰 헤더를 붙인다.
+const { createClient } = require('@supabase/supabase-js')
+const supabase = createClient(SUPABASE_URL, SERVICE_KEY, { auth: { persistSession: false, autoRefreshToken: false } })
+
 async function upsertUpdate(item) {
-  const res = await fetch(`${SUPABASE_URL}/rest/v1/app_updates`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'apikey': SERVICE_KEY,
-      'Authorization': `Bearer ${SERVICE_KEY}`,
-      'Prefer': 'resolution=merge-duplicates,return=minimal',
-    },
-    body: JSON.stringify({ ...item, active: true }),
-  })
-  const text = await res.text()
-  if (!res.ok && res.status !== 409) {
-    console.error('FAIL', item.title, res.status, text.slice(0, 200))
+  const { error } = await supabase.from('app_updates').insert({ ...item, active: true })
+  // 23505 = 이미 있는 행 (예전 REST 호출의 409 와 같은 뜻) → 성공으로 본다
+  if (error && error.code !== '23505') {
+    console.error('FAIL', item.title, error.code || '', String(error.message || '').slice(0, 200))
     return false
   }
   console.log('OK', item.title)

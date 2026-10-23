@@ -7,8 +7,14 @@
 // · og:meta + JSON-LD product schema + 네이버 쇼핑 패턴
 // · 5분 in-memory 캐시 (실시간 체크하되 부하 최소화)
 // · 실패 시 graceful — null 필드 반환
+// · 보안(SEC-L12): 로그인 필수 · 허용 호스트(제휴 미리보기 출처)만 · http(s) 기본 포트만
+//   DNS 해석 IP 가 사설/루프백/링크로컬/메타데이터면 거부 · 리다이렉트 안 따라감
+//   응답 1MB · 8초 상한 · 캐시 100개 상한 · CORS 와일드카드 제거
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
+import { requireUser } from '../../../lib/userAuth'
+import { safeFetchText } from '../../../lib/safe-fetch'
+import { AFFILIATE_PREVIEW_HOSTS } from '../../../lib/affiliate-config'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -18,15 +24,21 @@ type CacheEntry = { at: number; data: any }
 const CACHE: Map<string, CacheEntry> = (globalThis as any).__affiliate_cache || new Map()
 ;(globalThis as any).__affiliate_cache = CACHE
 const TTL_MS = 5 * 60 * 1000
+const CACHE_MAX = 100
+const MAX_BYTES = 1_000_000
+const TIMEOUT_MS = 8000
 
-const CORS_HEADERS = {
- 'Access-Control-Allow-Origin': '*',
- 'Access-Control-Allow-Methods': 'GET, OPTIONS',
- 'Access-Control-Allow-Headers': 'Content-Type',
-}
+// 같은 출처 화면(qr-admin)만 부른다 → CORS 헤더 없음 · 응답은 사용자별로 캐시하지 않는다
+const CORS_HEADERS = { 'Cache-Control': 'private, no-store' }
 
-export async function OPTIONS() {
- return new NextResponse(null, { status: 204, headers: CORS_HEADERS })
+function cacheSet(key: string, entry: CacheEntry) {
+ CACHE.delete(key)
+ CACHE.set(key, entry)
+ while (CACHE.size > CACHE_MAX) {
+ const oldest = CACHE.keys().next().value
+ if (oldest === undefined) break
+ CACHE.delete(oldest)
+ }
 }
 
 function pickMeta(html: string, names: string[]): string | null {
@@ -121,6 +133,11 @@ function parsePrice(html: string): { price: string | null; currency: string | nu
 }
 
 export async function GET(req: NextRequest) {
+ const auth = await requireUser()
+ if (!auth.ok) {
+ return NextResponse.json({ ok: false, error: 'unauthorized' }, { status: 401, headers: CORS_HEADERS })
+ }
+
  const url = req.nextUrl.searchParams.get('url')
  if (!url || !/^https?:\/\//i.test(url)) {
  return NextResponse.json({ ok: false, error: 'invalid_url' }, { status: 400, headers: CORS_HEADERS })
@@ -133,19 +150,21 @@ export async function GET(req: NextRequest) {
  }
 
  try {
- const res = await fetch(url, {
+ const res = await safeFetchText(url, {
+ allowedHosts: AFFILIATE_PREVIEW_HOSTS,
+ maxBytes: MAX_BYTES,
+ timeoutMs: TIMEOUT_MS,
  headers: {
  'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/127.0.0.0 Safari/537.36',
  'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
  'Accept-Language': 'ko-KR,ko;q=0.9,en-US;q=0.8',
  },
- redirect: 'follow',
- signal: AbortSignal.timeout(8000),
  })
  if (!res.ok) {
- return NextResponse.json({ ok: false, error: 'fetch_failed', status: res.status }, { status: 502, headers: CORS_HEADERS })
+ const status = res.error === 'invalid_url' || res.error === 'host_not_allowed' ? 400 : 502
+ return NextResponse.json({ ok: false, error: res.error, status: res.status }, { status, headers: CORS_HEADERS })
  }
- const html = await res.text()
+ const html = res.text
 
  const ogImage = pickMeta(html, ['og:image', 'og:image:secure_url', 'twitter:image'])
  const ogTitle = pickMeta(html, ['og:title', 'twitter:title']) || pickTitle(html)
@@ -193,9 +212,9 @@ export async function GET(req: NextRequest) {
  reviewCount: reviewCount ?? null,
  brand: brandName ? brandName.slice(0, 60) : null,
  }
- CACHE.set(url, { at: Date.now(), data })
+ cacheSet(url, { at: Date.now(), data })
  return NextResponse.json({ ok: true, cached: false, ...data }, { headers: CORS_HEADERS })
  } catch (e: any) {
- return NextResponse.json({ ok: false, error: 'parse_failed', message: String(e?.message || e).slice(0, 120) }, { status: 500, headers: CORS_HEADERS })
+ return NextResponse.json({ ok: false, error: 'parse_failed' }, { status: 500, headers: CORS_HEADERS })
  }
 }

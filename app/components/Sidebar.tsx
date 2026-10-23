@@ -4,7 +4,6 @@ import { Suspense, useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 import { usePathname, useSearchParams, useRouter } from 'next/navigation'
 import { Link2, ClipboardList, Store, Settings, MessageSquare, LogOut, BarChart3, HelpCircle, Shield } from 'lucide-react'
-import { isAdminEmail } from '@/app/lib/admin-emails'
 
 const FLAT_NAV = [
  { href: '/support', label: '지원사업', icon: '지원', colors: { bg: '#E7F1ED', text: '#16685D' } },
@@ -178,6 +177,8 @@ interface UserInfo {
  name: string
  email: string
  provider: string
+ // /api/me 가 서버에서 판정한 관리자 여부 (화면 표시용 · 실제 권한은 서버가 다시 본다)
+ isAdmin?: boolean
 }
 
 function SidebarContent() {
@@ -627,7 +628,7 @@ function SidebarContent() {
  <MessageSquare size={16} strokeWidth={2.5} />
  <span className="font-medium">1:1 문의</span>
  </Link>
- {isAdminEmail(userEmail) && (
+ {user?.isAdmin === true && (
  <>
  <div className="h-px bg-[#F3F5F4]" />
  <Link href="/admin/users"
