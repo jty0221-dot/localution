@@ -2,7 +2,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 import { isAdminEmail } from '@/app/lib/admin-emails'
 import { verifyCookieEdge, decideAdminGate } from '@/app/lib/cookieSigningEdge'
 import { hasPlausibleSupabaseSession } from '@/app/lib/supabase-cookie-shape'
-import { detectApexDomain } from '@/app/lib/session-cookies'
+import { appendSessionCookieClears } from '@/app/lib/session-cookies'
 
 // 로그인 필수 경로 (prefix 매칭)
 // ⚠️ 공개 페이지 절대 추가 금지:
@@ -80,12 +80,9 @@ export async function middleware(request: NextRequest) {
     const res = NextResponse.redirect(loginUrl)
     // 서명 무효 localution_user · 짝 없는 localution_session 이 남아 있으면 지운다
     // (남겨 두면 /login 과 보호 경로 사이를 오가며 '로그인된 것처럼 보이는' 상태가 계속된다)
-    const domain = detectApexDomain(request.headers.get('host'))
-    for (const name of ['localution_user', 'localution_session']) {
-      if (request.cookies.get(name)?.value) {
-        res.cookies.set(name, '', { path: '/', maxAge: 0, expires: new Date(0), ...(domain ? { domain } : {}) })
-      }
-    }
+    // R-07: 호스트 전용 · Domain 지정 두 벌 모두 지운다 (한 벌만 지우면 남은 옛 쿠키로 /login 이 반복된다)
+    const stale = ['localution_user', 'localution_session'].filter(name => !!request.cookies.get(name)?.value)
+    if (stale.length) appendSessionCookieClears(res.headers, request.url, stale)
     return res
   }
 

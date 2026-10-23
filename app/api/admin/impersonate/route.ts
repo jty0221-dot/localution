@@ -20,6 +20,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { cookies } from 'next/headers'
 import { requireAdmin, createServiceClient } from '@/app/lib/adminAuth'
 import { signCookie, verifyCookie } from '@/app/lib/cookieSigning'
+import { sessionCookieSetOpts, appendHostOnlyDuplicateClears, SESSION_COOKIE_NAMES } from '@/app/lib/session-cookies'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -93,13 +94,15 @@ export async function POST(req: NextRequest) {
     name: targetName || '임시 로그인 사용자',
     provider: targetProvider || 'admin_impersonation',
   })
-  cookieStore.set('localution_user', signed, COOKIE_OPTS)
+  // R-07: 로그인 콜백과 같은 속성(프로덕션 Domain=.localution.co.kr)으로 심어야 같은 이름 쿠키가 두 벌 안 생긴다
+  const sessOpts = sessionCookieSetOpts(req.url, COOKIE_OPTS.maxAge)
+  cookieStore.set('localution_user', signed, sessOpts)
   // localution_session 은 access_token 형식을 기대 — fake token 표시
-  cookieStore.set('localution_session', `impersonation:${admin.email}:${targetUserId}`, COOKIE_OPTS)
+  cookieStore.set('localution_session', `impersonation:${admin.email}:${targetUserId}`, sessOpts)
 
   console.log(`[admin-impersonate] ${admin.email} → ${targetUserId} (${targetEmail || 'no-email'})`)
 
-  return NextResponse.json({
+  const res = NextResponse.json({
     ok: true,
     impersonating: {
       user_id: targetUserId,
@@ -110,6 +113,8 @@ export async function POST(req: NextRequest) {
     expires_in_sec: COOKIE_OPTS.maxAge,
     message: '임시 로그인 활성화 (1시간) — 사장님 화면 동일하게 사용 가능',
   })
+  appendHostOnlyDuplicateClears(res.headers, req.url, SESSION_COOKIE_NAMES)
+  return res
 }
 
 export async function GET() {
@@ -129,7 +134,7 @@ export async function GET() {
   })
 }
 
-export async function DELETE() {
+export async function DELETE(req: NextRequest) {
   const admin = await requireAdmin()
   // 백업 쿠키 검증 — admin 권한이거나, 이미 백업이 있는 상태에서 본인 호출
   const cookieStore = await cookies()
@@ -141,21 +146,9 @@ export async function DELETE() {
   }
 
   // 원본 복원
-  cookieStore.set('localution_user', backup, {
-    httpOnly: true,
-    secure: true,
-    sameSite: 'lax' as const,
-    maxAge: 30 * 24 * 60 * 60,
-    path: '/',
-  })
+  cookieStore.set('localution_user', backup, sessionCookieSetOpts(req.url))
   if (backupSession) {
-    cookieStore.set('localution_session', backupSession, {
-      httpOnly: true,
-      secure: true,
-      sameSite: 'lax' as const,
-      maxAge: 30 * 24 * 60 * 60,
-      path: '/',
-    })
+    cookieStore.set('localution_session', backupSession, sessionCookieSetOpts(req.url))
   }
 
   // 백업 쿠키 삭제
@@ -164,5 +157,7 @@ export async function DELETE() {
 
   console.log(`[admin-impersonate] revert by ${admin.ok ? admin.email : 'unknown'}`)
 
-  return NextResponse.json({ ok: true, message: '관리자 계정으로 복귀' })
+  const res = NextResponse.json({ ok: true, message: '관리자 계정으로 복귀' })
+  appendHostOnlyDuplicateClears(res.headers, req.url, SESSION_COOKIE_NAMES)
+  return res
 }

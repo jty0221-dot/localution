@@ -1,29 +1,21 @@
 import { NextResponse } from 'next/server'
-import { cookies } from 'next/headers'
-import { sessionCookieDeleteOpts } from '@/app/lib/session-cookies'
+import { appendSessionCookieClears } from '@/app/lib/session-cookies'
 
-async function clearAll(requestUrl: string) {
-  const cookieStore = await cookies()
-  const opts = sessionCookieDeleteOpts(requestUrl)
-  // 모든 인증/캐시 쿠키 명시적 제거 (path=/, domain=.localution.co.kr 매칭)
-  const keys = ['localution_session', 'localution_user', 'sb-access-token', 'sb-refresh-token']
-  for (const k of keys) {
-    try { cookieStore.delete(k) } catch {}
-    // 도메인 스코프로 심어진 쿠키 삭제 (매칭 실패 시 브라우저가 무시)
-    try { cookieStore.set(k, '', opts) } catch {}
-    // 이전 버전에서 도메인 없이 심어진 쿠키도 함께 삭제 (전환기 대응)
-    try { cookieStore.set(k, '', { expires: new Date(0), path: '/', maxAge: 0 }) } catch {}
-  }
-}
+// 모든 인증/캐시 쿠키를 호스트 전용 · Domain(.localution.co.kr) 지정 두 벌 모두 지운다 (LU-018 · R-07)
+//   예전 코드는 cookies() 에 같은 이름을 세 번 set/delete 했는데, Next 는 이름 하나에 Set-Cookie 하나만
+//   남겨 마지막(호스트 전용 삭제)만 나갔다 → 프로덕션의 Domain 쿠키가 로그아웃 뒤에도 남았다.
+const KEYS = ['localution_session', 'localution_user', 'sb-access-token', 'sb-refresh-token']
 
 export async function GET(request: Request) {
   const baseUrl = new URL(request.url).origin
-  await clearAll(request.url)
-  return NextResponse.redirect(new URL('/login', baseUrl))
+  const res = NextResponse.redirect(new URL('/login', baseUrl))
+  appendSessionCookieClears(res.headers, request.url, KEYS)
+  return res
 }
 
 // 클라이언트 fetch('/api/auth/logout', { method: 'POST' }) 호환
 export async function POST(request: Request) {
-  await clearAll(request.url)
-  return NextResponse.json({ ok: true })
+  const res = NextResponse.json({ ok: true })
+  appendSessionCookieClears(res.headers, request.url, KEYS)
+  return res
 }
