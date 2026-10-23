@@ -1,6 +1,8 @@
 // app/api/threads/generate/route.ts
 // AI로 Threads 포스트 초안 생성 (Claude)
 import { NextRequest, NextResponse } from 'next/server'
+import { requireUser } from '@/app/lib/userAuth'
+import { rateLimit } from '@/app/lib/rate-limit'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -17,7 +19,25 @@ const PERSONA_DESC: Record<string, string> = {
 }
 
 export async function POST(request: NextRequest) {
- const body = await request.json() as {
+ // LU-018 · 유료 AI 호출 — 로그인 사용자만 · 사용자당 1분 5회 · 1일 100회
+ const auth = await requireUser()
+ if (!auth.ok) {
+ return NextResponse.json(
+ { error: auth.status === 401 ? '로그인하면 쓸 수 있어요.' : auth.message, code: auth.status === 401 ? 'login_required' : 'auth_error' },
+ { status: auth.status },
+ )
+ }
+ const perMin = await rateLimit({ bucket: 'threads-gen-min', id: auth.userId, limit: 5, windowSec: 60 })
+ const perDay = perMin.ok ? await rateLimit({ bucket: 'threads-gen-day', id: auth.userId, limit: 100, windowSec: 86400 }) : perMin
+ if (!perMin.ok || !perDay.ok) {
+ const retryAfter = (!perMin.ok ? perMin : perDay).retryAfter
+ return NextResponse.json(
+ { error: 'AI 생성 요청이 너무 많아요. 잠시 후 다시 시도해주세요.', code: 'rate_limited', retryAfter },
+ { status: 429, headers: { 'Retry-After': String(retryAfter || 60) } },
+ )
+ }
+
+ let body: {
  topic?: string
  persona?: string
  business_type?: string
@@ -25,6 +45,15 @@ export async function POST(request: NextRequest) {
  review_text?: string
  review_rating?: number
  }
+ try {
+ body = await request.json()
+ } catch {
+ return NextResponse.json({ error: '요청 형식이 올바르지 않아요.' }, { status: 400 })
+ }
+ // 입력 길이 상한 (프롬프트 비용 보호)
+ if (typeof body.topic === 'string') body.topic = body.topic.slice(0, 300)
+ if (typeof body.review_text === 'string') body.review_text = body.review_text.slice(0, 2000)
+ if (typeof body.business_type === 'string') body.business_type = body.business_type.slice(0, 50)
 
  const persona = body.persona || 'friendly'
  const personaDesc = PERSONA_DESC[persona] ?? PERSONA_DESC.friendly
@@ -34,7 +63,7 @@ export async function POST(request: NextRequest) {
 
  if (body.mode === 'from_review' && body.review_text?.trim()) {
  // 리뷰 기반 생성
- const rating = body.review_rating ?? 5
+ const rating = Math.min(5, Math.max(1, Math.round(Number(body.review_rating ?? 5)) || 5))
  const stars = '★'.repeat(rating)
  prompt = `너는 ${businessType}를 위한 스레드(Threads) SNS 콘텐츠 전문가다.
 
@@ -94,8 +123,8 @@ ${body.review_text.trim()}
  })
 
  if (!res.ok) {
- const err = await res.text()
- throw new Error(`Anthropic API 오류: ${res.status} ${err.slice(0, 200)}`)
+ // 공급자 응답 본문은 돌려주지 않는다
+ throw new Error(`AI 서비스 오류 (${res.status})`)
  }
 
  const data = await res.json() as { content?: { text: string }[] }

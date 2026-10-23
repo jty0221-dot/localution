@@ -7,6 +7,8 @@
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/app/lib/adminAuth'
+import { rateLimit, getClientIp } from '@/app/lib/rate-limit'
+import { publicStampCard, publicStampCollection } from '@/app/lib/stamp-public'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -19,6 +21,16 @@ const CORS = {
 
 export async function OPTIONS() {
  return new NextResponse(null, { status: 204, headers: CORS })
+}
+
+// LU-018 · 공개 라우트 속도제한 (Redis fixed-window · rate-limit.ts)
+//   · 적립(POST): IP 당 10분 20회 · 매장 당 1시간 300회 (적립 위조 · 손님 명부 오염 방지)
+//   · 조회(GET + phone): IP 당 10분 30회 (전화번호 대입 조회 방지) · 카드만 조회: IP 당 1분 60회
+function tooMany(retryAfter: number) {
+ return NextResponse.json(
+ { ok: false, error: 'rate_limited', message: '잠시 후 다시 시도해주세요.' },
+ { status: 429, headers: { ...CORS, 'Retry-After': String(retryAfter || 60) } },
+ )
 }
 
 function normalizePhone(p: string): string {
@@ -38,6 +50,12 @@ export async function POST(req: NextRequest) {
 
  if (!slug) return NextResponse.json({ ok: false, error: 'missing_slug' }, { status: 400, headers: CORS })
  if (phone.length < 10) return NextResponse.json({ ok: false, error: 'invalid_phone' }, { status: 400, headers: CORS })
+
+ const ip = getClientIp(req)
+ const byIp = await rateLimit({ bucket: 'stamp-collect-ip', id: ip, limit: 20, windowSec: 600 })
+ if (!byIp.ok) return tooMany(byIp.retryAfter)
+ const byStore = await rateLimit({ bucket: 'stamp-collect-store', id: slug.slice(0, 80), limit: 300, windowSec: 3600 })
+ if (!byStore.ok) return tooMany(byStore.retryAfter)
 
  const svc = createServiceClient()
 
@@ -95,8 +113,8 @@ export async function POST(req: NextRequest) {
  if (minutesAgo < 60) {
  return NextResponse.json({
  ok: true, deduped: true,
- card,
- collection: existing,
+ card: publicStampCard(card),
+ collection: publicStampCollection(existing),
  message: '한 시간 이내에 이미 적립하셨어요.',
  }, { headers: CORS })
  }
@@ -127,7 +145,7 @@ export async function POST(req: NextRequest) {
  consent_marketing: consent || existing.consent_marketing,
  })
  .eq('id', existing.id)
- if (error) return NextResponse.json({ ok: false, error: 'update_failed', message: error.message }, { status: 500, headers: CORS })
+ if (error) return NextResponse.json({ ok: false, error: 'update_failed' }, { status: 500, headers: CORS })
  } else {
  const { data, error } = await svc
  .from('stamp_collections')
@@ -145,7 +163,7 @@ export async function POST(req: NextRequest) {
  })
  .select('id')
  .single()
- if (error) return NextResponse.json({ ok: false, error: 'insert_failed', message: error.message }, { status: 500, headers: CORS })
+ if (error) return NextResponse.json({ ok: false, error: 'insert_failed' }, { status: 500, headers: CORS })
  collectionId = data.id
  }
 
@@ -203,8 +221,8 @@ export async function POST(req: NextRequest) {
 
  return NextResponse.json({
  ok: true,
- card,
- collection: updated,
+ card: publicStampCard(card),
+ collection: publicStampCollection(updated),
  reward_pending: willCompleteReward,
  milestone_reached: hitMilestone || null,
  message: willCompleteReward
@@ -216,11 +234,18 @@ export async function POST(req: NextRequest) {
 }
 
 // GET — 카드 정보 + 손님 적립 현황 조회 (전화번호 기반)
+//   · LU-018: 응답은 적립 수 같은 최소값만 (전화번호 · 이름 · 동의 여부 · 사장님 user_id 제외)
 export async function GET(req: NextRequest) {
  const slug = req.nextUrl.searchParams.get('slug') || ''
  const phone = normalizePhone(req.nextUrl.searchParams.get('phone') || '')
 
  if (!slug) return NextResponse.json({ ok: false, error: 'missing_slug' }, { status: 400, headers: CORS })
+
+ const ip = getClientIp(req)
+ const rl = phone.length >= 10
+ ? await rateLimit({ bucket: 'stamp-lookup-ip', id: ip, limit: 30, windowSec: 600 })
+ : await rateLimit({ bucket: 'stamp-card-ip', id: ip, limit: 60, windowSec: 60 })
+ if (!rl.ok) return tooMany(rl.retryAfter)
 
  const svc = createServiceClient()
 
@@ -276,5 +301,5 @@ export async function GET(req: NextRequest) {
  collection = data
  }
 
- return NextResponse.json({ ok: true, card, collection }, { headers: CORS })
+ return NextResponse.json({ ok: true, card: publicStampCard(card), collection: publicStampCollection(collection) }, { headers: CORS })
 }

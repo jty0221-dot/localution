@@ -178,6 +178,10 @@ export default function BlogTrackingPage() {
  setTop5Loading(true); setTop5Error(null); setTop5Data([]); setTop5Keyword('')
  try {
  const r = await fetch(`/api/marketing/blog-top5?keyword=${encodeURIComponent(kw)}`)
+ if (r.status === 401) {
+ setTop5Error('로그인하면 쓸 수 있어요.')
+ return
+ }
  const j = await r.json()
  if (!r.ok || j.error) throw new Error(j.error || `HTTP ${r.status}`)
  setTop5Data(j.items || [])
