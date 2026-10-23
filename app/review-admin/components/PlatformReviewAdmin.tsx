@@ -28,6 +28,8 @@ import ReplyTemplatePicker from '../../components/ReplyTemplatePicker'
 import PageHeader from '../../components/PageHeader'
 import { toast } from '../../lib/toast'
 import { copyTextWithFallback } from '../../lib/clipboard'
+import { DEFAULT_REPLY_VOICE, normalizeReplyVoice, voiceFromLegacyEditor, shouldMigrateLegacy, toAiRequest, type ReplyVoice } from '../../lib/reply-voice'
+import { sanitizeReviewId } from '../../lib/review-inbox'
 import { Heart, Briefcase, Smile, Edit3, Mail, Flame, FileText, AlertTriangle, Sparkles, Star, Shuffle, X, Hourglass, Clock, type LucideIcon } from 'lucide-react'
 // 76차: CoupangReviewBookmarkletDialog import 제거 (자동 연결로 대체됨)
 
@@ -77,6 +79,8 @@ const AGE_OPTIONS: { value: PersonaAge; label: string }[] = [
 ]
 
 const PERSONA_KEY = 'localution:review_persona'
+// LU-018 W2-10: 브라우저 값을 서버(/api/reply-voice)로 한 번 옮겼는지
+const PERSONA_MIGRATED_KEY = 'localution:review_persona_migrated'
 
 interface Review {
  id: string
@@ -307,6 +311,63 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  return ''
  })
 
+ // LU-018 W2-10: 계정 단위 답글 말투 (서버 저장). 서버 값이 있으면 브라우저 값보다 우선한다.
+ const [voice, setVoice] = useState<ReplyVoice>(DEFAULT_REPLY_VOICE)
+ const [voiceStorage, setVoiceStorage] = useState<'loading' | 'ready' | 'missing' | 'error'>('loading')
+ useEffect(() => {
+ let alive = true
+ // 불러오는 사이 사장님이 바꾼 값은 덮지 않도록 시작 시점 값을 기억한다
+ const startPersona = persona
+ const startCustom = customPrompt
+ ;(async () => {
+ try {
+ const res = await fetch('/api/reply-voice', { credentials: 'include', cache: 'no-store' })
+ const j = await res.json().catch(() => null)
+ if (!alive) return
+ if (!res.ok || !j?.ok) { setVoiceStorage('error'); return }
+ const storage: 'ready' | 'missing' = j.storage === 'ready' ? 'ready' : 'missing'
+ setVoiceStorage(storage)
+ let serverVoice = normalizeReplyVoice(j.voice)
+ let legacy: Partial<ReplyVoice> | null = null
+ let migrated = false
+ let migratedNow = false
+ try {
+ legacy = voiceFromLegacyEditor(localStorage.getItem(PERSONA_KEY), localStorage.getItem(CUSTOM_PROMPT_KEY))
+ migrated = localStorage.getItem(PERSONA_MIGRATED_KEY) === '1'
+ } catch { /* 브라우저 저장소를 못 읽으면 옮기지 않는다 */ }
+ // 처음 한 번 : 서버에 값이 없고 이 기기에 예전 값이 있으면 서버로 옮긴다
+ if (shouldMigrateLegacy({ storage, serverSaved: !!j.saved, legacy, alreadyMigrated: migrated })) {
+ const put = await fetch('/api/reply-voice', {
+ method: 'PUT', credentials: 'include',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ voice: legacy, migrate_from_browser: true }),
+ })
+ const pj = await put.json().catch(() => null)
+ if (!alive) return
+ if (put.ok && pj?.ok) {
+ serverVoice = normalizeReplyVoice(pj.voice)
+ migratedNow = true
+ try { localStorage.setItem(PERSONA_MIGRATED_KEY, '1') } catch {}
+ }
+ } else if (storage === 'ready' && j.saved) {
+ try { localStorage.setItem(PERSONA_MIGRATED_KEY, '1') } catch {}
+ }
+ // 서버에 저장돼 있거나 방금 옮겼을 때만 서버 값을 쓴다.
+ // 서버가 비어 있고 옮기지도 못했으면(이미 옮긴 표시 · 실패 · 준비 전) 이 기기 값을 그대로 둔다.
+ if (storage === 'ready' && (j.saved || migratedNow)) {
+ setVoice(serverVoice)
+ setPersona((prev) => (prev === startPersona ? { tone: serverVoice.tone, gender: serverVoice.customer_gender, age: serverVoice.customer_age } : prev))
+ setCustomPrompt((prev) => (prev === startCustom ? serverVoice.custom_prompt : prev))
+ }
+ } catch { if (alive) setVoiceStorage('error') }
+ })()
+ return () => { alive = false }
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [])
+ const voiceRequest = (p: Persona) => toAiRequest(normalizeReplyVoice({
+ ...voice, tone: p.tone, customer_gender: p.gender, customer_age: p.age, custom_prompt: customPrompt,
+ }))
+
  // ── 일괄 초안 생성 상태 ───────────────────────
  const [bulkRunning, setBulkRunning] = useState(false)
  const [bulkCancelled, setBulkCancelled] = useState(false)
@@ -519,9 +580,8 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  review: review.content,
  rating: review.rating,
  platform: config.platform,
- aiSettings: { tone: usePersona.tone, length: 'medium' },
- customerProfile: { gender: usePersona.gender, age: usePersona.age },
- customPrompt: usePersona.tone === 'custom' ? customPrompt : undefined,
+ // LU-018 W2-10: 길이 · 마무리 문구 · 금지 표현 · 포함 요소도 계정 말투 설정에서
+ ...voiceRequest(usePersona),
  }),
  signal: aiController.signal,
  })
@@ -580,6 +640,28 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  }
  }
  }
+
+ // LU-018 W2-12: 대시보드 'AI 답글' 에서 저장한 초안을 이어 쓰기 — ?review=<id> 리뷰를 열어 둔다
+ const handoffDoneRef = useRef(false)
+ useEffect(() => {
+ if (handoffDoneRef.current || loadingReviews || reviews.length === 0) return
+ handoffDoneRef.current = true
+ let target: string | null = null
+ try { target = sanitizeReviewId(new URLSearchParams(window.location.search).get('review')) } catch {}
+ if (!target) return
+ const found = reviews.find((r) => r.id === target)
+ if (!found) {
+ toast.error('넘겨받은 리뷰를 이 목록에서 찾지 못했어요. 기간을 전체로 바꿔 확인해주세요.')
+ return
+ }
+ openEditor(found)
+ window.setTimeout(() => {
+ try {
+ document.querySelector(`[data-review-id="${CSS.escape(found.id)}"]`)?.scrollIntoView({ block: 'center', behavior: 'smooth' })
+ } catch {}
+ }, 80)
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [loadingReviews, reviews])
 
  // ── 7) 수정된 초안 저장 ─────────────────────
  const saveDraftEdit = async (review: Review, text: string) => {
@@ -760,8 +842,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  review: target.content,
  rating: target.rating,
  platform: config.platform,
- aiSettings: { tone: persona.tone, length: 'medium' },
- customerProfile: { gender: persona.gender, age: persona.age },
+ ...voiceRequest(persona),
  }),
  })
  const aiData = await aiRes.json()
@@ -1243,6 +1324,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  return (
  <div
  key={review.id}
+ data-review-id={review.id}
  className={`bg-white rounded-[10px] border p-4 md:p-5 ${isNegative ? 'border-[#FCA5A5]' : 'border-[var(--lu-line)]'} ${isBulkTarget ? 'ring-2' : ''}`}
  style={isBulkTarget ? { ['--tw-ring-color' as any]: config.color } : {}}
  >
@@ -1362,7 +1444,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  className="w-full rounded-md border border-[#E9D5FF] bg-white p-2 text-[12px] text-[var(--lu-ink)] focus:outline-none focus:ring-2 focus:ring-[#7C3AED40] resize-y min-h-[60px]"
  />
  <p className="text-[10px] text-[var(--lu-muted)] mt-1">
- {customPrompt.length}자 · 입력 후 다른 곳을 클릭하면 자동 저장
+ {customPrompt.length}자 · 아래 '기본값으로 저장' 을 누르면 계정에 저장돼요
  </p>
  </div>
  )}
@@ -1407,9 +1489,30 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  </div>
  <div className="flex justify-end pt-1">
  <button
- onClick={() => {
- try { localStorage.setItem(PERSONA_KEY, JSON.stringify(persona)) } catch {}
- toast.success('기본 페르소나 저장됨 ')
+ onClick={async () => {
+ try { localStorage.setItem(PERSONA_KEY, JSON.stringify(persona)); localStorage.setItem(CUSTOM_PROMPT_KEY, customPrompt) } catch {}
+ // LU-018 W2-10: 계정 하나의 서버 저장 (설정 화면 · 자동답글과 같은 값)
+ try {
+ const res = await fetch('/api/reply-voice', {
+ method: 'PUT', credentials: 'include',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ voice: { tone: persona.tone, customer_gender: persona.gender, customer_age: persona.age, custom_prompt: customPrompt } }),
+ })
+ const j = await res.json().catch(() => null)
+ if (res.ok && j?.ok) {
+ setVoice(normalizeReplyVoice(j.voice))
+ setVoiceStorage('ready')
+ try { localStorage.setItem(PERSONA_MIGRATED_KEY, '1') } catch {}
+ toast.success('기본 말투를 저장했어요. 다른 기기와 자동답글에도 같이 쓰여요.')
+ } else if (res.status === 503 || j?.code === 'storage_not_ready') {
+ setVoiceStorage('missing')
+ toast.error('서버 저장 준비 전이라 이 기기에만 저장했어요.')
+ } else {
+ toast.error('서버에 저장하지 못해 이 기기에만 저장했어요. 다시 시도해주세요.')
+ }
+ } catch {
+ toast.error('인터넷 연결 문제로 이 기기에만 저장했어요.')
+ }
  }}
  className="min-h-11 text-[10px] px-2.5 py-1 rounded-lg font-bold bg-[var(--lu-canvas)] text-[var(--lu-muted)] hover:bg-[var(--lu-line)] hover:text-[var(--lu-muted)]"
  >

@@ -7,8 +7,8 @@
 // ============================================================
 import { NextResponse } from 'next/server'
 import { createServiceClient } from '@/app/lib/adminAuth'
-import { loadStoreInfo, generateNaverReply } from '@/app/lib/generate-naver-reply'
-import { enqueuePlatformJob } from '@/app/lib/queue'
+import { runNaverAutoreplyForUser } from '@/app/lib/naver-autoreply-run'
+import { resolveNaverAutoreplyOptions } from '@/app/lib/naver-autoreply-options'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -77,118 +77,9 @@ export async function GET(req: Request) {
  for (const cred of enabledUsers) {
  const userId: string = cred.user_id
  const extra = (cred.extra_data as Record<string, unknown>) || {}
- const tone: string = String(extra.autoreply_tone || 'friendly')
- const autoApprove: boolean = extra.autoreply_auto_approve === true
- const maxPerRun: number = Math.min(20, Math.max(1, Number(extra.autoreply_max_per_run) || 5))
- const bizId: string | null = String(extra.smartplace_biz_id || '') || null
-
- const stat: UserStat = { userId: userId.slice(0, 8) + '…', drafted: 0, queued: 0, skipped: 0, errors: [] }
-
- try {
- // 2. 이 유저의 미답변 + draft 없는 리뷰
- const { data: reviews, error: revErr } = await svc
- .from('platform_reviews')
- .select('id, content, rating, photos, platform_review_id')
- .eq('user_id', userId)
- .eq('platform', 'naver_place')
- .eq('has_reply', false)
- .is('draft_reply', null)
- .not('reply_status', 'in', '("submitted","queued","rejected")')
- .order('posted_at', { ascending: false })
- .limit(maxPerRun)
-
- if (revErr) {
- stat.errors.push(`리뷰 조회 실패: ${revErr.message}`)
- summary.push(stat)
- continue
- }
-
- if (!reviews || reviews.length === 0) {
- summary.push(stat)
- continue
- }
-
- // 3. 매장 정보 1회 로드
- const storeInfo = await loadStoreInfo(userId)
-
- // stores.id 1회 조회 (BullMQ payload용)
- const { data: storeRow } = await svc
- .from('stores')
- .select('id')
- .eq('user_id', userId)
- .limit(1)
- .maybeSingle()
- const storeId: string = storeRow?.id || userId
-
- for (const rev of reviews) {
- const reviewInfo = {
- content: String(rev.content || ''),
- rating: typeof rev.rating === 'number' ? rev.rating : null,
- photos: Array.isArray(rev.photos) ? (rev.photos as string[]) : [],
- }
-
- // 4. AI 생성
- const result = await generateNaverReply(storeInfo, reviewInfo, tone)
-
- if (!result.ok) {
- stat.errors.push(`review ${rev.id}: ${result.error}`)
- stat.skipped++
- continue
- }
-
- const newStatus = autoApprove ? 'queued' : 'pending'
- const nowIso = new Date().toISOString()
-
- // 5. draft 저장
- const { error: updateErr } = await svc
- .from('platform_reviews')
- .update({
- draft_reply: result.reply,
- reply_status: newStatus,
- reply_tone: result.tone || tone,   // 'auto' 면 실제로 쓰인 톤을 남긴다
- reply_queued_at: autoApprove ? nowIso : null,
- })
- .eq('id', rev.id)
-
- if (updateErr) {
- stat.errors.push(`DB update 실패 (${rev.id}): ${updateErr.message}`)
- stat.skipped++
- continue
- }
-
- stat.drafted++
-
- // 6. auto_approve 이면 BullMQ 투입
- if (autoApprove) {
- const enqResult = await enqueuePlatformJob({
- platform: 'naver_place',
- action: 'post_reply',
- userId,
- storeId,
- payload: {
- platform_review_id: rev.platform_review_id || rev.id,
- reply_text: result.reply,
- ...(bizId ? { biz_id: bizId } : {}),
- },
- })
-
- if (enqResult.ok) {
- stat.queued++
- } else {
- stat.errors.push(`enqueue 실패 (${rev.id}): ${enqResult.error}`)
- // 큐 투입 실패 → pending으로 롤백
- await svc
- .from('platform_reviews')
- .update({ reply_status: 'pending', reply_queued_at: null })
- .eq('id', rev.id)
- }
- }
- }
- } catch (e: unknown) {
- stat.errors.push(`처리 오류: ${e instanceof Error ? e.message : String(e)}`)
- }
-
- summary.push(stat)
+ // LU-018 W2-11: 사용자 1명 처리는 lib 로 옮겨 '지금 생성'(run-now) 과 같이 쓴다
+ const r = await runNaverAutoreplyForUser(svc, userId, resolveNaverAutoreplyOptions(extra, 'cron'))
+ summary.push({ userId: userId.slice(0, 8) + '…', drafted: r.drafted, queued: r.queued, skipped: r.skipped, errors: r.errors })
  }
 
  const totalDrafted = summary.reduce((s, u) => s + u.drafted, 0)

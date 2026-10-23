@@ -15,6 +15,7 @@ import PageHeader from '../components/PageHeader'
 import HarangMarketingPopup from '../components/HarangMarketingPopup'
 import { MessageSquare, Inbox, Star } from 'lucide-react'
 import PlatformHealthStatus from './components/PlatformHealthStatus'
+import { isReviewReplied, parseInboxFilter, readPlatformCounts, sumKnown, formatCount, filterFeed, type InboxFilter } from '../lib/review-inbox'
 
 export const dynamic = 'force-dynamic'
 
@@ -91,9 +92,10 @@ interface PlatformStat {
  platform: PlatformKey
  connected: boolean
  externalName: string
- reviewCount: number
+ // LU-018 W2-9: 모르는 수는 null ('-' 로 표시 · 0 으로 바꾸지 않는다)
+ reviewCount: number | null
  avgRating: number | null
- unreplied: number
+ unreplied: number | null
  latestAt: string | null
 }
 
@@ -137,14 +139,33 @@ export default function ReviewAdminHub() {
  const [stats, setStats] = useState<PlatformStat[]>(
  ALL_PLATFORMS.map(p => ({
  platform: p, connected: false, externalName: '',
- reviewCount: 0, avgRating: null, unreplied: 0, latestAt: null,
+ reviewCount: null, avgRating: null, unreplied: null, latestAt: null,
  }))
  )
  const [loadingStats, setLoadingStats] = useState(true)
 
  const [feed, setFeed] = useState<FeedReview[]>([])
  const [loadingFeed, setLoadingFeed] = useState(false)
+ const [feedMode, setFeedMode] = useState<InboxFilter>('all')
+ const feedSeqRef = React.useRef(0)
  const [filter, setFilter] = useState<'all' | PlatformKey>('all')
+ // LU-018 W2-9: ?filter=unanswered 로 들어오면 답글 안 단 리뷰만 (대시보드 '미답변 N건 검토')
+ const [replyFilter, setReplyFilter] = useState<InboxFilter>('all')
+ const [replyFilterReady, setReplyFilterReady] = useState(false)
+ const [countsKnown, setCountsKnown] = useState(false)
+ useEffect(() => {
+ try { setReplyFilter(parseInboxFilter(new URLSearchParams(window.location.search).get('filter'))) } catch { /* 기본값 유지 */ }
+ setReplyFilterReady(true)
+ }, [])
+ const changeReplyFilter = useCallback((next: InboxFilter) => {
+ setReplyFilter(next)
+ try {
+ const url = new URL(window.location.href)
+ if (next === 'unanswered') url.searchParams.set('filter', 'unanswered')
+ else url.searchParams.delete('filter')
+ window.history.replaceState(null, '', url.pathname + (url.search || ''))
+ } catch { /* 주소 갱신 실패는 화면 동작과 무관 */ }
+ }, [])
 
  // ── 1) 플랫폼 통계 로드 (stores/me) ──────────────────────
  const [statsError, setStatsError] = useState<string | null>(null)
@@ -161,11 +182,15 @@ export default function ReviewAdminHub() {
  if (!res.ok) throw new Error('플랫폼 연결 상태를 불러오지 못했어요. 잠시 후 다시 확인해주세요.')
  const j = await res.json()
  if (!j?.ok || !Array.isArray(j.platforms)) throw new Error('플랫폼 연결 응답을 확인하지 못했어요.')
+ // 리뷰 집계를 서버가 실제로 읽었을 때만 숫자를 믿는다 (실패해도 서버는 0 을 채워 보낸다)
+ const reviewsRead = j?.source_states?.reviews === 'read'
+ setCountsKnown(reviewsRead)
  setStats(ALL_PLATFORMS.map(platform => {
  const p = j.platforms.find((item: any) => item.platform === HUB_TO_SLUG[platform])
+ const counts = readPlatformCounts(p, reviewsRead)
  return { platform, connected: !!p?.connected, externalName: p?.platform_store_name || '',
- reviewCount: p?.review_count ?? 0, avgRating: typeof p?.rating_avg === 'number' ? p.rating_avg : null,
- unreplied: p?.unreplied_count ?? 0, latestAt: p?.latest_collected_at ?? null }
+ reviewCount: counts.reviewCount, avgRating: reviewsRead && typeof p?.rating_avg === 'number' ? p.rating_avg : null,
+ unreplied: counts.unreplied, latestAt: p?.latest_collected_at ?? null }
  }))
  setStatsReady(true)
  } catch (error) { setStatsError(error instanceof Error ? error.message : '연결 상태를 확인하지 못했어요. 인터넷 연결을 확인해주세요.') }
@@ -173,41 +198,56 @@ export default function ReviewAdminHub() {
  }, [])
  useEffect(() => { void loadStats() }, [loadStats])
  const loadFeed = useCallback(async () => {
+ const seq = ++feedSeqRef.current
  setLoadingFeed(true)
  setFeedError(null)
- const targets = stats.filter(s => s.connected || s.reviewCount > 0)
+ const targets = stats.filter(s => s.connected || (s.reviewCount ?? 0) > 0)
+ // 답글 안 단 리뷰 보기는 서버에서 같은 기준으로 걸러 받는다 (최근 100건 밖의 미답변도 놓치지 않게)
+ const mode = replyFilter
+ const query = mode === 'unanswered' ? 'limit=300&unreplied_only=1' : 'limit=100'
  const succeeded: PlatformKey[] = []
  const failed: PlatformKey[] = []
  const all: FeedReview[] = []
  await Promise.all(targets.map(async s => {
  try {
- const res = await fetch(`/api/place/reviews?platform=${HUB_TO_SLUG[s.platform]}&limit=100`, { credentials: 'include', cache: 'no-store' })
+ const res = await fetch(`/api/place/reviews?platform=${HUB_TO_SLUG[s.platform]}&${query}`, { credentials: 'include', cache: 'no-store' })
  if (res.status === 401) setLoginRequired(true)
  if (!res.ok) throw new Error('request failed')
  const data = await res.json()
  if (!data?.ok || !Array.isArray(data.reviews)) throw new Error('invalid response')
  for (const r of data.reviews) all.push({ id: `${s.platform}-${r.id}`, platform: s.platform,
  rating: typeof r.rating === 'number' ? r.rating : null, author: r.author_mask || r.author_name || '익명',
- date: r.posted_at || r.collected_at || '', text: r.content || '', replied: !!r.has_reply })
+ date: r.posted_at || r.collected_at || '', text: r.content || '', replied: isReviewReplied(r) })
  succeeded.push(s.platform)
  } catch { failed.push(s.platform) }
  }))
+ // 필터를 빨리 바꿔 더 새 요청이 나갔으면 이 응답은 버린다
+ if (seq !== feedSeqRef.current) return
  if (failed.length) setFeedError(`${failed.map(p => PLATFORM_META[p].label).join(' · ')} 리뷰를 확인하지 못했어요. 이전에 불러온 리뷰가 있으면 유지했어요. 다시 시도해주세요.`)
- if (succeeded.length || targets.length === 0) setFeed(previous => {
- const next = [...previous.filter(r => failed.includes(r.platform)), ...all]
+ if (succeeded.length || targets.length === 0) {
+ setFeedMode(mode)
+ setFeed(previous => {
+ // 실패한 매체의 이전 자료는 같은 보기(전체/미답변)로 받은 것일 때만 남긴다
+ const keep = feedMode === mode ? previous.filter(r => failed.includes(r.platform)) : []
+ const next = [...keep, ...all]
  return next.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
  })
+ }
  setLoadingFeed(false)
- }, [stats])
+ }, [stats, replyFilter, feedMode])
  useEffect(() => {
- if (statsReady && !loadingStats && !statsError) void loadFeed()
- }, [statsReady, loadingStats, statsError, loadFeed])
+ if (replyFilterReady && statsReady && !loadingStats && !statsError) void loadFeed()
+ // feedMode 는 결과 기록용이라 다시 불러오는 조건에서 뺀다
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [replyFilterReady, statsReady, loadingStats, statsError, stats, replyFilter])
 
- const activeCount = stats.filter(s => s.connected || s.reviewCount > 0).length
- const totalReviews = stats.reduce((a, s) => a + s.reviewCount, 0)
- const totalUnreplied = stats.reduce((a, s) => a + s.unreplied, 0)
+ const activeStats = stats.filter(s => s.connected || (s.reviewCount ?? 0) > 0)
+ const activeCount = activeStats.length
+ // 하나라도 모르면 합계도 모른다 → '-'
+ const totalReviews = countsKnown ? sumKnown(stats.map(s => s.reviewCount)) : null
+ const totalUnreplied = countsKnown ? sumKnown(stats.map(s => s.unreplied)) : null
 
- const filteredFeed = filter === 'all' ? feed : feed.filter(r => r.platform === filter)
+ const filteredFeed = filterFeed(feed, { filter: replyFilter, platform: filter })
 
  return (
  <div className="min-h-screen bg-[#F8F9FA] flex flex-col overflow-x-hidden">
@@ -243,11 +283,13 @@ export default function ReviewAdminHub() {
  </div>
  <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB]">
  <p className="text-[11px] md:text-xs text-[#8B95A1] font-medium mb-1">전체 리뷰</p>
- <p className="text-xl md:text-2xl font-black text-[#191F28]">{statsReady ? totalReviews : '확인 전'}</p>
+ <p className="text-xl md:text-2xl font-black text-[#191F28] tabular-nums">{statsReady ? formatCount(totalReviews) : '확인 전'}</p>
+ {statsReady && totalReviews === null && <p className="text-[11px] text-[#8B95A1] mt-0.5">불러오지 못함</p>}
  </div>
  <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB]">
- <p className="text-[11px] md:text-xs text-[#8B95A1] font-medium mb-1">미답변</p>
- <p className="text-xl md:text-2xl font-black text-[#F59E0B]">{statsReady ? totalUnreplied : '확인 전'}</p>
+ <p className="text-[11px] md:text-xs text-[#8B95A1] font-medium mb-1">답글 안 단 리뷰</p>
+ <p className="text-xl md:text-2xl font-black text-[#F59E0B] tabular-nums">{statsReady ? formatCount(totalUnreplied) : '확인 전'}</p>
+ {statsReady && totalUnreplied === null && <p className="text-[11px] text-[#8B95A1] mt-0.5">불러오지 못함</p>}
  </div>
  </div>
 
@@ -256,7 +298,7 @@ export default function ReviewAdminHub() {
  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 md:gap-4 mb-8">
  {stats.map(stat => {
  const meta = PLATFORM_META[stat.platform]
- const hasData = stat.connected || stat.reviewCount > 0
+ const hasData = stat.connected || (stat.reviewCount ?? 0) > 0
  return (
  <div key={stat.platform} className="bg-white rounded-2xl border border-[#E5E8EB] p-4 flex flex-col">
  {/* 헤더 */}
@@ -276,7 +318,7 @@ export default function ReviewAdminHub() {
  <p className="text-[10px] text-[#10B981] font-semibold flex items-center gap-1">
  <span className="w-1.5 h-1.5 rounded-full bg-[#10B981]" />연결됨
  </p>
- ) : stat.reviewCount > 0 ? (
+ ) : (stat.reviewCount ?? 0) > 0 ? (
  <p className="text-[10px] text-[#F59E0B] font-semibold">리뷰 수집됨</p>
  ) : (
  <p className="text-[10px] text-[#8B95A1]">미연결</p>
@@ -297,9 +339,11 @@ export default function ReviewAdminHub() {
  <span className="ml-0.5">{stat.avgRating.toFixed(1)}</span>
  </span>
  )}
- <span>리뷰 <b className="text-[#191F28]">{stat.reviewCount}</b></span>
- {stat.unreplied > 0 && (
- <span className="text-[#F04452] font-bold">미답변 {stat.unreplied}</span>
+ <span>리뷰 <b className="text-[#191F28] tabular-nums">{formatCount(stat.reviewCount)}</b></span>
+ {stat.unreplied === null ? (
+ <span className="text-[#8B95A1]">답글 안 단 리뷰 - · 불러오지 못함</span>
+ ) : stat.unreplied > 0 && (
+ <span className="text-[#F04452] font-bold">답글 안 단 리뷰 {formatCount(stat.unreplied)}</span>
  )}
  </div>
  {stat.latestAt && (
@@ -340,22 +384,39 @@ export default function ReviewAdminHub() {
  disabled={loadingFeed || activeCount === 0}
  className="px-3 py-1.5 rounded-lg text-xs font-bold bg-[#3182F6] text-white hover:bg-[#1C6FE0] disabled:bg-[#B0B8C1] transition-colors"
  >
- {loadingFeed ? '불러오는 중...' : '↻ 새로고침'}
+ {loadingFeed ? '불러오는 중...' : '새로고침'}
  </button>
  </div>
 
- {/* 필터 탭 */}
+ {/* 답글 상태 필터 (LU-018 W2-9) */}
+ {activeCount > 0 && (
+ <div role="group" aria-label="답글 상태" className="flex flex-wrap gap-2 mb-3">
+ {([['all', '전체 리뷰'], ['unanswered', '답글 안 단 리뷰']] as Array<[InboxFilter, string]>).map(([key, label]) => (
+ <button
+ key={key}
+ type="button"
+ aria-pressed={replyFilter === key}
+ onClick={() => changeReplyFilter(key)}
+ className={`min-h-[44px] px-4 rounded-xl text-sm font-semibold border transition-colors ${replyFilter === key ? 'bg-[var(--lu-accent)] border-[var(--lu-accent)] text-white' : 'bg-white border-[var(--lu-line)] text-[var(--lu-ink)]'}`}
+ >
+ {label}{key === 'unanswered' && statsReady ? ` ${formatCount(totalUnreplied)}` : ''}
+ </button>
+ ))}
+ </div>
+ )}
+
+ {/* 매체 필터 탭 */}
  {activeCount > 0 && (
  <div className="flex gap-2 mb-4 overflow-x-auto pb-1">
  <button
  onClick={() => setFilter('all')}
  className={`px-3 py-1.5 rounded-full text-xs font-bold whitespace-nowrap transition-all ${filter === 'all' ? 'bg-[#191F28] text-white' : 'bg-white text-[#4E5968] border border-[#E5E8EB]'}`}
  >
- 전체 ({feed.length})
+ 전체 ({filterFeed(feed, { filter: replyFilter, platform: 'all' }).length})
  </button>
- {stats.filter(s => s.connected || s.reviewCount > 0).map(s => {
+ {activeStats.map(s => {
  const meta = PLATFORM_META[s.platform]
- const count = feed.filter(r => r.platform === s.platform).length
+ const count = filterFeed(feed, { filter: replyFilter, platform: s.platform }).length
  return (
  <button
  key={s.platform}
@@ -387,7 +448,7 @@ export default function ReviewAdminHub() {
  </div>
  ) : filteredFeed.length === 0 ? (
  <div className="bg-white rounded-2xl border border-[#E5E8EB] p-8 text-center text-sm text-[#8B95A1]">
- 표시할 리뷰가 없어요
+ {replyFilter === 'unanswered' ? '답글 안 단 리뷰가 없어요. 불러온 리뷰에는 모두 답글이 달려 있어요.' : '표시할 리뷰가 없어요'}
  </div>
  ) : (
  <div className="space-y-3">

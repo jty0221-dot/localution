@@ -16,6 +16,7 @@ import { Store, Bell, Bot, Link2, CreditCard, Check, X } from 'lucide-react'
 const TAB_HERO_ICONS = { Store, Bell, Bot, Link2, CreditCard } as const
 import { toast, confirmDialog, promptDialog } from '../lib/toast'
 import { INDUSTRY_CATALOG, INDUSTRY_LABELS, DEFAULT_INDUSTRY_GROUP_ID, findIndustryGroup } from '../lib/industry-catalog'
+import { DEFAULT_REPLY_VOICE, normalizeReplyVoice, type ReplyVoice } from '../lib/reply-voice'
 import PlatformLogo from '../components/PlatformLogo'
 import HarangMarketingPopup from '../components/HarangMarketingPopup'
 
@@ -1052,18 +1053,41 @@ function NotifyTab() {
  )
 }
 
+// LU-018 W2-10: 말투 어휘를 리뷰 편집기 · 자동답글과 같게 (app/lib/reply-voice.ts REPLY_TONES)
+const SETTINGS_TONE_OPTIONS: { v: string; label: string; desc: string }[] = [
+ { v: 'friendly', label: '친근하게', desc: '다정하고 부드러운 어투' },
+ { v: 'formal', label: '정중하게', desc: '예의 바르고 격식 있는 어투' },
+ { v: 'expert', label: '전문적으로', desc: '신뢰감 있는 전문가 어투' },
+ { v: 'witty', label: '재치있게', desc: '유머러스하고 센스 있는 어투' },
+ { v: 'simple', label: '담백하게', desc: '차분하고 간결한 어투' },
+ { v: 'mz', label: '활발하게', desc: '밝고 에너지 넘치는 어투' },
+ { v: 'emo', label: '감성적으로', desc: '따뜻한 감성 어투' },
+ { v: 'grateful', label: '감사 중심', desc: '고마움을 먼저 전하는 어투' },
+ { v: 'apologetic', label: '사과 중심', desc: '불편에 먼저 사과하는 어투' },
+ { v: 'gourmand', label: '메뉴 중심', desc: '음식 이야기를 살리는 어투' },
+ { v: 'auto', label: '자동', desc: '리뷰에 맞춰 AI가 고름' },
+ { v: 'custom', label: '맞춤', desc: '사장님이 직접 설명' },
+]
+
 function buildPrompt(cfg: {
  bizType: string; tone: string; length: string;
  gender: string; age: string;
  includes: Record<string, boolean>; closing: string; excludes: string; storeDesc: string;
+ customPrompt?: string;
 }) {
  const toneMap: Record<string,string> = {
- warm: '따뜻하고 다정한',
- polite: '정중하고 예의 바른',
- pro: '전문적이고 신뢰감 있는',
+ friendly: '따뜻하고 다정한',
+ formal: '정중하고 예의 바른',
+ expert: '전문적이고 신뢰감 있는',
  witty: '재치 있고 유쾌한',
- calm: '차분하고 담백한',
- energetic: '밝고 에너지 넘치는'
+ simple: '차분하고 담백한',
+ mz: '밝고 에너지 넘치는',
+ emo: '감성적이고 따뜻한',
+ grateful: '감사를 먼저 전하는',
+ apologetic: '불편에 먼저 사과하는',
+ gourmand: '메뉴 이야기를 살리는',
+ auto: '리뷰 내용에 맞춘',
+ custom: '사장님이 설명한',
  }
  const lengthMap: Record<string,string> = { short:'150자 내외', medium:'250자 내외', long:'400자 내외' }
  const genderMap: Record<string,string> = { male:'남성', female:'여성', neutral:'중성' }
@@ -1074,6 +1098,7 @@ function buildPrompt(cfg: {
  parts.push('')
  parts.push('[답변 스타일]')
  parts.push('- 톤: ' + (toneMap[cfg.tone] || '따뜻하고 다정한') + ' 어투')
+ if (cfg.tone === 'custom' && cfg.customPrompt) parts.push('- 사장님 설명: ' + cfg.customPrompt)
  parts.push('- 길이: ' + (lengthMap[cfg.length] || '250자 내외'))
  if (cfg.gender && cfg.gender !== 'none') parts.push('- 화자 성별감: ' + (genderMap[cfg.gender] || '중성') + ' 느낌')
  if (cfg.age && cfg.age !== 'none') parts.push('- 화자 연령대: ' + (ageMap[cfg.age] || '30대') + ' 느낌의 말투')
@@ -1092,11 +1117,20 @@ function buildPrompt(cfg: {
 }
 
 function AITab() {
- const [tone, setTone] = useState('warm')
- const [length, setLength] = useState('medium')
- const [gender, setGender] = useState('none')
- const [age, setAge] = useState('none')
- const [autoReply, setAutoReply] = useState(false)
+ // LU-018 W2-10: 이 탭이 계정 단위 답글 말투의 저장소다 (/api/reply-voice).
+ // 리뷰 편집기 · 자동답글이 같은 값을 읽는다. 예전엔 저장 버튼이 없어 새로고침하면 사라졌다.
+ const [tone, setTone] = useState<string>(DEFAULT_REPLY_VOICE.tone)
+ const [length, setLength] = useState<string>(DEFAULT_REPLY_VOICE.length)
+ const [gender, setGender] = useState<string>(DEFAULT_REPLY_VOICE.speaker_gender)
+ const [age, setAge] = useState<string>(DEFAULT_REPLY_VOICE.speaker_age)
+ const [customPrompt, setCustomPrompt] = useState('')
+ const [voiceBase, setVoiceBase] = useState<ReplyVoice>(DEFAULT_REPLY_VOICE)
+ const [voiceState, setVoiceState] = useState<'loading' | 'ready' | 'missing' | 'error' | 'login'>('loading')
+ const [voiceSavedAt, setVoiceSavedAt] = useState<string | null>(null)
+ const [voiceSaving, setVoiceSaving] = useState(false)
+ const [voiceDirty, setVoiceDirtyState] = useState(false)
+ const voiceDirtyRef = useRef(false)
+ const setVoiceDirty = (v: boolean) => { voiceDirtyRef.current = v; setVoiceDirtyState(v) }
  const [bizType, setBizType] = useState('')
  const [industryGroup, setIndustryGroup] = useState<string>(DEFAULT_INDUSTRY_GROUP_ID)
  const [industrySearch, setIndustrySearch] = useState('')
@@ -1112,7 +1146,69 @@ function AITab() {
  personalize: false, improve: true, keyword: false,
  })
 
- const prompt = buildPrompt({ bizType, tone, length, gender, age, includes, closing, excludes, storeDesc })
+ const applyVoice = (v: ReplyVoice) => {
+ setVoiceBase(v)
+ setTone(v.tone); setLength(v.length); setGender(v.speaker_gender); setAge(v.speaker_age)
+ setCustomPrompt(v.custom_prompt); setClosing(v.closing); setExcludes(v.excludes)
+ setIncludes({ ...v.includes }); setBizType(v.biz_type); setStoreDesc(v.store_desc)
+ }
+ useEffect(() => {
+ let alive = true
+ ;(async () => {
+ try {
+ const res = await fetch('/api/reply-voice', { credentials: 'include', cache: 'no-store' })
+ if (!alive) return
+ if (res.status === 401) { setVoiceState('login'); return }
+ const j = await res.json().catch(() => null)
+ if (!res.ok || !j?.ok) { setVoiceState('error'); return }
+ setVoiceSavedAt(j.saved ? (j.updated_at ?? null) : null)
+ setVoiceState(j.storage === 'ready' ? 'ready' : 'missing')
+ // 불러오는 사이 사장님이 이미 바꿨으면 화면 값을 덮지 않는다 (저장 때 기존 값 위에 합쳐짐)
+ if (voiceDirtyRef.current) { setVoiceBase(normalizeReplyVoice(j.voice)); return }
+ applyVoice(normalizeReplyVoice(j.voice))
+ setVoiceDirty(false)
+ } catch { if (alive) setVoiceState('error') }
+ })()
+ return () => { alive = false }
+ // eslint-disable-next-line react-hooks/exhaustive-deps
+ }, [])
+ // 처음 불러온 뒤 사장님이 바꾼 것이 있으면 '저장 안 됨' 표시
+ const markDirty = <T,>(setter: (v: T) => void) => (v: T) => { setter(v); setVoiceDirty(true) }
+
+ const saveVoice = async () => {
+ setVoiceSaving(true)
+ try {
+ const voice = normalizeReplyVoice({
+ ...voiceBase, tone, length, speaker_gender: gender, speaker_age: age,
+ custom_prompt: customPrompt, closing, excludes, includes, biz_type: bizType, store_desc: storeDesc,
+ })
+ const res = await fetch('/api/reply-voice', {
+ method: 'PUT', credentials: 'include',
+ headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ voice }),
+ })
+ const j = await res.json().catch(() => null)
+ if (res.status === 503 || j?.code === 'storage_not_ready') {
+ setVoiceState('missing')
+ toast.error('말투를 서버에 저장할 준비가 아직 안 됐어요. 저장되지 않았어요.')
+ return
+ }
+ if (!res.ok || !j?.ok) { toast.error(j?.error || '말투 설정을 저장하지 못했어요.'); return }
+ applyVoice(normalizeReplyVoice(j.voice))
+ setVoiceSavedAt(j.updated_at ?? new Date().toISOString())
+ setVoiceState('ready')
+ setVoiceDirty(false)
+ toast.success(typeof j.autoreply_synced === 'number' && j.autoreply_synced > 0
+ ? '답글 말투를 저장했어요. 자동답글도 같은 말투로 맞췄어요.'
+ : '답글 말투를 저장했어요.')
+ } catch {
+ toast.error('인터넷 연결을 확인하고 다시 저장해주세요.')
+ } finally {
+ setVoiceSaving(false)
+ }
+ }
+
+ const prompt = buildPrompt({ bizType, tone, length, gender, age, includes, closing, excludes, storeDesc, customPrompt })
 
  const handleTest = async () => {
  if (!testReview.trim()) return
@@ -1237,7 +1333,7 @@ function AITab() {
  </div>
  <div>
  <label htmlFor="store-desc" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">매장 소개 (AI 참고용)</label>
- <textarea id="store-desc" value={storeDesc} onChange={e => setStoreDesc(e.target.value)} rows={2}
+ <textarea id="store-desc" value={storeDesc} onChange={e => markDirty(setStoreDesc)(e.target.value)} rows={2}
  placeholder="예: 강남역 10번 출구 도보 2분, 제주 원두 사용 스페셜티 카페. 감성 인테리어와 직접 구운 크로아상이 인기."
  className="w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors resize-none" />
  <p className="text-[10px] text-[var(--lu-muted)] mt-1">입력할수록 AI가 매장에 맞는 답변을 생성합니다</p>
@@ -1249,21 +1345,23 @@ function AITab() {
  <div className="mb-5">
  <h3 className="font-bold text-[var(--lu-ink)] mb-3">답변 톤</h3>
  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
- {[
- { v:'warm', label:'따뜻하게', desc:'다정하고 부드러운 어투' },
- { v:'polite', label:'정중하게', desc:'예의 바르고 격식 있는 어투' },
- { v:'pro', label:'전문적으로', desc:'신뢰감 있는 전문가 어투' },
- { v:'witty', label:'재치있게', desc:'유머러스하고 센스 있는 어투' },
- { v:'calm', label:'담백하게', desc:'차분하고 간결한 어투' },
- { v:'energetic', label:'활발하게', desc:'밝고 에너지 넘치는 어투' },
- ].map(opt => (
- <button key={opt.v} onClick={() => setTone(opt.v)}
+ {SETTINGS_TONE_OPTIONS.map(opt => (
+ <button key={opt.v} onClick={() => markDirty(setTone)(opt.v)}
  className={`p-3 rounded-[6px] border-2 text-center transition-colors ${tone === opt.v ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)]' : 'border-[var(--lu-line)] hover:border-[#BFDBFE]'}`}>
  <div className="text-sm font-bold text-[var(--lu-ink)]">{opt.label}</div>
  <div className="text-[10px] text-[var(--lu-muted)] mt-0.5">{opt.desc}</div>
  </button>
  ))}
  </div>
+ {tone === 'custom' && (
+ <div className="mt-3">
+ <label htmlFor="voice-custom" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">맞춤 말투 설명</label>
+ <textarea id="voice-custom" value={customPrompt} onChange={e => markDirty(setCustomPrompt)(e.target.value)} rows={3} maxLength={500}
+ placeholder="예) 정성스러운 한식당 사장님처럼 소박한 말투. 메뉴 칭찬과 재방문 인사."
+ className="w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-3 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors resize-y" />
+ <p className="text-[11px] text-[var(--lu-muted)] mt-1">{customPrompt.length}/500자</p>
+ </div>
+ )}
  </div>
  <div>
  <h3 className="font-bold text-[var(--lu-ink)] mb-3">답변 길이</h3>
@@ -1273,7 +1371,7 @@ function AITab() {
  { v:'medium', label:'보통', desc:'250자\u00B1' },
  { v:'long', label:'길게', desc:'400자\u00B1' },
  ].map(opt => (
- <button key={opt.v} onClick={() => setLength(opt.v)}
+ <button key={opt.v} onClick={() => markDirty(setLength)(opt.v)}
  className={`p-3 rounded-[6px] border-2 text-center transition-colors ${length === opt.v ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)]' : 'border-[var(--lu-line)] hover:border-[#BFDBFE]'}`}>
  <div className="text-sm font-bold text-[var(--lu-ink)]">{opt.label}</div>
  <div className="text-[10px] text-[var(--lu-muted)] mt-0.5">{opt.desc}</div>
@@ -1294,7 +1392,7 @@ function AITab() {
  { v:'female', label:'여성', desc:'여성적 어투' },
  { v:'neutral', label:'중성', desc:'성별 무관' },
  ].map(opt => (
- <button key={opt.v} onClick={() => setGender(opt.v)}
+ <button key={opt.v} onClick={() => markDirty(setGender)(opt.v)}
  className={`p-3 rounded-[6px] border-2 text-center transition-colors ${gender === opt.v ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)]' : 'border-[var(--lu-line)] hover:border-[#BFDBFE]'}`}>
  <div className="text-sm font-bold text-[var(--lu-ink)]">{opt.label}</div>
  <div className="text-[10px] text-[var(--lu-muted)] mt-0.5">{opt.desc}</div>
@@ -1313,7 +1411,7 @@ function AITab() {
  { v:'40s', label:'40대', desc:'안정적인' },
  { v:'50s', label:'50대+', desc:'노련한' },
  ].map(opt => (
- <button key={opt.v} onClick={() => setAge(opt.v)}
+ <button key={opt.v} onClick={() => markDirty(setAge)(opt.v)}
  className={`p-3 rounded-[6px] border-2 text-center transition-colors ${age === opt.v ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)]' : 'border-[var(--lu-line)] hover:border-[#BFDBFE]'}`}>
  <div className="text-sm font-bold text-[var(--lu-ink)]">{opt.label}</div>
  <div className="text-[10px] text-[var(--lu-muted)] mt-0.5">{opt.desc}</div>
@@ -1340,7 +1438,7 @@ function AITab() {
  <p className="text-sm font-medium text-[var(--lu-ink)]">{item.label}</p>
  <p className="text-xs text-[var(--lu-muted)]">{item.desc}</p>
  </div>
- <Toggle checked={includes[item.k]} onChange={v => setIncludes(p => ({ ...p, [item.k]: v }))} />
+ <Toggle checked={includes[item.k]} onChange={v => { setIncludes(p => ({ ...p, [item.k]: v })); setVoiceDirty(true) }} />
  </div>
  ))}
  </div>
@@ -1350,34 +1448,41 @@ function AITab() {
  <div className="bg-white rounded-[10px] p-6 shadow-none space-y-4">
  <div>
  <label htmlFor="closing" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">고정 마무리 문구</label>
- <input id="closing" value={closing} onChange={e => setClosing(e.target.value)}
+ <input id="closing" value={closing} onChange={e => markDirty(setClosing)(e.target.value)}
  placeholder="예: 오늘도 행복한 하루 되세요 "
  className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  <p className="text-[10px] text-[var(--lu-muted)] mt-1">모든 답변 마지막에 고정으로 들어갈 문구</p>
  </div>
  <div>
  <label htmlFor="excludes" className="block text-xs font-semibold text-[var(--lu-muted)] mb-1.5">사용 금지 표현</label>
- <input id="excludes" value={excludes} onChange={e => setExcludes(e.target.value)}
+ <input id="excludes" value={excludes} onChange={e => markDirty(setExcludes)(e.target.value)}
  placeholder="예: 죄송, 유감, 어떠셨나요"
  className="min-h-11 w-full border border-[var(--lu-line)] rounded-[6px] px-4 py-2.5 text-base focus:outline-none focus:border-[var(--lu-accent)] transition-colors" />
  <p className="text-[10px] text-[var(--lu-muted)] mt-1">쉼표로 구분 · AI가 절대 사용하지 않을 표현</p>
  </div>
  </div>
 
- {/* 자동 답변 ON/OFF */}
- <div className="bg-white rounded-[10px] p-6 shadow-none">
- <div className="flex items-center justify-between">
+ {/* LU-018 W2-10: 말투 저장 — 계정 하나 · 리뷰 편집기와 자동답글이 같은 값을 쓴다 */}
+ <div className="bg-white rounded-[10px] p-6 shadow-none border border-[var(--lu-line)]">
+ <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-3">
  <div>
- <p className="font-bold text-[var(--lu-ink)]">자동 답변 활성화</p>
- <p className="text-xs text-[var(--lu-muted)] mt-0.5">새 리뷰가 등록되면 AI가 즉시 자동 답변</p>
+ <p className="font-bold text-[var(--lu-ink)]">답글 말투 저장</p>
+ <p className="text-xs text-[var(--lu-muted)] mt-0.5" role="status">
+ {voiceState === 'loading' ? '저장된 말투를 불러오는 중이에요.'
+ : voiceState === 'login' ? '로그인하면 말투를 저장할 수 있어요.'
+ : voiceState === 'error' ? '저장된 말투를 불러오지 못했어요. 지금 보이는 값은 기본값이에요.'
+ : voiceState === 'missing' ? '서버 저장 준비 전이에요. 지금 바꾼 값은 저장되지 않아요.'
+ : voiceDirty ? '바꾼 내용이 아직 저장되지 않았어요.'
+ : voiceSavedAt ? `저장됨 · ${new Date(voiceSavedAt).toLocaleString('ko-KR')}`
+ : '아직 저장한 말투가 없어 기본값을 쓰고 있어요.'}
+ </p>
+ <p className="text-[11px] text-[var(--lu-muted)] mt-1">저장한 말투는 리뷰 관리 화면의 AI 초안과 매체별 자동답글에 같이 쓰여요. 자동답글 켜기 · 끄기는 아래 매체별 패널에서 해요.</p>
  </div>
- <Toggle checked={autoReply} onChange={setAutoReply} />
+ <button type="button" onClick={saveVoice} disabled={voiceSaving || voiceState === 'loading' || voiceState === 'login'}
+ className="min-h-[44px] px-5 rounded-[6px] text-sm font-bold bg-[var(--lu-accent)] text-white hover:bg-[var(--lu-accent-hover)] disabled:opacity-50 shrink-0">
+ {voiceSaving ? '저장 중' : '말투 저장'}
+ </button>
  </div>
- {autoReply && (
- <div className="mt-4 p-3 bg-blue-50 rounded-[6px] text-xs text-[var(--lu-accent)] font-medium">
- 자동 답변 ON · 연동된 플랫폼에 리뷰가 등록되면 즉시 답변이 달립니다
- </div>
- )}
  </div>
 
  {/* AI 프롬프트 미리보기 */}
