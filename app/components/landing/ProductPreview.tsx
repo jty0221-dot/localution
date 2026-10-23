@@ -25,15 +25,14 @@ type Row = {
   delta: number // 전일 대비 (음수 = 순위 상승)
   blog: number
   visitor: number
-  score: number
 }
 
 /** UI 구조 설명용 예시 데이터 — 실제 사용자 성과가 아니다 */
 const ROWS: Row[] = [
-  { date: '08.19', rank: 3, delta: -1, blog: 1702, visitor: 203, score: 41.2 },
-  { date: '08.18', rank: 4, delta: 0, blog: 1702, visitor: 201, score: 40.8 },
-  { date: '08.17', rank: 4, delta: -2, blog: 1698, visitor: 198, score: 40.5 },
-  { date: '08.16', rank: 6, delta: 1, blog: 1695, visitor: 195, score: 39.1 },
+  { date: '08.19', rank: 3, delta: -1, blog: 1702, visitor: 203 },
+  { date: '08.18', rank: 4, delta: 0, blog: 1702, visitor: 201 },
+  { date: '08.17', rank: 4, delta: -2, blog: 1698, visitor: 198 },
+  { date: '08.16', rank: 6, delta: 1, blog: 1695, visitor: 195 },
 ]
 
 function RankCell({ rank, delta }: { rank: number; delta: number }) {
@@ -135,8 +134,7 @@ export default function ProductPreview() {
                   <th className="text-left font-semibold px-3.5 py-1.5">일자</th>
                   <th className="text-center font-semibold px-2 py-1.5">순위</th>
                   <th className="text-right font-semibold px-2 py-1.5">블로그</th>
-                  <th className="text-right font-semibold px-2 py-1.5">방문자</th>
-                  <th className="text-right font-semibold px-3.5 py-1.5">점수</th>
+                  <th className="text-right font-semibold px-3.5 py-1.5">방문자</th>
                 </tr>
               </thead>
               <tbody>
@@ -149,11 +147,8 @@ export default function ProductPreview() {
                     <td className="px-2 py-1.5 text-right text-[#4E5968] tabular-nums">
                       {r.blog.toLocaleString('ko-KR')}
                     </td>
-                    <td className="px-2 py-1.5 text-right text-[#4E5968] tabular-nums">
+                    <td className="px-3.5 py-1.5 text-right text-[#4E5968] tabular-nums">
                       {r.visitor}
-                    </td>
-                    <td className="px-3.5 py-1.5 text-right font-bold text-[#191F28] tabular-nums">
-                      {r.score.toFixed(1)}
                     </td>
                   </tr>
                 ))}
@@ -164,7 +159,7 @@ export default function ProductPreview() {
 
         <figcaption className="sr-only">
           로컬루션 플레이스 모니터링 화면 예시. 매장별로 등록한 키워드의 네이버 검색 순위와
-          블로그·방문자 리뷰 수, 노출 점수를 날짜별로 보여줍니다.
+          블로그·방문자 리뷰 수를 날짜별로 보여줍니다.
         </figcaption>
       </figure>
 
