@@ -8,6 +8,8 @@ import Footer from '../components/Footer'
 import Sidebar from '../components/Sidebar'
 import PageHeader from '../components/PageHeader'
 import { UserCircle2 } from 'lucide-react'
+import { isUsageAllZero, hasUnknownUsage, type MyUsage } from '../lib/my-usage'
+import { formatCount } from '../lib/review-inbox'
 
 interface AuthUser {
  id: string
@@ -75,7 +77,9 @@ export default function MyPage() {
  const [user, setUser] = useState<AuthUser | null>(null)
  const [loading, setLoading] = useState(true)
  const [logoutLoading, setLogoutLoading] = useState(false)
- const [stats, setStats] = useState({ stores: 0, customers: 0, platforms: 0 })
+ // LU-018 W2-12: 서버 집계 (/api/me/usage) · 못 읽은 칸은 null → '-'
+ const [stats, setStats] = useState<MyUsage | null>(null)
+ const [statsState, setStatsState] = useState<'loading' | 'ready' | 'error'>('loading')
 
  useEffect(() => {
  const cached = sessionStorage.getItem('localution_user')
@@ -97,40 +101,20 @@ export default function MyPage() {
  .finally(() => setLoading(false))
  }, [router])
 
- // 실제 사용 현황 localStorage 기반 집계
+ // LU-018 W2-12: 이용 현황은 서버 집계 — 예전 localStorage 집계는 기기마다 달랐다
  useEffect(() => {
  if (!user) return
- try {
- // 등록 매장
- const storeRaw = localStorage.getItem('localution_store')
- const stores = storeRaw ? 1 : 0
-
- // 등록 고객
- let customers = 0
- try {
- const c = localStorage.getItem('localution.customers')
- if (c) {
- const arr = JSON.parse(c)
- if (Array.isArray(arr)) customers = arr.length
- }
- } catch {}
-
- // 연결된 플랫폼 수
- let platforms = 0
- try {
- const pl = localStorage.getItem('localution.platform_links')
- if (pl) {
- const obj = JSON.parse(pl)
- platforms = Object.values(obj).filter((v: any) => v?.connected).length
- } else {
- // 레거시 키 fallback
- const legacy = ['naver','kakao','google','baemin','coupang','yogiyo']
- platforms = legacy.filter(k => localStorage.getItem(`localution.${k}.connected`) === 'true').length
- }
- } catch {}
-
- setStats({ stores, customers, platforms })
- } catch {}
+ let alive = true
+ setStatsState('loading')
+ fetch('/api/me/usage', { credentials: 'include', cache: 'no-store' })
+ .then(r => r.ok ? r.json() : null)
+ .then(j => {
+ if (!alive) return
+ if (j?.ok && j.usage) { setStats(j.usage as MyUsage); setStatsState('ready') }
+ else { setStats(null); setStatsState('error') }
+ })
+ .catch(() => { if (alive) { setStats(null); setStatsState('error') } })
+ return () => { alive = false }
  }, [user])
 
  async function handleLogout() {
@@ -263,25 +247,30 @@ export default function MyPage() {
  </div>
  </div>
 
- {/* 서비스 이용 현황 (localStorage 실시간) */}
+ {/* 서비스 이용 현황 (서버 집계 · LU-018 W2-12) */}
  <div className="bg-white rounded-2xl p-6 shadow-sm">
  <h2 className="text-sm font-bold text-[#191F28] mb-4">서비스 이용 현황</h2>
  <div className="grid grid-cols-3 gap-3">
  {[
- { label: '등록 매장', value: stats.stores, unit: '곳' },
- { label: '등록 고객', value: stats.customers, unit: '명' },
- { label: '연결 플랫폼', value: stats.platforms, unit: '개' },
+ { label: '등록 매장', value: stats?.stores ?? null, unit: '곳' },
+ { label: '등록 고객', value: stats?.customers ?? null, unit: '명' },
+ { label: '연결 플랫폼', value: stats?.platforms ?? null, unit: '개' },
  ].map(item => (
  <div key={item.label} className="bg-[#F8F9FA] rounded-xl p-3 text-center">
- <div className="text-2xl font-black text-[#3182F6]">
- {item.value}
- <span className="text-sm font-bold text-[#8B95A1] ml-0.5">{item.unit}</span>
+ <div className="text-2xl font-black text-[#3182F6] tabular-nums">
+ {statsState === 'loading' ? '-' : formatCount(item.value)}
+ {item.value !== null && <span className="text-sm font-bold text-[#8B95A1] ml-0.5">{item.unit}</span>}
  </div>
  <div className="text-xs text-[#8B95A1] mt-1">{item.label}</div>
+ {statsState !== 'loading' && item.value === null && <div className="text-[11px] text-[#8B95A1] mt-0.5">불러오지 못함</div>}
  </div>
  ))}
  </div>
- {stats.stores === 0 && stats.customers === 0 && stats.platforms === 0 && (
+ {statsState === 'loading' && <p role="status" className="mt-3 text-xs text-[#8B95A1] text-center">이용 현황을 불러오는 중이에요.</p>}
+ {statsState !== 'loading' && hasUnknownUsage(stats) && (
+ <p role="status" className="mt-3 text-xs text-[#8B95A1] text-center">일부 숫자를 불러오지 못했어요. 잠시 후 새로고침해주세요.</p>
+ )}
+ {statsState === 'ready' && isUsageAllZero(stats) && (
  <div className="mt-4 text-xs text-[#8B95A1] bg-[#F8F9FA] rounded-xl p-3 text-center">
  아직 등록된 데이터가 없어요. 홈에서 매장을 먼저 등록해보세요.
  </div>
