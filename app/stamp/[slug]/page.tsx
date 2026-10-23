@@ -38,6 +38,8 @@ export default function StampScanPage() {
  setErrCode(j.error === 'no_active_card' ? 'no_card' : 'network')
  setErr(j.error === 'no_active_card'
  ? '이 매장은 아직 스탬프 카드를 등록하지 않았어요.'
+ : j.error === 'rate_limited'
+ ? (j.message || '잠시 후 다시 시도해주세요.')
  : '연결에 실패했어요.')
  return
  }

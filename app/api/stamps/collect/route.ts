@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createServiceClient } from '@/app/lib/adminAuth'
 import { rateLimit, getClientIp } from '@/app/lib/rate-limit'
+import { checkRate } from '@/app/lib/rateLimit'
 import { publicStampCard, publicStampCollection } from '@/app/lib/stamp-public'
 
 export const runtime = 'nodejs'
@@ -26,6 +27,15 @@ export async function OPTIONS() {
 // LU-018 · 공개 라우트 속도제한 (Redis fixed-window · rate-limit.ts)
 //   · 적립(POST): IP 당 10분 20회 · 매장 당 1시간 300회 (적립 위조 · 손님 명부 오염 방지)
 //   · 조회(GET + phone): IP 당 10분 30회 (전화번호 대입 조회 방지) · 카드만 조회: IP 당 1분 60회
+// Redis(rate-limit.ts)는 REDIS_URL 이 없거나 오류면 허용으로 열리므로 인스턴스 메모리 한도를 바닥으로 같이 건다
+async function limitBoth(bucket: string, id: string, limit: number, windowSec: number): Promise<number | null> {
+ const r = await rateLimit({ bucket, id, limit, windowSec })
+ if (!r.ok) return r.retryAfter || windowSec
+ const m = checkRate(`${bucket}:${id}`, limit, windowSec)
+ if (!m.ok) return m.resetIn || windowSec
+ return null
+}
+
 function tooMany(retryAfter: number) {
  return NextResponse.json(
  { ok: false, error: 'rate_limited', message: '잠시 후 다시 시도해주세요.' },
@@ -52,10 +62,10 @@ export async function POST(req: NextRequest) {
  if (phone.length < 10) return NextResponse.json({ ok: false, error: 'invalid_phone' }, { status: 400, headers: CORS })
 
  const ip = getClientIp(req)
- const byIp = await rateLimit({ bucket: 'stamp-collect-ip', id: ip, limit: 20, windowSec: 600 })
- if (!byIp.ok) return tooMany(byIp.retryAfter)
- const byStore = await rateLimit({ bucket: 'stamp-collect-store', id: slug.slice(0, 80), limit: 300, windowSec: 3600 })
- if (!byStore.ok) return tooMany(byStore.retryAfter)
+ const byIp = await limitBoth('stamp-collect-ip', ip, 20, 600)
+ if (byIp !== null) return tooMany(byIp)
+ const byStore = await limitBoth('stamp-collect-store', slug.slice(0, 80), 300, 3600)
+ if (byStore !== null) return tooMany(byStore)
 
  const svc = createServiceClient()
 
@@ -243,9 +253,9 @@ export async function GET(req: NextRequest) {
 
  const ip = getClientIp(req)
  const rl = phone.length >= 10
- ? await rateLimit({ bucket: 'stamp-lookup-ip', id: ip, limit: 30, windowSec: 600 })
- : await rateLimit({ bucket: 'stamp-card-ip', id: ip, limit: 60, windowSec: 60 })
- if (!rl.ok) return tooMany(rl.retryAfter)
+ ? await limitBoth('stamp-lookup-ip', ip, 30, 600)
+ : await limitBoth('stamp-card-ip', ip, 60, 60)
+ if (rl !== null) return tooMany(rl)
 
  const svc = createServiceClient()
 

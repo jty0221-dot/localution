@@ -67,9 +67,9 @@ const TONE_PROMPTS: Record<string, string> = {
 
 export async function POST(req: NextRequest) {
  // LU-018 · SEC-L08 · QR 손님용 공개 경로라 로그인 대신 IP · 매장 기준 한도 + 입력 상한
- //   · IP: 분당 5회 · 1일 100회 (Redis + 인스턴스 메모리) · 매장(매장명): 분당 30회 · 1일 600회
+ //   · IP: 분당 10회 · 1일 150회 (손님 1명이 OCR + 생성 2~3회 · 매장 와이파이 공유 고려) (Redis + 인스턴스 메모리) · 매장(매장명): 분당 30회 · 1일 600회
  const ip = getClientIp(req)
- const ipLimited = await enforceQuota('qr-review-ip', ip, { perMinute: 5, perDay: 100 }, '요청이 너무 많아요. 잠시 후 다시 시도해주세요.')
+ const ipLimited = await enforceQuota('qr-review-ip', ip, { perMinute: 10, perDay: 150 }, '요청이 너무 많아요. 잠시 후 다시 시도해주세요.')
  if (ipLimited) return ipLimited
 
  try {
