@@ -147,6 +147,7 @@ export default function ReviewAdminHub() {
  const [feed, setFeed] = useState<FeedReview[]>([])
  const [loadingFeed, setLoadingFeed] = useState(false)
  const [feedMode, setFeedMode] = useState<InboxFilter>('all')
+ const feedSeqRef = React.useRef(0)
  const [filter, setFilter] = useState<'all' | PlatformKey>('all')
  // LU-018 W2-9: ?filter=unanswered 로 들어오면 답글 안 단 리뷰만 (대시보드 '미답변 N건 검토')
  const [replyFilter, setReplyFilter] = useState<InboxFilter>('all')
@@ -197,6 +198,7 @@ export default function ReviewAdminHub() {
  }, [])
  useEffect(() => { void loadStats() }, [loadStats])
  const loadFeed = useCallback(async () => {
+ const seq = ++feedSeqRef.current
  setLoadingFeed(true)
  setFeedError(null)
  const targets = stats.filter(s => s.connected || (s.reviewCount ?? 0) > 0)
@@ -219,14 +221,18 @@ export default function ReviewAdminHub() {
  succeeded.push(s.platform)
  } catch { failed.push(s.platform) }
  }))
+ // 필터를 빨리 바꿔 더 새 요청이 나갔으면 이 응답은 버린다
+ if (seq !== feedSeqRef.current) return
  if (failed.length) setFeedError(`${failed.map(p => PLATFORM_META[p].label).join(' · ')} 리뷰를 확인하지 못했어요. 이전에 불러온 리뷰가 있으면 유지했어요. 다시 시도해주세요.`)
- if (succeeded.length || targets.length === 0) setFeed(previous => {
+ if (succeeded.length || targets.length === 0) {
+ setFeedMode(mode)
+ setFeed(previous => {
  // 실패한 매체의 이전 자료는 같은 보기(전체/미답변)로 받은 것일 때만 남긴다
  const keep = feedMode === mode ? previous.filter(r => failed.includes(r.platform)) : []
  const next = [...keep, ...all]
  return next.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
  })
- setFeedMode(mode)
+ }
  setLoadingFeed(false)
  }, [stats, replyFilter, feedMode])
  useEffect(() => {

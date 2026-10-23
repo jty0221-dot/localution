@@ -213,7 +213,7 @@ function inferCategoryFromStore(name: string): string | null {
 }
 
 // LU-018 W2-12: reviewId · platformSlug — 모달 초안을 그 리뷰의 draft 로 저장하고 편집기로 이어 쓰기
-type ReviewPreview = { platform: string; name: string; rating: number; text: string; time: string; replied: boolean; color: string; reviewId?: string; platformSlug?: string };
+type ReviewPreview = { platform: string; name: string; rating: number; text: string; time: string; replied: boolean; color: string; reviewId?: string; platformSlug?: string; replyStatus?: string | null };
 const RECENT_REVIEWS: ReviewPreview[] = []
 
 // 30차-23: 실제 platform_reviews 레코드 (요약 카드·하단 최근 리뷰 용)
@@ -577,6 +577,11 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
  // 저장할 리뷰 id 가 없으면(옛 미리보기 자료) 초안을 클립보드에 남기고 이동
  try { await navigator.clipboard.writeText(text) } catch {}
  window.location.assign('/review-admin')
+ return
+ }
+ // 이미 올렸거나 올리는 중인 리뷰를 초안으로 되돌리면 두 번 올라갈 수 있다
+ if (review.replyStatus && ['submitted', 'queued', 'submitting'].includes(review.replyStatus)) {
+ setSaveError('이미 답글을 올렸거나 올리는 중인 리뷰예요. 리뷰 관리에서 확인해주세요.')
  return
  }
  setSaving(true)
@@ -1323,6 +1328,7 @@ export default function Dashboard() {
  color: pf?.color || '#03C75A',
  reviewId: r.id,
  platformSlug: r.platform,
+ replyStatus: r.reply_status ?? null,
  })
  },
  [platforms],

@@ -105,8 +105,9 @@ export async function PUT(req: NextRequest) {
   }
 
   // 자동답글 말투 맞추기 (이 계정 · 연결된 매체 행만)
+  // 브라우저 값 자동 이관(migrate_from_browser)은 사장님이 누른 저장이 아니므로 자동답글 말투를 바꾸지 않는다
   let autoreplySynced: number | null = 0
-  try {
+  if (!migrate) try {
     const { data: creds, error } = await svc
       .from('platform_credentials')
       .select('platform, extra_data')

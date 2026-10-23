@@ -1128,7 +1128,9 @@ function AITab() {
  const [voiceState, setVoiceState] = useState<'loading' | 'ready' | 'missing' | 'error' | 'login'>('loading')
  const [voiceSavedAt, setVoiceSavedAt] = useState<string | null>(null)
  const [voiceSaving, setVoiceSaving] = useState(false)
- const [voiceDirty, setVoiceDirty] = useState(false)
+ const [voiceDirty, setVoiceDirtyState] = useState(false)
+ const voiceDirtyRef = useRef(false)
+ const setVoiceDirty = (v: boolean) => { voiceDirtyRef.current = v; setVoiceDirtyState(v) }
  const [bizType, setBizType] = useState('')
  const [industryGroup, setIndustryGroup] = useState<string>(DEFAULT_INDUSTRY_GROUP_ID)
  const [industrySearch, setIndustrySearch] = useState('')
@@ -1159,9 +1161,11 @@ function AITab() {
  if (res.status === 401) { setVoiceState('login'); return }
  const j = await res.json().catch(() => null)
  if (!res.ok || !j?.ok) { setVoiceState('error'); return }
- applyVoice(normalizeReplyVoice(j.voice))
  setVoiceSavedAt(j.saved ? (j.updated_at ?? null) : null)
  setVoiceState(j.storage === 'ready' ? 'ready' : 'missing')
+ // 불러오는 사이 사장님이 이미 바꿨으면 화면 값을 덮지 않는다 (저장 때 기존 값 위에 합쳐짐)
+ if (voiceDirtyRef.current) { setVoiceBase(normalizeReplyVoice(j.voice)); return }
+ applyVoice(normalizeReplyVoice(j.voice))
  setVoiceDirty(false)
  } catch { if (alive) setVoiceState('error') }
  })()

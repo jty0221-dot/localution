@@ -316,6 +316,9 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  const [voiceStorage, setVoiceStorage] = useState<'loading' | 'ready' | 'missing' | 'error'>('loading')
  useEffect(() => {
  let alive = true
+ // 불러오는 사이 사장님이 바꾼 값은 덮지 않도록 시작 시점 값을 기억한다
+ const startPersona = persona
+ const startCustom = customPrompt
  ;(async () => {
  try {
  const res = await fetch('/api/reply-voice', { credentials: 'include', cache: 'no-store' })
@@ -327,6 +330,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  let serverVoice = normalizeReplyVoice(j.voice)
  let legacy: Partial<ReplyVoice> | null = null
  let migrated = false
+ let migratedNow = false
  try {
  legacy = voiceFromLegacyEditor(localStorage.getItem(PERSONA_KEY), localStorage.getItem(CUSTOM_PROMPT_KEY))
  migrated = localStorage.getItem(PERSONA_MIGRATED_KEY) === '1'
@@ -342,16 +346,18 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  if (!alive) return
  if (put.ok && pj?.ok) {
  serverVoice = normalizeReplyVoice(pj.voice)
+ migratedNow = true
  try { localStorage.setItem(PERSONA_MIGRATED_KEY, '1') } catch {}
  }
  } else if (storage === 'ready' && j.saved) {
  try { localStorage.setItem(PERSONA_MIGRATED_KEY, '1') } catch {}
  }
- // 서버 값이 있거나 방금 옮겼으면 서버 값을 쓴다. 서버 저장 준비 전이면 이 기기 값을 그대로 둔다.
- if (storage === 'ready' && (j.saved || legacy)) {
+ // 서버에 저장돼 있거나 방금 옮겼을 때만 서버 값을 쓴다.
+ // 서버가 비어 있고 옮기지도 못했으면(이미 옮긴 표시 · 실패 · 준비 전) 이 기기 값을 그대로 둔다.
+ if (storage === 'ready' && (j.saved || migratedNow)) {
  setVoice(serverVoice)
- setPersona({ tone: serverVoice.tone, gender: serverVoice.customer_gender, age: serverVoice.customer_age })
- setCustomPrompt(serverVoice.custom_prompt)
+ setPersona((prev) => (prev === startPersona ? { tone: serverVoice.tone, gender: serverVoice.customer_gender, age: serverVoice.customer_age } : prev))
+ setCustomPrompt((prev) => (prev === startCustom ? serverVoice.custom_prompt : prev))
  }
  } catch { if (alive) setVoiceStorage('error') }
  })()
