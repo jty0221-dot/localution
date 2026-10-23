@@ -10,7 +10,7 @@
 // ============================================================
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { requestMutation } from '../lib/client-mutations';
+import { describeCustomerSaveFailure, isServerSaveBlocked } from '../lib/customer-save-status';
 
 export type CustomerTag = 'VIP' | '단골' | '신규' | '휴면' | '블랙리스트';
 
@@ -23,6 +23,8 @@ export type Customer = {
  lastVisit: string;
  tags: CustomerTag[];
  memo: string;
+ // 광고성 메시지 수신 동의 (LU-018 W2-5) — 없거나 false 면 단체 메시지 대상에서 빠진다
+ consentMarketing?: boolean;
 };
 
 const LS_KEY = 'localution.customers';
@@ -37,6 +39,10 @@ export interface UseCustomersResult {
  isDemo: boolean;
  loading: boolean;
  error: string | null;
+ // 로그인은 됐지만 서버 저장이 막힌 상태 (409 계정 연결 필요 등) — 화면에 '저장 못 함' 을 띄운다
+ saveBlocked: boolean;
+ // 서버에 동의 열이 있는지 (마이그레이션 전이면 false → 전원 미동의로 보인다)
+ consentAvailable: boolean;
  add: (input: Omit<Customer, 'id' | 'visits' | 'totalSpend' | 'lastVisit'>) => Promise<void>;
  update: (id: string, patch: Partial<Customer>) => Promise<void>;
  remove: (id: string) => Promise<void>;
@@ -51,6 +57,8 @@ export function useCustomers(): UseCustomersResult {
  const [mode, setMode] = useState<UseCustomersMode>('loading');
  const [loading, setLoading] = useState(true);
  const [error, setError] = useState<string | null>(null);
+ const [saveBlocked, setSaveBlocked] = useState(false);
+ const [consentAvailable, setConsentAvailable] = useState(true);
  const migratedRef = useRef(false);
  const bootstrapSequence = useRef(0);
 
@@ -82,18 +90,18 @@ export function useCustomers(): UseCustomersResult {
  const fetchRemote = useCallback(async (): Promise<Customer[] | null> => {
  try {
  const r = await fetch('/api/customers', { credentials: 'include', cache: 'no-store' });
- if (!r.ok) return null;
- const j = await r.json();
- if (!j.ok) {
- setError(j.error || 'fetch failed');
+ const j = await r.json().catch(() => null);
+ if (!r.ok || !j?.ok) {
+ setError(describeCustomerSaveFailure(r.status, j));
  return null;
  }
  const list = (j.customers || []) as Customer[];
+ setConsentAvailable(j.consentAvailable !== false);
  // DB 결과를 캐시에 저장 (다음 진입 시 즉시 표시)
  writeCache(list);
  return list;
- } catch (e) {
- setError(e instanceof Error ? e.message : 'fetch failed');
+ } catch {
+ setError(describeCustomerSaveFailure(0, null));
  return null;
  }
  }, []);
@@ -125,6 +133,7 @@ export function useCustomers(): UseCustomersResult {
  phone: c.phone,
  memo: c.memo,
  tags: c.tags,
+ consentMarketing: c.consentMarketing === true,
  }),
  });
  if (r.ok) migratedCount++;
@@ -151,6 +160,7 @@ export function useCustomers(): UseCustomersResult {
  setCustomers([]);
  setMode('loading');
  setError(null);
+ setSaveBlocked(false);
  writeCache([]);
  try {
 
@@ -178,11 +188,20 @@ export function useCustomers(): UseCustomersResult {
  return;
  }
  }
- // 실패 fallback (네트워크 오류 등)
+ // 로그인은 됐는데 서버가 저장을 거절(409 계정 연결 필요 · 503 · 500) → 이 기기 저장으로 두되 이유를 그대로 띄운다
+ // (예전에는 아무 말 없이 로컬 모드로 떨어져 사장님이 서버에 저장된 줄 알았다 · LU-018 W2-4)
+ const failure = await r.json().catch(() => null);
+ if (sequence !== bootstrapSequence.current) return;
+ if (isServerSaveBlocked(r.status) || failure?.ok === false) {
+ setSaveBlocked(true);
+ setError(describeCustomerSaveFailure(r.status, failure));
+ }
  setCustomers(readLocal());
  setMode('local');
  } catch (_) {
  if (sequence !== bootstrapSequence.current) return;
+ setSaveBlocked(true);
+ setError(describeCustomerSaveFailure(0, null));
  setCustomers(readLocal());
  setMode('local');
  } finally {
@@ -212,12 +231,21 @@ export function useCustomers(): UseCustomersResult {
  setError(null);
  let j: { ok: boolean; customer: Customer };
  try {
- j = await requestMutation<{ ok: boolean; customer: Customer }>('/api/customers', 'POST', {
- name: input.name, phone: input.phone, memo: input.memo, tags: input.tags,
- }, '고객을 저장하지 못했어요. 입력한 내용을 확인한 뒤 다시 시도해주세요.');
- if (!j.customer?.id) throw new Error('저장 결과를 확인하지 못했어요. 고객 목록을 확인해주세요.');
+ let r: Response;
+ try {
+ r = await fetch('/api/customers', {
+ method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
+ body: JSON.stringify({ name: input.name, phone: input.phone, memo: input.memo, tags: input.tags, consentMarketing: input.consentMarketing === true }),
+ });
+ } catch {
+ throw new Error(describeCustomerSaveFailure(0, null));
+ }
+ const body = await r.json().catch(() => null);
+ if (!r.ok || !body?.ok) throw new Error(describeCustomerSaveFailure(r.status, body));
+ j = body;
+ if (!j.customer?.id) throw new Error('저장 못 함 · 저장 결과를 확인하지 못했어요. 고객 목록을 확인해주세요.');
  } catch (e) {
- const message = e instanceof Error ? e.message : '고객을 저장하지 못했어요.';
+ const message = e instanceof Error ? e.message : describeCustomerSaveFailure(0, null);
  setError(message);
  throw new Error(message);
  }
@@ -235,6 +263,7 @@ export function useCustomers(): UseCustomersResult {
  lastVisit: todayISODate(),
  tags: input.tags,
  memo: input.memo ?? '',
+ consentMarketing: input.consentMarketing === true,
  };
  const nextList = [next, ...customers];
  try { localStorage.setItem(LS_KEY, JSON.stringify(nextList)); }
@@ -244,14 +273,17 @@ export function useCustomers(): UseCustomersResult {
 
  const update: UseCustomersResult['update'] = async (id, patch) => {
  if (mode === 'remote') {
- const r = await fetch('/api/customers', {
+ let r: Response;
+ try {
+ r = await fetch('/api/customers', {
  method: 'PUT',
  credentials: 'include',
  headers: { 'Content-Type': 'application/json' },
  body: JSON.stringify({ id, ...patch }),
  });
- const j = await r.json();
- if (!j.ok) { setError(j.error || 'update failed'); return; }
+ } catch { setError(describeCustomerSaveFailure(0, null)); return; }
+ const j = await r.json().catch(() => null);
+ if (!r.ok || !j?.ok) { setError(describeCustomerSaveFailure(r.status, j)); return; }
  const next = customers.map(c => (c.id === id ? { ...c, ...patch } : c));
  setCustomers(next);
  writeCache(next);
@@ -264,9 +296,11 @@ export function useCustomers(): UseCustomersResult {
 
  const remove: UseCustomersResult['remove'] = async (id) => {
  if (mode === 'remote') {
- const r = await fetch('/api/customers?id=' + id, { method: 'DELETE', credentials: 'include' });
- const j = await r.json();
- if (!j.ok) { setError(j.error || 'remove failed'); return; }
+ let r: Response;
+ try { r = await fetch('/api/customers?id=' + encodeURIComponent(id), { method: 'DELETE', credentials: 'include' }); }
+ catch { setError(describeCustomerSaveFailure(0, null)); return; }
+ const j = await r.json().catch(() => null);
+ if (!r.ok || !j?.ok) { setError(describeCustomerSaveFailure(r.status, j)); return; }
  const next = customers.filter(c => c.id !== id);
  setCustomers(next);
  writeCache(next);
@@ -303,6 +337,8 @@ export function useCustomers(): UseCustomersResult {
  isDemo: customers.length === 0,
  loading,
  error,
+ saveBlocked,
+ consentAvailable: mode === 'local' ? true : consentAvailable,
  add,
  update,
  remove,

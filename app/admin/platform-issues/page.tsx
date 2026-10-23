@@ -7,7 +7,7 @@
 import { useState, useEffect } from 'react'
 import PageHeader from '@/app/components/PageHeader'
 import {
-  AlertTriangle, RefreshCw, Users, Link2, Activity, ShieldAlert, Clock,
+  AlertTriangle, RefreshCw, Users, Link2, Activity, ShieldAlert, Clock, UserX,
 } from 'lucide-react'
 
 type Overview = {
@@ -16,7 +16,10 @@ type Overview = {
     null_place_id_count: number
     failed_replies_24h: number
     stuck_queued_count: number
+    // LU-018 W2-4 · 스탬프 → 고객 자동 등록 실패 (null = 집계 실패)
+    crm_sync_failed_24h?: number | null
   }
+  crm_sync_failed_reasons?: Record<string, number>
   platform_counts?: Record<string, { total: number; success: number; failed: number; disabled: number; never: number }>
   failed_replies_pattern?: Record<string, number>
   failed_credentials_users?: Array<{ user_id: string; issues: any[] }>
@@ -59,12 +62,13 @@ export default function PlatformIssuesPage() {
       />
 
       <div className="max-w-6xl mx-auto px-4 md:px-6 lg:px-8 py-4 md:py-6 space-y-4 md:space-y-6">
-        {/* 요약 카드 4개 */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        {/* 요약 카드 5개 */}
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           <SumCard label="자격증명 오류" value={s.failed_credentials_count} icon={ShieldAlert} color="from-red-500 to-rose-600" highlight={s.failed_credentials_count > 0} />
           <SumCard label="매장ID 누락" value={s.null_place_id_count} icon={Link2} color="from-amber-500 to-orange-600" highlight={s.null_place_id_count > 5} />
           <SumCard label="24h 답글 실패" value={s.failed_replies_24h} icon={AlertTriangle} color="from-purple-500 to-violet-600" highlight={s.failed_replies_24h > 5} />
           <SumCard label="정체 답글" value={s.stuck_queued_count} icon={Clock} color="from-blue-500 to-indigo-600" highlight={s.stuck_queued_count > 0} />
+          <SumCard label="24h 고객 자동등록 실패" value={s.crm_sync_failed_24h === null ? '확인 불가' : (s.crm_sync_failed_24h ?? 0)} icon={UserX} color="from-slate-500 to-slate-700" highlight={(s.crm_sync_failed_24h ?? 0) > 0} />
         </div>
 
         {/* 새로고침 */}
@@ -199,6 +203,29 @@ export default function PlatformIssuesPage() {
                   <span className="px-2 py-0.5 bg-purple-600 text-white rounded-md text-xs md:text-xs font-bold">
                     {count}건
                   </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* 스탬프 → 고객 자동 등록 실패 원인 (LU-018 W2-4) */}
+        {data?.crm_sync_failed_reasons && Object.keys(data.crm_sync_failed_reasons).length > 0 && (
+          <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center">
+                <UserX size={16} className="text-white" strokeWidth={2.5} />
+              </div>
+              <div>
+                <div className="text-base md:text-lg font-bold text-gray-900">24h 고객 자동등록 실패 원인</div>
+                <div className="text-xs text-gray-500">owner_key_uuid = 고객 표 소유 키 마이그레이션 실행 전 (OAuth 사장님)</div>
+              </div>
+            </div>
+            <div className="space-y-1.5">
+              {Object.entries(data.crm_sync_failed_reasons).sort((a, b) => b[1] - a[1]).map(([reason, count]) => (
+                <div key={reason} className="flex items-center justify-between p-2 bg-gray-50 rounded-lg text-xs md:text-sm">
+                  <span className="font-medium text-gray-900">{reason}</span>
+                  <span className="px-2 py-0.5 bg-gray-700 text-white rounded-md text-xs font-bold">{count}건</span>
                 </div>
               ))}
             </div>

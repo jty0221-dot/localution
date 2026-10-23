@@ -8,6 +8,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/app/lib/userAuth'
 import { createServiceClient } from '@/app/lib/adminAuth'
+import { syncStampCustomer } from '@/app/lib/stamp-customer-sync'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -66,36 +67,21 @@ export async function POST(req: NextRequest) {
 
  if (error) return NextResponse.json({ ok: false, error: 'insert_failed', message: error.message }, { status: 500 })
 
- // customers 동기화
- try {
- const { data: existingC } = await svc
- .from('customers')
- .select('id, visits_count, tags')
- .eq('user_id', auth.userId)
- .eq('phone', phone)
- .maybeSingle()
-
- if (existingC) {
- const tags = existingC.tags || []
- if (!tags.includes('단골')) tags.push('단골')
- await svc.from('customers').update({
- visits_count: (existingC.visits_count || 0) + initialStamps,
- last_visit_at: new Date().toISOString(),
- tags,
- name: name || undefined,
- }).eq('id', existingC.id)
- } else {
- await svc.from('customers').insert({
- user_id: auth.userId,
- name: name || ('손님 ' + phone.slice(-4)),
+ // customers 동기화 (LU-018 W2-4 · 태그는 방문 수 기준 · 실패는 서버 로그 + stamp_events 기록)
+ const sync = await syncStampCustomer(svc, {
+ ownerId: auth.userId,
  phone,
+ name,
+ addVisits: initialStamps,
  memo: '스탬프 카드 수동 등록',
- tags: ['단골'],
- visits_count: initialStamps,
- last_visit_at: new Date().toISOString(),
+ source: 'manual_add',
+ stampCardId: card.id ?? null,
+ collectionId: null,
  })
+ if (!sync.ok) {
+ // 적립 등록은 됐으니 성공으로 두고, 고객 목록 반영 실패를 화면이 알 수 있게 함께 내린다
+ return NextResponse.json({ ok: true, customer_synced: false, customer_sync_error: '스탬프는 등록됐지만 고객 목록에는 저장하지 못했어요.' })
  }
- } catch (_) {}
 
- return NextResponse.json({ ok: true })
+ return NextResponse.json({ ok: true, customer_synced: true })
 }

@@ -10,7 +10,8 @@ import PageHeader from '../components/PageHeader'
 import { BRAND_GRAD } from '../lib/brand-colors'
 import { useCustomers, type Customer, type CustomerTag } from '../hooks/useCustomers'
 import RevisitInsightCard from './RevisitInsightCard'
-import { Users, Star, Heart, Moon, MessageSquare, FileText, Check, type LucideIcon } from 'lucide-react'
+import { splitMessageRecipients, excludedCount, withAdNotice, isNightAdHour } from '../lib/crm-messaging'
+import { Users, Star, Heart, Moon, MessageSquare, FileText, Check, AlertTriangle, type LucideIcon } from 'lucide-react'
 
 type Tag = CustomerTag
 type FilterTagType = Tag | '전체'
@@ -26,7 +27,7 @@ const TAG_COLORS: Record<Tag, { bg: string; text: string }> = {
 const ALL_TAGS: Tag[] = ['VIP', '단골', '신규', '휴면', '블랙리스트']
 
 export default function CustomersPage() {
- const { customers, loading, mode, error: customerError, add } = useCustomers()
+ const { customers, loading, mode, error: customerError, saveBlocked, consentAvailable, add } = useCustomers()
  const isEmpty = customers.length === 0
 
  const [filterTag, setFilterTag] = useState<FilterTagType>('전체')
@@ -40,6 +41,7 @@ export default function CustomersPage() {
  const [newPhone, setNewPhone] = useState('')
  const [newTag, setNewTag] = useState<Tag>('신규')
  const [newMemo, setNewMemo] = useState('')
+ const [newConsent, setNewConsent] = useState(false)
  const [submitting, setSubmitting] = useState(false)
  const [addError, setAddError] = useState<string | null>(null)
  const [messageResult, setMessageResult] = useState('')
@@ -69,10 +71,15 @@ export default function CustomersPage() {
  const [sendMode, setSendMode] = useState<'kakao' | 'sms'>('kakao')
  const [sendError, setSendError] = useState<string | null>(null)
 
+ // LU-018 W2-5 · 광고 수신 동의한 손님만 · 연락처 없음 · 블랙리스트 자동 제외
+ const recipients = splitMessageRecipients(customers.filter(c => selected.includes(c.id)))
+ const eligible = recipients.eligible
+ const excluded = excludedCount(recipients)
+ const nightHour = isNightAdHour()
+
  const buildPersonalizedBlocks = (): string => {
- const pick = customers.filter(c => selected.includes(c.id))
- return pick.map(c => {
- const body = msgText.replace(/\{고객명\}/g, c.name || '고객')
+ return eligible.map(c => {
+ const body = withAdNotice(msgText.replace(/\{고객명\}/g, c.name || '고객'))
  return `[${c.name} · ${c.phone}]\n${body}`
  }).join('\n\n--------\n\n')
  }
@@ -102,14 +109,15 @@ export default function CustomersPage() {
 
  const sendSMS = () => {
  setSendError(null)
- const pick = customers.filter(c => selected.includes(c.id))
+ const pick = eligible
+ if (pick.length === 0) { setSendError('수신 동의한 고객이 없어요.'); return }
  const phones = pick.map(c => c.phone.replace(/[^0-9]/g, '')).filter(Boolean).join(',')
  if (!phones) { setSendError('전화번호가 없는 고객입니다.'); return }
  // 모바일: sms: URI → 기본 메시지 앱이 열림
  // Windows 데스크톱: sms: URI는 Windows 10+ Your Phone/Phone Link 연동 시에만 동작
  // → 실패 시 클립보드 fallback
  let previewBody: string
- try { previewBody = smsBodyForRecipients(msgText, pick.map(c => c.name)) }
+ try { previewBody = withAdNotice(smsBodyForRecipients(msgText, pick.map(c => c.name))) }
  catch (e) { setSendError(e instanceof Error ? e.message : '문자 내용을 확인해주세요.'); return }
  const ua = navigator.userAgent.toLowerCase()
  const isMobile = /android|iphone|ipad|ipod/.test(ua)
@@ -155,9 +163,10 @@ export default function CustomersPage() {
  phone: newPhone.trim(),
  memo: newMemo.trim(),
  tags: [newTag],
+ consentMarketing: newConsent,
  })
  setAddOpen(false)
- setNewName(''); setNewPhone(''); setNewMemo(''); setNewTag('신규')
+ setNewName(''); setNewPhone(''); setNewMemo(''); setNewTag('신규'); setNewConsent(false)
  } catch (e) {
  setAddError(e instanceof Error ? e.message : '고객을 저장하지 못했어요. 다시 시도해주세요.')
  } finally {
@@ -184,9 +193,9 @@ export default function CustomersPage() {
  />
 
  <main className="flex-1 px-4 md:px-6 py-4 md:py-6 max-w-6xl mx-auto w-full">
- <div role="status" className={`mb-4 rounded-xl border p-3 text-sm leading-6 ${mode === 'local' || customerError ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-[#E5E8EB] bg-white text-[#4E5968]'}`}>
- {loading ? '고객 목록과 저장 위치를 확인하고 있어요.' : mode === 'remote' ? '서버에 연결되어 있어요. 고객을 추가하면 서버에 저장해요.' : '이 기기에 저장하는 모드예요. 서버 저장과 다른 기기 동기화는 확인되지 않았어요.'}
- {customerError && <p className="mt-1">{customerError}</p>}
+ <div role={saveBlocked ? 'alert' : 'status'} className={`mb-4 rounded-xl border p-3 text-sm leading-6 ${saveBlocked ? 'border-red-200 bg-red-50 text-red-700' : mode === 'local' || customerError ? 'border-amber-200 bg-amber-50 text-amber-800' : 'border-[#E5E8EB] bg-white text-[#4E5968]'}`}>
+ {loading ? '고객 목록과 저장 위치를 확인하고 있어요.' : saveBlocked ? '서버에 저장 못 함 · 지금 추가하는 고객은 이 기기에만 남고 다른 기기에서는 보이지 않아요.' : mode === 'remote' ? '서버에 연결되어 있어요. 고객을 추가하면 서버에 저장해요.' : '이 기기에 저장하는 모드예요. 서버 저장과 다른 기기 동기화는 확인되지 않았어요.'}
+ {customerError && <p className="mt-1 font-semibold">{customerError}</p>}
  </div>
  <div className="w-full">
 
@@ -367,7 +376,12 @@ export default function CustomersPage() {
  </span>
  ))}
  </div>
- <div className="text-xs text-[#8B95A1]">{c.phone || '연락처 없음'}</div>
+ <div className="text-xs text-[#8B95A1]">
+ {c.phone || '연락처 없음'}
+ <span className={`ml-2 font-semibold ${c.consentMarketing ? 'text-[#059669]' : 'text-[#B0B8C1]'}`}>
+ {c.consentMarketing ? '수신 동의' : '수신 미동의'}
+ </span>
+ </div>
  {c.memo && <div className="text-xs text-[#4E5968] mt-0.5 truncate flex items-center gap-1"><FileText size={11} strokeWidth={2.5} /> {c.memo}</div>}
  </div>
 
@@ -416,6 +430,14 @@ export default function CustomersPage() {
  ))}
  </div>
  </div>
+ <label htmlFor="new-consent" className="flex items-start gap-2 rounded-xl border border-[#E5E8EB] p-3 text-xs text-[#4E5968] leading-5 cursor-pointer">
+ <input id="new-consent" type="checkbox" checked={newConsent} onChange={e => setNewConsent(e.target.checked)}
+ className="mt-0.5 w-4 h-4 rounded flex-shrink-0" />
+ <span>
+ <strong className="text-[#191F28]">광고 문자 · 카톡 수신 동의를 받았어요</strong>
+ <br />동의를 받은 고객만 단체 메시지 대상에 들어가요. 받지 않았다면 체크하지 마세요.
+ </span>
+ </label>
  <div>
  <label htmlFor="new-memo" className="text-xs text-[#8B95A1] font-semibold block mb-1">메모</label>
  <textarea id="new-memo" value={newMemo} onChange={e => setNewMemo(e.target.value)}
@@ -445,7 +467,20 @@ export default function CustomersPage() {
  <div className="fixed inset-0 bg-black/50 z-50 flex items-end md:items-center justify-center p-4">
  <div ref={messageDialogRef} role="dialog" aria-modal="true" aria-labelledby="customer-message-title" tabIndex={-1} className="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6">
  <h3 id="customer-message-title" className="text-lg font-black text-[#191F28] mb-1">단체 메시지 전송 준비</h3>
- <p className="text-xs text-[#8B95A1] mb-3">선택한 {selected.length}명의 메시지를 준비합니다. 실제 전송은 메시지 앱에서 직접 확인해주세요.</p>
+ <p className="text-xs text-[#8B95A1] mb-3">선택한 {selected.length}명 중 광고 수신에 동의한 고객에게만 메시지를 준비합니다. 실제 전송은 메시지 앱에서 직접 확인해주세요.</p>
+
+ {/* 수신 동의 대상 요약 (LU-018 W2-5) */}
+ <div className="mb-3 rounded-xl border border-[#E5E8EB] bg-[#F8F9FB] p-3 text-xs leading-5 text-[#4E5968]">
+ <p><strong className="text-[#191F28]">보낼 대상 {eligible.length}명</strong>{excluded > 0 && <> · 제외 {excluded}명 (미동의 {recipients.excluded.noConsent.length} · 연락처 없음 {recipients.excluded.noPhone.length} · 블랙리스트 {recipients.excluded.blacklisted.length})</>}</p>
+ <p className="text-[#8B95A1]">맨 앞에 (광고) 표시와 맨 끝에 수신거부 안내가 자동으로 붙어요.</p>
+ {!consentAvailable && <p className="mt-1 text-amber-700">수신 동의를 서버에 저장하는 기능이 아직 준비 중이라 지금은 모든 고객이 미동의로 보여요.</p>}
+ {nightHour && (
+ <p className="mt-1 flex items-start gap-1 text-[#DC2626]">
+ <AlertTriangle size={13} strokeWidth={2.5} className="mt-0.5 flex-shrink-0" />
+ 밤 9시부터 아침 8시까지는 광고 메시지에 별도 동의가 더 필요해요. 아침에 보내주세요.
+ </p>
+ )}
+ </div>
 
  {/* 채널 선택 */}
  <div className="grid grid-cols-2 gap-2 mb-3">
@@ -507,7 +542,7 @@ export default function CustomersPage() {
  className="flex-1 border border-[#E5E8EB] text-[#4E5968] py-3 rounded-xl text-sm font-bold hover:bg-[#F2F4F6]">
  취소
  </button>
- <button onClick={sendMessage} disabled={!msgText.trim() || selected.length === 0}
+ <button onClick={sendMessage} disabled={!msgText.trim() || eligible.length === 0}
  className="flex-1 bg-[#3182F6] text-white py-3 rounded-xl text-sm font-bold hover:bg-[#1B64DA] disabled:opacity-40 transition-colors">
  {sendMode === 'kakao' ? '복사 + 카카오톡 열기' : '문자 앱 열기'}
  </button>

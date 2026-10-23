@@ -6,6 +6,7 @@
 //   · 최근 24h failed 수집 (last_login_status='failed')
 //   · stuck queued 답글
 //   · place_id 누락 사용자
+//   · 스탬프 → 고객 자동 등록 실패 (stamp_events.event_type='crm_sync_failed' · LU-018 W2-4)
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin, createServiceClient } from '@/app/lib/adminAuth'
@@ -72,6 +73,20 @@ export async function GET(req: NextRequest) {
     .lte('reply_queued_at', new Date(Date.now() - 30 * 60 * 1000).toISOString())
     .limit(20)
 
+  // 4-B) 스탬프 → /customers 고객 자동 등록 실패 (24h) — 예전에는 catch 로 조용히 사라졌다
+  //   reason 별 건수만 집계 (전화번호 · 사장님 ID 는 이벤트에 남기지 않음)
+  const { data: crmSyncFails, count: crmSyncFailCount, error: crmSyncError } = await svc
+    .from('stamp_events')
+    .select('meta', { count: 'exact' })
+    .eq('event_type', 'crm_sync_failed')
+    .gte('created_at', since24h)
+    .limit(200)
+  const crmSyncReasons: Record<string, number> = {}
+  for (const r of (crmSyncFails || [])) {
+    const reason = String((r.meta as { reason?: unknown } | null)?.reason || 'unknown')
+    crmSyncReasons[reason] = (crmSyncReasons[reason] || 0) + 1
+  }
+
   // 5) 플랫폼별 사용자 카운트
   const { data: platformStats } = await svc
     .from('platform_credentials')
@@ -112,7 +127,9 @@ export async function GET(req: NextRequest) {
       null_place_id_count: nullPlaceId?.length || 0,
       failed_replies_24h: failedReplyCount || 0,
       stuck_queued_count: stuckCount || 0,
+      crm_sync_failed_24h: crmSyncError ? null : (crmSyncFailCount || 0),
     },
+    crm_sync_failed_reasons: crmSyncReasons,
     platform_counts: platformCounts,
     failed_replies_pattern: failedReplyPatterns,
     failed_credentials_users: Object.entries(credsByUser).slice(0, 20).map(([uid, list]) => ({
@@ -129,6 +146,6 @@ export async function GET(req: NextRequest) {
       queued_at: r.reply_queued_at,
     })),
     triggered_by: admin.email,
-    hint: '문제 발견 시: 자격증명 오류 → 사용자에게 재연결 안내. 누락 place_id → sync-naver-store-ids. stuck queued → admin/queue-control 의 4번 액션.',
+    hint: '문제 발견 시: 자격증명 오류 → 사용자에게 재연결 안내. 누락 place_id → sync-naver-store-ids. stuck queued → admin/queue-control 의 4번 액션. crm_sync_failed (owner_key_uuid) → supabase/migrations/20261023_crm_owner_key_text.sql 실행 필요.',
   })
 }

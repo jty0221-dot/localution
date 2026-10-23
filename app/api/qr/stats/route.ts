@@ -6,81 +6,68 @@
 // · 인증 필요
 // · 본인 user_id 의 qr_review_logs 만 조회
 // · 일/주별 카운트 + 이벤트별 funnel + 최근 활동
+//
+// LU-018 W2-6 · 500행 잘림 해소
+// · 예전에는 .limit(500) 한 번으로 끝나 바쁜 매장(하루 수십 스캔 × 30~90일)은 숫자가 과소 집계됐다
+// · 이제 기간 안의 행을 1,000행씩 끝까지 읽어 집계한다 (안전 상한 100,000행 · 넘으면 truncated=true 로 알린다)
+// · 집계 계산은 app/lib/qr-stats.ts (순수 함수 · 테스트 scripts/qr-stats.test.mjs)
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/app/lib/userAuth'
 import { createServiceClient } from '@/app/lib/adminAuth'
+import { aggregateQrStats, type QrLogRow } from '@/app/lib/qr-stats'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
+
+const PAGE_SIZE = 1000
+const MAX_ROWS = 100_000
 
 export async function GET(req: NextRequest) {
  const auth = await requireUser()
  if (!auth.ok) return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status })
 
- const days = Math.min(90, Math.max(1, parseInt(req.nextUrl.searchParams.get('days') || '7', 10)))
+ const days = Math.min(90, Math.max(1, parseInt(req.nextUrl.searchParams.get('days') || '7', 10) || 7))
  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString()
 
  const svc = createServiceClient()
 
- // 본인 매장 logs 만 조회
+ // 1) 기간 안 전체 행 — 집계에 필요한 열만 · 페이지 단위
+ //    created_at · id 순으로 고정해 페이지 사이에 행이 빠지거나 겹치지 않게 한다
+ const rows: QrLogRow[] = []
+ let truncated = false
+ for (let from = 0; ; from += PAGE_SIZE) {
  const { data, error } = await svc
  .from('qr_review_logs')
- .select('id, store_slug, event_type, meta, device_kind, visitor_hash, created_at')
+ .select('event_type, device_kind, visitor_hash, created_at')
  .eq('user_id', auth.userId)
  .gte('created_at', since)
  .order('created_at', { ascending: false })
- .limit(500)
-
+ .order('id', { ascending: false })
+ .range(from, from + PAGE_SIZE - 1)
  if (error) {
  return NextResponse.json({ ok: false, error: 'db_error' }, { status: 500 })
  }
-
- const rows = data || []
-
- // 이벤트별 카운트
- const counts: Record<string, number> = {}
- // 일별 scan/submit 추이
- const dailyMap: Record<string, { scan: number; submit: number; ai: number }> = {}
- // 고유 방문자 (visitor_hash)
- const uniqueVisitors = new Set<string>()
- // 디바이스 분포
- const deviceCounts: Record<string, number> = { mobile: 0, tablet: 0, desktop: 0 }
-
- for (const r of rows) {
- counts[r.event_type] = (counts[r.event_type] || 0) + 1
- if (r.visitor_hash) uniqueVisitors.add(r.visitor_hash)
- if (r.device_kind) deviceCounts[r.device_kind] = (deviceCounts[r.device_kind] || 0) + 1
-
- const day = String(r.created_at || '').slice(0, 10)
- if (!dailyMap[day]) dailyMap[day] = { scan: 0, submit: 0, ai: 0 }
- if (r.event_type === 'scan') dailyMap[day].scan += 1
- if (r.event_type === 'ai_generated') dailyMap[day].ai += 1
- if (r.event_type.startsWith('submitted_')) dailyMap[day].submit += 1
+ const page = (data || []) as QrLogRow[]
+ rows.push(...page)
+ if (page.length < PAGE_SIZE) break
+ if (rows.length >= MAX_ROWS) { truncated = true; break }
  }
 
- // funnel (스캔 → AI → 등록)
- const scans = counts.scan || 0
- const aiCount = counts.ai_generated || 0
- const submits = (counts.submitted_naver || 0) + (counts.submitted_google || 0) + (counts.submitted_kakao || 0)
- const funnel = {
- scan: scans,
- ai_generated: aiCount,
- submitted: submits,
- scan_to_ai_rate: scans > 0 ? Math.round((aiCount / scans) * 100) : 0,
- ai_to_submit_rate: aiCount > 0 ? Math.round((submits / aiCount) * 100) : 0,
- overall_rate: scans > 0 ? Math.round((submits / scans) * 100) : 0,
+ // 2) 최근 활동 타임라인 (20개) — meta 는 여기서만 읽는다
+ const { data: recentRows, error: recentError } = await svc
+ .from('qr_review_logs')
+ .select('event_type, device_kind, meta, created_at')
+ .eq('user_id', auth.userId)
+ .gte('created_at', since)
+ .order('created_at', { ascending: false })
+ .limit(20)
+ if (recentError) {
+ return NextResponse.json({ ok: false, error: 'db_error' }, { status: 500 })
  }
 
- // 일별 배열 (since 부터 오늘까지 — 빈 날도 0 으로 채움)
- const daily: Array<{ date: string; scan: number; submit: number; ai: number }> = []
- for (let i = days - 1; i >= 0; i--) {
- const d = new Date(Date.now() - i * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
- daily.push({ date: d, ...(dailyMap[d] || { scan: 0, submit: 0, ai: 0 }) })
- }
-
- // 최근 활동 타임라인 (20개)
- const recent = rows.slice(0, 20).map(r => ({
+ const agg = aggregateQrStats(rows, days)
+ const recent = (recentRows || []).map(r => ({
  event_type: r.event_type,
  device_kind: r.device_kind,
  meta: r.meta,
@@ -90,11 +77,13 @@ export async function GET(req: NextRequest) {
  return NextResponse.json({
  ok: true,
  period: { days, since },
- counts,
- funnel,
- unique_visitors: uniqueVisitors.size,
- devices: deviceCounts,
- daily,
+ counts: agg.counts,
+ funnel: agg.funnel,
+ unique_visitors: agg.unique_visitors,
+ devices: agg.devices,
+ daily: agg.daily,
  recent,
+ rows_counted: rows.length,
+ truncated,
  })
 }
