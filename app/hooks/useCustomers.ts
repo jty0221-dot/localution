@@ -23,6 +23,8 @@ export type Customer = {
  lastVisit: string;
  tags: CustomerTag[];
  memo: string;
+ // 광고성 메시지 수신 동의 (LU-018 W2-5) — 없거나 false 면 단체 메시지 대상에서 빠진다
+ consentMarketing?: boolean;
 };
 
 const LS_KEY = 'localution.customers';
@@ -39,6 +41,8 @@ export interface UseCustomersResult {
  error: string | null;
  // 로그인은 됐지만 서버 저장이 막힌 상태 (409 계정 연결 필요 등) — 화면에 '저장 못 함' 을 띄운다
  saveBlocked: boolean;
+ // 서버에 동의 열이 있는지 (마이그레이션 전이면 false → 전원 미동의로 보인다)
+ consentAvailable: boolean;
  add: (input: Omit<Customer, 'id' | 'visits' | 'totalSpend' | 'lastVisit'>) => Promise<void>;
  update: (id: string, patch: Partial<Customer>) => Promise<void>;
  remove: (id: string) => Promise<void>;
@@ -54,6 +58,7 @@ export function useCustomers(): UseCustomersResult {
  const [loading, setLoading] = useState(true);
  const [error, setError] = useState<string | null>(null);
  const [saveBlocked, setSaveBlocked] = useState(false);
+ const [consentAvailable, setConsentAvailable] = useState(true);
  const migratedRef = useRef(false);
  const bootstrapSequence = useRef(0);
 
@@ -91,6 +96,7 @@ export function useCustomers(): UseCustomersResult {
  return null;
  }
  const list = (j.customers || []) as Customer[];
+ setConsentAvailable(j.consentAvailable !== false);
  // DB 결과를 캐시에 저장 (다음 진입 시 즉시 표시)
  writeCache(list);
  return list;
@@ -127,6 +133,7 @@ export function useCustomers(): UseCustomersResult {
  phone: c.phone,
  memo: c.memo,
  tags: c.tags,
+ consentMarketing: c.consentMarketing === true,
  }),
  });
  if (r.ok) migratedCount++;
@@ -228,7 +235,7 @@ export function useCustomers(): UseCustomersResult {
  try {
  r = await fetch('/api/customers', {
  method: 'POST', credentials: 'include', headers: { 'Content-Type': 'application/json' },
- body: JSON.stringify({ name: input.name, phone: input.phone, memo: input.memo, tags: input.tags }),
+ body: JSON.stringify({ name: input.name, phone: input.phone, memo: input.memo, tags: input.tags, consentMarketing: input.consentMarketing === true }),
  });
  } catch {
  throw new Error(describeCustomerSaveFailure(0, null));
@@ -256,6 +263,7 @@ export function useCustomers(): UseCustomersResult {
  lastVisit: todayISODate(),
  tags: input.tags,
  memo: input.memo ?? '',
+ consentMarketing: input.consentMarketing === true,
  };
  const nextList = [next, ...customers];
  try { localStorage.setItem(LS_KEY, JSON.stringify(nextList)); }
@@ -330,6 +338,7 @@ export function useCustomers(): UseCustomersResult {
  loading,
  error,
  saveBlocked,
+ consentAvailable: mode === 'local' ? true : consentAvailable,
  add,
  update,
  remove,

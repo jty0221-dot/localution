@@ -8,10 +8,13 @@
 //   → 관리자 /api/admin/platform-issues-overview 가 24시간 건수를 보여준다
 //   (재방문 분석은 enrolled · stamped · reward_claimed 만 읽어 이 기록이 방문으로 섞이지 않는다)
 // · 적립 자체는 실패시키지 않는다 — 손님 화면은 적립 성공, 고객 목록 반영 실패만 기록
+// · 손님이 적립 화면에서 광고 수신에 동의하면 customers.consent_marketing 도 켠다 (W2-5)
+//   동의 열이 없는 DB(20261023_crm_consent_marketing.sql 실행 전)면 동의 없이 다시 저장한다
+//   한 번 받은 동의를 다음 적립의 미체크로 끄지 않는다 (stamp_collections 와 같은 규칙)
 // ============================================================
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { applyLifecycleTags } from './customer-lifecycle'
-import { classifyCrmSyncError, type DbErrorLike } from './crm-db-errors'
+import { classifyCrmSyncError, isMissingColumnError, type DbErrorLike } from './crm-db-errors'
 
 export type StampCustomerSyncInput = {
   ownerId: string // stamp_cards.user_id (text 사장님 ID)
@@ -22,6 +25,7 @@ export type StampCustomerSyncInput = {
   source: 'qr_stamp' | 'manual_add'
   stampCardId: string | null
   collectionId: string | null
+  consentMarketing?: boolean // 이번 적립에서 손님이 동의 체크
 }
 
 export type StampCustomerSyncResult =
@@ -56,6 +60,10 @@ export async function syncStampCustomer(svc: SupabaseClient, input: StampCustome
   }
   const nowIso = now.toISOString()
   const addVisits = Math.max(0, Math.floor(input.addVisits))
+  const consent: Record<string, unknown> = input.consentMarketing === true
+    ? { consent_marketing: true, consent_marketing_at: nowIso, consent_source: 'stamp' }
+    : {}
+  const hasConsent = Object.keys(consent).length > 0
 
   const fail = async (stage: string, err: DbErrorLike): Promise<StampCustomerSyncResult> => {
     const reason = classifyCrmSyncError(err)
@@ -71,7 +79,10 @@ export async function syncStampCustomer(svc: SupabaseClient, input: StampCustome
       tags: applyLifecycleTags(row.tags, { visits, lastVisitAt: nowIso }, now),
     }
     if (input.name) patch.name = input.name
-    const { error } = await svc.from('customers').update(patch).eq('id', row.id)
+    let { error } = await svc.from('customers').update({ ...patch, ...consent }).eq('id', row.id)
+    if (error && hasConsent && isMissingColumnError(error, 'consent_marketing')) {
+      ({ error } = await svc.from('customers').update(patch).eq('id', row.id))
+    }
     if (error) return fail('update', error)
     return { ok: true, action: 'updated' }
   }
@@ -87,7 +98,7 @@ export async function syncStampCustomer(svc: SupabaseClient, input: StampCustome
   if (lookupError) return fail('lookup', lookupError)
   if (existing) return update(existing as CustomerLookup)
 
-  const { error: insertError } = await svc.from('customers').insert({
+  const newRow = {
     user_id: input.ownerId,
     name: input.name || ('손님 ' + input.phone.slice(-4)),
     phone: input.phone,
@@ -95,7 +106,11 @@ export async function syncStampCustomer(svc: SupabaseClient, input: StampCustome
     tags: applyLifecycleTags([], { visits: addVisits, lastVisitAt: nowIso }, now),
     visits_count: addVisits,
     last_visit_at: nowIso,
-  })
+  }
+  let { error: insertError } = await svc.from('customers').insert({ ...newRow, ...consent })
+  if (insertError && hasConsent && isMissingColumnError(insertError, 'consent_marketing')) {
+    ({ error: insertError } = await svc.from('customers').insert(newRow))
+  }
   if (!insertError) return { ok: true, action: 'inserted' }
 
   // 같은 순간 두 번 적립(동시 요청)으로 unique(user_id, phone) 충돌 → 다시 찾아 방문만 올린다

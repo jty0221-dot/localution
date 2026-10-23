@@ -201,6 +201,7 @@ export async function POST(req: NextRequest) {
  source: 'qr_stamp',
  stampCardId: card.id ?? null,
  collectionId: collectionId ?? null,
+ consentMarketing: consent,
  })
  }
 

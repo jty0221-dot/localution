@@ -138,3 +138,32 @@ test('Supabase 사장님은 uuid 오류가 나도 재시도하지 않는다', as
   const r = await owner.runWithCustomerOwner({ ok: true, userId: 'u', email: null, source: 'supabase' }, async () => ({ error: UUID_ERR }))
   assert.equal(r.ok, true); assert.equal(r.via, 'direct'); assert.equal(identityCalls, 0)
 })
+
+// ---------- 단체 메시지 대상 · 광고 표기 (W2-5) ----------
+const msg = load('app/lib/crm-messaging')
+const C = (id, extra = {}) => ({ id, name: '고객' + id, phone: '01012345678', tags: [], consentMarketing: true, ...extra })
+test('미동의 · 동의 미상 · 연락처 없음 · 블랙리스트 제외', () => {
+  const s = msg.splitMessageRecipients([C('a'), C('b', { consentMarketing: false }), C('c', { consentMarketing: undefined }), C('d', { phone: '' }), C('e', { tags: ['블랙리스트'] })])
+  assert.deepEqual(s.eligible.map(x => x.id), ['a'])
+  assert.deepEqual(s.excluded.noConsent.map(x => x.id), ['b', 'c'])
+  assert.deepEqual(s.excluded.noPhone.map(x => x.id), ['d'])
+  assert.deepEqual(s.excluded.blacklisted.map(x => x.id), ['e'])
+  assert.equal(msg.excludedCount(s), 4)
+})
+test('블랙리스트는 동의해도 제외', () => {
+  assert.equal(msg.splitMessageRecipients([C('x', { tags: ['VIP', '블랙리스트'] })]).eligible.length, 0)
+})
+test('(광고) 표시와 수신거부 안내를 붙이고 두 번 붙이지 않는다', () => {
+  const once = msg.withAdNotice('이번 주 이벤트')
+  assert.ok(once.startsWith('(광고) 이번 주 이벤트'))
+  assert.ok(once.endsWith(msg.OPT_OUT_LINE))
+  assert.equal(msg.withAdNotice(once), once)
+  assert.ok(msg.withAdNotice('안내', '○○카페 A').startsWith('(광고) ○○카페 A 안내'))
+  assert.equal(msg.withAdNotice('   '), '')
+})
+test('야간 광고 시간 KST 21~08', () => {
+  assert.equal(msg.isNightAdHour(new Date('2026-10-23T11:59:00Z')), false) // KST 20:59
+  assert.equal(msg.isNightAdHour(new Date('2026-10-23T12:00:00Z')), true) // KST 21:00
+  assert.equal(msg.isNightAdHour(new Date('2026-10-23T22:59:00Z')), true) // KST 07:59
+  assert.equal(msg.isNightAdHour(new Date('2026-10-23T23:00:00Z')), false) // KST 08:00
+})
