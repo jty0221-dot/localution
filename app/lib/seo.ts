@@ -30,8 +30,8 @@ export const SITE = {
   ogImage: '/opengraph-image', // app/opengraph-image.tsx 자동 생성 1200x630
   ogAlt: '로컬루션 · 사장님 마케팅 플랫폼',
   launchYear: 2026,
-  platforms: ['네이버 플레이스', '구글', '카카오맵', '배달의민족', '요기요', '쿠팡이츠'] as const,
-  platformCount: 6,
+  platforms: ['네이버 플레이스', '카카오맵', '배달의민족', '요기요', '쿠팡이츠'] as const, // 구글 리뷰 수집기는 준비 중이라 제외
+  platformCount: 5,
   toneCount: 11,
   pollingMinutes: 15,
   priceFromKrw: 6900,
