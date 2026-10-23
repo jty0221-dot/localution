@@ -190,20 +190,25 @@ export default function NaverAutoReplyPage() {
  setSettingsSaving(false)
  }
 
- // ── 수동 생성 (크론 트리거) ───────────────────────────────
+ // ── 수동 생성 ──────────────────────────────────────────────
+ // LU-018 W2-11: 크론 경로(CRON_SECRET 필요 → 항상 401) 대신 로그인 사장님 자기 매장만 처리하는 사용자 API
  const handleManualRun = async () => {
  setLoading(true)
  try {
- const res = await fetch('/api/cron/naver-reply-generate')
- const data = await res.json()
- if (data.ok) {
- showToast(`AI 초안 생성 완료: ${data.total_drafted}건`)
+ const res = await fetch('/api/naver-autoreply/run-now', { method: 'POST', credentials: 'include' })
+ const data = await res.json().catch(() => null)
+ if (res.ok && data?.ok) {
+ showToast(data.message || `AI 초안 ${data.total_drafted}건을 만들었어요.`)
  loadReviews(tab === 'all')
+ } else if (res.status === 429) {
+ showToast('조금 전에 생성했어요. 잠시 후 다시 눌러주세요.', 'err')
+ } else if (res.status === 401) {
+ showToast('로그인하면 쓸 수 있어요.', 'err')
  } else {
- showToast(data.error || '생성 실패', 'err')
+ showToast(data?.error || '초안을 만들지 못했어요. 잠시 후 다시 시도해주세요.', 'err')
  }
  } catch {
- showToast('네트워크 오류', 'err')
+ showToast('인터넷 연결을 확인하고 다시 시도해주세요.', 'err')
  }
  setLoading(false)
  }
