@@ -95,7 +95,7 @@ export default function KeywordRankTracker() {
       if (res.status === 401) { setPhase('guest'); return }
       if (!res.ok || data.ok !== true) throw new Error(typeof data.error === 'string' ? data.error : '키워드를 등록하지 못했어요.')
       setDraft('')
-      setStatus(`'${keyword}' 을 등록했어요. 매일 아침 자동 측정 목록에 들어가요. 바로 보려면 지금 측정을 눌러 주세요.`)
+      setStatus(`'${keyword}' 을 등록했어요. 자동 측정 차례에 들어가요. 바로 보려면 지금 측정을 눌러 주세요.`)
       await load(targetId)
     } catch (reason) {
       setError(reason instanceof Error ? reason.message : '키워드를 등록하지 못했어요.')
@@ -138,7 +138,7 @@ export default function KeywordRankTracker() {
 
   if (!targets.length) return <section className="max-w-4xl rounded-[10px] border border-[var(--lu-line)] bg-white p-4 md:p-6">
     <div className="flex items-center gap-3"><div className="flex h-9 w-9 items-center justify-center rounded-[6px] bg-[var(--lu-accent-soft)]"><Store size={18} className="text-[var(--lu-accent)]" aria-hidden="true" /></div><h2 className="text-lg font-bold">먼저 내 플레이스를 등록해 주세요</h2></div>
-    <p className="mt-3 text-sm leading-relaxed text-[var(--lu-muted)]">추적할 매장이 아직 없어요. 플레이스 관리에서 내 매장 주소를 한 번 등록하면, 이 화면에서 키워드를 붙여 매일 순위를 기록할 수 있어요.</p>
+    <p className="mt-3 text-sm leading-relaxed text-[var(--lu-muted)]">추적할 매장이 아직 없어요. 플레이스 관리에서 내 매장 주소를 한 번 등록하면, 이 화면에서 키워드를 붙여 순위를 차례로 기록할 수 있어요.</p>
     <Link href="/marketing/place" className={primary + ' mt-4'}>플레이스 등록하러 가기</Link>
   </section>
 
@@ -148,7 +148,7 @@ export default function KeywordRankTracker() {
   return <section aria-labelledby="tracker-title" className="max-w-4xl space-y-4">
     <div className="rounded-[10px] border border-[var(--lu-line)] bg-white p-4 md:p-6">
       <h2 id="tracker-title" className="text-lg font-bold">내 플레이스 키워드 순위</h2>
-      <p className="mt-2 text-sm leading-relaxed text-[var(--lu-muted)]">등록한 키워드는 매일 아침 6시쯤 자동으로 측정해 기록해요. 대상이 많은 날은 일부가 다음 측정으로 넘어갈 수 있어요. 측정에 실패한 날은 기록을 남기지 않고 빈칸으로 둬요.</p>
+      <p className="mt-2 text-sm leading-relaxed text-[var(--lu-muted)]">등록한 키워드를 하루 한 번(아침 6시쯤) 오래 안 잰 것부터 차례로 측정해요. 키워드가 많으면 측정 간격이 며칠로 길어질 수 있어 키워드마다 마지막 측정 시각을 함께 보여드려요. 측정에 실패한 날은 기록을 남기지 않고 빈칸으로 둬요.</p>
       {targets.length > 1 && <label className="mt-4 block text-sm font-semibold">매장 선택<select value={targetId} onChange={e => { setTargetId(e.target.value); setStatus(''); setError('') }} className="mt-2 block min-h-[44px] w-full rounded-[6px] border border-[var(--lu-line)] bg-white px-3 text-base md:w-80">{targets.map(t => <option key={t.id} value={t.id}>{t.name || '이름 없는 매장'} · {t.place_id}</option>)}</select></label>}
       {targets.length === 1 && <p className="mt-4 text-sm"><span className="font-semibold">{targets[0].name || '내 매장'}</span> <span className="text-[var(--lu-muted)]">· 플레이스 ID {targets[0].place_id}</span></p>}
       <form onSubmit={add} className="mt-4 flex flex-col gap-2 sm:flex-row">
@@ -246,7 +246,7 @@ function GuestExample() {
   return <section aria-labelledby="example-title" className="max-w-4xl space-y-3">
     <div className="rounded-[10px] border border-[var(--lu-warning)] bg-[var(--lu-warning-soft)] p-4 text-sm leading-relaxed text-[var(--lu-ink)]">
       <p id="example-title" className="font-bold">예시 화면이에요 · 업체와 순위는 가상</p>
-      <p className="mt-1">로그인하면 내 플레이스에 키워드를 등록하고, 매일 측정한 실제 순위와 측정 시각, 최근 30일 추이를 이 자리에서 볼 수 있어요.</p>
+      <p className="mt-1">로그인하면 내 플레이스에 키워드를 등록하고, 차례로 측정한 실제 순위와 측정 시각, 최근 30일 추이를 이 자리에서 볼 수 있어요.</p>
       <Link href="/login?redirect=/marketing/keyword-rank" className={primary + ' mt-3'}><LogIn size={16} aria-hidden="true" />로그인하고 내 순위 보기</Link>
     </div>
     <ul className="space-y-3" aria-label="예시 키워드">

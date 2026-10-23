@@ -33,7 +33,7 @@ export default function KeywordRankPage() {
     } finally { clearTimeout(timer); if (request === generation.current) setLoading(false) }
 }
   const field = 'mt-2 min-h-[44px] w-full rounded-[6px] border border-[var(--lu-line)] px-3 py-2.5 text-base focus:outline-[var(--lu-accent)]'
-  return <div className="min-h-screen bg-[var(--lu-canvas)] text-[var(--lu-ink)]"><Sidebar /><div className="md:ml-[220px] flex min-h-screen flex-col"><PageHeader icon={<TrendingUp size={28} />} title="플레이스 키워드 순위 확인" subtitle="내 플레이스 키워드를 등록하면 매일 측정한 순위와 30일 추이를 보여드려요" /><main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-6 md:px-6">
+  return <div className="min-h-screen bg-[var(--lu-canvas)] text-[var(--lu-ink)]"><Sidebar /><div className="md:ml-[220px] flex min-h-screen flex-col"><PageHeader icon={<TrendingUp size={28} />} title="플레이스 키워드 순위 확인" subtitle="내 플레이스 키워드를 등록하면 차례로 측정한 순위와 측정 시각, 30일 추이를 보여드려요" /><main className="mx-auto w-full max-w-6xl flex-1 space-y-5 px-4 py-6 md:px-6">
     <Link href="/marketing" className="inline-flex min-h-[44px] items-center font-semibold text-[var(--lu-accent)] underline">마케팅 도구로 돌아가기</Link>
     <KeywordRankTracker />
     <h2 className="max-w-4xl pt-4 text-lg font-bold">등록 없이 한 번만 확인하기</h2>

@@ -3,6 +3,9 @@
 // 플레이스 키워드 순위 일 1회 수집 크론 (AdRank 벤치마킹 Phase 0)
 //
 // 매일 KST 06:00 (UTC 21:00) 호출.
+// 1회 MAX_PER_RUN 개만 잰다(네이버 부하 · 차단 회피). 전 사용자 키워드를
+// last_checked_at 오름차순(측정 전 우선)으로 골라 돌아가며 재므로, 활성 키워드가
+// 상한보다 많으면 키워드마다 측정 간격이 하루보다 길어진다. 화면 문구도 그렇게 적는다.
 // place-tracking-daily(05:30, 리뷰수·평점 수집) 30분 뒤에 돌아
 // 최신 스냅샷을 기준으로 점수를 계산하도록 순서를 맞춘다.
 //
@@ -31,6 +34,22 @@ const GAP_MS = 700
  */
 const TIME_BUDGET_MS = 240_000
 const PER_ITEM_RESERVE_MS = 30_000
+
+/**
+ * 측정 시도 시각 기록 — 실패 · 매장 없음 건을 라운드로빈 뒤로 보낸다.
+ * last_checked_at 은 크론 정렬용 커서이고 화면에 측정 시각으로 쓰지 않는다
+ * (화면은 place_keyword_latest.ts). 갱신 실패는 무시한다.
+ */
+async function markAttempted(svc: ReturnType<typeof createServiceClient>, id: string) {
+  try {
+    await svc
+      .from('place_keyword_targets')
+      .update({ last_checked_at: new Date().toISOString() })
+      .eq('id', id)
+  } catch {
+    /* 커서 갱신 실패는 다음 회차에 다시 시도될 뿐 */
+  }
+}
 
 type KeywordRow = {
   id: string
@@ -117,6 +136,8 @@ export async function GET(req: NextRequest) {
     if (!store?.place_id) {
       skipped += 1
       results.push({ keyword: kt.keyword, skipped: 'store_not_found' })
+      // eslint-disable-next-line no-await-in-loop
+      await markAttempted(svc, kt.id)
       continue
     }
 
@@ -128,6 +149,11 @@ export async function GET(req: NextRequest) {
       methodCount[r.method] = (methodCount[r.method] || 0) + 1
     } else {
       failed += 1
+      // 실패 건도 시도 시각을 남겨 줄 뒤로 보낸다. 안 그러면 계속 실패하는 키워드가
+      // 매일 맨 앞 자리를 차지해 다른 사장님 키워드가 측정되지 못한다(기아).
+      // 화면의 측정 시각은 place_keyword_latest.ts(실제 기록)라 영향 없다.
+      // eslint-disable-next-line no-await-in-loop
+      await markAttempted(svc, kt.id)
     }
     results.push({
       keyword: r.keyword,
