@@ -85,6 +85,7 @@ const ROUTE_CATALOG: PublicRoute[] = [
   { path: 'marketing/business-search', title: '매장과 참고 자료 검색', summary: '업종과 지역에 맞는 매장, 블로그와 카페 참고 글을 연결된 검색 공급자에서 찾아 출처 확인', priority: 0.7, freq: 'monthly' },
   { path: 'marketing/campaign-url', title: 'UTM 홍보 링크 생성기', summary: '도착 주소와 유입 출처, 홍보 방식으로 UTM 주소를 작성하고 복사하거나 내려받기', priority: 0.7, freq: 'monthly' },
   { path: 'marketing/promotion-profit', title: '할인·행사 수익 비교', summary: '같은 한 달 가정에서 할인과 쿠폰 행사 전후 예상 이익과 필요 판매량을 비교', priority: 0.7, freq: 'monthly' },
+  { path: 'marketing/rank-history', title: '순위 이력 분석기', summary: '순위 이력 JSON·TSV 파일을 브라우저에서 읽어 날짜별 순위 변화와 리뷰 증감을 확인하고 CSV로 내보내기', priority: 0.6, freq: 'monthly' },
   { path: 'marketing/cost-calculator', title: '원가·손익분기 계산기', summary: '판매가와 비용으로 공헌이익, 손익분기 판매량과 목표 판매량을 계산하고 브라우저 저장과 CSV로 내보내기', priority: 0.7, freq: 'monthly' },
   { path: 'marketing/notice', title: '가게 공지 작성', summary: '휴무와 영업시간 변경, 예약 안내를 입력해 공지 문안을 만들고 복사하거나 내려받기', priority: 0.7, freq: 'monthly' },
   { path: 'marketing/events', title: '이벤트 문안', summary: '매장 이벤트 · 프로모션 문안 생성', priority: 0.5, freq: 'monthly' },
