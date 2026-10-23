@@ -171,7 +171,7 @@ const faqs = [
  },
  {
  q: '해지는 쉽게 되나요?',
- a: '설정에서 원클릭 해지 가능합니다. 정식 출시 후에도 당월 남은 일수만큼 일할 계산 후 환불됩니다.',
+ a: '해지는 언제든 1:1 문의로 접수해 처리합니다. 정식 출시 후에도 당월 남은 일수만큼 일할 계산 후 환불됩니다.',
  },
  {
  q: '여러 매장을 운영 중인데 한 계정으로 쓸 수 있나요?',
@@ -268,7 +268,7 @@ export default function PricingPage() {
  지금은 모든 기능,<br className="sm:hidden" /> 테스트 기간 무료
  </h1>
  <p className="text-[var(--lu-muted)] text-sm sm:text-base max-w-lg mx-auto break-keep leading-relaxed">
- 신용카드 등록 없음 · 자동결제 없음 · 언제든 원클릭 해지
+ 신용카드 등록 없음 · 자동결제 없음 · 해지는 1:1 문의로 접수
  <br/>
  <span className="font-bold text-[#059669]">필요한 기능을 담고 지금 바로 써보세요.</span>
  </p>
@@ -278,7 +278,7 @@ export default function PricingPage() {
  <AnswerBlock
   className="mb-8 sm:mb-10 max-w-4xl mx-auto"
   question="로컬루션 요금은 얼마인가요?"
-  answer={`${SITE.priceText}부터 필요한 기능만 골라 쓰는 선택형 요금제입니다. 신용카드 등록 없이 시작하고 언제든 원클릭으로 해지할 수 있습니다.`}
+  answer={`${SITE.priceText}부터 필요한 기능만 골라 쓰는 선택형 요금제입니다. 신용카드 등록 없이 시작하고 해지는 언제든 1:1 문의로 접수합니다.`}
   facts={[
    '기능 단위로 담는 선택형 요금제 · 여러 개를 담으면 번들 할인',
    '베타 테스트 기간에는 전 기능 무료',
