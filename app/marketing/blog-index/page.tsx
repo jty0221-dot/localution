@@ -39,8 +39,14 @@ function fmtNum(n: number) {
  if (n >= 10000) return (n / 10000).toFixed(1) + '만'
  return n.toLocaleString()
 }
-function gradeLabel(g: string) {
- return { S:'최상위 블로거', A:'파워블로거', B:'중상위 블로거', C:'일반 블로거', D:'신규/저활동' }[g] || ''
+// 최근 글이 며칠 전인지 — 측정값(최근 글 날짜)에서 바로 계산. 날짜를 못 읽으면 null
+// API 는 ko-KR 표기('2026. 10. 20.')로 준다 → 숫자 세 개를 읽어 날짜로 만든다
+function daysSince(dateText: string): number | null {
+ const m = dateText.match(/(\d{4})\D+(\d{1,2})\D+(\d{1,2})/)
+ if (!m) return null
+ const t = new Date(Number(m[1]), Number(m[2]) - 1, Number(m[3])).getTime()
+ if (!Number.isFinite(t)) return null
+ return Math.max(0, Math.floor((Date.now() - t) / 86400000))
 }
 
 const CAT_MAP: Record<string, string[]> = {
@@ -103,7 +109,7 @@ export default function BlogIndexPage() {
  const [loading, setLoading] = useState(false)
  const [error, setError] = useState<string|null>(null)
  const [data, setData] = useState<BlogData|null>(null)
- const [recentList, setRecentList] = useState<{blogId:string;blogName:string;grade:string;gradeColor:string;score:number}[]>([])
+ const [recentList, setRecentList] = useState<{blogId:string;blogName:string;neighborCount:number;latestPostDate:string}[]>([])
  const [graphData, setGraphData] = useState<DailyVisit[]>([])
 
  const doFetch = useCallback(async (urlOrId: string) => {
@@ -133,7 +139,7 @@ export default function BlogIndexPage() {
 
  setData(j)
  setRecentList(prev => [
- { blogId: j.blogId, blogName: j.blogName, grade: j.index.grade, gradeColor: j.index.gradeColor, score: j.index.score },
+ { blogId: j.blogId, blogName: j.blogName, neighborCount: j.neighborCount, latestPostDate: j.latestPostDate },
  ...prev.filter(p => p.blogId !== j.blogId)
  ].slice(0, 8))
  } catch (e) {
@@ -148,7 +154,7 @@ export default function BlogIndexPage() {
  <Sidebar />
  <main className="flex-1 ml-0 md:ml-[220px] flex flex-col min-h-screen pt-4 md:pt-0">
  <PageHeader icon={<BarChart3 size={28} className="text-white" strokeWidth={2.5} />} title="블로그 지수조회"
- subtitle="방문자 · 이웃 · 최신화 · 지수를 한눈에 · 조회 반복 시 방문자 그래프 자동 축적"
+ subtitle="방문자 · 이웃 · 글 수 · 최근 글 날짜를 공개 자료 그대로 · 조회 반복 시 방문자 그래프 자동 축적"
  variant="sky" />
 
  <div className="flex-1 p-4 md:p-6 max-w-2xl mx-auto w-full space-y-4">
@@ -175,8 +181,8 @@ export default function BlogIndexPage() {
  <Zap size={16} className="text-[#92400E]" strokeWidth={2.5} />
  </div>
  <div className="flex-1">
- <p className="text-xs font-bold text-[#92400E]">지금 보이는 값은 네이버 공개 자료 기준이에요</p>
- <p className="text-[11px] text-[#B45309] mt-0.5">블로그 메인 · RSS · 방문자 수 공개 자료로 계산했어요. 블라이(BLAI) 공식 지수 연동은 로컬루션에서 준비 중이라 사장님이 따로 설정할 것은 없어요.</p>
+ <p className="text-xs font-bold text-[#92400E]">지금 보이는 값은 네이버 공개 자료에서 읽은 측정값이에요</p>
+ <p className="text-[11px] text-[#B45309] mt-0.5">블로그 메인 · RSS · 방문자 수 공개 자료를 그대로 보여드려요. 네이버는 블로그 지수를 공개하지 않아 로컬루션은 점수 · 등급을 매기지 않아요.</p>
  </div>
  <a href="https://blai.co.kr" target="_blank" rel="noopener noreferrer"
  className="shrink-0 text-[11px] text-[#D97706] font-semibold hover:underline">블라이 →</a>
@@ -213,30 +219,20 @@ export default function BlogIndexPage() {
  {/* 지수 + 방문자 그래프 나란히 */}
  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
 
- {/* 블로그 지수 */}
+ {/* 최근 글 활동 — 측정값만. 네이버가 블로그 지수를 공개하지 않아 점수 · 등급은 만들지 않는다 (대표 10/18 정정) */}
  <div className="bg-white rounded-2xl border border-[#E5E8EB] p-5">
- <p className="text-xs font-bold text-[#8B95A1] mb-3">블로그 지수</p>
- <div className="flex items-center gap-4">
- <div className="w-16 h-16 rounded-full flex flex-col items-center justify-center shrink-0"
- style={{ background: data.index.gradeColor+'18', border:'3px solid '+data.index.gradeColor }}>
- <span className="text-xl font-black" style={{ color:data.index.gradeColor }}>{data.index.grade}</span>
- <span className="text-[10px] font-bold" style={{ color:data.index.gradeColor }}>{data.index.score}점</span>
+ <p className="text-xs font-bold text-[#8B95A1] mb-3">최근 글 활동</p>
+ {(() => {
+ const d = data.latestPostDate ? daysSince(data.latestPostDate) : null
+ return (
+ <div>
+ <p className="text-sm text-[#4E5968]">최근 글 날짜</p>
+ <p className="text-xl font-black text-[#191F28] mt-0.5">{data.latestPostDate || '확인 못 함'}</p>
+ {d !== null && <p className="text-xs text-[#4E5968] mt-1">오늘 기준 {d === 0 ? '오늘 올린 글' : d + '일 전'}</p>}
+ <p className="text-[11px] text-[#8B95A1] mt-3 leading-relaxed">근거 · 블로그 RSS 의 가장 최근 글 날짜예요. 네이버는 블로그 지수를 공개하지 않아 점수 · 등급은 매기지 않고 비워 둬요.</p>
  </div>
- <div className="flex-1">
- <p className="text-sm font-bold text-[#191F28]">{gradeLabel(data.index.grade)}</p>
- <div className="mt-1.5 bg-[#F2F4F6] rounded-full h-2 overflow-hidden">
- <div className="h-full rounded-full" style={{ width:data.index.score+'%', background:data.index.gradeColor }} />
- </div>
- <div className="mt-2 grid grid-cols-4 gap-0.5">
- {[['방문자',data.index.factors.vScore,40],['이웃',data.index.factors.nScore,30],['글수',data.index.factors.pScore,20],['최신화',data.index.factors.uScore,10]].map(([l,s,m])=>(
- <div key={String(l)} className="text-center">
- <div className="text-[9px] text-[#8B95A1]">{l}</div>
- <div className="text-[11px] font-bold text-[#191F28]">{s}<span className="text-[#C9D0D8] font-normal">/{m}</span></div>
- </div>
- ))}
- </div>
- </div>
- </div>
+ )
+ })()}
  </div>
 
  {/* 방문자 그래프 */}
@@ -273,19 +269,8 @@ export default function BlogIndexPage() {
  ))}
  </div>
 
- {/* 최근 포스팅 */}
- {data.latestPostDate && (
- <div className="bg-white rounded-2xl border border-[#E5E8EB] px-4 py-3 flex items-center gap-3">
- <span className="text-lg"></span>
- <div>
- <p className="text-xs text-[#8B95A1]">최근 포스팅</p>
- <p className="text-sm font-bold text-[#191F28]">{data.latestPostDate}</p>
- </div>
- </div>
- )}
-
  <p className="text-[11px] text-[#C9D0D8] text-center">
- * 공개된 정보 기반 추정 · 네이버 공식 지표와 다를 수 있음 · 매일 조회 시 그래프가 쌓입니다
+ * 네이버 공개 자료에서 읽은 값 · 네이버 내부 지표와 다를 수 있음 · 매일 조회 시 그래프가 쌓입니다
  </p>
  </div>
  )}
@@ -298,11 +283,12 @@ export default function BlogIndexPage() {
  {recentList.map(h => (
  <button key={h.blogId} onClick={() => { setInput('blog.naver.com/'+h.blogId); doFetch(h.blogId) }}
  className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-[#F8F9FA] transition-colors text-left">
- <div className="w-8 h-8 rounded-full flex items-center justify-center text-sm font-black shrink-0"
- style={{ background:h.gradeColor+'18', color:h.gradeColor }}>{h.grade}</div>
+ <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 bg-[#EFF6FF] text-[#3182F6]">
+ <FileText size={14} strokeWidth={2.5} />
+ </div>
  <div className="flex-1 min-w-0">
  <p className="text-sm font-semibold text-[#191F28] truncate">{h.blogName}</p>
- <p className="text-[11px] text-[#8B95A1]">@{h.blogId} · {h.score}점</p>
+ <p className="text-[11px] text-[#8B95A1]">@{h.blogId} · 이웃 {fmtNum(h.neighborCount)} · 최근 글 {h.latestPostDate || '-'}</p>
  </div>
  <span className="text-[11px] text-[#3182F6]">다시조회</span>
  </button>

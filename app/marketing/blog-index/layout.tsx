@@ -6,7 +6,7 @@ import { pageMetadata } from '../../lib/seo'
 export const metadata: Metadata = pageMetadata({
   title: '네이버 블로그 지수 조회 · 분석',
   description:
-    '내 블로그 아이디만 넣으면 네이버 블로그 지수와 노출 상태, 최근 글의 검색 반영 여부를 분석합니다. 상위노출을 막는 요인을 한눈에 확인하세요.',
+    '내 블로그 아이디만 넣으면 네이버 공개 자료에서 방문자 · 이웃 · 글 수 · 최근 글 날짜를 읽어 보여줍니다. 네이버는 블로그 지수를 공개하지 않아 점수 · 등급은 매기지 않습니다.',
   path: 'marketing/blog-index',
   keywords: [
     '네이버 블로그 지수',
