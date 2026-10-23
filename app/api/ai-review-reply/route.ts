@@ -31,9 +31,8 @@
 // · 첫 문단에 "지역+업종" 또는 매장명, 마지막 문단에 "재방문 유도 + 위치·서비스" 자연 노출
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
-import { requireUser } from '@/app/lib/userAuth'
+import { requirePaidQuota } from '@/app/lib/paid-quota'
 import { createServiceClient } from '@/app/lib/adminAuth'
-import { rateLimit, getClientIp } from '@/app/lib/rate-limit'
 import {
   hashSeed, extractReviewSignals, buildKeywordPool, pickVariation, buildVarietyLines,
   loadStoreMenus, loadRecentOpeners, type ReviewKind,
@@ -406,15 +405,10 @@ export async function POST(req: NextRequest) {
  try {
  // 인증 + 레이트 리밋 — 분당 10회/사용자 (비로그인은 IP)
  // 아래 매장/리뷰 자동 로드 단계에서 동일한 auth 결과를 재사용한다.
- const auth = await requireUser()
- const limitId = auth.ok ? auth.userId : `ip:${getClientIp(req)}`
- const rl = await rateLimit({ bucket: 'ai-review-reply', id: limitId, limit: 10, windowSec: 60 })
- if (!rl.ok) {
- return NextResponse.json(
- { ok: false, error: '요청이 너무 많습니다. 잠시 후 다시 시도해 주세요.', retryAfter: rl.retryAfter },
- { status: 429, headers: { 'Retry-After': String(rl.retryAfter) } },
- )
- }
+ // LU-018 · SEC-L08 · 로그인 필수 (예전에는 비로그인도 IP 로 통과) · 사용자당 분당 10회 · 1일 500회
+ const gate = await requirePaidQuota('ai-review-reply', { perMinute: 10, perDay: 500 })
+ if (!gate.ok) return gate.response
+ const auth = { ok: true as const, userId: gate.userId }
 
  const body = await req.json().catch(() => ({}))
 

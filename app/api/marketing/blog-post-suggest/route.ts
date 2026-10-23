@@ -9,8 +9,7 @@
 // · 사용자가 그대로 사용하거나 수정 가능
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
-import { requireUser } from '@/app/lib/userAuth'
-import { rateLimit, getClientIp } from '@/app/lib/rate-limit'
+import { requirePaidQuota } from '@/app/lib/paid-quota'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -18,15 +17,10 @@ export const maxDuration = 30
 
 export async function POST(req: NextRequest) {
  try {
- const auth = await requireUser()
- const limitId = auth.ok ? auth.userId : `ip:${getClientIp(req)}`
- const rl = await rateLimit({ bucket: 'blog-post-suggest', id: limitId, limit: 30, windowSec: 60 })
- if (!rl.ok) {
- return NextResponse.json(
- { ok: false, error: '잠시 후 다시 시도해 주세요.', retryAfter: rl.retryAfter },
- { status: 429 },
- )
- }
+ // LU-018 · SEC-L08 · 로그인 필수 (예전에는 비로그인도 IP 로 통과) · 사용자당 분당 30회 · 1일 300회
+ const gate = await requirePaidQuota('blog-post-suggest', { perMinute: 30, perDay: 300 })
+ if (!gate.ok) return gate.response
+ const auth = { ok: true as const, userId: gate.userId }
 
  if (!process.env.ANTHROPIC_API_KEY) {
  return NextResponse.json({ ok: false, error: 'ANTHROPIC_API_KEY 미설정' }, { status: 500 })

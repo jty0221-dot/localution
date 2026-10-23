@@ -1,8 +1,7 @@
 // app/api/threads/generate/route.ts
 // AI로 Threads 포스트 초안 생성 (Claude)
 import { NextRequest, NextResponse } from 'next/server'
-import { requireUser } from '@/app/lib/userAuth'
-import { rateLimit } from '@/app/lib/rate-limit'
+import { requirePaidQuota } from '@/app/lib/paid-quota'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -20,22 +19,8 @@ const PERSONA_DESC: Record<string, string> = {
 
 export async function POST(request: NextRequest) {
  // LU-018 · 유료 AI 호출 — 로그인 사용자만 · 사용자당 1분 5회 · 1일 100회
- const auth = await requireUser()
- if (!auth.ok) {
- return NextResponse.json(
- { error: auth.status === 401 ? '로그인하면 쓸 수 있어요.' : auth.message, code: auth.status === 401 ? 'login_required' : 'auth_error' },
- { status: auth.status },
- )
- }
- const perMin = await rateLimit({ bucket: 'threads-gen-min', id: auth.userId, limit: 5, windowSec: 60 })
- const perDay = perMin.ok ? await rateLimit({ bucket: 'threads-gen-day', id: auth.userId, limit: 100, windowSec: 86400 }) : perMin
- if (!perMin.ok || !perDay.ok) {
- const retryAfter = (!perMin.ok ? perMin : perDay).retryAfter
- return NextResponse.json(
- { error: 'AI 생성 요청이 너무 많아요. 잠시 후 다시 시도해주세요.', code: 'rate_limited', retryAfter },
- { status: 429, headers: { 'Retry-After': String(retryAfter || 60) } },
- )
- }
+ const gate = await requirePaidQuota('threads-gen', { perMinute: 5, perDay: 100 })
+ if (!gate.ok) return gate.response
 
  let body: {
  topic?: string
