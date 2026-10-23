@@ -7,7 +7,7 @@
 // · 지정 user_id 의 platform_credentials 조회
 // · 큐에 fetch_reviews 잡 추가 (priority 1)
 //
-// 일반 사장님 self-service 는 /api/admin/manual-fetch (auth.userId 사용)
+// 일반 사장님 self-service 는 /api/me/manual-fetch (auth.userId 사용)
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAdmin, createServiceClient } from '@/app/lib/adminAuth'

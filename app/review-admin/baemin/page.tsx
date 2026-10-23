@@ -43,7 +43,7 @@ function SystemHealthFloating() {
  async function check() {
  setChecking(true); setMsg('')
  try {
- const res = await fetch('/api/admin/baemin-health', { credentials: 'include' })
+ const res = await fetch('/api/me/baemin-health', { credentials: 'include' })
  const data = await res.json()
  if (data.status) setHealth(data.status)
  } catch {}

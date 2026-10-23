@@ -115,9 +115,9 @@
 
 ## 5. 운영 endpoint
 
-- `/api/admin/queue-status` 진단 (배민 포함)
-- `/api/admin/queue-cleanup?force=1` 큐 청소
-- `/api/admin/manual-fetch?platform=baemin&days=N` 수동 풀 fetch
+- `/api/me/queue-status` 진단 (배민 포함)
+- `/api/me/queue-cleanup?force=1 (POST)` 큐 청소
+- `/api/me/manual-fetch?platform=baemin&days=N` 수동 풀 fetch
 - `/api/baemin/collect-reviews` (직접 호출 + 북마크릿)
 - `/api/baemin/auto-login` 쿠키 강제 재발급
 - `/api/baemin/post-reply` 답글 발행
