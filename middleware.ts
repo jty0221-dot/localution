@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { isAdminEmail } from '@/app/lib/admin-emails'
+import { verifyCookieEdge, decideAdminGate } from '@/app/lib/cookieSigningEdge'
+import { detectApexDomain } from '@/app/lib/session-cookies'
 
 // 로그인 필수 경로 (prefix 매칭)
 // ⚠️ 공개 페이지 절대 추가 금지:
@@ -21,10 +23,11 @@ const PROTECTED_PREFIXES = [
   '/my',
   '/reservations',
   '/partner-points',
+  '/whoami',
 ]
 
 // 관리자 전용 경로 (prefix 매칭) — 로그인 + 관리자 화이트리스트 모두 통과해야 함
-const ADMIN_PREFIXES = ['/admin']
+const ADMIN_PREFIXES = ['/admin', '/whoami']
 
 function isProtected(pathname: string): boolean {
   return PROTECTED_PREFIXES.some(prefix =>
@@ -38,36 +41,23 @@ function isAdminPath(pathname: string): boolean {
   )
 }
 
-// 세션 쿠키 존재 판단 — 듀얼 모드
-//   1) localution_session  : 네이버/카카오/구글 OAuth
-//   2) sb-*-auth-token     : Supabase Auth (브라우저 SDK)
-function hasAnySession(request: NextRequest): boolean {
-  if (request.cookies.get('localution_session')?.value) return true
-
-  // Supabase 클라이언트가 심는 쿠키는 sb-<projectref>-auth-token 형식
-  // Next.js RequestCookies 는 getAll() 지원
-  const all = request.cookies.getAll()
-  if (all.some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token') && c.value)) {
-    return true
-  }
-  return false
+// 세션 판단 — 듀얼 모드 (LU-018 · SEC-L01 연장)
+//   1) localution_user : 네이버/카카오/구글 OAuth — signCookie() 의 "<base64url payload>.<sig>" 를
+//      Edge 에서 Web Crypto HMAC 으로 검증한다 (cookieSigningEdge.ts).
+//      예전에는 localution_session(공급자 access_token · 서명 없음)이 '있는지만' 봐서
+//      아무 값이나 심으면 보호 경로 미들웨어를 통과했다. /api/me 도 session 만 있고 user 가 없으면
+//      로그아웃으로 보므로 같은 기준으로 맞췄다.
+//      예전 코드는 localution_user 를 JSON.parse 해서 항상 실패 → 관리자 검사도 통째로 건너뛰었다.
+//   2) sb-*-auth-token : Supabase Auth (브라우저 SDK) — Edge 에서 JWT 를 검증할 비밀값이 없어
+//      존재만 본다. 데이터는 각 API 의 requireUser · requireAdmin 이 토큰을 검증해 막는다.
+function hasSupabaseSessionCookie(request: NextRequest): boolean {
+  return request.cookies.getAll().some(c => c.name.startsWith('sb-') && c.name.endsWith('-auth-token') && !!c.value)
 }
 
-// localution_user 쿠키에서 email 추출
-//   · 43차-1: 관리자 영역 진입 차단을 위해 미들웨어에서 화이트리스트 검사
-//   · OAuth 사용자만 여기서 거른다. Supabase 세션 사용자는 토큰 검증이 무거우므로
-//     /admin/layout.tsx 의 클라 사이드 isAdminEmail 검사에 위임한다.
-function readLocalutionUserEmail(request: NextRequest): string | null {
+async function readVerifiedLocalutionUser(request: NextRequest) {
   const raw = request.cookies.get('localution_user')?.value
-  if (!raw) return null
-  try {
-    const decoded = decodeURIComponent(raw)
-    const parsed = JSON.parse(decoded) as { email?: string }
-    const email = (parsed?.email || '').toString().toLowerCase().trim()
-    return email || null
-  } catch {
-    return null
-  }
+  const user = raw ? await verifyCookieEdge(raw, process.env.LOCALUTION_COOKIE_SECRET) : null
+  return { hasCookie: !!raw, user }
 }
 
 export async function middleware(request: NextRequest) {
@@ -77,20 +67,32 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next({ request })
   }
 
-  if (!hasAnySession(request)) {
+  const lu = await readVerifiedLocalutionUser(request)
+  const hasSupabase = hasSupabaseSessionCookie(request)
+  if (!lu.user && !hasSupabase) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
     loginUrl.search = ''
     loginUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(loginUrl)
+    const res = NextResponse.redirect(loginUrl)
+    // 서명 무효 localution_user · 짝 없는 localution_session 이 남아 있으면 지운다
+    // (남겨 두면 /login 과 보호 경로 사이를 오가며 '로그인된 것처럼 보이는' 상태가 계속된다)
+    const domain = detectApexDomain(request.headers.get('host'))
+    for (const name of ['localution_user', 'localution_session']) {
+      if (request.cookies.get(name)?.value) {
+        res.cookies.set(name, '', { path: '/', maxAge: 0, expires: new Date(0), ...(domain ? { domain } : {}) })
+      }
+    }
+    return res
   }
 
   // /admin* 은 관리자 화이트리스트 추가 검증
-  //   OAuth 로그인의 경우: 쿠키에서 email 직접 읽어 즉시 차단
-  //   Supabase 로그인의 경우: 클라 사이드 layout 검사로 폴백
+  //   OAuth 로그인의 경우: 서명 검증한 쿠키의 email 로 즉시 차단 (위조·옛 형식 쿠키도 차단)
+  //   Supabase 로그인의 경우: layout 검사 + API requireAdmin 으로 폴백
   if (isAdminPath(pathname)) {
-    const luEmail = readLocalutionUserEmail(request)
-    if (luEmail && !isAdminEmail(luEmail)) {
+    //   Supabase 세션만 있는 경우는 여기서 판단하지 않고(defer) /admin 레이아웃과 API requireAdmin 이 막는다.
+    const decision = decideAdminGate(lu.hasCookie, lu.user, isAdminEmail, hasSupabase)
+    if (decision === 'deny') {
       const homeUrl = request.nextUrl.clone()
       homeUrl.pathname = '/'
       homeUrl.search = ''

@@ -6,8 +6,7 @@
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { createDecipheriv } from 'crypto'
-import { requireUser } from '@/app/lib/userAuth'
-import { createServiceClient } from '@/app/lib/adminAuth'
+import { createServiceClient, requireAdmin } from '@/app/lib/adminAuth'
 import { getProxy, testProxy } from '@/app/lib/proxy-manager'
 
 export const runtime = 'nodejs'
@@ -40,8 +39,10 @@ function cookieAge(extra: any): number | null {
 }
 
 export async function GET(req: NextRequest) {
- const auth = await requireUser()
+ // LU-018 · 관리자 전용 (운영 키 일부 · 프록시 · 유료 API 실시간 호출을 포함)
+ const auth = await requireAdmin()
  if (!auth.ok) return NextResponse.json({ ok: false, error: auth.message }, { status: auth.status })
+ if (!auth.userId) return NextResponse.json({ ok: false, error: 'userId 없음' }, { status: 401 })
  const userId = auth.userId!
 
  const result: Record<string, any> = {

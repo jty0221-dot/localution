@@ -108,6 +108,12 @@ export default function NaverHealthPage() {
  setErr('로그인이 필요합니다. 로그인 후 다시 시도해 주세요.')
  return
  }
+ if (r.status === 403) {
+ // LU-018 · 실시간 API 키 진단은 관리자 전용으로 바뀌었다
+ setErr('이 진단 화면은 관리자 전용이에요. 연동 상태는 플랫폼 연결 화면에서 확인할 수 있어요.')
+ setAuto(false)
+ return
+ }
  const j = await r.json()
  if (!r.ok) throw new Error(j.error || `HTTP ${r.status}`)
  setReport(j); setLastAt(new Date()); setCountdown(60)

@@ -5,8 +5,7 @@
 // · POST { action: 'live_test' } → 네이버 오픈 API 실시간 테스트만 별도 실행
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
-import { requireUser } from '@/app/lib/userAuth'
-import { createServiceClient } from '@/app/lib/adminAuth'
+import { createServiceClient, requireAdmin } from '@/app/lib/adminAuth'
 
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
@@ -50,8 +49,10 @@ function hoursAgo(iso: string): number {
 }
 
 export async function GET() {
- const auth = await requireUser()
+ // LU-018 · 관리자 전용 (운영 키 일부 · 프록시 · 유료 API 실시간 호출을 포함)
+ const auth = await requireAdmin()
  if (!auth.ok) return NextResponse.json({ error: auth.message }, { status: auth.status })
+ if (!auth.userId) return NextResponse.json({ error: 'userId 없음' }, { status: 401 })
 
  const svc = createServiceClient()
  const userId = auth.userId
@@ -72,7 +73,7 @@ export async function GET() {
  ? 'NAVER_CLIENT_ID 미설정'
  : 'NAVER_CLIENT_SECRET 미설정',
  detail: hasOpenApi
- ? `Client ID: ${process.env.NAVER_CLIENT_ID!.slice(0, 6)}***`
+ ? 'Client ID 설정됨'
  : '.env.local 또는 Vercel 환경변수에 추가 필요',
  action_url: hasOpenApi ? null : 'https://developers.naver.com/apps/#/list',
  })
@@ -404,7 +405,7 @@ export async function GET() {
  id: 'claude_api', label: 'Claude AI API (AI 답글 생성)', category: 'AI 상태',
  status: 'ok',
  message: `정상 응답 (${latency}ms) — ${testModel}`,
- detail: `사용 가능 모델 ${allIds.length}개 | 키: ${anthropicKey.slice(0, 8)}***`,
+ detail: `사용 가능 모델 ${allIds.length}개 | 키 설정됨`,
  })
  } else {
  const errText = (await r.text()).slice(0, 150)
