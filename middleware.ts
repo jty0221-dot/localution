@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { isAdminEmail } from '@/app/lib/admin-emails'
 import { verifyCookieEdge, decideAdminGate } from '@/app/lib/cookieSigningEdge'
+import { detectApexDomain } from '@/app/lib/session-cookies'
 
 // 로그인 필수 경로 (prefix 매칭)
 // ⚠️ 공개 페이지 절대 추가 금지:
@@ -67,12 +68,22 @@ export async function middleware(request: NextRequest) {
   }
 
   const lu = await readVerifiedLocalutionUser(request)
-  if (!lu.user && !hasSupabaseSessionCookie(request)) {
+  const hasSupabase = hasSupabaseSessionCookie(request)
+  if (!lu.user && !hasSupabase) {
     const loginUrl = request.nextUrl.clone()
     loginUrl.pathname = '/login'
     loginUrl.search = ''
     loginUrl.searchParams.set('redirect', pathname)
-    return NextResponse.redirect(loginUrl)
+    const res = NextResponse.redirect(loginUrl)
+    // 서명 무효 localution_user · 짝 없는 localution_session 이 남아 있으면 지운다
+    // (남겨 두면 /login 과 보호 경로 사이를 오가며 '로그인된 것처럼 보이는' 상태가 계속된다)
+    const domain = detectApexDomain(request.headers.get('host'))
+    for (const name of ['localution_user', 'localution_session']) {
+      if (request.cookies.get(name)?.value) {
+        res.cookies.set(name, '', { path: '/', maxAge: 0, expires: new Date(0), ...(domain ? { domain } : {}) })
+      }
+    }
+    return res
   }
 
   // /admin* 은 관리자 화이트리스트 추가 검증
@@ -80,7 +91,7 @@ export async function middleware(request: NextRequest) {
   //   Supabase 로그인의 경우: layout 검사 + API requireAdmin 으로 폴백
   if (isAdminPath(pathname)) {
     //   Supabase 세션만 있는 경우는 여기서 판단하지 않고(defer) /admin 레이아웃과 API requireAdmin 이 막는다.
-    const decision = decideAdminGate(lu.hasCookie, lu.user, isAdminEmail)
+    const decision = decideAdminGate(lu.hasCookie, lu.user, isAdminEmail, hasSupabase)
     if (decision === 'deny') {
       const homeUrl = request.nextUrl.clone()
       homeUrl.pathname = '/'

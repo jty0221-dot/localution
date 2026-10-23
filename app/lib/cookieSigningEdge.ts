@@ -83,6 +83,7 @@ export type AdminGateDecision = 'allow' | 'deny' | 'defer'
  * 미들웨어의 /admin 진입 판단 (순수 함수).
  *   · localution_user 쿠키 없음 → 'defer' (Supabase 세션 · /admin 레이아웃 · API 의 requireAdmin 이 막는다)
  *   · 쿠키는 있는데 서명 검증 실패 → 'deny' (위조 · 옛 형식)
+ *     단 같은 요청에 Supabase 세션 쿠키가 있으면 'defer' (남은 옛 쿠키 때문에 Supabase 관리자가 막히지 않게)
  *   · 검증 성공 + email 없음 → 'defer' (requireAdmin 과 같은 규칙: Supabase 로 확인)
  *   · 검증 성공 + 관리자 email → 'allow', 아니면 'deny'
  */
@@ -90,9 +91,10 @@ export function decideAdminGate(
   hasCookie: boolean,
   user: EdgeLocalutionUser | null,
   isAdmin: (email: string) => boolean,
+  hasSupabaseSession = false,
 ): AdminGateDecision {
   if (!hasCookie) return 'defer'
-  if (!user) return 'deny'
+  if (!user) return hasSupabaseSession ? 'defer' : 'deny'
   const email = (user.email || '').toLowerCase().trim()
   if (!email) return 'defer'
   return isAdmin(email) ? 'allow' : 'deny'

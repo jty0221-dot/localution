@@ -45,6 +45,8 @@ await check('id 없는 payload 는 실패', async () => {
 await check('관리자 판정 표', async () => {
   assert.equal(decideAdminGate(false, null, isAdmin), 'defer')
   assert.equal(decideAdminGate(true, null, isAdmin), 'deny')
+  assert.equal(decideAdminGate(true, null, isAdmin, true), 'defer')
+  assert.equal(decideAdminGate(true, { id: 'a', email: 'user@example.com' }, isAdmin, true), 'deny')
   assert.equal(decideAdminGate(true, { id: 'a' }, isAdmin), 'defer')
   assert.equal(decideAdminGate(true, { id: 'a', email: ' Admin@Example.com ' }, isAdmin), 'allow')
   assert.equal(decideAdminGate(true, { id: 'a', email: 'user@example.com' }, isAdmin), 'deny')
