@@ -25,7 +25,13 @@ type Overview = {
   failed_credentials_users?: Array<{ user_id: string; issues: any[] }>
   null_place_id_users?: Array<{ user_id: string; platform: string }>
   stuck_queued_sample?: Array<{ user_id: string; platform: string; queued_at: string }>
+  collection_health?: Array<{ store: string; platform: string; login_status: string; last_login_at: string | null; last_collected_at: string | null; collected_7d: number; state: string; ok: boolean }>
 }
+
+const PLATFORM_LABEL: Record<string, string> = {
+  naver_place: '네이버', baemin: '배민', yogiyo: '요기요', coupangeats: '쿠팡이츠', kakao: '카카오', kakao_map: '카카오', google: '구글',
+}
+const fmtKst = (iso: string | null) => iso ? new Date(iso).toLocaleString('ko-KR', { timeZone: 'Asia/Seoul', month: 'numeric', day: 'numeric', hour: '2-digit', minute: '2-digit' }) : '-'
 
 export default function PlatformIssuesPage() {
   const [data, setData] = useState<Overview | null>(null)
@@ -80,6 +86,37 @@ export default function PlatformIssuesPage() {
           >
             <RefreshCw size={14} className={loading ? 'animate-spin' : ''} /> 새로고침 (30s 자동)
           </button>
+        </div>
+
+        {/* 연동 · 수집 상태 — 로그인 성공과 실제 수집을 나란히 */}
+        <div className="bg-white rounded-[10px] border border-gray-200 shadow-none p-4 md:p-6">
+          <div className="flex items-center gap-2 mb-3">
+            <div className="w-9 h-9 rounded-[6px] bg-[var(--lu-accent)] shadow-none flex items-center justify-center">
+              <Activity size={16} className="text-white" strokeWidth={2.5} />
+            </div>
+            <div className="min-w-0">
+              <div className="text-base md:text-lg font-bold text-gray-900">연동 · 수집 상태</div>
+              <div className="text-xs text-gray-500">로그인 성공이어도 리뷰가 안 들어오면 위쪽에 표시돼요. 새 리뷰가 실제로 없는 매장도 'N일째 없음'으로 보일 수 있어요.</div>
+            </div>
+          </div>
+          <div className="space-y-2">
+            {(data?.collection_health || []).length === 0 ? (
+              <div className="text-sm text-gray-400 py-3 text-center">데이터 없음</div>
+            ) : (data?.collection_health || []).map((c, i) => (
+              <div key={i} className={'rounded-lg border px-3 py-2 text-xs md:text-sm ' + (c.ok ? 'border-gray-100' : 'border-amber-200 bg-amber-50')}>
+                <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
+                  <span className="font-bold text-gray-900 break-all">{c.store}</span>
+                  <span className="px-1.5 py-0.5 rounded bg-gray-100 text-gray-700 font-semibold">{PLATFORM_LABEL[c.platform] || c.platform}</span>
+                  <span className={'font-semibold ' + (c.ok ? 'text-emerald-700' : 'text-amber-800')}>{c.state}</span>
+                </div>
+                <div className="mt-1 text-gray-500 flex flex-wrap gap-x-3">
+                  <span>마지막 수집 {fmtKst(c.last_collected_at)}</span>
+                  <span>7일 수집 {c.collected_7d}건</span>
+                  <span className="break-all">로그인 {c.login_status} · {fmtKst(c.last_login_at)}</span>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
 
         {/* 플랫폼별 사용자 카운트 */}

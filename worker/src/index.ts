@@ -41,7 +41,16 @@ const connection = new IORedis(REDIS_URL, {
 })
 
 connection.on('connect', () => log.info('redis connected'))
-connection.on('error', (err) => log.error({ err }, 'redis error'))
+// 같은 오류가 초당 수십 번 반복되면(예: Upstash rate-limit) 로그 비용만 커진다 → 1분에 한 번만 남긴다
+let lastRedisErrLog = 0
+let suppressedRedisErr = 0
+connection.on('error', (err) => {
+  const now = Date.now()
+  if (now - lastRedisErrLog < 60_000) { suppressedRedisErr++; return }
+  log.error({ err, suppressed: suppressedRedisErr }, 'redis error')
+  lastRedisErrLog = now
+  suppressedRedisErr = 0
+})
 
 let browserSingleton: Browser | null = null
 async function closeBrowser() {
@@ -184,6 +193,8 @@ const worker = new Worker<PlatformJobData>(
   },
   {
     connection,
+    // 큐가 비었을 때 30초 단위로 기다린다(기본 5초) — 대기 중 Redis 명령 수를 줄인다
+    drainDelay: 30,
     // Pro 8GB — concurrency 5 (각 ~1.2GB × 5 = 6GB, 여유 2GB)
     concurrency: parseInt(process.env.WORKER_CONCURRENCY || '5', 10),
     removeOnComplete: { count: 500 },
@@ -237,7 +248,7 @@ const healthServer = http.createServer(async (req, res) => {
   // GET /jobs  — 최근 완료/실패 잡 조회 (디버그용)
   if (req.method === 'GET' && req.url && req.url.startsWith('/jobs')) {
     const auth = req.headers['authorization'] || ''
-    if (TRIGGER_SECRET && auth !== `Bearer ${TRIGGER_SECRET}`) {
+    if (!TRIGGER_SECRET || auth !== `Bearer ${TRIGGER_SECRET}`) { // 비밀값이 없으면 막는다(예전엔 비면 누구나 통과)
       res.writeHead(401, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ ok: false, error: 'unauthorized' }))
       return
@@ -275,7 +286,7 @@ const healthServer = http.createServer(async (req, res) => {
   if (req.method === 'POST' && req.url === '/trigger') {
     // optional secret check
     const auth = req.headers['authorization'] || ''
-    if (TRIGGER_SECRET && auth !== `Bearer ${TRIGGER_SECRET}`) {
+    if (!TRIGGER_SECRET || auth !== `Bearer ${TRIGGER_SECRET}`) { // 비밀값이 없으면 막는다(예전엔 비면 누구나 통과)
       res.writeHead(401, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ ok: false, error: 'unauthorized' }))
       return
@@ -302,7 +313,7 @@ const healthServer = http.createServer(async (req, res) => {
   // GET /debug-creds  — platform_credentials 테이블 플랫폼별 카운트 조회
   if (req.method === 'GET' && req.url === '/debug-creds') {
     const auth = req.headers['authorization'] || ''
-    if (TRIGGER_SECRET && auth !== `Bearer ${TRIGGER_SECRET}`) {
+    if (!TRIGGER_SECRET || auth !== `Bearer ${TRIGGER_SECRET}`) { // 비밀값이 없으면 막는다(예전엔 비면 누구나 통과)
       res.writeHead(401, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ ok: false, error: 'unauthorized' }))
       return
@@ -330,7 +341,7 @@ const healthServer = http.createServer(async (req, res) => {
   // POST /run-all?platform=coupangeats  — 모든 유저 잡 일괄 등록
   if (req.method === 'POST' && req.url && req.url.startsWith('/run-all')) {
     const auth = req.headers['authorization'] || ''
-    if (TRIGGER_SECRET && auth !== `Bearer ${TRIGGER_SECRET}`) {
+    if (!TRIGGER_SECRET || auth !== `Bearer ${TRIGGER_SECRET}`) { // 비밀값이 없으면 막는다(예전엔 비면 누구나 통과)
       res.writeHead(401, { 'Content-Type': 'application/json' })
       res.end(JSON.stringify({ ok: false, error: 'unauthorized' }))
       return

@@ -25,7 +25,7 @@ export async function GET(req: NextRequest) {
   //    'success' 로 시작하지 않는 모든 값 = 실패/잠금 상태
   const { data: allCreds } = await svc
     .from('platform_credentials')
-    .select('user_id, platform, last_login_status, last_login_error_message, last_login_at, platform_store_name')
+    .select('user_id, platform, last_login_status, last_error_message, last_login_at, platform_store_name')
     .not('last_login_status', 'is', null)
     .order('last_login_at', { ascending: false })
     .limit(200)
@@ -105,6 +105,49 @@ export async function GET(req: NextRequest) {
     else platformCounts[plat].never++
   }
 
+  // 6) 연동 · 수집 상태 — 매장 × 매체마다 로그인 상태와 마지막 리뷰 수집 시각을 나란히 본다.
+  //    '로그인 성공'만으로는 수집이 되는지 알 수 없다(2026-07-31 이후 배민 · 요기요가 성공 기록만 남기고 0건 수집).
+  const PLATFORM_ALIAS: Record<string, string> = { kakao: 'kakao_map' }
+  const since7d = new Date(Date.now() - 7 * 86400 * 1000).toISOString()
+  const [{ data: connRows }, { data: storeRows }] = await Promise.all([
+    svc.from('platform_credentials').select('user_id, platform, platform_store_name, last_login_status, last_login_at').limit(300),
+    svc.from('stores').select('user_id, name').limit(1000),
+  ])
+  // 매장 × 매체마다 최신 1건 + 7일 건수 (전체를 한 번에 받으면 1000행 상한에 잘린다)
+  const lastCollected = new Map<string, { at: string; n7d: number }>()
+  await Promise.all(((connRows || []) as Array<{ user_id: string; platform: string }>).map(async c => {
+    const plat = PLATFORM_ALIAS[c.platform] || c.platform
+    const [latest, recent] = await Promise.all([
+      svc.from('platform_reviews').select('collected_at').eq('user_id', c.user_id).eq('platform', plat).order('collected_at', { ascending: false }).limit(1).maybeSingle(),
+      svc.from('platform_reviews').select('id', { count: 'exact', head: true }).eq('user_id', c.user_id).eq('platform', plat).gte('collected_at', since7d),
+    ])
+    const at = (latest.data as { collected_at?: string } | null)?.collected_at
+    if (at) lastCollected.set(`${c.user_id}|${plat}`, { at, n7d: recent.count || 0 })
+  }))
+  const storeName = new Map((storeRows || []).map((s: { user_id: string; name: string | null }) => [s.user_id, s.name || '']))
+  const collectionHealth = ((connRows || []) as Array<{ user_id: string; platform: string; platform_store_name: string | null; last_login_status: string | null; last_login_at: string | null }>)
+    .filter(c => c.platform !== 'threads' && c.platform !== 'instagram' && c.platform !== 'youtube')
+    .map(c => {
+      const lc = lastCollected.get(`${c.user_id}|${PLATFORM_ALIAS[c.platform] || c.platform}`)
+      const loginOk = String(c.last_login_status || '').startsWith('success')
+      const days = lc ? Math.floor((Date.now() - Date.parse(lc.at)) / 86400000) : null
+      // 판정 문구만 쓴다(점수 없음). 새 리뷰가 실제로 없는 매장도 '3일 넘게 없음'으로 보일 수 있다.
+      const state = !lc ? (loginOk ? '로그인 성공 · 수집 기록 없음 (의심)' : '수집 기록 없음')
+        : days! > 3 ? (loginOk ? `로그인 성공 · ${days}일째 새 리뷰 없음` : `${days}일째 새 리뷰 없음`)
+        : '정상'
+      return {
+        store: storeName.get(c.user_id) || c.platform_store_name || c.user_id.slice(0, 8),
+        platform: c.platform,
+        login_status: c.last_login_status || '기록 없음',
+        last_login_at: c.last_login_at,
+        last_collected_at: lc?.at || null,
+        collected_7d: lc?.n7d || 0,
+        state,
+        ok: state === '정상',
+      }
+    })
+    .sort((a, b) => Number(a.ok) - Number(b.ok) || a.store.localeCompare(b.store))
+
   // failed creds 사용자별 그룹화 (UI 친화)
   const credsByUser: Record<string, any[]> = {}
   for (const c of (failedCreds || [])) {
@@ -113,7 +156,7 @@ export async function GET(req: NextRequest) {
     credsByUser[u].push({
       platform: c.platform,
       status: c.last_login_status,
-      error: String(c.last_login_error_message || '').slice(0, 150),
+      error: String(c.last_error_message || '').slice(0, 150),
       last_login_at: c.last_login_at,
       store: c.platform_store_name,
     })
@@ -130,6 +173,7 @@ export async function GET(req: NextRequest) {
       crm_sync_failed_24h: crmSyncError ? null : (crmSyncFailCount || 0),
     },
     crm_sync_failed_reasons: crmSyncReasons,
+    collection_health: collectionHealth,
     platform_counts: platformCounts,
     failed_replies_pattern: failedReplyPatterns,
     failed_credentials_users: Object.entries(credsByUser).slice(0, 20).map(([uid, list]) => ({
