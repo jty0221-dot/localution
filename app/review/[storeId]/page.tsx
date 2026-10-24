@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { useState, useRef, useEffect } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
-import { Camera, Image as ImageIcon, CheckCircle2, AlertTriangle, ClipboardList, Sparkles, Check, UtensilsCrossed, X } from 'lucide-react'
+import { Camera, Image as ImageIcon, CheckCircle2, AlertTriangle, ClipboardList, Sparkles, Check, UtensilsCrossed, X, Star } from 'lucide-react'
 
 const BLUE = '#3182F6'
 const BLUE_DARK = '#1B64DA'
@@ -237,6 +237,7 @@ export default function ReviewPage() {
  const [gender, setGender] = useState<'F' | 'M' | '-'>('-')
  const [age, setAge] = useState<string>('30s')
  const [tone, setTone] = useState<string>('warm')
+ const [rating, setRating] = useState<number>(5) // 기본 5점 · 손님이 바꿀 수 있다
  const [length, setLength] = useState<LengthKey>('mid')
  const [drafting, setDrafting] = useState(false)
  const [advancing, setAdvancing] = useState(false)
@@ -445,7 +446,6 @@ export default function ReviewPage() {
  const receiptUrl = photos.find(p => p.cat === 'receipt')?.url
 
  const apiTone = TONE_MAP[tone] || 'mom'
- const rating = 5 // 손님이 QR 통해 자발적 리뷰 · 일반적으로 긍정
 
  // 클라이언트 타임아웃 45초 — 서버 maxDuration(50s) 직전 fallback
  const controller = new AbortController()
@@ -527,7 +527,7 @@ export default function ReviewPage() {
  // 2-C 추적: 네이버 등록 클릭
  trackEvent(storeId, 'submitted_naver', {
  char_count: final.length,
- tone, length, rating: 5,
+ tone, length, rating,
  has_receipt: photos.some(p => p.cat === 'receipt'),
  has_photo: photos.some(p => p.cat === 'photo'),
  })
@@ -536,7 +536,7 @@ export default function ReviewPage() {
  if (!win) window.location.href = reviewUrl // 새 창이 막힌 앱 브라우저는 같은 창으로 이동
  }
 
- const reset = () => { setStep(0); setPhotos([]); setReceiptStatus('idle'); setDraft(''); setFinal('') }
+ const reset = () => { setStep(0); setRating(5); setPhotos([]); setReceiptStatus('idle'); setDraft(''); setFinal('') }
 
  const toneOptions = [
  { k: 'warm', l: '따뜻하게', d: '감성적이고 다정한' },
@@ -586,8 +586,8 @@ export default function ReviewPage() {
  </div>
  )}
  <p className="text-sm leading-relaxed" style={{ color: GRAY }}>
- 사장님을 위해 방문 후기를 AI가 대신 써드려요.<br />
- 영수증과 사진만 올려주시면 끝!
+ 영수증과 사진을 올리면 AI가 방문 후기 초안을 써 드려요.<br />
+ 확인하고 마음대로 고쳐서 올리시면 돼요.
  </p>
  <div className="mt-5 space-y-2.5">
  {[
@@ -610,7 +610,7 @@ export default function ReviewPage() {
  <li>· 사진 AI 분석 (음식 · 서비스 · 전경 자동 구분)</li>
  <li>· {store.name} 맞춤 SEO 키워드 자동 삽입</li>
  <li>· 나이 · 말투 · 길이 기반 자연스러운 문장</li>
- <li>· AI 티 안 나는 구어체 블로거 스타일</li>
+ <li>· 올리기 전에 손님이 직접 확인하고 고칠 수 있어요</li>
  </ul>
  </div>
  <button onClick={() => setStep(1)} className="w-full py-4 rounded-2xl font-black text-white text-base shadow-lg" style={{ background: BLUE }}>
@@ -762,7 +762,21 @@ export default function ReviewPage() {
  <div className="space-y-5">
  <div>
  <h2 className="text-lg font-black mb-1">리뷰 스타일을 골라주세요</h2>
- <p className="text-xs" style={{ color: GRAY }}>AI가 맞춤 리뷰를 작성합니다</p>
+ <p className="text-xs" style={{ color: GRAY }}>AI가 맞춤 리뷰 초안을 작성합니다</p>
+ </div>
+
+ {/* 별점 — 기본 5점, 탭해서 바꿀 수 있다 */}
+ <div>
+ <label className="text-sm font-bold mb-2 block">별점</label>
+ <div className="flex items-center gap-1" role="radiogroup" aria-label="별점">
+ {[1, 2, 3, 4, 5].map(n => (
+ <button key={n} type="button" role="radio" aria-checked={rating === n} aria-label={n + '점'}
+ onClick={() => setRating(n)} className="w-11 h-11 flex items-center justify-center">
+ <Star size={30} strokeWidth={2} className={n <= rating ? 'text-[#F59E0B]' : 'text-[#D1D6DB]'} fill={n <= rating ? '#F59E0B' : 'none'} />
+ </button>
+ ))}
+ <span className="ml-2 text-sm font-bold" style={{ color: '#4E5968' }}>{rating}점</span>
+ </div>
  </div>
 
  {/* 성별 */}
