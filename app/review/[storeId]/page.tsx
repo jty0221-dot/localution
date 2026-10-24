@@ -3,7 +3,7 @@ export const dynamic = 'force-dynamic'
 
 import { useState, useRef, useEffect } from 'react'
 import { useParams, useSearchParams } from 'next/navigation'
-import { Camera, Image as ImageIcon, CheckCircle2, AlertTriangle, ClipboardList, Sparkles, Check, UtensilsCrossed } from 'lucide-react'
+import { Camera, Image as ImageIcon, CheckCircle2, AlertTriangle, ClipboardList, Sparkles, Check, UtensilsCrossed, X } from 'lucide-react'
 
 const BLUE = '#3182F6'
 const BLUE_DARK = '#1B64DA'
@@ -421,7 +421,7 @@ export default function ReviewPage() {
  } catch (_) {}
  }
 
- // ⭐ 2-B: 서버 AI 리뷰 생성 우선 + 실패 시 buildReview fallback
+ // 2-B: 서버 AI 리뷰 생성 · 실패하면 손님이 직접 작성 (지어낸 대체문 없음)
  // tone 매핑: page.tsx 의 'warm/short/detail/casual/funny' → API 의 'mom/honest/insta/friend/z'
  const TONE_MAP: Record<string, string> = {
  warm: 'mom', // 따뜻한 → 맘카페 스타일
@@ -495,14 +495,10 @@ export default function ReviewPage() {
  }
  } catch (_) {}
 
- // Fallback: 로컬 buildReview (AI 호출 실패 / API 키 없음)
- const fallbackText = buildReview(store, gender, age, tone, length, photos)
- setDraft(fallbackText)
+ // AI 실패 시: 손님이 하지 않은 경험을 지어낸 대체문을 넣지 않는다(허위 리뷰 방지) → 빈 칸에 직접 작성
+ setDraft('')
  setAiSource('fallback')
  setDrafting(false)
- trackEvent(storeId, 'ai_generated', {
- tone, length, ai_source: 'fallback', char_count: fallbackText.length,
- })
  setStep(3)
  }
 
@@ -511,17 +507,23 @@ export default function ReviewPage() {
  setTimeout(() => { setFinal(draft.trim()); setAdvancing(false); setStep(4) }, 600)
  }
 
- const copyAndGoNaver = async () => {
- try { await navigator.clipboard.writeText(final) } catch {
+ // 모든 동작을 탭 직후 동기로 처리한다: 기다린 뒤 창을 열면 iOS · 카톡 · 네이버 앱 브라우저가 막는다
+ const copyAndGoNaver = () => {
  const el = document.createElement('textarea')
  el.value = final
+ el.setAttribute('readonly', '')
+ el.style.position = 'fixed'
+ el.style.opacity = '0'
  document.body.appendChild(el)
  el.select()
- document.execCommand('copy')
+ el.setSelectionRange(0, 99999) // iOS 는 select() 만으로 선택되지 않는다
+ let ok = false
+ try { ok = document.execCommand('copy') } catch {}
  document.body.removeChild(el)
- }
+ navigator.clipboard?.writeText(final).catch(() => {})
  setCopied(true)
  setTimeout(() => setCopied(false), 2500)
+ if (!ok && !navigator.clipboard) alert('복사가 안 됐어요. 리뷰 글을 길게 눌러 직접 복사해 주세요.')
  // 2-C 추적: 네이버 등록 클릭
  trackEvent(storeId, 'submitted_naver', {
  char_count: final.length,
@@ -530,7 +532,8 @@ export default function ReviewPage() {
  has_photo: photos.some(p => p.cat === 'photo'),
  })
  const reviewUrl = getNaverReviewUrl(store.naverUrl)
- setTimeout(() => window.open(reviewUrl, '_blank'), 350)
+ const win = window.open(reviewUrl, '_blank')
+ if (!win) window.location.href = reviewUrl // 새 창이 막힌 앱 브라우저는 같은 창으로 이동
  }
 
  const reset = () => { setStep(0); setPhotos([]); setReceiptStatus('idle'); setDraft(''); setFinal('') }
@@ -733,7 +736,7 @@ export default function ReviewPage() {
  {photos.map(p => (
  <div key={p.id} className="relative aspect-square rounded-lg overflow-hidden bg-gray-100">
  <img src={p.url} alt={p.label} className="w-full h-full object-cover" />
- <button onClick={() => removePhoto(p.id)} className="absolute top-1 right-1 w-6 h-6 rounded-full bg-black/60 text-white text-xs font-bold flex items-center justify-center">×</button>
+ <button onClick={() => removePhoto(p.id)} aria-label="사진 삭제" className="absolute top-1 right-1 w-8 h-8 min-h-0 rounded-full bg-black/60 text-white flex items-center justify-center"><X size={14} strokeWidth={3} /></button>
  <div className="absolute bottom-0 left-0 right-0 px-1 py-0.5 bg-black/50 text-[10px] text-white text-center">{p.cat === 'receipt' ? '영수증' : '사진'}</div>
  </div>
  ))}
@@ -841,9 +844,9 @@ export default function ReviewPage() {
  <div>
  <h2 className="text-lg font-black mb-1 flex items-center gap-1.5">
  {aiSource === 'ai' && <Sparkles size={16} className="text-[#7C3AED]" strokeWidth={2.5} />}
- {aiSource === 'ai' ? 'AI가 사진과 영수증을 분석했어요' : 'AI 초안이 완성됐어요'}
+ {aiSource === 'fallback' ? '직접 적어 주세요' : aiSource === 'ai' ? 'AI가 사진과 영수증을 분석했어요' : 'AI 초안이 완성됐어요'}
  </h2>
- <p className="text-xs" style={{ color: GRAY }}>내용을 직접 수정할 수도 있어요. 다 됐으면 아래 다음 버튼을 눌러주세요</p>
+ <p className="text-xs" style={{ color: GRAY }}>{aiSource === 'fallback' ? '드셔 보신 메뉴와 느낌을 한두 줄로 적으면 충분해요. 다 됐으면 아래 다음 버튼을 눌러주세요' : '내용을 직접 수정할 수도 있어요. 다 됐으면 아래 다음 버튼을 눌러주세요'}</p>
  </div>
 
  {/* 영수증 OCR 결과 — AI 가 메뉴 인식 시 노출 */}
@@ -866,7 +869,7 @@ export default function ReviewPage() {
  <div className="bg-white rounded-2xl p-5 shadow-sm">
  <div className="flex items-center gap-2 mb-3 flex-wrap">
  <span className="inline-flex items-center gap-1 text-[11px] font-bold px-2 py-1 rounded-full text-white" style={{ background: aiSource === 'ai' ? '#7C3AED' : BLUE }}>
- {aiSource === 'ai' ? (<><Sparkles size={10} strokeWidth={2.5} /> AI 작성</>) : 'AI 초안'}
+ {aiSource === 'ai' ? (<><Sparkles size={10} strokeWidth={2.5} /> AI 작성</>) : aiSource === 'fallback' ? '직접 작성' : 'AI 초안'}
  </span>
  <span className="text-[11px]" style={{ color: GRAY }}>{draft.length}자 · 직접 수정 가능</span>
  {aiSource === 'ai' && (
@@ -876,7 +879,8 @@ export default function ReviewPage() {
  <textarea
  value={draft}
  onChange={e => setDraft(e.target.value)}
- className="w-full min-h-[240px] text-sm leading-relaxed border-none outline-none resize-none bg-transparent"
+ placeholder="예) 점심에 칼국수 먹었는데 국물이 진하고 김치가 맛있었어요."
+ className="w-full min-h-[240px] text-base leading-relaxed border-none outline-none resize-none bg-transparent"
  style={{ color: BLACK }}
  />
  </div>
@@ -975,9 +979,8 @@ export default function ReviewPage() {
  {drafting && (
  <button
  onClick={() => {
- // AI 없이 즉시 fallback 텍스트로 진행
- const fallbackText = buildReview(store, gender, age, tone, length, photos)
- setDraft(fallbackText)
+ // AI 없이 직접 작성 — 빈 칸으로 진행
+ setDraft('')
  setAiSource('fallback')
  setDrafting(false)
  setStep(3)
@@ -1001,208 +1004,4 @@ export default function ReviewPage() {
  )}
  </div>
  )
-}
-
-// ───────────────────────────────────────────────────────────────────
-// buildReview: 안티-AI 한국어 리뷰 생성기
-// 목표: short≈150자 / mid≈250자 / long≈400자 (한글 1자=1자 카운팅)
-// 전략: 문장 풀에서 선택 → 합산 → 최솟값 미달 시 padding 추가 → 최댓값 초과 시 자르기
-// ───────────────────────────────────────────────────────────────────
-function pick<T>(arr: T[]): T { return arr[Math.floor(Math.random() * arr.length)] }
-
-function buildReview(store: Store, gender: string, age: string, tone: string, length: LengthKey, photos: Photo[]): string {
- const sig1 = pick(store.signatures)
- const remaining = store.signatures.filter(s => s !== sig1)
- const sig2 = remaining.length > 0 ? pick(remaining) : sig1
- const kw1 = store.keywords[0] || ''
- const kw2 = store.keywords[1] || kw1
- const area = store.address ? store.address.split(' ').slice(-1)[0] : ''
- const hasReceipt = photos.some(p => p.cat === 'receipt')
- const hasPhoto = photos.some(p => p.cat === 'photo')
- const nm = store.name
-
- // ── 여성(F) 문장 풀 ──────────────────────────────────────────
- const F_s1 = [
- '주말에 친구랑 약속 잡았다가 여기 ' + nm + ' 왔는데 진짜ㅠㅠ 완전 제 취향이었어요!!',
- '요즘 ' + (kw1 || store.category) + ' 핫한 곳 찾고 있었는데 소문 듣고 바로 ' + nm + ' 달려왔어요ㅎㅎ',
- '친구가 여기 꼭 가봐야 된다고 난리길래 ' + nm + ' 다녀왔는데요~ 결론부터 말하면 진짜 너무 좋았어요ㅠㅠㅠ',
- '오랜만에 셀프 힐링 좀 해볼까 해서 ' + nm + ' 왔잖아요~ 근데 기대 이상이었어요!!',
- (area ? area + ' ' : '') + '쪽 놀러 왔다가 ' + nm + ' 들렀는데 완전 대박ㅠㅠ 처음부터 끝까지 만족이었어요!',
- ]
- const F_s2 = hasPhoto
- ? ['들어가자마자 분위기 미쳤어요ㅠㅠ 사진부터 막 찍었잖아요ㅎㅎ', '공간이 너무 예뻐서 앉기 전부터 핸드폰 먼저 꺼냈어요ㅋㅋㅋ', '인테리어 진짜 취향 저격이에요~ 구석구석 예쁘더라구요!']
- : ['들어가자마자 느낌부터 좋았어요~ 뭔가 기분 좋아지는 공간이더라구요!', '위치도 딱 찾기 좋아서 편했어요ㅎㅎ', '안쪽으로 들어가니까 더 아늑해서 놀랐어요ㅠㅠ']
- const F_s3 = hasReceipt
- ? ['저 이번에 ' + sig1 + '이랑 ' + sig2 + ' 시켰는데요~ 둘 다 진짜진짜 맛있었어요ㅠㅠ 특히 ' + sig1 + ' 완전 제 취향!!', sig1 + ' 먼저 먹어봤는데 한 입 먹자마자 "헉" 했어요ㅠㅠ 진짜 맛있더라구요~']
- : [sig1 + ' 시켜봤어요~ 첫입부터 "오~?" 하면서 계속 먹었잖아요ㅎㅎ 진짜 맛있었어요ㅠㅠ', sig1 + ' 유명하다길래 기대하고 먹었는데요 기대 이상이었어요!! 완전 만족~']
- const F_s4 = ['사장님 너무너무 친절하셔서 완전 기분 좋게 먹고 왔어요ㅠㅠ', '직원분들도 응대가 다정해서 편했어요~ 이런 거 되게 중요하잖아요ㅎㅎ', '사장님이 메뉴 설명도 해주시고 진짜 세심하셔서 감동이었어요ㅠㅠ']
- const F_s5: Record<string, string[]> = {
- '10s': ['친구들이랑 오면 완전 좋아할 것 같아요!! 사진도 엄청 잘 나와요ㅎㅎ', '또래끼리 수다 떨기 딱이에요ㅠㅠ 진짜 강추!'],
- '20s': ['데이트 코스로도 완전 찰떡이고 친구랑 와도 좋아요ㅎㅎ', '2030이면 여기 진짜 좋아할 거예요ㅠㅠ 감성 터져요~'],
- '30s': ['바쁜 일상 중에 힐링하러 오기 딱 좋아요ㅠㅠ 저도 또 올 거예요!', '조용히 쉬고 싶을 때 생각날 곳이에요~ 완전 내 스타일!'],
- '40s': ['가족이랑 와도 너무 편해요~ 엄마랑 같이 와도 좋아하실 것 같아요ㅎㅎ', '부담 없이 편하게 쉬기 좋아요ㅠㅠ 재방문 확정!'],
- '50s+': ['어른들 모시고 와도 좋을 분위기예요~ 부담 없어서 딱이에요ㅎㅎ', '편하게 한 끼 하기 정말 좋은 곳이에요!'],
- }
- // 길이별 outro (normal ≈40-55자, long ≈70-90자)
- const F_outro: Record<string, string[]> = {
- warm: [(area ? area + ' ' : '') + (kw2 || '분위기 좋은 곳') + ' 찾는 분들 여기 진짜 완전 강추예요ㅠㅠ!! 저 다음 주에 또 올 거예요ㅎㅎ', '진짜 오길 잘했다 싶었어요ㅠㅠ ' + (kw1 || store.category) + ' 찾으시면 무조건 여기 가세요!!'],
- short: ['완전 만족ㅠㅠ ' + (kw2 || '') + ' 찾으시면 여기요!!', (kw1 || '') + ' 강추강추~ 또 올 거예요ㅎㅎ'],
- detail: [(kw1 || store.category) + ' 진심으로 여기 진짜 잘 왔다 싶었어요ㅠㅠ 분위기·맛·응대 다 챙기는 곳 찾기 쉽지 않잖아요~ 근데 여기가 딱이었어요!! ' + (kw2 || '') + ' 찾는 분들 한번 꼭 가보세요~'],
- casual: [(kw2 || '') + ' 찾는 사람들 여기 완전 내 스타일일걸요ㅎㅎ!! 진짜 강추~', '여기 한번만 와봐요ㅠㅠ 진짜 반할 거예요!! ' + (kw1 || '') + ' 강추~'],
- funny: ['여기 진짜 "왜 진작 안 왔지?" 하는 타입의 맛집이에요ㅋㅋㅋ ' + (kw1 || '') + ' 찾으신다면 여기 무조건 강추!! 저 이미 세 번 방문 계획 세웠어요ㅠㅠ', (kw2 || '이 동네') + ' 자랑 아이템 하나 생겼어요ㅋㅋ "거기 알아? 되게 좋거든~" 이러면서 다 데려올 예정이에요ㅠㅠ 진짜 맛있었어요!!'],
- emotional: ['여기서의 시간이 오래 기억에 남을 것 같아요ㅠㅠ 맛도 분위기도 그냥 마음에 쏙 들었어요. ' + (kw1 || '') + ' 생각날 때 다시 와야겠어요~', '별로인 날도 여기 오면 기분이 좋아질 것 같은 느낌? ' + (kw2 || '') + ' 찾으시는 분들 꼭 와보세요ㅠㅠ 감성 충만해서 돌아왔어요!!'],
- pro: ['종합적으로 평가하면 맛·서비스·가성비 세 부분 모두 만족스러웠어요. ' + (kw1 || store.category) + '을 찾으시는 분들께 적극 추천드려요! 다음 방문에는 나머지 메뉴도 도전해볼 예정이에요ㅎㅎ'],
- honest: ['솔직히 말하면 딱 하나 아쉬웠던 건 대기가 좀 있었다는 거예요. 근데 그 기다림이 아깝지 않은 맛이었어요!! ' + (kw1 || '') + ' 찾으신다면 주말은 좀 이르게 오세요ㅎㅎ', '장점만 말하는 건 양심 없는 것 같아서ㅎㅎ 가격이 살짝 있긴 해요. 근데 그만큼의 퀄리티는 충분히 있었어요!! ' + (kw2 || '') + ' 고려하시는 분들 한번 가보세요~'],
- }
- // long 전용 패딩 풀 (F)
- const F_pad = [
- '이 정도면 완전 합격이지 않나요?? 저 점수 꽤 짜게 주는 편인데 여기는 진짜 만족이었어요!!',
- '계속 생각날 것 같아요ㅎㅎ 분명히 금방 또 오게 될 것 같은 느낌이에요ㅠㅠ',
- '주변 사람들한테도 진짜 강추하고 싶어요~ 아는 사람들한테 다 알려줄 거예요ㅎㅎ',
- '사진도 너무 잘 나와서 인스타에 올렸더니 친구들이 다 어디냐고 물어봤어요ㅋㅋㅋ',
- '음식도 음식이지만 공간 자체가 너무 좋아서 그냥 있기만 해도 힐링이 됐어요ㅠㅠ',
- ]
-
- // ── 남성(M) 문장 풀 ──────────────────────────────────────────
- const M_s1 = [
- '주말에 시간이 나서 ' + nm + ' 방문해봤어요.',
- '평소 ' + (kw1 || store.category) + ' 쪽 관심이 있어서 ' + nm + ' 한번 가봤어요.',
- (area ? area + ' ' : '') + '근처에 볼 일이 있어서 겸사겸사 ' + nm + ' 들렀어요.',
- '지인 추천으로 ' + nm + ' 찾아가봤어요.',
- '퇴근길에 ' + nm + ' 들러봤어요. 오래 전부터 궁금했던 곳이에요.',
- ]
- const M_s2 = hasPhoto
- ? ['안으로 들어가니 생각보다 공간이 넓고 깔끔했어요.', '자리 간격도 여유롭고 조명이 차분해서 편하게 앉을 수 있었어요.', '첫인상이 단정해서 마음에 들더라구요.']
- : ['위치가 찾기 어렵지 않아서 좋았어요.', '평일 저녁이었는데 자리도 여유 있어서 편했어요.', '처음 와보는 곳이었지만 분위기가 어색하지 않았어요.']
- const M_s3 = hasReceipt
- ? ['메뉴판을 보고 ' + sig1 + '이랑 ' + sig2 + ' 주문했어요. 둘 다 만족스러웠어요.', '대표 메뉴라는 ' + sig1 + ' 먼저 먹어봤어요. 양도 괜찮고 맛이 담백해서 좋았어요.']
- : [sig1 + ' 주문했어요. 평이 좋은 이유가 있더라구요.', sig1 + ' 시켜봤는데 생각보다 깊이가 있는 맛이에요. 추천해줄 만하네요.']
- const M_s4 = ['사장님 응대가 편안해서 부담 없이 식사할 수 있었어요.', '직원분들도 필요한 때만 조용히 도와주셔서 편했어요.', '주문이나 안내가 간결해서 좋았어요. 이런 부분이 생각보다 중요하더라구요.']
- const M_s5: Record<string, string[]> = {
- '10s': ['또래 친구들과 와도 어색하지 않을 분위기예요.', '가볍게 들르기 좋은 곳이에요.'],
- '20s': ['혼자 와도, 누구와 와도 편하게 있을 수 있는 곳이에요.', '요즘 감성에 맞는 무난한 분위기라 좋았어요.'],
- '30s': ['일 끝나고 조용히 시간 보내기 좋은 곳이에요.', '하루 마무리로 들르기 적당한 분위기였어요.'],
- '40s': ['가족과 와도 부담 없는 곳이에요.', '편하게 한 끼 하기 좋은 분위기였어요.'],
- '50s+': ['어른을 모시고 와도 무난한 곳이에요.', '조용히 머물기에 좋은 공간이에요.'],
- }
- const M_outro: Record<string, string[]> = {
- warm: [(area ? area + ' 근처' : '이 동네') + '에서 ' + (kw2 || '괜찮은 곳') + ' 찾으신다면 한번 가보실 만해요. 저도 조만간 다시 방문할 생각이에요.', '기분 좋게 잘 다녀왔어요. ' + (kw1 || store.category) + ' 찾는 분들께 조심스럽게 추천드려요.'],
- short: [(kw2 || '') + ' 무난하게 괜찮았어요. 재방문 의사 있어요.', '담백하게 잘 먹고 왔어요. ' + (kw1 || '') + '.'],
- detail: ['전반적으로 ' + (kw1 || store.category) + ' 기준으로 부족함 없는 곳이에요. ' + (kw2 || '') + ' 찾으시는 분들께도 나쁘지 않을 것 같아요. 저는 다시 방문할 생각입니다.'],
- casual: [(kw2 || '') + ' 찾으신다면 한번 가보세요. 저는 다음에 또 와볼 것 같아요.', '가볍게 다녀오기 괜찮은 곳이에요. ' + (kw1 || '') + ' 근처 오시면 들러보세요.'],
- funny: ['맛있는 집이라 소개할 때 " ' + nm + ' 알아?" 하면 포인트 좀 올릴 수 있을 것 같아요. ' + (kw1 || '') + ' 찾으신다면 여기 강추합니다.', '다음에 또 올 것 같아요. 그냥 그렇게 됩니다. ' + (kw2 || '') + '.'],
- emotional: ['조용히 앉아서 시간을 보내기 좋은 공간이었어요. 뭔가 마음이 차분해지는 기분이었어요. ' + (kw1 || '') + ' 생각날 때 다시 올 것 같아요.', '소소하지만 좋은 경험이었어요. ' + (kw2 || '') + ' 찾으시는 분들께 권해드리고 싶어요.'],
- pro: ['맛·서비스·가성비를 종합하면 평균 이상의 퀄리티예요. ' + (kw1 || store.category) + ' 카테고리에서 추천할 만한 곳입니다. 재방문 예정이에요.'],
- honest: ['전반적으로 만족스러웠어요. 굳이 아쉬운 점을 꼽자면 웨이팅이 있다는 거예요. 그래도 ' + (kw1 || '') + ' 찾으신다면 기다릴 만한 곳이에요.', '장단점이 있는 곳이에요. 맛은 확실하고 서비스도 무난해요. ' + (kw2 || '') + ' 찾으신다면 한번 가보세요.'],
- }
- const M_pad = [
- '앞으로도 이쪽 올 일 있으면 자연스럽게 들르게 될 것 같아요.',
- '이 정도 퀄리티면 재방문 의사 충분히 있어요. 다음엔 다른 메뉴도 도전해볼 생각이에요.',
- '비슷한 곳 여럿 가봤는데 여기가 전반적으로 균형이 잘 잡혀있는 편이에요.',
- '지인에게도 조심스럽게 추천할 만한 곳이에요.',
- ]
-
- // ── 중립(-) 문장 풀 ──────────────────────────────────────────
- const N_s1 = [
- '주말에 시간 나서 ' + nm + ' 다녀왔어요.',
- '요즘 ' + (kw1 || store.category) + ' 찾고 있다가 ' + nm + ' 가봤어요.',
- (area ? area + ' ' : '') + '쪽에 일 있어서 간 김에 ' + nm + ' 들렀어요.',
- '지인 추천으로 ' + nm + ' 찾아가봤어요.',
- ]
- const N_s2 = hasPhoto
- ? ['들어가자마자 공간이 깔끔하고 편안했어요.', '자리도 적당히 여유 있어서 기분 좋게 앉았어요.', '분위기가 차분해서 오래 있기 좋았어요.']
- : ['위치가 찾기 쉬워서 편했어요.', '처음이었는데 분위기가 부담 없이 편했어요.']
- const N_s3 = hasReceipt
- ? [sig1 + '이랑 ' + sig2 + ' 시켰어요. 둘 다 괜찮았어요.', '대표 메뉴 ' + sig1 + ' 먹어봤어요. 기대만큼 만족스러웠어요.']
- : [sig1 + ' 시켜봤어요. 생각보다 맛있었어요.', sig1 + '이 유명하다길래 먹어봤는데 괜찮았어요.']
- const N_s4 = ['응대도 편하고 부담스럽지 않았어요.', '사장님이 친절하셔서 기분 좋게 다녀왔어요.']
- const N_s5: Record<string, string[]> = {
- '10s': ['친구들이랑 가볍게 오기 좋아요.'],
- '20s': ['데이트하기도, 혼자 오기도 좋은 곳이에요.'],
- '30s': ['조용히 시간 보내기 좋은 곳이에요.'],
- '40s': ['가족과 와도 편한 곳이에요.'],
- '50s+': ['어른들 모시고 오기에도 무난해요.'],
- }
- const N_outro: Record<string, string[]> = {
- warm: [(area ? area : '이 근처') + ' ' + (kw2 || '괜찮은 곳') + ' 찾는 분들 한번 가보세요. 저도 또 올 것 같아요.'],
- short: [(kw2 || '') + ' 괜찮았어요. 재방문 의사 있어요.'],
- detail: ['전반적으로 ' + (kw1 || store.category) + ' 기준에서 괜찮은 곳이에요. ' + (kw2 || '') + ' 찾는 분들께 추천합니다.'],
- casual: [(kw2 || '') + ' 찾으신다면 한번 가보세요. 기분 좋게 다녀왔어요.'],
- funny: [nm + ' 생각보다 훨씬 좋았어요. "아 거기 알아~ 나 갔다왔어" 하고 싶어지는 곳이에요. ' + (kw1 || '') + ' 강추합니다!'],
- emotional: ['오래 기억에 남을 것 같은 공간이었어요. ' + (kw1 || '') + ' 찾으신다면 한번 가보세요.'],
- pro: ['종합 평가: 맛·공간·서비스 모두 무난하게 합격점이에요. ' + (kw1 || '') + ' 찾으시는 분들께 추천합니다.'],
- honest: ['좋은 점과 아쉬운 점 둘 다 있지만 전반적으로 만족스러웠어요. ' + (kw2 || '') + ' 찾으신다면 가볼 만해요.'],
- }
- const N_pad = [
- '다음에 기회 되면 다시 와볼 생각이에요.',
- '주변 분들께도 추천할 만한 곳이에요.',
- '비슷한 곳들이랑 비교해도 손색없는 퀄리티예요.',
- ]
-
- // ── 성별 분기 ──────────────────────────────────────────────────
- let s1: string, s2: string, s3: string, s4: string, s5: string, s6: string
- let padPool: string[]
-
- if (gender === 'F') {
- s1 = pick(F_s1); s2 = pick(F_s2); s3 = pick(F_s3); s4 = pick(F_s4)
- s5 = pick(F_s5[age] || F_s5['30s'])
- s6 = pick(F_outro[tone] || F_outro.warm)
- padPool = F_pad
- } else if (gender === 'M') {
- s1 = pick(M_s1); s2 = pick(M_s2); s3 = pick(M_s3); s4 = pick(M_s4)
- s5 = pick(M_s5[age] || M_s5['30s'])
- s6 = pick(M_outro[tone] || M_outro.warm)
- padPool = M_pad
- } else {
- s1 = pick(N_s1); s2 = pick(N_s2); s3 = pick(N_s3); s4 = pick(N_s4)
- s5 = pick(N_s5[age] || N_s5['30s'])
- s6 = pick(N_outro[tone] || N_outro.warm)
- padPool = N_pad
- }
-
- // ── 길이별 문장 조합 ──────────────────────────────────────────
- let parts: string[]
- if (length === 'short') {
- parts = [s1, s3, s6]
- } else if (length === 'mid') {
- parts = [s1, s2, s3, s5, s6]
- } else {
- // long: 6 scenes 기본
- parts = [s1, s2, s3, s4, s5, s6]
- }
-
- let text = parts.join(' ')
-
- // ── 최솟값 보장 (padding) ─────────────────────────────────────
- const minTargets: Record<LengthKey, number> = { short: 120, mid: 215, long: 360 }
- const maxTargets: Record<LengthKey, number> = { short: 155, mid: 260, long: 410 }
- const minLen = minTargets[length]
- const maxLen = maxTargets[length]
-
- // 섞어서 순서 랜덤화
- const shuffled = [...padPool].sort(() => Math.random() - 0.5)
- for (const pad of shuffled) {
- if (text.length >= minLen) break
- if (text.length + 1 + pad.length > maxLen) continue
- text += ' ' + pad
- }
-
- // ── 최댓값 초과 시 문장 경계에서 자르기 ─────────────────────
- if (text.length > maxLen) {
- const cut = text.slice(0, maxLen)
- const last = Math.max(
- cut.lastIndexOf('요'),
- cut.lastIndexOf('!'),
- cut.lastIndexOf('~'),
- cut.lastIndexOf('.')
- )
- text = last > 50 ? cut.slice(0, last + 1) : cut
- }
-
- // ── 공백 정리 (정규식 미사용) ─────────────────────────────────
- while (text.indexOf(' ') >= 0) text = text.split(' ').join(' ')
- while (text.indexOf('..') >= 0) text = text.split('..').join('.')
- text = text.split(' ,').join(',').split(' .').join('.')
-
- return text.trim()
 }

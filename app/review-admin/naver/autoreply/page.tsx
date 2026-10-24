@@ -270,7 +270,7 @@ export default function NaverAutoReplyPage() {
  <textarea
  value={editText}
  onChange={e => setEditText(e.target.value)}
- className="w-full text-sm text-[#1A1A2E] bg-[#EEF4FF] border border-[#3182F6]/30 rounded-xl px-3 py-2.5 resize-none leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#3182F6]/30"
+ className="w-full text-base md:text-sm text-[#1A1A2E] bg-[#EEF4FF] border border-[#3182F6]/30 rounded-xl px-3 py-2.5 resize-none leading-relaxed focus:outline-none focus:ring-2 focus:ring-[#3182F6]/30"
  rows={5}
  />
  ) : (
@@ -382,7 +382,7 @@ export default function NaverAutoReplyPage() {
  </div>
  <button
  onClick={() => setSettingsDraft(prev => prev ? { ...prev, enabled: !prev.enabled } : prev)}
- className={`relative w-12 h-6 rounded-full transition-colors ${
+ className={`relative shrink-0 min-h-0 w-12 h-6 rounded-full transition-colors ${
  settingsDraft.enabled ? 'bg-[#3182F6]' : 'bg-[#D1D5DB]'
  }`}
  >
@@ -447,7 +447,7 @@ export default function NaverAutoReplyPage() {
  </div>
  <button
  onClick={() => setSettingsDraft(prev => prev ? { ...prev, auto_approve: !prev.auto_approve } : prev)}
- className={`relative shrink-0 w-12 h-6 rounded-full transition-colors ${
+ className={`relative shrink-0 min-h-0 w-12 h-6 rounded-full transition-colors ${
  settingsDraft.auto_approve ? 'bg-amber-500' : 'bg-[#D1D5DB]'
  }`}
  >
@@ -555,7 +555,7 @@ export default function NaverAutoReplyPage() {
 
  {/* 탭 콘텐츠 */}
  {tab === 'settings' ? (
- <SettingsTab />
+ SettingsTab()
  ) : (
  <>
  {loading ? (
@@ -578,7 +578,8 @@ export default function NaverAutoReplyPage() {
  </div>
  ) : (
  <div className="space-y-3">
- {reviews.map(rev => <ReviewCard key={rev.id} rev={rev} />)}
+ {/* 함수로 호출: 렌더마다 새 컴포넌트 타입이 되면 입력 중 textarea 가 다시 마운트돼 포커스 · 키보드가 닫힌다 */}
+ {reviews.map(rev => <div key={rev.id}>{ReviewCard({ rev })}</div>)}
  </div>
  )}
  </>

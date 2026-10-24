@@ -43,7 +43,8 @@ export default function QuickSlot() {
 
  useEffect(() => { setOpen(false) }, [pathname])
 
- if (pathname === '/login' || pathname === '/dashboard') return null
+ // 손님 QR 리뷰 화면(/review/[storeId])에는 사장님용 빠른 이동 버튼을 띄우지 않는다
+ if (pathname === '/login' || pathname === '/dashboard' || pathname?.startsWith('/review/')) return null
 
  return (
  // 2026-04-19 모바일 우측 터치 불가 수정

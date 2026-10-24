@@ -11,6 +11,7 @@ const HIDE_PREFIXES = [
  '/signup',
  '/signin',
  '/onboarding',
+ '/review', // 손님 QR 리뷰 화면 (/review/[storeId]) — 사장님 폰으로 열어도 하단 탭이 버튼을 가리지 않게
 ]
 const HIDE_EXACT = ['/', '/pricing', '/about', '/terms', '/privacy']
 

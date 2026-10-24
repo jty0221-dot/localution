@@ -45,6 +45,7 @@ const EXCLUDE_PREFIXES = [
  '/login', '/signup', '/auth', '/onboarding', '/locked',
  '/help/videos', // 설명 영상과 단계를 가리지 않도록 제외
  '/updates', // 업데이트 내역 본인 페이지에선 이중 노출 금지
+ '/review', // 손님 QR 리뷰 화면 (/review/[storeId]) — 손님에게 사장님용 업데이트 팝업 금지
 ]
 const EXCLUDE_EXACT = new Set<string>(['/', '/privacy', '/terms'])
 

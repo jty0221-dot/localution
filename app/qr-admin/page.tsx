@@ -78,10 +78,10 @@ const DEFAULT_STORE: StoreInfo = {
 }
 
 const PURPOSE_OPTIONS = [
- { value: 'review', label: '리뷰 유도', icon: 'Star', desc: '네이버·구글 리뷰 작성' },
- { value: 'menu', label: '디지털 메뉴', icon: 'ClipboardList', desc: 'QR로 메뉴판 연결' },
- { value: 'event', label: '쿠폰·이벤트', icon: 'Gift', desc: '할인 쿠폰 / 이벤트 페이지' },
- { value: 'sns', label: 'SNS 팔로우', icon: 'Camera', desc: '인스타·카카오 연결' },
+ { value: 'review', label: '리뷰 유도', icon: Star, desc: '네이버·구글 리뷰 작성' },
+ { value: 'menu', label: '디지털 메뉴', icon: ClipboardList, desc: 'QR로 메뉴판 연결' },
+ { value: 'event', label: '쿠폰·이벤트', icon: Gift, desc: '할인 쿠폰 / 이벤트 페이지' },
+ { value: 'sns', label: 'SNS 팔로우', icon: Camera, desc: '인스타·카카오 연결' },
 ]
 
 // ─── 리뷰 URL 생성 (2-A: stores.slug 기반) ────────────────────────
@@ -1119,12 +1119,12 @@ export default function QRAdmin() {
  ) : qrList.map((qr, i) => {
  const purposeOpt = PURPOSE_OPTIONS.find(p => p.value === qr.purpose)
  return (
- <div key={qr.id} className="flex items-center justify-between p-3.5 rounded-[6px] bg-[var(--lu-canvas)]">
+ <div key={qr.id} className="flex items-center justify-between gap-2 p-3.5 rounded-[6px] bg-[var(--lu-canvas)]">
  <div className="flex items-center gap-3">
  <span className={`text-xs font-bold w-5 ${i === 0 ? 'text-[#D97706]' : 'text-[var(--lu-muted)]'}`}>{i + 1}</span>
  <div>
  <p className="text-sm font-semibold text-[var(--lu-ink)]">{qr.name}</p>
- <p className="text-xs text-[var(--lu-muted)]">{purposeOpt?.icon} {purposeOpt?.label} · {qr.createdAt}</p>
+ <p className="text-xs text-[var(--lu-muted)] inline-flex items-center gap-1">{purposeOpt && <purposeOpt.icon size={12} strokeWidth={2.5} aria-hidden="true" />} {purposeOpt?.label} · {qr.createdAt}</p>
  </div>
  </div>
  <div className="flex items-center gap-2">
@@ -1211,7 +1211,7 @@ export default function QRAdmin() {
  {/* ── 새 QR 만들기 모달 ── */}
  {showCreate && (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
- <div ref={createDialogRef} role="dialog" aria-modal="true" aria-labelledby="qr-create-title" tabIndex={-1} className="bg-white rounded-[10px] w-full max-w-md shadow-2xl">
+ <div ref={createDialogRef} role="dialog" aria-modal="true" aria-labelledby="qr-create-title" tabIndex={-1} className="bg-white rounded-[10px] w-full max-w-md shadow-2xl max-h-[90dvh] overflow-y-auto">
  <div className="flex items-center justify-between p-6 border-b border-[var(--lu-canvas)]">
  <h2 id="qr-create-title" className="text-lg font-bold text-[var(--lu-ink)]">새 QR 코드 만들기</h2>
  <button aria-label="QR 만들기 닫기" disabled={creating} onClick={() => setShowCreate(false)} className="min-h-11 text-[var(--lu-muted)] hover:text-[var(--lu-ink)] text-2xl leading-none">×</button>
@@ -1235,7 +1235,7 @@ export default function QRAdmin() {
  className={`p-3.5 rounded-[6px] border-2 text-left transition-colors ${
  newQR.purpose === opt.value ? 'border-[var(--lu-accent)] bg-[var(--lu-accent-soft)]' : 'border-[var(--lu-line)] hover:border-[var(--lu-accent)]'
  }`}>
- <div className="text-xl mb-1">{opt.icon}</div>
+ <div className="mb-1 text-[var(--lu-accent)]"><opt.icon size={20} strokeWidth={2.25} aria-hidden="true" /></div>
  <div className="text-sm font-semibold text-[var(--lu-ink)]">{opt.label}</div>
  <div className="text-xs text-[var(--lu-muted)] mt-0.5">{opt.desc}</div>
  </button>
@@ -1278,7 +1278,7 @@ export default function QRAdmin() {
  {/* ── QR 미리보기·다운로드 모달 ── */}
  {previewQR && (
  <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50">
- <div ref={previewDialogRef} role="dialog" aria-modal="true" aria-labelledby="qr-preview-title" tabIndex={-1} className="bg-white rounded-[10px] w-full max-w-sm shadow-2xl">
+ <div ref={previewDialogRef} role="dialog" aria-modal="true" aria-labelledby="qr-preview-title" tabIndex={-1} className="bg-white rounded-[10px] w-full max-w-sm shadow-2xl max-h-[90dvh] overflow-y-auto">
  <div className="flex items-center justify-between p-6 border-b border-[var(--lu-canvas)]">
  <h2 id="qr-preview-title" className="font-bold text-[var(--lu-ink)]">{previewQR.name}</h2>
  <button aria-label="QR 미리보기 닫기" onClick={() => setPreviewQR(null)} className="min-h-11 text-[var(--lu-muted)] hover:text-[var(--lu-ink)] text-2xl leading-none">×</button>

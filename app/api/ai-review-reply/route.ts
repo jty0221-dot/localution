@@ -121,7 +121,8 @@ function stripArtifacts(text: string, dropEmoji: boolean): string {
  }
  out = cleaned
  }
- while (out.indexOf(' ') !== -1) out = out.split(' ').join(' ')
+ // 연속 공백 → 한 칸 (예전 일괄 치환으로 '한 칸→한 칸' 무한 반복이 됐던 줄)
+ out = out.replace(/ {2,}/g, ' ')
  return out.trim()
 }
 

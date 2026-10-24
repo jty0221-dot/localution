@@ -58,7 +58,8 @@ export async function GET(request: Request) {
     const signed = signCookie({
       id: String(userData.id),
       name: profile.nickname || 'User',
-      email: kakaoAccount.email || '',
+      // SEC-L05: 관리자 판정이 이메일이라, 카카오가 인증·유효를 확인한 이메일만 싣는다
+      email: kakaoAccount.is_email_verified && kakaoAccount.is_email_valid ? (kakaoAccount.email || '') : '',
       provider: 'kakao',
     })
     cookieStore.set('localution_user', signed, { ...opts, httpOnly: true })

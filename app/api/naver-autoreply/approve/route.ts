@@ -6,7 +6,7 @@
 // · BullMQ에 post_reply 잡 투입
 //
 // DELETE { review_id }
-// · 초안 무시 (draft_reply 클리어, reply_status → null)
+// · 초안 무시 (draft_reply 클리어, reply_status → 'rejected' · 2026-10-24 CHECK 에 추가)
 // ============================================================
 import { NextRequest, NextResponse } from 'next/server'
 import { requireUser } from '@/app/lib/userAuth'
@@ -29,7 +29,7 @@ export async function POST(req: NextRequest) {
  // 리뷰 검증
  const { data: rev, error: revErr } = await svc
  .from('platform_reviews')
- .select('id, platform_review_id, draft_reply, reply_status, user_id')
+ .select('id, platform_review_id, platform_store_id, draft_reply, reply_status, user_id')
  .eq('id', reviewId)
  .eq('user_id', auth.userId)
  .maybeSingle()
@@ -49,12 +49,14 @@ export async function POST(req: NextRequest) {
  if (!replyText) return NextResponse.json({ error: '답글 내용이 없습니다.' }, { status: 400 })
 
  // 자격 증명에서 biz_id 조회
- const { data: credRow } = await svc
+ // 매장이 여럿이면 maybeSingle 이 오류로 null 이 되므로, 리뷰의 매장과 같은 연결을 고른다
+ const { data: creds } = await svc
  .from('platform_credentials')
  .select('extra_data, platform_store_id')
  .eq('user_id', auth.userId)
  .eq('platform', 'naver_place')
- .maybeSingle()
+ .limit(10)
+ const credRow = creds?.find(c => rev.platform_store_id && c.platform_store_id === rev.platform_store_id) || creds?.[0] || null
 
  const extra = (credRow?.extra_data as Record<string, unknown>) || {}
  const bizId: string | null =
@@ -67,10 +69,10 @@ export async function POST(req: NextRequest) {
  .eq('user_id', auth.userId)
  .limit(1)
  .maybeSingle()
- const storeId: string = storeRow?.id || auth.userId
+ const storeId: string = rev.platform_store_id || storeRow?.id || auth.userId
 
- // DB 업데이트 (queued)
- await svc
+ // DB 업데이트 (queued) — 본인 행이고 아직 대기 전일 때만. 두 번 눌러도 한 번만 넘어간다
+ const { data: claimed } = await svc
  .from('platform_reviews')
  .update({
  draft_reply: replyText,
@@ -78,6 +80,10 @@ export async function POST(req: NextRequest) {
  reply_queued_at: new Date().toISOString(),
  })
  .eq('id', reviewId)
+ .eq('user_id', auth.userId)
+ .in('reply_status', ['none', 'draft', 'failed', 'rejected'])
+ .select('id')
+ if (!claimed?.length) return NextResponse.json({ error: '이미 처리 중이거나 게시된 답글입니다.' }, { status: 409 })
 
  // BullMQ 투입
  const enqResult = await enqueuePlatformJob({

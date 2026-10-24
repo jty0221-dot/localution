@@ -578,7 +578,7 @@ function SidebarContent() {
 
  {mobileOpen && <div className="md:hidden fixed inset-0 bg-black/30 z-30" onClick={() => setMobileOpen(false)} />}
 
- <aside className={"fixed top-0 left-0 h-screen pt-safe w-[220px] bg-[#F3F5F4] border-r border-[#D5DEDC] z-40 flex flex-col transition-transform duration-300 " + (mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0')}>
+ <aside className={"fixed top-0 left-0 h-[100dvh] pt-safe w-[220px] bg-[#F3F5F4] border-r border-[#D5DEDC] z-40 max-md:z-[45] flex flex-col transition-transform duration-300 " + (mobileOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0')}>
  {/* 로고 */}
  <div className="px-5 py-5 border-b border-[#F3F5F4]">
  <Link href="/" className="block">

@@ -423,7 +423,7 @@ function ConnectModal({ platform, initialUrl, isConnected, savedStoreName, onClo
 
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true" aria-label="플랫폼 연결 모달">
- <div className="bg-white rounded-[10px] shadow-2xl max-w-md w-full p-6" onClick={e => e.stopPropagation()}>
+ <div className="bg-white rounded-[10px] shadow-2xl max-w-md w-full p-5 md:p-6 max-h-[90dvh] overflow-y-auto" onClick={e => e.stopPropagation()}>
  <div className="flex items-center gap-3 mb-4">
  {platform.logo(40)}
  <div className="flex-1">
@@ -453,7 +453,7 @@ function ConnectModal({ platform, initialUrl, isConnected, savedStoreName, onClo
  value={url}
  onChange={e => setUrl(e.target.value)}
  placeholder={placeholder}
- className="w-full px-3 py-2.5 border border-[var(--lu-line)] rounded-[6px] text-sm focus:border-[var(--lu-accent)] focus:outline-none mb-3"
+ className="w-full px-3 py-2.5 border border-[var(--lu-line)] rounded-[6px] text-base md:text-sm focus:border-[var(--lu-accent)] focus:outline-none mb-3"
  />
 
  <button
@@ -610,7 +610,7 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
 
  return (
  <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4" onClick={onClose} role="dialog" aria-modal="true" aria-labelledby="ai-reply-modal-title">
- <div className="bg-white rounded-[10px] shadow-2xl max-w-2xl w-full p-6" onClick={e => e.stopPropagation()}>
+ <div className="bg-white rounded-[10px] shadow-2xl max-w-2xl w-full p-5 md:p-6 max-h-[90dvh] overflow-y-auto" onClick={e => e.stopPropagation()}>
  <div className="flex items-center justify-between mb-4">
  <h3 id="ai-reply-modal-title" className="text-lg font-semibold text-[var(--lu-ink)]">AI 답글 생성</h3>
  <button onClick={onClose} aria-label="모달 닫기" className="min-h-11 text-[var(--lu-muted)] hover:text-[var(--lu-ink)] w-7 h-7 rounded-lg flex items-center justify-center hover:bg-[var(--lu-canvas)] transition-colors">
@@ -647,7 +647,7 @@ function AIReplyModal({ review, onClose }: ReplyModalProps) {
  value={reply}
  onChange={e => setReply(e.target.value)}
  rows={8}
- className="w-full px-3 py-2.5 border border-[var(--lu-line)] rounded-[6px] text-sm focus:border-[var(--lu-accent)] focus:outline-none resize-none"
+ className="w-full px-3 py-2.5 border border-[var(--lu-line)] rounded-[6px] text-base md:text-sm focus:border-[var(--lu-accent)] focus:outline-none resize-none"
  />
  )}
 

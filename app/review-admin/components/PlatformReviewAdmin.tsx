@@ -1025,7 +1025,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
 
  {/* 통계 카드 */}
  {connected && (
- <div className="grid grid-cols-4 gap-3 mb-5">
+ <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
  <div className="bg-white rounded-[10px] p-4 border border-[var(--lu-line)]">
  <p className="text-[11px] text-[var(--lu-muted)] font-medium mb-1">총 리뷰</p>
  <p className="text-xl font-semibold text-[var(--lu-ink)]">{agg.review_count}건</p>
@@ -1441,7 +1441,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  onChange={(e) => setCustomPrompt(e.target.value)}
  onBlur={() => { try { localStorage.setItem(CUSTOM_PROMPT_KEY, customPrompt) } catch {} }}
  placeholder={"예) 정성스러운 한식당 사장님처럼 소박한 말투. 메뉴 칭찬 + 재방문 유도. \"이모티콘 절대 금지\""}
- className="w-full rounded-md border border-[#E9D5FF] bg-white p-2 text-[12px] text-[var(--lu-ink)] focus:outline-none focus:ring-2 focus:ring-[#7C3AED40] resize-y min-h-[60px]"
+ className="w-full rounded-md border border-[#E9D5FF] bg-white p-2 text-base md:text-[12px] text-[var(--lu-ink)] focus:outline-none focus:ring-2 focus:ring-[#7C3AED40] resize-y min-h-[60px]"
  />
  <p className="text-[10px] text-[var(--lu-muted)] mt-1">
  {customPrompt.length}자 · 아래 '기본값으로 저장' 을 누르면 계정에 저장돼요
@@ -1528,7 +1528,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  value={draftText}
  onChange={(e) => setDraftText(e.target.value)}
  disabled={isQueued || isSubmitted || submitting}
- className="w-full rounded-lg border border-[var(--lu-line)] p-2.5 text-sm text-[var(--lu-ink)] bg-white focus:outline-none focus:ring-2 leading-relaxed resize-y min-h-[120px] disabled:bg-[#F9FAFB]"
+ className="w-full rounded-lg border border-[var(--lu-line)] p-2.5 text-base md:text-sm text-[var(--lu-ink)] bg-white focus:outline-none focus:ring-2 leading-relaxed resize-y min-h-[120px] disabled:bg-[#F9FAFB]"
  style={{ ['--tw-ring-color' as any]: config.color + '40' }}
  placeholder="AI 초안이 여기에 나타나요..."
  />
@@ -1795,7 +1795,7 @@ export default function PlatformReviewAdmin({ config }: { config: PlatformConfig
  onClick={() => setExpiredInfoOpen(false)}
  >
  <div
- className="bg-white rounded-[10px] shadow-xl max-w-md w-full overflow-hidden"
+ className="bg-white rounded-[10px] shadow-xl max-w-md w-full max-h-[90dvh] overflow-y-auto"
  onClick={(e) => e.stopPropagation()}
  >
  <div className="px-5 py-4 border-b border-[var(--lu-canvas)] flex items-center justify-between">

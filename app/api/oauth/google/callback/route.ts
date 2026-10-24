@@ -56,7 +56,8 @@ export async function GET(request: Request) {
     const signed = signCookie({
       id: userData.id,
       name: userData.name || 'User',
-      email: userData.email || '',
+      // SEC-L05: 관리자 판정이 이메일이라, 구글이 인증한 이메일만 싣는다
+      email: userData.verified_email ? (userData.email || '') : '',
       provider: 'google',
     })
     cookieStore.set('localution_user', signed, { ...opts, httpOnly: true })

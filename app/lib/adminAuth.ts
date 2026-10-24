@@ -124,7 +124,10 @@ export async function requireAdmin(): Promise<AdminResult> {
       return { ok: false, status: 401, message: '토큰 검증 실패' }
     }
     const email = data.user.email.toLowerCase()
-    if (!isAdminEmail(email)) {
+    // SEC-L05: 공개 가입(이메일·비밀번호)은 이메일 확인 설정에 따라 바로 '확인됨'이 될 수 있어
+    //   화이트리스트 이메일을 누구나 선점할 수 있다 → 이메일 가입 계정은 관리자로 인정하지 않는다.
+    const provider = String((data.user.app_metadata as any)?.provider || 'email')
+    if (!isAdminEmail(email) || !data.user.email_confirmed_at || provider === 'email') {
       return { ok: false, status: 403, message: '관리자 권한이 없습니다.' }
     }
     return { ok: true, email, userId: data.user.id, source: 'supabase' }

@@ -86,7 +86,8 @@ export async function enqueuePlatformJob(
         const existing = await q.getJob(jobId)
         if (existing) {
           const state = await existing.getState()
-          if (state === 'completed' || state === 'failed' || state === 'unknown') {
+          // completed 는 지우지 않는다: 이미 게시된 답글인데 상태 저장만 실패한 행을 정리 크론이 다시 넣으면 두 번 게시된다
+          if (state === 'failed' || state === 'unknown') {
             await existing.remove()
           }
         }

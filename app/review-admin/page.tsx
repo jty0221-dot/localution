@@ -275,20 +275,20 @@ export default function ReviewAdminHub() {
  {statsReady && statsError && <p role="status" className="mb-3 text-sm text-[#4E5968]">현재 연결 상태와 다를 수 있어요.</p>}
  {/* ─── 요약 통계 ─── */}
  <div className="grid grid-cols-3 gap-3 md:gap-4 mb-6">
- <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB]">
+ <div className="bg-white rounded-2xl p-3 md:p-5 border border-[#E5E8EB] min-w-0">
  <p className="text-[11px] md:text-xs text-[#8B95A1] font-medium mb-1">활성 플랫폼</p>
- <p className="text-xl md:text-2xl font-black text-[#191F28]">
+ <p className="text-lg md:text-2xl font-black break-keep text-[#191F28]">
  {statsReady ? activeCount : '확인 전'}<span className="text-sm text-[#8B95A1] font-medium">/{ALL_PLATFORMS.length}</span>
  </p>
  </div>
- <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB]">
+ <div className="bg-white rounded-2xl p-3 md:p-5 border border-[#E5E8EB] min-w-0">
  <p className="text-[11px] md:text-xs text-[#8B95A1] font-medium mb-1">전체 리뷰</p>
- <p className="text-xl md:text-2xl font-black text-[#191F28] tabular-nums">{statsReady ? formatCount(totalReviews) : '확인 전'}</p>
+ <p className="text-lg md:text-2xl font-black break-keep text-[#191F28] tabular-nums">{statsReady ? formatCount(totalReviews) : '확인 전'}</p>
  {statsReady && totalReviews === null && <p className="text-[11px] text-[#8B95A1] mt-0.5">불러오지 못함</p>}
  </div>
- <div className="bg-white rounded-2xl p-4 md:p-5 border border-[#E5E8EB]">
+ <div className="bg-white rounded-2xl p-3 md:p-5 border border-[#E5E8EB] min-w-0">
  <p className="text-[11px] md:text-xs text-[#8B95A1] font-medium mb-1">답글 안 단 리뷰</p>
- <p className="text-xl md:text-2xl font-black text-[#F59E0B] tabular-nums">{statsReady ? formatCount(totalUnreplied) : '확인 전'}</p>
+ <p className="text-lg md:text-2xl font-black break-keep text-[#F59E0B] tabular-nums">{statsReady ? formatCount(totalUnreplied) : '확인 전'}</p>
  {statsReady && totalUnreplied === null && <p className="text-[11px] text-[#8B95A1] mt-0.5">불러오지 못함</p>}
  </div>
  </div>
