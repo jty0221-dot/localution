@@ -22,7 +22,7 @@ const GAP_MS = 500
 type Target = {
  user_id: string
  place_id: string
- source: 'platform_credentials' | 'place_targets'
+ source: 'platform_credentials' | 'place_targets' | 'stores'
  category?: string | null
 }
 
@@ -85,6 +85,26 @@ export async function GET(req: NextRequest) {
  source: 'platform_credentials',
  })
  }
+ }
+ }
+ } catch (_) {}
+
+ // 자격 행의 platform_store_id 가 비어 있으면(재저장 때 지워진 경우) stores.naver_place_id 로 대신한다
+ try {
+ const { data: blank } = await svc
+ .from('platform_credentials')
+ .select('user_id')
+ .eq('platform', 'naver_place')
+ .is('platform_store_id', null)
+ .limit(MAX_USERS_PER_RUN)
+ const ids = Array.from(new Set((blank || []).map((r: { user_id: string }) => r.user_id)))
+ if (ids.length) {
+ const { data: st } = await svc.from('stores').select('user_id, naver_place_id').in('user_id', ids)
+ for (const s of (st || []) as Array<{ user_id: string; naver_place_id: string | null }>) {
+ const pid = String(s.naver_place_id || '')
+ if (!/^\d+$/.test(pid)) continue
+ const k = `${s.user_id}|${pid}`
+ if (!targetMap.has(k)) targetMap.set(k, { user_id: s.user_id, place_id: pid, source: 'stores' })
  }
  }
  } catch (_) {}
@@ -181,14 +201,16 @@ export async function GET(req: NextRequest) {
  upserted: 0,
  })
  } else {
- const rows = reviews.map((r) => ({
+ // 이미 있는 리뷰는 다시 쓰지 않는다: has_reply 를 false 로 덮어 답글 단 리뷰에 초안이 다시 생기는 것을 막는다
+ const rows = reviews.filter(r => !knownReviewIds.has(r.reviewId)).map((r) => ({
  user_id: t.user_id,
  platform: 'naver_place' as const,
  platform_store_id: t.place_id,
  platform_review_id: r.reviewId,
  author_name: r.authorName ?? null,
  author_mask: maskAuthor(r.authorName),
- rating: typeof r.rating === 'number' && r.rating >= 1 && r.rating <= 5 ? r.rating : null,
+ // rating 칸은 smallint — 3.5 같은 소수 하나가 50건 묶음 저장 전체를 실패시켰다
+ rating: typeof r.rating === 'number' && r.rating >= 1 && r.rating <= 5 ? Math.round(r.rating) : null,
  content: r.body,
  photos: r.photos.length > 0 ? r.photos : null,
  posted_at: parseDateSafely(r.postedAt) || parseDateSafely(r.visitedAt),
@@ -202,6 +224,7 @@ export async function GET(req: NextRequest) {
  .upsert(rows, { onConflict: 'platform,platform_review_id', ignoreDuplicates: false })
  .select('platform_review_id')
  if (upErr) {
+ console.error(`[naver-reviews-fetch] upsert 실패 user=${t.user_id.slice(0, 8)} place=${t.place_id}: ${upErr.message}`)
  failUsers += 1
  results.push({
  user_id: t.user_id,
